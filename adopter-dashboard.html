@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — Adopter Dashboard</title>
+  <meta name="description" content="ATAMAN Tree Monitoring System — Adopter Impact Dashboard." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- Adopter Dashboard Styles -->
+  <link rel="stylesheet" href="adopter-dashboard.css?v=20261001_hover_fix" />
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════ SIDEBAR ══════════════════════════════════ -->
+  <aside class="ad-sidebar" id="sidebar">
+
+    <!-- Logo -->
+    <div class="ad-logo-wrap">
+      <div class="ad-brand-logo">
+        <svg class="ad-brand-icon" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="22" stroke="#22c55e" stroke-width="2.5" fill="#0c381e" />
+          <path d="M24 38V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" />
+          <path d="M24 24C24 16 16 16 14 16C14 24 22 24 24 24Z" stroke="#4ade80" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M24 18C24 10 32 10 34 10C34 18 26 18 24 18Z" stroke="#4ade80" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M24 30C24 22 34 22 36 22C36 30 26 30 24 30Z" stroke="#4ade80" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M14 38H34" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+        <div class="ad-brand-text">
+          <span class="ad-brand-name">ATAMAN</span>
+          <span class="ad-brand-tag">Tanom. Ataman. Padayon.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation List -->
+    <nav class="ad-nav">
+      <ul class="ad-nav-list">
+
+        <!-- 1. Dashboard (Active) -->
+        <li class="ad-nav-item active">
+          <a href="adopter-dashboard.html" class="ad-nav-link">
+            <svg class="ad-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <!-- 2. Tree Map -->
+        <li class="ad-nav-item">
+          <a href="#" class="ad-nav-link" id="navTreeMap">
+            <svg class="ad-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <!-- 3. My Trees -->
+        <li class="ad-nav-item">
+          <a href="my-trees.html?role=adopter" class="ad-nav-link" id="navMyTrees">
+            <svg class="ad-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span>My Trees</span>
+          </a>
+        </li>
+
+        <!-- 4. Adoption -->
+        <li class="ad-nav-item">
+          <a href="#" class="ad-nav-link" id="navAdoption">
+            <svg class="ad-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+            <span>Adoption</span>
+          </a>
+        </li>
+
+        <!-- 5. Reports -->
+        <li class="ad-nav-item">
+          <a href="#" class="ad-nav-link" id="navReports">
+            <svg class="ad-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <!-- 6. Impact -->
+        <li class="ad-nav-item">
+          <a href="#" class="ad-nav-link" id="navImpact">
+            <svg class="ad-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="m15 9-6 6" />
+              <path d="M9 9h6v6" />
+            </svg>
+            <span>Impact</span>
+          </a>
+        </li>
+
+        <!-- 7. Messages -->
+        <li class="ad-nav-item">
+          <a href="#" class="ad-nav-link" id="navMessages">
+            <svg class="ad-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Messages</span>
+          </a>
+        </li>
+
+        <!-- 8. Events -->
+        <li class="ad-nav-item">
+          <a href="#" class="ad-nav-link" id="navEvents">
+            <svg class="ad-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+              <line x1="16" x2="16" y1="2" y2="6" />
+              <line x1="8" x2="8" y1="2" y2="6" />
+              <line x1="3" x2="21" y1="10" y2="10" />
+            </svg>
+            <span>Events</span>
+          </a>
+        </li>
+
+        <!-- 9. Rewards -->
+        <li class="ad-nav-item">
+          <a href="#" class="ad-nav-link" id="navRewards">
+            <svg class="ad-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+              <path d="M4 22h16" />
+              <path
+                d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34" />
+              <path d="M18 4H6v7a6 6 0 0 0 12 0V4Z" />
+            </svg>
+            <span>Rewards</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ════════════════════════════════ MAIN CONTENT WRAPPER ════════════════════════════════ -->
+  <div class="ad-main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="ad-header">
+      <div class="ad-header-left">
+        <h1 class="ad-dash-title">Dashboard</h1>
+        <p class="ad-dash-subtitle">Welcome back, <span id="hdrUserName">Adopter</span>! <span
+            class="sprout-emoji">🌱</span></p>
+        <p class="ad-dash-tagline">Together, we grow a greener tomorrow.</p>
+      </div>
+
+      <div class="ad-header-right">
+        <!-- Location Dropdown Pill -->
+        <div class="ad-location-select-wrap">
+          <button class="ad-hdr-pill" type="button" id="adLocSelect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>All Locations</span>
+            <svg class="ad-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Notification Bell -->
+        <button class="ad-hdr-btn" type="button" id="adNotifBtn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="ad-badge-red" style="display:none;">0</span>
+        </button>
+
+        <!-- Live Real-Time Date & Clock Pill -->
+        <button class="ad-hdr-pill ad-date-pill" type="button" id="adDatePill" title="Live Real-Time Date & Clock">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+            <line x1="16" x2="16" y1="2" y2="6" />
+            <line x1="8" x2="8" y1="2" y2="6" />
+            <line x1="3" x2="21" y1="10" y2="10" />
+          </svg>
+          <span id="adLiveDateText">Live Date</span>
+        </button>
+
+        <!-- Adopter User Profile Dropdown Wrapper -->
+        <div class="ad-user-dropdown-wrapper" id="adUserDropdownWrapper">
+          <div class="ad-top-user-profile" id="adUserProfile" role="button" tabindex="0" aria-haspopup="true"
+            aria-expanded="false" aria-label="Open account menu">
+            <div class="ad-user-avatar" id="adUserAvatar">AD</div>
+            <div class="ad-user-info">
+              <span class="ad-user-name" id="adUserName">Adopter</span>
+              <div class="ad-user-role-row">
+                <span class="ad-user-role">Tree Adopter</span>
+              </div>
+            </div>
+            <svg class="ad-user-chevron" id="adUserChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
+
+          <!-- Account Dropdown Popover Menu (Support, Settings, Logout) -->
+          <div class="ad-profile-dropdown hide" id="adProfileDropdown" role="menu">
+            <div class="ad-profile-dd-header">
+              <div class="ad-profile-dd-avatar" id="ddAdUserAvatar">AD</div>
+              <div class="ad-profile-dd-user">
+                <div class="ad-profile-dd-name" id="ddAdUserName">Adopter</div>
+                <div class="ad-user-role-row">
+                  <span class="ad-profile-dd-badge">Tree Adopter</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ad-profile-dd-divider"></div>
+
+            <div class="ad-profile-dd-menu">
+              <!-- Support -->
+              <a href="#" class="ad-profile-dd-item" id="navSupport" role="menuitem">
+                <div class="ad-dd-item-icon ad-dd-icon-support">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+                    <path
+                      d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+                  </svg>
+                </div>
+                <div class="ad-dd-item-text">
+                  <span class="ad-dd-item-title">Support</span>
+                  <span class="ad-dd-item-subtitle">Help center &amp; adopter assistance</span>
+                </div>
+              </a>
+
+              <!-- Settings -->
+              <a href="#" class="ad-profile-dd-item" id="navSettings" role="menuitem">
+                <div class="ad-dd-item-icon ad-dd-icon-settings">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path
+                      d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </div>
+                <div class="ad-dd-item-text">
+                  <span class="ad-dd-item-title">Settings</span>
+                  <span class="ad-dd-item-subtitle">Account &amp; notification preferences</span>
+                </div>
+              </a>
+            </div>
+
+            <div class="ad-profile-dd-divider"></div>
+
+            <!-- Logout -->
+            <div class="ad-profile-dd-footer">
+              <button type="button" class="ad-profile-dd-item ad-dd-logout-item" id="adLogoutBtn" role="menuitem">
+                <div class="ad-dd-item-icon ad-dd-icon-logout">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                </div>
+                <div class="ad-dd-item-text">
+                  <span class="ad-dd-item-title">Logout</span>
+                  <span class="ad-dd-item-subtitle">Sign out of ATAMAN portal</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        <script>
+          (function () {
+            try {
+              var n = localStorage.getItem('ATAMAN_user_name') || 'Adopter';
+              var ini = n.split(' ').filter(Boolean).map(function (w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || 'AD';
+              var elN = document.getElementById('adUserName'); if (elN) elN.textContent = n;
+              var elH = document.getElementById('hdrUserName'); if (elH) elH.textContent = n;
+              var elA = document.getElementById('adUserAvatar'); if (elA) elA.textContent = ini;
+              var elDN = document.getElementById('ddAdUserName'); if (elDN) elDN.textContent = n;
+              var elDA = document.getElementById('ddAdUserAvatar'); if (elDA) elDA.textContent = ini;
+              var elDT = document.getElementById('adLiveDateText');
+              if (elDT) {
+                var now = new Date();
+                elDT.textContent = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' • ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+              }
+            } catch (e) { }
+          })();
+        </script>
+      </div>
+    </header>
+
+    <!-- ── MAIN DASHBOARD BODY ── -->
+    <main class="ad-body">
+
+      <!-- ─── STATS ROW (6 Cards) ─── -->
+      <section class="ad-stats-grid">
+
+        <!-- 1. Total Trees Adopted -->
+        <div class="ad-stat-card">
+          <div class="ad-stat-icon-wrap ico-green-tint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-label">Total Trees Adopted</span>
+            <span class="ad-stat-value" id="adStatTotalTrees">0</span>
+            <span class="ad-stat-change up" id="adStatTotalTreesChange">Your adopted trees</span>
+          </div>
+        </div>
+
+        <!-- 2. Healthy Trees -->
+        <div class="ad-stat-card">
+          <div class="ad-stat-icon-wrap ico-blue-tint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-label">Healthy Trees</span>
+            <span class="ad-stat-value" id="adStatHealthy">0</span>
+            <span class="ad-stat-change neutral" id="adStatHealthyChange">0% of total</span>
+          </div>
+        </div>
+
+        <!-- 3. Needs Care -->
+        <div class="ad-stat-card">
+          <div class="ad-stat-icon-wrap ico-amber-tint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M18 11V6a2 2 0 0 0-4 0v5" />
+              <path d="M14 10V4a2 2 0 0 0-4 0v6" />
+              <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+              <path
+                d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+            </svg>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-label">Needs Care</span>
+            <span class="ad-stat-value" id="adStatNeedsCare">0</span>
+            <span class="ad-stat-change neutral" id="adStatNeedsCareChange">0% of total</span>
+          </div>
+        </div>
+
+        <!-- 4. Critical -->
+        <div class="ad-stat-card">
+          <div class="ad-stat-icon-wrap ico-red-tint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-label">Critical</span>
+            <span class="ad-stat-value" id="adStatCritical">0</span>
+            <span class="ad-stat-change neutral" id="adStatCriticalChange">0% of total</span>
+          </div>
+        </div>
+
+        <!-- 5. Dead Trees -->
+        <div class="ad-stat-card">
+          <div class="ad-stat-icon-wrap ico-gray-tint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M2 22l7-7" />
+              <path d="M16 8c0-2.8-4-8-4-8S8 5.2 8 8a4 4 0 0 0 8 0" />
+              <path d="m12 12-1.5 7.5" />
+              <path d="M14.5 19.5h-5" />
+            </svg>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-label">Dead Trees</span>
+            <span class="ad-stat-value" id="adStatDead">0</span>
+            <span class="ad-stat-change neutral" id="adStatDeadChange">0% of total</span>
+          </div>
+        </div>
+
+        <!-- 6. Total Contribution -->
+        <div class="ad-stat-card">
+          <div class="ad-stat-icon-wrap ico-emerald-tint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-label">Total Contribution</span>
+            <span class="ad-stat-value" id="adStatFunding">₱0</span>
+            <span class="ad-stat-change up" id="adStatFundingStatus">Verified funding</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── MIDDLE ROW: Tree Map Overview + Tree Health Donut ─── -->
+      <section class="ad-mid-grid">
+
+        <!-- Left: Tree Map Overview -->
+        <div class="ad-card">
+          <div class="ad-card-header">
+            <h2 class="ad-card-title">Tree Map Overview</h2>
+            <div class="ad-map-controls">
+              <select class="ad-select" id="adSpeciesSelect">
+                <option>All Species</option>
+                <option>Narra</option>
+                <option>Mahogany</option>
+                <option>Acacia</option>
+                <option>Ipil-Ipil</option>
+              </select>
+              <button class="ad-ctrl-btn" type="button" id="adFilterBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                <span>Filter</span>
+              </button>
+              <button class="ad-icon-btn" type="button" id="adExpandMapBtn" title="Expand Map">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 3 21 3 21 9" />
+                  <polyline points="9 21 3 21 3 15" />
+                  <line x1="21" x2="14" y1="3" y2="10" />
+                  <line x1="3" x2="10" y1="21" y2="14" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="ad-map-container">
+            <div id="adopterMap"></div>
+            <!-- Map Legend -->
+            <div class="ad-map-legend">
+              <div class="leg-row"><span class="leg-dot dot-healthy"></span>Healthy</div>
+              <div class="leg-row"><span class="leg-dot dot-needs"></span>Needs Care</div>
+              <div class="leg-row"><span class="leg-dot dot-critical"></span>Critical</div>
+              <div class="leg-row"><span class="leg-dot dot-dead"></span>Dead</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Tree Health Distribution Donut -->
+        <div class="ad-card">
+          <div class="ad-card-header">
+            <h2 class="ad-card-title">Tree Health Distribution</h2>
+          </div>
+
+          <div class="ad-donut-layout">
+            <div class="ad-donut-chart-wrap">
+              <canvas id="adHealthChart"></canvas>
+              <div class="ad-donut-center-text">
+                <span class="center-number" id="adDonutCenterNum">0</span>
+                <span class="center-label" id="adDonutCenterLbl">Trees</span>
+              </div>
+            </div>
+
+            <div class="ad-health-legend-list">
+              <div class="health-leg-item">
+                <span class="hl-dot bg-green"></span>
+                <div class="hl-text-block">
+                  <strong class="hl-name">Healthy</strong>
+                  <span class="hl-val" id="adLegHealthyVal">0 (0%)</span>
+                </div>
+              </div>
+
+              <div class="health-leg-item">
+                <span class="hl-dot bg-amber"></span>
+                <div class="hl-text-block">
+                  <strong class="hl-name">Needs Care</strong>
+                  <span class="hl-val" id="adLegNeedsVal">0 (0%)</span>
+                </div>
+              </div>
+
+              <div class="health-leg-item">
+                <span class="hl-dot bg-red"></span>
+                <div class="hl-text-block">
+                  <strong class="hl-name">Critical</strong>
+                  <span class="hl-val" id="adLegCriticalVal">0 (0%)</span>
+                </div>
+              </div>
+
+              <div class="health-leg-item">
+                <span class="hl-dot bg-gray"></span>
+                <div class="hl-text-block">
+                  <strong class="hl-name">Dead</strong>
+                  <span class="hl-val" id="adLegDeadVal">0 (0%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── BOTTOM ROW: Recent Activities + Impact Summary + Top Tree Species ─── -->
+      <section class="ad-bot-grid">
+
+        <!-- 1. Recent Activities -->
+        <div class="ad-card">
+          <div class="ad-card-header">
+            <h2 class="ad-card-title">Recent Activities</h2>
+            <a href="#" class="ad-view-all-link">View All</a>
+          </div>
+
+          <div class="ad-activity-list" id="adRecentActivitiesList">
+            <!-- Dynamically populated or clean empty state -->
+          </div>
+        </div>
+
+        <!-- 2. Impact Summary -->
+        <div class="ad-card">
+          <div class="ad-card-header">
+            <h2 class="ad-card-title">Impact Summary</h2>
+            <a href="#" class="ad-view-all-link">View Report</a>
+          </div>
+
+          <div class="ad-impact-grid">
+
+            <!-- 1. Carbon Sequestered -->
+            <div class="ad-impact-card">
+              <div class="ad-impact-ico ico-impact-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+                </svg>
+              </div>
+              <div class="ad-impact-body">
+                <span class="impact-label">Carbon Sequestered</span>
+                <strong class="impact-val" id="adImpactCarbon">0.0 <span class="unit">tCO₂e</span></strong>
+                <span class="impact-chg up" id="adImpactCarbonSub">0 kg CO₂ / yr</span>
+              </div>
+            </div>
+
+            <!-- 2. Estimated Oxygen -->
+            <div class="ad-impact-card">
+              <div class="ad-impact-ico ico-impact-teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                  <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                </svg>
+              </div>
+              <div class="ad-impact-body">
+                <span class="impact-label">Estimated Oxygen</span>
+                <strong class="impact-val" id="adImpactOxygen">0 <span class="unit">kg</span></strong>
+                <span class="impact-chg up" id="adImpactOxygenSub">Produced annually</span>
+              </div>
+            </div>
+
+            <!-- 3. Biodiversity Supported -->
+            <div class="ad-impact-card">
+              <div class="ad-impact-ico ico-impact-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1" />
+                  <path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4" />
+                </svg>
+              </div>
+              <div class="ad-impact-body">
+                <span class="impact-label">Biodiversity Supported</span>
+                <strong class="impact-val" id="adImpactBiodiv">0 <span class="unit">Species</span></strong>
+                <span class="impact-chg up" id="adImpactBiodivSub">Native Philippine species</span>
+              </div>
+            </div>
+
+            <!-- 4. Communities Involved -->
+            <div class="ad-impact-card">
+              <div class="ad-impact-ico ico-impact-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <div class="ad-impact-body">
+                <span class="impact-label">Communities Involved</span>
+                <strong class="impact-val" id="adImpactComm">0 <span class="unit">Communities</span></strong>
+                <span class="impact-chg up" id="adImpactCommSub">Partner barangays</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 3. Top Tree Species -->
+        <div class="ad-card">
+          <div class="ad-card-header">
+            <h2 class="ad-card-title">Top Tree Species</h2>
+            <a href="#" class="ad-view-all-link">View All</a>
+          </div>
+
+          <div class="ad-species-list" id="adTopSpeciesList">
+            <!-- Dynamically populated or clean empty state -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── CALL TO ACTION BANNER (Bottom Row) ─── -->
+      <section class="ad-cta-banner">
+        <div class="cta-left-content">
+          <div class="cta-illustration">
+            <div class="tree-cluster-icon">
+              <svg viewBox="0 0 64 64" fill="none" class="banner-svg">
+                <!-- Trees group -->
+                <circle cx="20" cy="24" r="14" fill="#22c55e" opacity="0.9" />
+                <circle cx="34" cy="18" r="16" fill="#16a34a" opacity="0.95" />
+                <circle cx="48" cy="26" r="12" fill="#15803d" opacity="0.85" />
+                <path d="M20 38v16M34 34v20M48 38v16" stroke="#5a3825" stroke-width="3" stroke-linecap="round" />
+                <!-- People silhouettes -->
+                <circle cx="14" cy="46" r="3" fill="#0f172a" />
+                <path d="M11 54v-4a3 3 0 0 1 6 0v4" fill="#0f172a" />
+                <circle cx="28" cy="44" r="3" fill="#0f172a" />
+                <path d="M25 54v-5a3 3 0 0 1 6 0v5" fill="#0f172a" />
+              </svg>
+            </div>
+          </div>
+          <div class="cta-text">
+            <h3 class="cta-title">Let's make an even bigger impact!</h3>
+            <p class="cta-subtitle">Invite your friends or your company to adopt more trees and help our forests thrive.
+            </p>
+          </div>
+        </div>
+
+        <div class="cta-actions">
+          <button class="btn-adopt-tree" type="button" id="btnAdoptTree">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span>Adopt a Tree</span>
+          </button>
+          <button class="btn-invite-others" type="button" id="btnInviteOthers">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="22" y1="11" x2="16" y2="11" />
+            </svg>
+            <span>Invite Others</span>
+          </button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="ad-toast" id="adToast">
+    <span id="adToastMsg">Action completed</span>
+  </div>
+
+  <!-- Firebase SDK (Compat - Universal) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Adopter Logic -->
+  <script src="adopter-dashboard.js?v=20260929_clean"></script>
+  <!-- Connectivity Guard & Native Mobile Browser Escape Engine -->
+  <script src="ataman-connectivity.js"></script>
+  <!-- PWA Service Worker Registration & Project Updates -->
+  <script src="pwa-register.js" defer></script>
+</body>
+
+</html>

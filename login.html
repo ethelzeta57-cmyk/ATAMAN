@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN - Sign In</title>
+  <meta name="description" content="Sign in to your ATAMAN account." />
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+    rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- PWA Manifest & Mobile Capability Tags -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#166534" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ATAMAN" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon-512.png" />
+
+  <style>
+    :root {
+      --lv-green: #11592c;
+      --lv-green-hover: #0c4622;
+      --lv-green-active: #083317;
+      --lv-focus-ring: 0 0 0 3px rgba(17, 89, 44, 0.18);
+      --lv-input-radius: 8px;
+      --lv-btn-radius: 50px;
+      --lv-border: #b8c1c7;
+      --lv-border-focus: #11592c;
+    }
+
+    /* ─── Reset ─────────────────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f4f6f3;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* ── Page wrapper ── */
+    .lv-page {
+      position: relative;
+      height: 100%;
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.16)), url('assets/Plain.jpg');
+      background-size: cover;
+      background-position: center 25%;
+      background-repeat: no-repeat;
+      padding: clamp(20px, 3.5vh, 44px) clamp(16px, 5vw, 40px) clamp(16px, 2.5vh, 24px);
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    /* ── Center content column ── */
+    .lv-center {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: auto 0;
+      padding: 8px 0;
+    }
+
+    /* ── Logo ── */
+    .lv-logo {
+      height: clamp(84px, 15vw, 115px);
+      width: auto;
+      object-fit: contain;
+      display: block;
+      margin-bottom: clamp(10px, 2.2vh, 16px);
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.08));
+    }
+
+    /* ── Heading ── */
+    .lv-heading {
+      font-size: clamp(22px, 4.5vw, 28px);
+      font-weight: 600;
+      color: #17542d;
+      text-align: center;
+      margin-bottom: clamp(20px, 3.5vh, 28px);
+      letter-spacing: -0.2px;
+    }
+
+    /* ── Form ── */
+    .lv-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .lv-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .lv-label {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #33393f;
+    }
+
+    .lv-field {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .lv-field-icon {
+      position: absolute;
+      left: 13px;
+      width: 17px;
+      height: 17px;
+      color: #9aa1a6;
+      pointer-events: none;
+      flex-shrink: 0;
+      transition: color 0.18s;
+    }
+
+    .lv-field:focus-within .lv-field-icon {
+      color: var(--lv-green);
+    }
+
+    .lv-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 44px 0 42px;
+      font-family: inherit;
+      font-size: 14.5px;
+      color: #1a1e21;
+      background: #ffffff;
+      border: 1px solid var(--lv-border);
+      border-radius: var(--lv-input-radius);
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+
+    .lv-input::placeholder {
+      color: #9aa1a6;
+      font-weight: 400;
+    }
+
+    .lv-input:focus {
+      border-color: var(--lv-border-focus);
+      box-shadow: var(--lv-focus-ring);
+    }
+
+    /* Eye toggle */
+    .lv-eye-btn {
+      position: absolute;
+      right: 11px;
+      background: none;
+      border: none;
+      padding: 6px;
+      cursor: pointer;
+      color: #9aa1a6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      outline: none;
+      transition: color 0.18s, background 0.18s;
+    }
+
+    .lv-eye-btn:hover {
+      color: #4b5563;
+      background: #f3f4f6;
+    }
+
+    .lv-eye-icon {
+      width: 19px;
+      height: 19px;
+    }
+
+    /* ── Remember + Forgot row ── */
+    .lv-form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 2px;
+    }
+
+    .lv-remember {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .lv-remember input[type=checkbox] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .lv-cb-box {
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid #9aa1a6;
+      border-radius: 4px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.18s;
+    }
+
+    .lv-cb-box svg {
+      width: 10px;
+      height: 10px;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .lv-remember input[type=checkbox]:checked+.lv-cb-box {
+      background: var(--lv-green);
+      border-color: var(--lv-green);
+    }
+
+    .lv-remember input[type=checkbox]:checked+.lv-cb-box svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .lv-cb-text {
+      font-size: 13.5px;
+      font-weight: 400;
+      color: #2b3034;
+    }
+
+    .lv-forgot {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--lv-green);
+      text-decoration: underline;
+      text-underline-offset: 2.5px;
+      transition: color 0.18s;
+    }
+
+    .lv-forgot:hover {
+      color: var(--lv-green-hover);
+    }
+
+    /* ── Sign In button ── */
+    .lv-submit {
+      width: 100%;
+      height: 48px;
+      background: var(--lv-green);
+      color: #fff;
+      font-family: inherit;
+      font-size: 15.5px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--lv-btn-radius);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+      box-shadow: 0 4px 14px rgba(17, 89, 44, 0.30);
+      transition: background 0.2s, transform 0.18s, box-shadow 0.18s;
+      outline: none;
+      letter-spacing: 0.1px;
+    }
+
+    .lv-submit:hover {
+      background: var(--lv-green-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(17, 89, 44, 0.38);
+    }
+
+    .lv-submit:active {
+      transform: translateY(0);
+      background: var(--lv-green-active);
+    }
+
+    /* ── OR divider ── */
+    .lv-or {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin: 18px 0 12px;
+      gap: 12px;
+    }
+
+    .lv-or::before,
+    .lv-or::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    .lv-or-text {
+      font-size: 13.5px;
+      color: #787f85;
+      font-style: italic;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    /* ── Register prompt ── */
+    .lv-register {
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .lv-register-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: #33393f;
+      margin-bottom: 5px;
+    }
+
+    .lv-register-link {
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--lv-green);
+      text-decoration: underline;
+      text-underline-offset: 2.5px;
+      transition: color 0.18s;
+    }
+
+    .lv-register-link:hover {
+      color: var(--lv-green-hover);
+    }
+
+    /* ── Footer ── */
+    .lv-footer {
+      width: 100%;
+      text-align: center;
+      padding: 16px 0 20px;
+      font-size: 12px;
+      color: #7b8389;
+      font-weight: 400;
+      border-top: none;
+      margin-top: auto;
+    }
+
+    /* Spinner */
+    .lv-spinner {
+      width: 17px;
+      height: 17px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .lv-toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #0f172a;
+      color: #fff;
+      padding: 13px 18px;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lv-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .lv-toast-icon {
+      font-size: 17px;
+    }
+
+    .lv-toast-msg {
+      font-size: 13.5px;
+      font-weight: 500;
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .lv-page {
+        padding-top: clamp(24px, 5vh, 40px);
+      }
+
+      .lv-logo {
+        height: clamp(72px, 22vw, 100px);
+      }
+
+      .lv-input {
+        height: 48px;
+        font-size: 14.5px;
+      }
+
+      .lv-submit {
+        height: 50px;
+        font-size: 15px;
+      }
+    }
+
+    @media (max-height: 600px) and (orientation: landscape) {
+      .lv-page {
+        padding-top: 16px;
+        justify-content: flex-start;
+        overflow-y: auto;
+      }
+
+      .lv-logo {
+        height: 64px;
+      }
+
+      .lv-heading {
+        margin-bottom: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN PAGE -->
+  <div class="lv-page">
+
+    <!-- Center content -->
+    <div class="lv-center">
+
+      <!-- Logo -->
+      <img src="assets/ataman-logo-stacked.png" alt="ATAMAN - Tanom. Ataman. Padayon." class="lv-logo" />
+
+      <!-- Heading -->
+      <h1 class="lv-heading">Welcome to ATAMAN</h1>
+
+      <!-- Auth form -->
+      <form class="lv-form" id="authForm" novalidate>
+
+        <!-- Email -->
+        <div class="lv-group">
+          <label for="emailInput" class="lv-label">Email Address</label>
+          <div class="lv-field">
+            <svg class="lv-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <input type="email" id="emailInput" name="email" class="lv-input" placeholder="your.email@example.com"
+              required autocomplete="email" />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="lv-group">
+          <label for="passwordInput" class="lv-label">Password</label>
+          <div class="lv-field">
+            <svg class="lv-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <input type="password" id="passwordInput" name="password" class="lv-input" placeholder="••••••••" required
+              autocomplete="current-password" />
+            <button type="button" class="lv-eye-btn" id="passwordToggle" aria-label="Toggle password visibility"
+              tabindex="-1">
+              <svg class="lv-eye-icon eye-slash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                <line x1="2" x2="22" y1="2" y2="22" />
+              </svg>
+              <svg class="lv-eye-icon eye-open hide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember me + Forgot -->
+        <div class="lv-form-row" id="signInActions">
+          <label class="lv-remember" for="rememberMe">
+            <input type="checkbox" id="rememberMe" name="remember" />
+            <span class="lv-cb-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+            <span class="lv-cb-text">Remember Me</span>
+          </label>
+          <a href="#" class="lv-forgot" id="forgotPasswordBtn">Forgot Password?</a>
+        </div>
+
+        <!-- Sign In button -->
+        <button type="submit" class="lv-submit" id="submitBtn">
+          <span class="lv-spinner hide" id="btnSpinner"></span>
+          <span id="btnText">Sign In</span>
+        </button>
+
+      </form>
+
+      <!-- OR divider -->
+      <div class="lv-or">
+        <span class="lv-or-text">Or</span>
+      </div>
+
+      <!-- Register prompt -->
+      <div class="lv-register">
+        <p class="lv-register-text">New to ATAMAN?</p>
+        <div style="display:flex;gap:10px;justify-content:center;align-items:center;margin-top:6px;font-size:0.92rem;">
+          <a href="register-adopter.html" class="lv-register-link">Register as Adopter</a>
+          <span style="opacity:0.4;">|</span>
+          <a href="register-caretaker.html" class="lv-register-link">Register as Caretaker</a>
+        </div>
+      </div>
+
+    </div><!-- /.lv-center -->
+
+    <!-- Footer -->
+    <footer class="lv-footer">
+      &copy; 2026 ATAMAN(CICTO). All Rights Reserved.
+    </footer>
+
+  </div><!-- /.lv-page -->
+
+  <div class="lv-toast" id="toast">
+    <span class="lv-toast-icon" id="toastIcon">&#127807;</span>
+    <span class="lv-toast-msg" id="toastMessage">Welcome to ATAMAN!</span>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <!-- ATAMAN Internet Connectivity & Mobile Browser Engine -->
+  <script src="ataman-connectivity.js"></script>
+  <script src="app.js"></script>
+  <!-- PWA Service Worker Registration -->
+  <script src="pwa-register.js" defer></script>
+
+</body>
+
+</html>

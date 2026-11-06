@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — My Trees</title>
+  <meta name="description" content="ATAMAN Tree Monitoring System — View and manage the trees assigned to you." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="my-trees.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════ SIDEBAR ══════════════════════════════════ -->
+  <aside class="ct-sidebar" id="sidebar">
+
+    <!-- Logo -->
+    <div class="ct-logo-wrap">
+      <a href="caretaker-dashboard.html" class="ct-brand-logo">
+        <svg class="ct-brand-icon" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="22" stroke="#22c55e" stroke-width="2.5" fill="#0c381e"/>
+          <path d="M24 38V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M24 24C24 16 16 16 14 16C14 24 22 24 24 24Z" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M24 18C24 10 32 10 34 10C34 18 26 18 24 18Z" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M24 30C24 22 34 22 36 22C36 30 26 30 24 30Z" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 38H34" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div class="ct-brand-text">
+          <span class="ct-brand-name">ATAMAN</span>
+          <span class="ct-brand-tag">Tree Monitoring System</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Navigation List -->
+    <nav class="ct-nav">
+      <ul class="ct-nav-list">
+
+        <!-- 1. Dashboard -->
+        <li class="ct-nav-item">
+          <a href="caretaker-dashboard.html" class="ct-nav-link">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <!-- 2. My Trees (Active) -->
+        <li class="ct-nav-item active">
+          <a href="my-trees.html" class="ct-nav-link">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            </svg>
+            <span>My Trees</span>
+          </a>
+        </li>
+
+        <!-- 3. Tree Map -->
+        <li class="ct-nav-item">
+          <a href="caretaker-tree-map.html" class="ct-nav-link">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <!-- 4. Monitoring -->
+        <li class="ct-nav-item">
+          <a href="#" class="ct-nav-link" id="navMonitoring">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span>Monitoring</span>
+          </a>
+        </li>
+
+        <!-- 5. Schedule -->
+        <li class="ct-nav-item">
+          <a href="caretaker-dashboard.html#schedule" class="ct-nav-link" id="navSchedule">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+            <span>Schedule</span>
+          </a>
+        </li>
+
+        <!-- 6. Maintenance -->
+        <li class="ct-nav-item">
+          <a href="#" class="ct-nav-link" id="navMaintenance">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+            <span>Maintenance</span>
+          </a>
+        </li>
+
+        <!-- 7. My Reports -->
+        <li class="ct-nav-item">
+          <a href="caretaker-dashboard.html#reports" class="ct-nav-link" id="navReports">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 20V10"/>
+              <path d="M12 20V4"/>
+              <path d="M6 20v-6"/>
+            </svg>
+            <span>My Reports</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ════════════════════════════════ MAIN CONTENT WRAPPER ════════════════════════════════ -->
+  <div class="ct-main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="ct-header">
+      <div class="ct-header-left">
+        <div class="title-with-icon">
+          <span class="tree-icon-badge">🌳</span>
+          <div>
+            <h1 class="ct-dash-title">My Trees</h1>
+            <p class="ct-dash-subtitle">View and manage the trees assigned to you.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ct-header-right">
+        <!-- Top + Record Monitoring Button -->
+        <button class="btn-top-record" type="button" id="btnTopRecordMon">
+          <span>+ Record Monitoring</span>
+        </button>
+
+        <!-- Notification Icon with Badge -->
+        <button class="ct-hdr-btn" type="button" id="ctNotifBtn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="ct-badge-red" style="display:none;">0</span>
+        </button>
+
+        <!-- Location Badge -->
+        <div class="ct-location-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span>Catbalogan, Samar</span>
+        </div>
+
+        <!-- Live Real-Time Date & Clock Pill -->
+        <div class="ct-location-pill" id="ctLiveDatePill" title="Live Real-Time Date & Clock">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+            <line x1="16" x2="16" y1="2" y2="6"/>
+            <line x1="8" x2="8" y1="2" y2="6"/>
+            <line x1="3" x2="21" y1="10" y2="10"/>
+          </svg>
+          <span id="ctLiveDateText">Live Date</span>
+        </div>
+
+        <!-- Caretaker / Adopter User Profile Dropdown Wrapper -->
+        <div class="ct-user-dropdown-wrapper" id="ctUserDropdownWrapper">
+          <div class="ct-user-pill" id="ctUserDropdown" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">
+            <div class="ct-user-avatar">
+              <span class="avatar-text" id="avatarText">--</span>
+            </div>
+            <div class="ct-user-details">
+              <span class="ct-user-name" id="ctUserName">Account</span>
+              <span class="ct-user-role" id="ctUserRole">Tree Adopter</span>
+            </div>
+            <svg class="ct-chevron" id="ctUserChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </div>
+
+          <!-- Dropdown Popover Menu -->
+          <div class="ct-profile-dropdown hide" id="ctProfileDropdown" role="menu">
+            <div class="ct-profile-dd-header">
+              <div class="ct-profile-dd-avatar">
+                <span class="dd-avatar-text" id="ddAvatarText">--</span>
+              </div>
+              <div class="ct-profile-dd-user">
+                <div class="ct-profile-dd-name" id="ddUserName">Account</div>
+                <div class="ct-profile-dd-badge" id="ddUserRoleBadge">Tree Adopter</div>
+                <div class="ct-profile-dd-location">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  <span>Catbalogan City, Samar</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ct-profile-dd-divider"></div>
+
+            <div class="ct-profile-dd-menu">
+              <!-- Settings Item -->
+              <a href="caretaker-dashboard.html" class="ct-profile-dd-item" id="btnProfileSettings" role="menuitem">
+                <div class="dd-item-icon dd-icon-settings">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                  </svg>
+                </div>
+                <div class="dd-item-text">
+                  <span class="dd-item-title">Settings</span>
+                  <span class="dd-item-subtitle">Preferences & sector profile</span>
+                </div>
+              </a>
+
+              <!-- Caretaker Dashboard Link -->
+              <a href="caretaker-dashboard.html" class="ct-profile-dd-item" role="menuitem">
+                <div class="dd-item-icon dd-icon-trees">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                  </svg>
+                </div>
+                <div class="dd-item-text">
+                  <span class="dd-item-title">Dashboard</span>
+                  <span class="dd-item-subtitle">Back to overview</span>
+                </div>
+              </a>
+            </div>
+
+            <div class="ct-profile-dd-divider"></div>
+
+            <!-- Logout Item -->
+            <div class="ct-profile-dd-footer">
+              <button type="button" class="ct-profile-dd-item dd-logout-item" id="ctLogoutBtn" role="menuitem">
+                <div class="dd-item-icon dd-icon-logout">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" x2="9" y1="12" y2="12"/>
+                  </svg>
+                </div>
+                <div class="dd-item-text">
+                  <span class="dd-item-title">Logout</span>
+                  <span class="dd-item-subtitle">Sign out of ATAMAN portal</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        <script>
+          (function() {
+            try {
+              var n = localStorage.getItem('ATAMAN_user_name') || 'Account';
+              var r = (localStorage.getItem('ATAMAN_user_role') || '').toLowerCase();
+              var isAdp = window.location.search.indexOf('role=adopter') !== -1 || r.indexOf('adopter') !== -1;
+              var ini = n.split(' ').filter(Boolean).map(function(w){ return w[0]; }).join('').toUpperCase().slice(0, 2) || 'AC';
+              var roleTxt = isAdp ? 'Tree Adopter' : 'Field Caretaker';
+              var elN = document.getElementById('ctUserName'); if (elN) elN.textContent = n;
+              var elA = document.getElementById('avatarText'); if (elA) elA.textContent = ini;
+              var elDN = document.getElementById('ddUserName'); if (elDN) elDN.textContent = n;
+              var elDA = document.getElementById('ddAvatarText'); if (elDA) elDA.textContent = ini;
+              var elR = document.getElementById('ctUserRole'); if (elR) elR.textContent = roleTxt;
+              var elDR = document.getElementById('ddUserRoleBadge'); if (elDR) elDR.textContent = roleTxt;
+            } catch (e) {}
+          })();
+        </script>
+      </div>
+    </header>
+
+    <!-- ── MAIN BODY ── -->
+    <main class="ct-body">
+
+      <!-- ─── 1. TOP STATS ROW (6 Cards) ─── -->
+      <section class="mytrees-stats-grid">
+
+        <!-- 1. My Assigned Trees -->
+        <div class="stat-box-card card-green">
+          <div class="s-icon ico-tree">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            </svg>
+          </div>
+          <div class="s-info">
+            <span class="s-label">My Assigned Trees</span>
+            <div class="s-num-row">
+              <span class="s-num" id="cntTotal">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Healthy Trees -->
+        <div class="stat-box-card card-healthy">
+          <div class="s-icon ico-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10" fill="#22c55e" stroke="none"/>
+              <path d="m8 12 3 3 5-5" stroke="#ffffff" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <div class="s-info">
+            <span class="s-label">Healthy</span>
+            <div class="s-num-row">
+              <span class="s-num" id="cntHealthy">0</span>
+              <span class="s-pct" id="pctHealthy">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Needs Care -->
+        <div class="stat-box-card card-needs">
+          <div class="s-icon ico-warn-yellow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="12" r="10" stroke="#f59e0b" fill="#fef3c7"/>
+              <line x1="12" y1="8" x2="12" y2="12" stroke="#d97706" stroke-width="2.5"/>
+              <line x1="12" y1="16" x2="12.01" y2="16" stroke="#d97706" stroke-width="3"/>
+            </svg>
+          </div>
+          <div class="s-info">
+            <span class="s-label">Needs Care</span>
+            <div class="s-num-row">
+              <span class="s-num" id="cntNeeds">0</span>
+              <span class="s-pct" id="pctNeeds">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Critical -->
+        <div class="stat-box-card card-critical">
+          <div class="s-icon ico-warn-red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" fill="#ef4444" stroke="#dc2626"/>
+              <line x1="12" y1="9" x2="12" y2="13" stroke="#ffffff" stroke-width="2.5"/>
+              <line x1="12" y1="17" x2="12.01" y2="17" stroke="#ffffff" stroke-width="3"/>
+            </svg>
+          </div>
+          <div class="s-info">
+            <span class="s-label">Critical</span>
+            <div class="s-num-row">
+              <span class="s-num" id="cntCritical">0</span>
+              <span class="s-pct" id="pctCritical">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Dead -->
+        <div class="stat-box-card card-dead">
+          <div class="s-icon ico-dead-tree">
+            <svg viewBox="0 0 24 24" fill="#64748b">
+              <path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.4 4.8 3.5 6l.5 6h6l.5-6c2.1-1.2 3.5-3.5 3.5-6a7 7 0 0 0-7-7z"/>
+            </svg>
+          </div>
+          <div class="s-info">
+            <span class="s-label">Dead</span>
+            <div class="s-num-row">
+              <span class="s-num" id="cntDead">0</span>
+              <span class="s-pct" id="pctDead">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Pending -->
+        <div class="stat-box-card card-pending">
+          <div class="s-icon ico-cal-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+          </div>
+          <div class="s-info">
+            <span class="s-label">Pending</span>
+            <div class="s-num-row">
+              <span class="s-num" id="cntPending">0</span>
+              <span class="s-unit">Visits</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── 2. INLINE SEARCH & FILTER BAR ─── -->
+      <section class="filters-bar-inline">
+        <!-- Search Input -->
+        <div class="search-box-wrap">
+          <svg class="s-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input 
+            type="text" 
+            id="treeSearchInput" 
+            class="s-input" 
+            placeholder="Search by Tree ID, Species or Location..." 
+          />
+          <button class="clear-btn hide" id="clearSearchBtn" title="Clear">✕</button>
+        </div>
+
+        <!-- Species Dropdown -->
+        <div class="pill-dropdown-wrap">
+          <select id="speciesFilter" class="pill-select">
+            <option value="all">🌱 Species</option>
+            <option value="Narra">Narra</option>
+            <option value="Mahogany">Mahogany</option>
+            <option value="Acacia">Acacia</option>
+            <option value="Ipil-ipil">Ipil-ipil</option>
+            <option value="Tanguile">Tanguile</option>
+          </select>
+        </div>
+
+        <!-- Health Status Dropdown -->
+        <div class="pill-dropdown-wrap">
+          <select id="healthFilter" class="pill-select">
+            <option value="all">🟢 Health Status</option>
+            <option value="healthy">🟢 Healthy</option>
+            <option value="needs">🟡 Needs Care</option>
+            <option value="critical">🔴 Critical</option>
+            <option value="dead">⚫ Dead</option>
+          </select>
+        </div>
+
+        <!-- Location Dropdown -->
+        <div class="pill-dropdown-wrap">
+          <select id="locationFilter" class="pill-select">
+            <option value="all">📍 Location</option>
+            <option value="Brgy. San Isidro">Brgy. San Isidro</option>
+            <option value="Brgy. Mabini">Brgy. Mabini</option>
+            <option value="Brgy. Santiago">Brgy. Santiago</option>
+          </select>
+        </div>
+
+        <!-- Monitoring Due Dropdown -->
+        <div class="pill-dropdown-wrap">
+          <select id="dueFilter" class="pill-select">
+            <option value="all">📅 Monitoring Due</option>
+            <option value="Due Today">Due Today</option>
+            <option value="Tomorrow">Tomorrow</option>
+            <option value="Overdue">Overdue</option>
+            <option value="Upcoming">Upcoming</option>
+          </select>
+        </div>
+
+        <!-- Reset Button -->
+        <button type="button" class="btn-reset-pill" id="btnResetFilters">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          <span>Reset</span>
+        </button>
+      </section>
+
+      <!-- ─── 3. SPLIT CONTENT: TREE LIST (LEFT) & TREE PROFILE PANEL (RIGHT) ─── -->
+      <div class="trees-split-container">
+
+        <!-- ─── LEFT COLUMN: TREE LIST TABLE CARD ─── -->
+        <div class="tree-list-card">
+          <div class="list-card-header">
+            <h2 class="list-title">Tree List (<span id="totalTreeCount">0</span>)</h2>
+            <div class="sort-wrap">
+              <span class="sort-label">Sort by:</span>
+              <select id="sortSelect" class="sort-select">
+                <option value="lastCheckDesc">Last Check (Newest)</option>
+                <option value="lastCheckAsc">Last Check (Oldest)</option>
+                <option value="treeId">Tree ID</option>
+                <option value="species">Species</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="trees-main-table">
+              <thead>
+                <tr>
+                  <th>Tree ID</th>
+                  <th>Species</th>
+                  <th>Location</th>
+                  <th>Health</th>
+                  <th>Last Check</th>
+                  <th>Next Monitoring</th>
+                  <th class="th-action">Action</th>
+                </tr>
+              </thead>
+              <tbody id="treeTableBody">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state hide" id="emptyState">
+            <div class="empty-icon">🍃</div>
+            <h3>No trees match your filters</h3>
+            <p>Try clearing your search term or resetting the filters above.</p>
+            <button class="btn-reset-pill" id="emptyResetBtn">Reset All Filters</button>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="pagination-footer">
+            <span class="page-range" id="paginationRangeText">Showing 0 of 0 trees</span>
+            <div class="pagination-controls" id="pagControls">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── RIGHT COLUMN: INLINE TREE PROFILE CARD ─── -->
+        <div class="tree-profile-panel" id="treeProfilePanel">
+
+          <!-- Profile Header -->
+          <div class="panel-header">
+            <h3 class="panel-title">Tree Profile</h3>
+            <button class="panel-close-btn" id="panelCloseBtn" title="Collapse Panel">✕</button>
+          </div>
+
+          <div class="panel-body">
+            <!-- Featured Large Tree Photo -->
+            <div class="panel-featured-photo">
+              <img src="assets/tree.jpg" alt="Tree photo" id="panelTreeImg" class="featured-img" onerror="this.src='assets/nature.jpg'" />
+            </div>
+
+            <!-- Title & Status Badge -->
+            <div class="panel-title-badge-row">
+              <h2 class="panel-tree-title" id="panelTreeTitle">No Tree Selected</h2>
+              <span class="panel-health-badge badge-healthy" id="panelHealthBadge">—</span>
+            </div>
+
+            <!-- Two-Column Specifications Table -->
+            <div class="specs-table-box">
+              <div class="spec-row">
+                <span class="s-key">📍 Location</span>
+                <strong class="s-val" id="specLoc">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">📅 Planting Date</span>
+                <strong class="s-val" id="specPlantDate">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">📏 Height</span>
+                <strong class="s-val" id="specHeight">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">⭕ Trunk Diameter</span>
+                <strong class="s-val" id="specDiameter">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">🎂 Estimated Age</span>
+                <strong class="s-val" id="specAge">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">👤 Caretaker</span>
+                <strong class="s-val" id="specCaretaker">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">📍 GPS Location</span>
+                <strong class="s-val" id="specGps">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">🕐 Last Monitoring</span>
+                <strong class="s-val" id="specLastMon">—</strong>
+              </div>
+            </div>
+
+            <!-- Main Primary & Secondary Action Buttons -->
+            <div class="panel-action-buttons">
+              <!-- Wide Primary Green Record Button -->
+              <button class="btn-primary-record" id="btnOpenRecordMon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+                <span>Record Monitoring</span>
+              </button>
+
+              <!-- Secondary Buttons 2-column row -->
+              <div class="secondary-btn-row">
+                <button class="btn-sec-outline" id="btnOpenAddMaint">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                  </svg>
+                  <span>Add Maintenance</span>
+                </button>
+                <button class="btn-sec-outline" id="btnViewOnMap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                    <line x1="9" x2="9" y1="3" y2="18"/>
+                    <line x1="15" x2="15" y1="6" y2="21"/>
+                  </svg>
+                  <span>View on Map</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Monitoring History Timeline -->
+            <div class="panel-section">
+              <div class="sec-title-row">
+                <h4 class="sec-title">Monitoring History</h4>
+                <a href="#" class="sec-link" id="viewAllHistoryBtn">View All</a>
+              </div>
+              <div class="history-timeline-compact" id="historyTimeline">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <!-- Photo History Gallery (4 thumbnails) -->
+            <div class="panel-section">
+              <div class="sec-title-row">
+                <h4 class="sec-title">Photo History</h4>
+                <a href="#" class="sec-link" id="viewAllPhotosBtn">View All</a>
+              </div>
+              <div class="photo-thumbs-row" id="photoThumbsRow">
+                <div style="grid-column: 1 / -1; color: #94a3b8; font-size: 0.8rem; padding: 8px 0;">No photos uploaded yet.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ══════════════════════════════════ MODAL: RECORD MONITORING ══════════════════════════════════ -->
+  <div class="modal-backdrop hide" id="monModalBackdrop">
+    <div class="custom-modal" role="dialog" aria-modal="true">
+      <div class="modal-hdr">
+        <div class="m-title-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <h3 class="modal-ttl" id="monModalTitle">Record Monitoring — TR-10021</h3>
+        </div>
+        <button class="modal-close-btn" id="monModalCloseBtn">✕</button>
+      </div>
+
+      <form id="recordMonForm" class="modal-form">
+        <!-- Health Status Selector -->
+        <div class="m-form-group">
+          <label class="m-label">Updated Health Status *</label>
+          <div class="health-options-grid">
+            <label class="health-radio-card opt-healthy">
+              <input type="radio" name="newHealth" value="Healthy" checked />
+              <span class="radio-body">🟢 Healthy</span>
+            </label>
+            <label class="health-radio-card opt-needs">
+              <input type="radio" name="newHealth" value="Needs Care" />
+              <span class="radio-body">🟡 Needs Care</span>
+            </label>
+            <label class="health-radio-card opt-critical">
+              <input type="radio" name="newHealth" value="Critical" />
+              <span class="radio-body">🔴 Critical</span>
+            </label>
+            <label class="health-radio-card opt-dead">
+              <input type="radio" name="newHealth" value="Dead" />
+              <span class="radio-body">⚫ Dead</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="m-row-2">
+          <!-- Height -->
+          <div class="m-form-group">
+            <label for="monHeight" class="m-label">Height (meters)</label>
+            <input type="number" step="0.1" id="monHeight" class="m-input" placeholder="e.g. 2.5" />
+          </div>
+          <!-- Diameter -->
+          <div class="m-form-group">
+            <label for="monDiameter" class="m-label">Trunk Diameter (cm)</label>
+            <input type="number" step="0.1" id="monDiameter" class="m-input" placeholder="e.g. 3.4" />
+          </div>
+        </div>
+
+        <!-- Photo Uploader -->
+        <div class="m-form-group">
+          <label class="m-label">Upload Evidence Photos</label>
+          <div class="photo-dropzone" id="photoDropzone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p><strong>Click to upload</strong> or drag & drop</p>
+            <span>Tree canopy, leaves, trunk, or pest close-ups</span>
+            <input type="file" id="monPhotoInput" multiple accept="image/*" class="file-input-hidden" />
+          </div>
+          <div class="uploaded-previews-row" id="uploadedPreviews"></div>
+        </div>
+
+        <!-- Remarks / Observations -->
+        <div class="m-form-group">
+          <label for="monRemarks" class="m-label">Field Remarks & Observations *</label>
+          <textarea id="monRemarks" class="m-textarea" rows="3" placeholder="Enter foliage condition, soil moisture, pest presence..." required></textarea>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button type="button" class="btn-cancel" id="monModalCancelBtn">Cancel</button>
+          <button type="submit" class="btn-submit-green">
+            <span>Save Monitoring Record</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ MODAL: ADD MAINTENANCE ══════════════════════════════════ -->
+  <div class="modal-backdrop hide" id="maintModalBackdrop">
+    <div class="custom-modal" role="dialog" aria-modal="true">
+      <div class="modal-hdr">
+        <div class="m-title-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          <h3 class="modal-ttl" id="maintModalTitle">Log Maintenance — TR-10021</h3>
+        </div>
+        <button class="modal-close-btn" id="maintModalCloseBtn">✕</button>
+      </div>
+
+      <form id="addMaintForm" class="modal-form">
+        <div class="m-form-group">
+          <label class="m-label">Maintenance Activity Type *</label>
+          <select id="maintType" class="m-select" required>
+            <option value="Watering">💧 Watering & Soil Hydration</option>
+            <option value="Fertilizing">🌱 Organic Fertilizer / Compost Application</option>
+            <option value="Weeding">🌿 Weeding & Ring Cleaning</option>
+            <option value="Pruning">✂️ Pruning & Canopy Trimming</option>
+            <option value="Pest Control">🛡️ Eco-Friendly Pest Treatment</option>
+            <option value="Staking">🪵 Stake & Support Repair</option>
+          </select>
+        </div>
+
+        <div class="m-row-2">
+          <div class="m-form-group">
+            <label for="maintDate" class="m-label">Date Performed</label>
+            <input type="date" id="maintDate" class="m-input" value="2026-08-26" />
+          </div>
+          <div class="m-form-group">
+            <label for="maintQty" class="m-label">Quantity / Dose</label>
+            <input type="text" id="maintQty" class="m-input" placeholder="e.g. 5 Liters / 200g compost" />
+          </div>
+        </div>
+
+        <div class="m-form-group">
+          <label for="maintNotes" class="m-label">Work Notes</label>
+          <textarea id="maintNotes" class="m-textarea" rows="3" placeholder="Describe actions taken or future follow-up needed..."></textarea>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button type="button" class="btn-cancel" id="maintModalCancelBtn">Cancel</button>
+          <button type="submit" class="btn-submit-green">
+            <span>Log Maintenance</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="ct-toast" id="ctToast">
+    <span id="ctToastMsg">Action completed</span>
+  </div>
+
+  <!-- Firebase SDK (Compat - Universal) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <!-- Logic -->
+  <script src="my-trees.js"></script>
+  <!-- Connectivity Guard & Native Mobile Browser Escape Engine -->
+  <script src="ataman-connectivity.js"></script>
+  <!-- PWA Service Worker Registration & Project Updates -->
+  <script src="pwa-register.js" defer></script>
+</body>
+</html>

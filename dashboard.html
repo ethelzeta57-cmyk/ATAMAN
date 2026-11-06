@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — Admin Dashboard</title>
+  <meta name="description" content="ATAMAN Administrator Dashboard — Monitor trees, adoptions, and system health." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1787906634580" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- PWA Manifest & Mobile Capability Tags -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#166534" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ATAMAN" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon-512.png" />
+
+  <!-- Dashboard Styles -->
+  <link rel="stylesheet" href="dashboard.css?v=20261001_hover_fix" />
+</head>
+
+<body>
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-brand">
+        <svg class="sb-brand-icon" viewBox="0 0 48 48" fill="none">
+          <path d="M24 40V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" />
+          <path d="M24 26C24 18 16 18 14 18C14 26 22 26 24 26Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M24 20C24 12 32 12 34 12C34 20 26 20 24 20Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M24 32C24 24 34 24 36 24C36 32 26 32 24 32Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M12 40H36" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+        <div class="sb-brand-text">
+          <span class="sb-brand-name">ATAMAN</span>
+          <span class="sb-brand-tag">Tanom.Ataman.Padayon.</span>
+        </div>
+      </div>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" type="button" aria-label="Close sidebar navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="sidebar-section-label">ADMIN PANEL</div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+
+        <li class="nav-item active">
+          <a href="dashboard.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-tree-map.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-trees.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span>Trees</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-adopters.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Adopters</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-caretakers.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Caretakers</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-reports.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-analytics.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span>Analytics</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-impact.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 14 14" />
+              <path d="m16 8-8 8" />
+              <path d="M16 16V8H8" />
+            </svg>
+            <span>Impact</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-users.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-content.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="15" y2="12" />
+              <line x1="3" y1="18" x2="9" y2="18" />
+            </svg>
+            <span>Content</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-notifications.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span>Notifications</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-system-logs.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            <span>System Logs</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ════════════════════════════════ MAIN WRAPPER ════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <header class="dash-header">
+      <div class="header-left">
+        <button class="mobile-nav-toggle" id="mobileMenuBtn" type="button" aria-label="Open Navigation Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="header-titles">
+          <h1 class="dash-title">Admin Dashboard</h1>
+          <p class="dash-subtitle">Welcome back, Ethel! Here's what's happening with ATAMAN today.</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="hdr-btn hdr-sync-btn" type="button" id="btnSyncAllDash" title="Sync all ATAMAN data in real-time">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+          </svg>
+          <span>Sync All Data</span>
+        </button>
+        <a href="admin-notifications.html" class="hdr-btn notif-btn" id="notifBtn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-badge" style="display:none;">0</span>
+        </a>
+        <button class="date-range-btn" type="button" id="dateRangeBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+            <line x1="16" x2="16" y1="2" y2="6" />
+            <line x1="8" x2="8" y1="2" y2="6" />
+            <line x1="3" x2="21" y1="10" y2="10" />
+          </svg>
+          <span>Select Date Range</span>
+          <svg class="chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+
+    <div class="sidebar-user-row">
+      <a href="admin-settings.html" class="sidebar-user " id="sidebarUserProfile" title="Open Admin Account & Settings"
+        style="text-decoration:none; flex:1;">
+        <div class="sb-user-avatar">EZ</div>
+        <div class="sb-user-info">
+          <span class="sb-user-name">Ethel Zeta (Admin)</span>
+          <span class="sb-user-role">Super Administrator</span>
+        </div>
+        <span class="sb-user-expand" title="Admin Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"
+            style="width:16px;height:16px;max-width:16px;max-height:16px;">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </span>
+      </a>
+      <a href="index.html" class="sb-logout-btn" title="Sign out of ATAMAN">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+      </a>
+    </div>
+      </div>
+    </header>
+
+    <!-- ── DASHBOARD BODY ── -->
+    <main class="dash-body">
+
+      <!-- Clean Slate / Sample Data Seed Banner -->
+      <div id="dashEmptyStateBanner" style="display:none; margin-bottom:18px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:12px 18px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:22px;">🌱</span>
+          <div>
+            <div style="font-size:13.5px; font-weight:700; color:#166534;">Your Tree Registry is currently ready for data</div>
+            <div style="font-size:12px; color:#15803d; margin-top:2px;">No trees have been planted yet. You can add your own tree records or load sample Samar reforestation data to preview the dashboard.</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button id="btnLoadSampleData" type="button" style="background:#166534; color:#ffffff; border:none; padding:7px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; transition:background 0.15s ease;">
+            Load Sample Data
+          </button>
+          <a href="admin-trees.html" style="background:#ffffff; color:#166534; border:1px solid #bbf7d0; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+            + Add New Tree
+          </a>
+        </div>
+      </div>
+
+      <!-- ─── STATS ROW ─── -->
+      <section class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap ico-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <p class="stat-label">Total Trees Planted</p>
+            <h3 class="stat-value" id="dashTotalPlanted">0</h3>
+            <p class="stat-change neutral" id="dashPlantedDelta">—</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap ico-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <p class="stat-label">Healthy Trees</p>
+            <h3 class="stat-value" id="dashHealthy">0</h3>
+            <p class="stat-change neutral" id="dashHealthyPct">0% of total</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap ico-orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M18 11V6a2 2 0 0 0-4 0v5" />
+              <path d="M14 10V4a2 2 0 0 0-4 0v6" />
+              <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+              <path
+                d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <p class="stat-label">Needs Care</p>
+            <h3 class="stat-value" id="dashNeedsCare">0</h3>
+            <p class="stat-change neutral" id="dashNeedsCarePct">0% of total</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap ico-red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+              <path d="M12 9v4" />
+              <path d="M12 17h.01" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <p class="stat-label">Critical Trees</p>
+            <h3 class="stat-value" id="dashCritical">0</h3>
+            <p class="stat-change neutral" id="dashCriticalPct">0% of total</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap ico-gray">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M2 22l7-7" />
+              <path d="M16 8c0-2.8-4-8-4-8S8 5.2 8 8a4 4 0 0 0 8 0" />
+              <path d="m12 12-1.5 7.5" />
+              <path d="M14.5 19.5h-5" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <p class="stat-label">Dead Trees</p>
+            <h3 class="stat-value" id="dashDead">0</h3>
+            <p class="stat-change neutral" id="dashDeadPct">0% of total</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap ico-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <p class="stat-label">Total Adopters</p>
+            <h3 class="stat-value" id="dashTotalAdopters">0</h3>
+            <p class="stat-change neutral" id="dashAdoptersDelta">—</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── MIDDLE ROW: Map + Health + Adoptions ─── -->
+      <section class="mid-grid">
+
+        <!-- Tree Map Overview -->
+        <div class="card">
+          <div class="card-hdr">
+            <h2 class="card-ttl">Tree Map Overview</h2>
+            <div class="card-actions">
+              <select class="filter-select" id="speciesFilter">
+                <option>All Species</option>
+                <option>Narra</option>
+                <option>Mahogany</option>
+                <option>Acacia</option>
+                <option>Ipil-Ipil</option>
+                <option>Gmelina</option>
+              </select>
+              <button class="filter-btn" type="button" id="filterBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                Filters
+              </button>
+              <a href="admin-tree-map.html" class="icon-btn" title="Open Full Admin Tree Map"
+                style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <polyline points="15 3 21 3 21 9" />
+                  <polyline points="9 21 3 21 3 15" />
+                  <line x1="21" y1="3" x2="14" y2="10" />
+                  <line x1="3" y1="21" x2="10" y2="14" />
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="map-wrap">
+            <div id="leafletMap"></div>
+            <div class="map-legend">
+              <div class="leg-item"><span class="leg-dot ld-healthy"></span>Healthy</div>
+              <div class="leg-item"><span class="leg-dot ld-needs"></span>Needs Care</div>
+              <div class="leg-item"><span class="leg-dot ld-critical"></span>Critical</div>
+              <div class="leg-item"><span class="leg-dot ld-dead"></span>Dead</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tree Health Distribution -->
+        <div class="card">
+          <div class="card-hdr">
+            <h2 class="card-ttl">Tree Health Distribution</h2>
+          </div>
+          <div class="donut-wrap">
+            <canvas id="healthChart"></canvas>
+            <div class="donut-center">
+              <span class="donut-val">0</span>
+              <span class="donut-sub">Total Trees</span>
+            </div>
+          </div>
+          <div class="health-legend">
+            <div class="hl-item"><span class="hl-dot" style="background:#22c55e"></span><span
+                class="hl-key">Healthy</span><span class="hl-cnt" id="hlHealthyCnt">0</span><span class="hl-pct"
+                id="hlHealthyPct">0%</span></div>
+            <div class="hl-item"><span class="hl-dot" style="background:#f59e0b"></span><span class="hl-key">Needs
+                Care</span><span class="hl-cnt" id="hlNeedsCnt">0</span><span class="hl-pct" id="hlNeedsPct">0%</span>
+            </div>
+            <div class="hl-item"><span class="hl-dot" style="background:#ef4444"></span><span
+                class="hl-key">Critical</span><span class="hl-cnt" id="hlCritCnt">0</span><span class="hl-pct"
+                id="hlCritPct">0%</span></div>
+            <div class="hl-item"><span class="hl-dot" style="background:#9ca3af"></span><span
+                class="hl-key">Dead</span><span class="hl-cnt" id="hlDeadCnt">0</span><span class="hl-pct"
+                id="hlDeadPct">0%</span></div>
+          </div>
+        </div>
+
+        <!-- Recent Adoptions -->
+        <div class="card">
+          <div class="card-hdr">
+            <h2 class="card-ttl">Recent Adoptions</h2>
+            <a href="admin-adopters.html" class="view-all">View All</a>
+          </div>
+          <div class="adoption-list" id="dashAdoptionList">
+            <div style="padding:32px 16px; text-align:center; color:#94a3b8; font-weight:600; font-size:13px;">
+              🌱 No tree adoptions recorded yet.<br>New adoptions will automatically appear here.
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── BOTTOM ROW: Activities + Overview + Species ─── -->
+      <section class="bot-grid">
+
+        <!-- Recent Activities -->
+        <div class="card">
+          <div class="card-hdr">
+            <h2 class="card-ttl">Recent Activities</h2>
+            <a href="admin-system-logs.html" class="view-all">View All</a>
+          </div>
+          <div class="act-list" id="dashActList">
+            <div style="padding:32px 16px; text-align:center; color:#94a3b8; font-weight:600; font-size:13px;">
+              📋 No recent activities.<br>Actions taken across ATAMAN will be logged here.
+            </div>
+          </div>
+        </div>
+
+        <!-- Adoptions Overview -->
+        <div class="card">
+          <div class="card-hdr">
+            <h2 class="card-ttl">Adoptions Overview</h2>
+            <a href="admin-reports.html" class="view-all">View Report</a>
+          </div>
+          <div class="ov-grid">
+
+            <div class="ov-item">
+              <div class="ov-ico ov-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg></div>
+              <div class="ov-data">
+                <p class="ov-lbl">Total Adoptions</p>
+                <h4 class="ov-val" id="ovTotalAdoptions">0</h4>
+                <p class="ov-chg neutral" id="ovTotalAdoptionsDelta">—</p>
+              </div>
+            </div>
+
+            <div class="ov-item">
+              <div class="ov-ico ov-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg></div>
+              <div class="ov-data">
+                <p class="ov-lbl">Active Adopters</p>
+                <h4 class="ov-val" id="ovActiveAdopters">0</h4>
+                <p class="ov-chg neutral" id="ovActiveAdoptersDelta">—</p>
+              </div>
+            </div>
+
+            <div class="ov-item">
+              <div class="ov-ico ov-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" x2="12" y1="2" y2="22" />
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg></div>
+              <div class="ov-data">
+                <p class="ov-lbl">Total Funded</p>
+                <h4 class="ov-val" id="ovTotalFunded">₱0</h4>
+                <p class="ov-chg neutral" id="ovTotalFundedDelta">—</p>
+              </div>
+            </div>
+
+            <div class="ov-item">
+              <div class="ov-ico ov-yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg></div>
+              <div class="ov-data">
+                <p class="ov-lbl">Pending Adoptions</p>
+                <h4 class="ov-val" id="ovPendingAdoptions">0</h4>
+                <p class="ov-chg neutral" id="ovPendingAdoptionsDelta">—</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Top Tree Species -->
+        <div class="card">
+          <div class="card-hdr">
+            <h2 class="card-ttl">Top Tree Species</h2>
+            <a href="admin-trees.html" class="view-all">View All</a>
+          </div>
+          <div class="table-responsive">
+            <table class="species-tbl">
+              <thead>
+                <tr>
+                  <th>Species</th>
+                  <th class="bar-col"></th>
+                  <th>Total Trees</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody id="dashSpeciesTableBody">
+                <tr>
+                  <td colspan="4"
+                    style="text-align:center; padding:28px 12px; color:#94a3b8; font-weight:600; font-size:13px;">
+                    🍃 No species data recorded yet.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── FOOTER ROW: System Summary + Quick Actions ─── -->
+      <section class="foot-grid">
+
+        <!-- System Summary -->
+        <div class="card">
+          <div class="card-hdr">
+            <h2 class="card-ttl">System Summary</h2>
+          </div>
+          <div class="sum-grid">
+
+            <div class="sum-item">
+              <div class="sum-ico s-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg></div>
+              <div class="sum-data">
+                <h4 id="dashSumUsers">0</h4>
+                <p>Total Users</p><span class="neutral" id="dashSumUsersTag">—</span>
+              </div>
+            </div>
+
+            <div class="sum-item">
+              <div class="sum-ico s-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg></div>
+              <div class="sum-data">
+                <h4 id="dashSumCaretakers">0</h4>
+                <p>Caretakers</p><span class="neutral" id="dashSumCaretakersTag">Active</span>
+              </div>
+            </div>
+
+            <div class="sum-item">
+              <div class="sum-ico s-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg></div>
+              <div class="sum-data">
+                <h4 id="dashSumLocations">0</h4>
+                <p>Locations</p><span class="neutral" id="dashSumLocationsTag">Barangays</span>
+              </div>
+            </div>
+
+            <div class="sum-item">
+              <div class="sum-ico s-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <line x1="8" x2="16" y1="21" y2="21" />
+                  <line x1="12" x2="12" y1="17" y2="21" />
+                </svg></div>
+              <div class="sum-data">
+                <h4 id="dashSumUptime">99.9%</h4>
+                <p>System Uptime</p><span class="up">Live</span>
+              </div>
+            </div>
+
+            <div class="sum-item">
+              <div class="sum-ico s-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <ellipse cx="12" cy="5" rx="9" ry="3" />
+                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                </svg></div>
+              <div class="sum-data">
+                <h4 id="dashSumStorage">Synced</h4>
+                <p>Cloud Database</p><span class="up" id="dashSumStorageTag">Firestore</span>
+              </div>
+            </div>
+
+            <div class="sum-item">
+              <div class="sum-ico s-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg></div>
+              <div class="sum-data">
+                <h4 id="dashSumReports">0</h4>
+                <p>Reports Logged</p><span class="neutral" id="dashSumReportsTag">Active</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-hdr">
+            <h2 class="card-ttl">Quick Actions</h2>
+          </div>
+          <div class="qa-grid">
+            <button class="qa-btn" type="button" id="qaAddTree">
+              <div class="qa-ico qa-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                  <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                </svg></div>
+              <span>Add New Tree</span>
+            </button>
+            <button class="qa-btn" type="button" id="qaAddUser">
+              <div class="qa-ico qa-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <line x1="19" y1="8" x2="19" y2="14" />
+                  <line x1="22" y1="11" x2="16" y2="11" />
+                </svg></div>
+              <span>Add User</span>
+            </button>
+            <button class="qa-btn" type="button" id="qaReport">
+              <div class="qa-ico qa-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg></div>
+              <span>Generate Report</span>
+            </button>
+            <button class="qa-btn" type="button" id="qaAnnounce">
+              <div class="qa-ico qa-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m3 11 19-9-9 19-2-8-8-2z" />
+                </svg></div>
+              <span>Send Announcement</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="dash-toast" id="dashToast">
+    <span id="dashToastMsg"></span>
+  </div>
+
+  <!-- Firebase SDK (Compat - Universal) -->
+  <script src="ATAMAN-init.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Dashboard JS -->
+  <script src="dashboard.js"></script>
+  <!-- Real-Time Sync Engine -->
+  <script src="realtime-admin.js"></script>
+  <!-- ATAMAN Internet Connectivity & Mobile Browser Engine -->
+  <script src="ataman-connectivity.js"></script>
+  <!-- PWA Service Worker Registration -->
+  <script src="pwa-register.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — Notifications & Alerts (Admin)</title>
+  <meta name="description" content="ATAMAN Admin — Central alert and communication center for system events, urgent tree issues, monitoring alerts, maintenance, and field operations." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="admin-notifications.css" />
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <svg class="sb-brand-icon" viewBox="0 0 48 48" fill="none">
+        <path d="M24 40V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" />
+        <path d="M24 26C24 18 16 18 14 18C14 26 22 26 24 26Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 20C24 12 32 12 34 12C34 20 26 20 24 20Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 32C24 24 34 24 36 24C36 32 26 32 24 32Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M12 40H36" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round" />
+      </svg>
+      <div class="sb-brand-text">
+        <span class="sb-brand-name">ATAMAN</span>
+        <span class="sb-brand-tag">Every Tree. Every Impact.</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">ADMIN PANEL</div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+
+        <li class="nav-item ">
+          <a href="dashboard.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-tree-map.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-trees.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span>Trees</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-adopters.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Adopters</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-caretakers.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Caretakers</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-reports.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-analytics.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span>Analytics</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-impact.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 14 14" />
+              <path d="m16 8-8 8" />
+              <path d="M16 16V8H8" />
+            </svg>
+            <span>Impact</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-users.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-content.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="15" y2="12" />
+              <line x1="3" y1="18" x2="9" y2="18" />
+            </svg>
+            <span>Content</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a href="admin-notifications.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span>Notifications</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-system-logs.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            <span>System Logs</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content" id="mainContent">
+
+    <!-- ── TOPBAR ── -->
+    <header class="topbar">
+      <button class="topbar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
+      <div class="topbar-title">
+        <div class="topbar-title-row">
+          <h1>🔔 Notifications</h1>
+          <span class="topbar-live-dot" title="Live alert stream active"></span>
+        </div>
+        <span class="topbar-sub">Stay informed about important activities, alerts, and system events across ATAMAN.</span>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="search-box-topbar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="topSearchInput" placeholder="Quick search..." aria-label="Quick search" />
+        </div>
+
+        <button class="btn-outline-sm" id="btnMarkAllRead" title="Mark all unread notifications as read">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Mark All as Read</span>
+        </button>
+
+        <button class="btn-outline-sm" id="btnOpenSettings" title="Configure notification preferences">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Notification Settings</span>
+        </button>
+
+        <button class="btn-primary-sm" id="btnRefreshFeed" title="Refresh notification feed">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          <span>Refresh</span>
+        </button>
+
+    <div class="sidebar-user-row">
+      <a href="admin-settings.html" class="sidebar-user " id="sidebarUserProfile" title="Open Admin Account & Settings" style="text-decoration:none; flex:1;">
+        <div class="sb-user-avatar">EZ</div>
+        <div class="sb-user-info">
+          <span class="sb-user-name">Ethel Zeta (Admin)</span>
+          <span class="sb-user-role">Super Administrator</span>
+        </div>
+        <span class="sb-user-expand" title="Admin Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;max-width:16px;max-height:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+      </a>
+      <a href="index.html" class="sb-logout-btn" title="Sign out of ATAMAN">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+      </div>
+    </header>
+
+    <div class="page-body">
+
+      <!-- ════════════════════════════════════════
+           1. NOTIFICATION SUMMARY CARDS (Top)
+      ════════════════════════════════════════ -->
+      <section class="notif-summary-grid" aria-label="Notification Summary">
+        <div class="summary-card urgent-card active-filter-card" data-filter-type="priority" data-filter-val="critical" id="cardUrgent" tabindex="0" role="button">
+          <div class="sc-badge-indicator red-pulse"></div>
+          <div class="sc-icon red-icon">🔴</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Urgent</span>
+            <div class="sc-val-row">
+              <span class="sc-val" id="cntUrgent">0</span>
+              <span class="sc-chip red-chip">Needs immediate action</span>
+            </div>
+            <span class="sc-sub">Critical trees, dead trees &amp; failures</span>
+          </div>
+          <div class="sc-arrow">→</div>
+        </div>
+
+        <div class="summary-card unread-card" data-filter-type="status" data-filter-val="unread" id="cardUnread" tabindex="0" role="button">
+          <div class="sc-badge-indicator amber-pulse"></div>
+          <div class="sc-icon amber-icon">🟡</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Unread</span>
+            <div class="sc-val-row">
+              <span class="sc-val" id="cntUnread">0</span>
+              <span class="sc-chip amber-chip">Pending review</span>
+            </div>
+            <span class="sc-sub">Notifications waiting for your attention</span>
+          </div>
+          <div class="sc-arrow">→</div>
+        </div>
+
+        <div class="summary-card today-card" data-filter-type="date" data-filter-val="today" id="cardToday" tabindex="0" role="button">
+          <div class="sc-icon blue-icon">📅</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Today</span>
+            <div class="sc-val-row">
+              <span class="sc-val" id="cntToday">0</span>
+              <span class="sc-chip blue-chip">Logged today</span>
+            </div>
+            <span class="sc-sub">Monitoring, tasks &amp; system activity</span>
+          </div>
+          <div class="sc-arrow">→</div>
+        </div>
+
+        <div class="summary-card total-card" data-filter-type="status" data-filter-val="all" id="cardTotal" tabindex="0" role="button">
+          <div class="sc-icon green-icon">📋</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Total</span>
+            <div class="sc-val-row">
+              <span class="sc-val" id="cntTotal">0</span>
+              <span class="sc-chip green-chip">All notifications</span>
+            </div>
+            <span class="sc-sub">Total records in active memory</span>
+          </div>
+          <div class="sc-arrow">→</div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           2. NOTIFICATION FILTERS & ACTION BAR
+      ════════════════════════════════════════ -->
+      <section class="notif-controls-card">
+        <!-- Top Search and Filter Bar -->
+        <div class="controls-header-row">
+          <div class="search-input-wrapper">
+            <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="notifSearchInput" placeholder="Search notifications, tree IDs, caretakers, locations..." />
+            <button class="clear-search-btn" id="btnClearSearch" title="Clear search" style="display:none;">✕</button>
+          </div>
+
+          <!-- Dropdown Filters -->
+          <div class="dropdown-filters-row">
+            <!-- Status -->
+            <div class="custom-select-group">
+              <label for="filterStatus">Status</label>
+              <select id="filterStatus" class="filter-select">
+                <option value="all">All Status</option>
+                <option value="unread" selected>Unread Only</option>
+                <option value="read">Read Only</option>
+              </select>
+            </div>
+
+            <!-- Priority -->
+            <div class="custom-select-group">
+              <label for="filterPriority">Priority</label>
+              <select id="filterPriority" class="filter-select">
+                <option value="all">All Priorities</option>
+                <option value="critical">🔴 Critical / Urgent</option>
+                <option value="high">🟠 High Priority</option>
+                <option value="normal">🟡 Normal</option>
+                <option value="info">🔵 Information</option>
+              </select>
+            </div>
+
+            <!-- Category -->
+            <div class="custom-select-group">
+              <label for="filterCategory">Category</label>
+              <select id="filterCategory" class="filter-select">
+                <option value="all">All Categories</option>
+                <option value="critical-tree">🚨 Critical Trees</option>
+                <option value="monitoring">📷 Monitoring</option>
+                <option value="maintenance">🔧 Maintenance</option>
+                <option value="trees">🌳 Trees</option>
+                <option value="caretakers">👤 Caretakers</option>
+                <option value="adopters">🤝 Adopters</option>
+                <option value="users">👥 Users</option>
+                <option value="schedule">📅 Schedule</option>
+                <option value="system">⚙️ System</option>
+                <option value="announcements">📢 Announcements</option>
+              </select>
+            </div>
+
+            <!-- Date -->
+            <div class="custom-select-group">
+              <label for="filterDate">Date</label>
+              <select id="filterDate" class="filter-select">
+                <option value="all">All Dates</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="last7days">Last 7 Days</option>
+                <option value="last30days">Last 30 Days</option>
+              </select>
+            </div>
+
+            <!-- Location -->
+            <div class="custom-select-group">
+              <label for="filterLocation">Location</label>
+              <select id="filterLocation" class="filter-select">
+              <option value="all">All Locations / Barangays</option>
+              <option value="Albalate">Albalate</option>
+              <option value="Bagongon">Bagongon</option>
+              <option value="Bangon">Bangon</option>
+              <option value="Basiao">Basiao</option>
+              <option value="Buluan">Buluan</option>
+              <option value="Bunuanan">Bunuanan</option>
+              <option value="Cabugawan">Cabugawan</option>
+              <option value="Cagudalo">Cagudalo</option>
+              <option value="Cagusipan">Cagusipan</option>
+              <option value="Cagutian">Cagutian</option>
+              <option value="Cagutsan">Cagutsan</option>
+              <option value="Canhawan Gote">Canhawan Gote</option>
+              <option value="Canlapwas">Canlapwas</option>
+              <option value="Cawayan">Cawayan</option>
+              <option value="Cinco">Cinco</option>
+              <option value="Darahuway Daco">Darahuway Daco</option>
+              <option value="Darahuway Gote">Darahuway Gote</option>
+              <option value="Estaka">Estaka</option>
+              <option value="Guinsorongan">Guinsorongan</option>
+              <option value="Ibol">Ibol</option>
+              <option value="Iguid">Iguid</option>
+              <option value="Lagundi">Lagundi</option>
+              <option value="Libas">Libas</option>
+              <option value="Lobo">Lobo</option>
+              <option value="Manguehay">Manguehay</option>
+              <option value="Maulong">Maulong</option>
+              <option value="Mercedes">Mercedes</option>
+              <option value="Mombon">Mombon</option>
+              <option value="New Mahayag">New Mahayag</option>
+              <option value="Old Mahayag">Old Mahayag</option>
+              <option value="Palanyogon">Palanyogon</option>
+              <option value="Pangdan">Pangdan</option>
+              <option value="Payao">Payao</option>
+              <option value="Poblacion 1">Poblacion 1</option>
+              <option value="Poblacion 2">Poblacion 2</option>
+              <option value="Poblacion 3">Poblacion 3</option>
+              <option value="Poblacion 4">Poblacion 4</option>
+              <option value="Poblacion 5">Poblacion 5</option>
+              <option value="Poblacion 6">Poblacion 6</option>
+              <option value="Poblacion 7">Poblacion 7</option>
+              <option value="Poblacion 8">Poblacion 8</option>
+              <option value="Poblacion 9">Poblacion 9</option>
+              <option value="Poblacion 10">Poblacion 10</option>
+              <option value="Poblacion 11">Poblacion 11</option>
+              <option value="Poblacion 12">Poblacion 12</option>
+              <option value="Poblacion 13">Poblacion 13</option>
+              <option value="Muñoz">Muñoz</option>
+              <option value="Pupua">Pupua</option>
+              <option value="Guindapunan">Guindapunan</option>
+              <option value="Rama">Rama</option>
+              <option value="San Andres">San Andres</option>
+              <option value="San Pablo">San Pablo</option>
+              <option value="San Roque">San Roque</option>
+              <option value="San Vicente">San Vicente</option>
+              <option value="Silanga">Silanga</option>
+              <option value="Socorro">Socorro</option>
+              <option value="Totoringon">Totoringon</option>
+              </select>
+            </div>
+
+            <button class="btn-reset-filters" id="btnResetFilters" title="Reset all filters">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Category & Priority Pills -->
+        <div class="quick-pills-row" id="quickPillsRow">
+          <button class="pill-chip active" data-pill-cat="all">
+            <span>All Categories</span>
+            <span class="pill-count" id="pillCntAll">0</span>
+          </button>
+          <button class="pill-chip pill-critical" data-pill-cat="critical-tree">
+            <span>🚨 Critical Trees</span>
+            <span class="pill-count">0</span>
+          </button>
+          <button class="pill-chip pill-monitoring" data-pill-cat="monitoring">
+            <span>📷 Monitoring</span>
+            <span class="pill-count">0</span>
+          </button>
+          <button class="pill-chip pill-maintenance" data-pill-cat="maintenance">
+            <span>🔧 Maintenance</span>
+            <span class="pill-count">0</span>
+          </button>
+          <button class="pill-chip pill-caretakers" data-pill-cat="caretakers">
+            <span>👤 Caretakers</span>
+            <span class="pill-count">0</span>
+          </button>
+          <button class="pill-chip pill-adopters" data-pill-cat="adopters">
+            <span>🤝 Adopters</span>
+            <span class="pill-count">0</span>
+          </button>
+          <button class="pill-chip pill-users" data-pill-cat="users">
+            <span>👥 Users</span>
+            <span class="pill-count">0</span>
+          </button>
+          <button class="pill-chip pill-schedule" data-pill-cat="schedule">
+            <span>📅 Schedule</span>
+            <span class="pill-count">0</span>
+          </button>
+          <button class="pill-chip pill-system" data-pill-cat="system">
+            <span>⚙️ System</span>
+            <span class="pill-count">0</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           3. MAIN NOTIFICATION LIST & ACTION CENTER
+      ════════════════════════════════════════ -->
+      <section class="notif-feed-container">
+        <!-- Feed Control Header -->
+        <div class="feed-header-bar">
+          <div class="feed-header-left">
+            <h2 class="feed-title" id="feedTitle">Active Notification Feed</h2>
+            <span class="feed-count-badge" id="feedShowingCount">Showing 0 notifications</span>
+          </div>
+
+          <div class="feed-header-right">
+            <div class="view-toggle-group">
+              <label class="view-mode-label">Group By:</label>
+              <button class="btn-toggle active" id="btnGroupPriority" title="Group by priority">
+                Priority
+              </button>
+              <button class="btn-toggle" id="btnGroupChronological" title="Sort by newest first">
+                Timeline
+              </button>
+            </div>
+
+            <div class="bulk-action-dropdown">
+              <button class="btn-outline-sm" id="btnBulkActions">
+                <span>Batch Actions</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="dropdown-menu" id="bulkMenu">
+                <button class="dropdown-item" id="bulkMarkRead">✓ Mark selected as read</button>
+                <button class="dropdown-item" id="bulkMarkUnread">○ Mark selected as unread</button>
+                <button class="dropdown-item" id="bulkDismiss">✕ Dismiss selected</button>
+                <button class="dropdown-item text-danger" id="bulkExport">📥 Export filtered to CSV</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification List Feed -->
+        <div class="notif-feed-list" id="notifFeedList">
+          <!-- Dynamic Content rendered by admin-notifications.js -->
+        </div>
+
+        <!-- Empty State (hidden by default) -->
+        <div class="notif-empty-state" id="notifEmptyState" style="display:none;">
+          <div class="empty-icon">🔔</div>
+          <h3 id="emptyNotifTitle">No Notifications Yet</h3>
+          <p id="emptyNotifDesc">System alerts, monitoring notices, and caretaker updates will appear here in real time.</p>
+          <button class="btn-outline-sm" id="btnResetEmptyFilters" style="display:none;">Clear Filters</button>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           4. NOTIFICATION HISTORY / AUDIT LOG
+      ════════════════════════════════════════ -->
+      <section class="notif-history-section">
+        <div class="history-card">
+          <div class="history-header">
+            <div class="history-title-col">
+              <h3 class="history-title">📋 Notification History &amp; Audit Log</h3>
+              <p class="history-sub">Searchable historic log of past system events, resolved alerts, and broadcast actions.</p>
+            </div>
+            <div class="history-actions">
+              <button class="btn-outline-sm" id="btnExportHistoryCsv">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export History (CSV)
+              </button>
+              <button class="btn-outline-sm" id="btnToggleHistoryCollapse">
+                <span id="txtHistoryCollapse">Collapse</span>
+                <svg id="icoHistoryChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="history-table-container" id="historyTableContainer">
+            <table class="history-table" id="historyTable">
+              <thead>
+                <tr>
+                  <th>Date &amp; Time</th>
+                  <th>Notification Event</th>
+                  <th>Category</th>
+                  <th>Target Entity / Location</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr><td colspan="7" style="text-align:center; padding:36px; color:#94a3b8; font-weight:600;">📋 No notification history records yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /.page-body -->
+  </main>
+
+  <!-- =========================================================================
+       MODALS & DRAWERS
+  ========================================================================= -->
+
+  <!-- 1. NOTIFICATION DETAIL DRAWER -->
+  <div class="drawer-backdrop" id="notifDetailBackdrop"></div>
+  <aside class="detail-drawer" id="notifDetailDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="dh-title-col">
+        <span class="dh-priority-badge" id="drawerPriorityBadge">🔴 Critical</span>
+        <h2 class="dh-title" id="drawerTitle">Critical Tree Requires Attention</h2>
+      </div>
+      <button class="btn-close-drawer" id="btnCloseDrawer" aria-label="Close detail panel">✕</button>
+    </div>
+
+    <div class="drawer-body" id="drawerBody">
+      <!-- Injected by JS -->
+    </div>
+
+    <div class="drawer-footer" id="drawerFooter">
+      <!-- Dynamic Action buttons -->
+    </div>
+  </aside>
+
+  <!-- 2. CREATE MAINTENANCE TASK MODAL -->
+  <div class="modal-backdrop" id="modalMaintBackdrop"></div>
+  <div class="modal-dialog" id="modalMaintDialog" role="dialog" aria-modal="true" aria-labelledby="modalMaintTitle">
+    <div class="modal-header">
+      <div class="modal-header-icon orange-icon">🔧</div>
+      <div class="modal-title-col">
+        <h3 id="modalMaintTitle">Create Maintenance Task</h3>
+        <p class="modal-sub">Directly schedule corrective action for the flagged notification.</p>
+      </div>
+      <button class="modal-close" id="btnCloseMaintModal">✕</button>
+    </div>
+    <form id="formCreateMaintTask">
+      <div class="modal-body">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="maintTreeId">Tree Reference</label>
+            <input type="text" id="maintTreeId" class="form-input" readonly />
+          </div>
+          <div class="form-group">
+            <label for="maintUrgency">Urgency Level</label>
+            <select id="maintUrgency" class="form-input">
+              <option value="Urgent (24h)">🔴 Urgent (Within 24 hours)</option>
+              <option value="High (48h)">🟠 High (Within 48 hours)</option>
+              <option value="Normal">🟡 Normal Routine</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="maintTaskType">Maintenance Activity *</label>
+          <select id="maintTaskType" class="form-input" required>
+            <option value="Pest Control & Spraying">🐛 Pest Control &amp; Treatment</option>
+            <option value="Pruning & Canopy Trimming">✂️ Pruning &amp; Canopy Trimming</option>
+            <option value="Soil Fertilization & Aeration">🌱 Soil Fertilization &amp; Aeration</option>
+            <option value="Structural Support & Staking">🪵 Structural Support &amp; Staking</option>
+            <option value="Emergency Health Inspection">🩺 Comprehensive Health Inspection</option>
+            <option value="Replanting / Replacement">🌳 Replacement Planting</option>
+          </select>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="maintCaretaker">Assign Caretaker *</label>
+            <select id="maintCaretaker" class="form-input" required>
+              <option value="">Select Registered Caretaker</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="maintDueDate">Target Due Date *</label>
+            <input type="date" id="maintDueDate" class="form-input" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="maintInstructions">Special Instructions / Diagnostic Notes</label>
+          <textarea id="maintInstructions" class="form-textarea" rows="3" placeholder="Provide details regarding the diagnosis, required equipment, or specific safety measures..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-outline-sm" id="btnCancelMaint">Cancel</button>
+        <button type="submit" class="btn-primary">
+          <span>Schedule &amp; Dispatch Task</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 3. NOTIFY / REMIND CARETAKER MODAL -->
+  <div class="modal-backdrop" id="modalNotifyBackdrop"></div>
+  <div class="modal-dialog" id="modalNotifyDialog" role="dialog" aria-modal="true" aria-labelledby="modalNotifyTitle">
+    <div class="modal-header">
+      <div class="modal-header-icon blue-icon">👤</div>
+      <div class="modal-title-col">
+        <h3 id="modalNotifyTitle">Send Dispatch Alert to Field Staff</h3>
+        <p class="modal-sub">Directly message or send push notification to assigned caretaker.</p>
+      </div>
+      <button class="modal-close" id="btnCloseNotifyModal">✕</button>
+    </div>
+    <form id="formNotifyCaretaker">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="notifyStaffName">Target Caretaker / Staff</label>
+          <input type="text" id="notifyStaffName" class="form-input" readonly />
+        </div>
+
+        <div class="form-group">
+          <label for="notifyPresetTemplate">Message Template</label>
+          <select id="notifyPresetTemplate" class="form-input">
+            <option value="urgent_critical">🚨 Urgent: Critical tree inspection required immediately</option>
+            <option value="overdue_mon">⚠️ Reminder: Monitoring records overdue for your assigned zone</option>
+            <option value="maintenance_assigned">🔧 Action Required: New maintenance task assigned to you</option>
+            <option value="workload_check">📊 Notice: High assigned tree workload review</option>
+            <option value="custom">✏️ Custom Message</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="notifyMessageText">Message Content *</label>
+          <textarea id="notifyMessageText" class="form-textarea" rows="4" required></textarea>
+        </div>
+
+        <div class="notify-channels-group">
+          <label class="section-sub-label">Dispatch Channels</label>
+          <div class="checkbox-options-grid">
+            <label class="cb-pill">
+              <input type="checkbox" id="chInApp" checked />
+              <span>📱 In-App Mobile Push</span>
+            </label>
+            <label class="cb-pill">
+              <input type="checkbox" id="chSms" checked />
+              <span>💬 SMS Notification</span>
+            </label>
+            <label class="cb-pill">
+              <input type="checkbox" id="chEmail" />
+              <span>📧 Email Dispatch</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-outline-sm" id="btnCancelNotify">Cancel</button>
+        <button type="submit" class="btn-primary">
+          <span>Send Field Alert</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 4. NOTIFICATION SETTINGS MODAL -->
+  <div class="modal-backdrop" id="modalSettingsBackdrop"></div>
+  <div class="modal-dialog modal-lg" id="modalSettingsDialog" role="dialog" aria-modal="true" aria-labelledby="modalSettingsTitle">
+    <div class="modal-header">
+      <div class="modal-header-icon green-icon">⚙️</div>
+      <div class="modal-title-col">
+        <h3 id="modalSettingsTitle">Notification Preferences &amp; Alert Rules</h3>
+        <p class="modal-sub">Configure which events trigger real-time alerts, dashboard badges, and field dispatches.</p>
+      </div>
+      <button class="modal-close" id="btnCloseSettingsModal">✕</button>
+    </div>
+    <form id="formNotificationSettings">
+      <div class="modal-body settings-modal-body">
+        
+        <!-- Channels Section -->
+        <div class="settings-card-group">
+          <h4 class="settings-group-title">🔔 Delivery Channels &amp; Sound</h4>
+          <div class="settings-toggle-grid">
+            <label class="setting-toggle-item">
+              <div class="sti-info">
+                <span class="sti-title">In-App Live Alerts &amp; Popups</span>
+                <span class="sti-desc">Show real-time toast alerts while working in ATAMAN Admin.</span>
+              </div>
+              <input type="checkbox" class="switch-input" id="setChannelInApp" checked />
+            </label>
+
+            <label class="setting-toggle-item">
+              <div class="sti-info">
+                <span class="sti-title">Email Incident Digests</span>
+                <span class="sti-desc">Send daily summary and urgent incident alerts to admin email.</span>
+              </div>
+              <input type="checkbox" class="switch-input" id="setChannelEmail" checked />
+            </label>
+
+            <label class="setting-toggle-item">
+              <div class="sti-info">
+                <span class="sti-title">SMS / Emergency Push</span>
+                <span class="sti-desc">Immediate SMS notification for critical tree die-offs or server failure.</span>
+              </div>
+              <input type="checkbox" class="switch-input" id="setChannelSms" checked />
+            </label>
+
+            <label class="setting-toggle-item">
+              <div class="sti-info">
+                <span class="sti-title">Audio Notification Chime</span>
+                <span class="sti-desc">Play subtle chime when a critical urgent alert arrives.</span>
+              </div>
+              <input type="checkbox" class="switch-input" id="setChannelSound" checked />
+            </label>
+          </div>
+        </div>
+
+        <!-- Tree Monitoring Alerts -->
+        <div class="settings-card-group">
+          <h4 class="settings-group-title">🌳 Tree Health &amp; Monitoring Alerts</h4>
+          <div class="settings-checkbox-list">
+            <label class="setting-check-item">
+              <input type="checkbox" id="setTreeCritical" checked />
+              <div class="sci-text">
+                <span class="sci-name">🔴 Critical Tree Alerts</span>
+                <span class="sci-desc">When a tree health is flagged Critical or severe disease is detected.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setTreeDead" checked />
+              <div class="sci-text">
+                <span class="sci-name">⚫ Dead Tree Reports</span>
+                <span class="sci-desc">When a caretaker logs tree mortality or structural failure.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setTreeOverdueMon" checked />
+              <div class="sci-text">
+                <span class="sci-name">⚠️ Overdue Monitoring Alerts</span>
+                <span class="sci-desc">When periodic photo monitoring has passed its target window.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setTreeMonDone" checked />
+              <div class="sci-text">
+                <span class="sci-name">📷 Monitoring Completed</span>
+                <span class="sci-desc">When field caretakers complete daily tree inspection batches.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Maintenance Alerts -->
+        <div class="settings-card-group">
+          <h4 class="settings-group-title">🔧 Maintenance Alerts</h4>
+          <div class="settings-checkbox-list">
+            <label class="setting-check-item">
+              <input type="checkbox" id="setMaintOverdue" checked />
+              <div class="sci-text">
+                <span class="sci-name">⚠️ Maintenance Overdue</span>
+                <span class="sci-desc">When scheduled pest control, pruning, or treatment passes due date.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setMaintDone" checked />
+              <div class="sci-text">
+                <span class="sci-name">🟢 Maintenance Completed</span>
+                <span class="sci-desc">Confirmation when field staff submit completed work logs.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setMaintPhotoUpload" checked />
+              <div class="sci-text">
+                <span class="sci-name">📷 Maintenance Evidence Uploaded</span>
+                <span class="sci-desc">When proof-of-work photos are uploaded for audit verification.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Caretakers & Field Staff -->
+        <div class="settings-card-group">
+          <h4 class="settings-group-title">👤 Caretakers &amp; Staff Alerts</h4>
+          <div class="settings-checkbox-list">
+            <label class="setting-check-item">
+              <input type="checkbox" id="setCtNew" checked />
+              <div class="sci-text">
+                <span class="sci-name">👤 New Caretaker Added</span>
+                <span class="sci-desc">When new staff onboarding occurs.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setCtReassigned" checked />
+              <div class="sci-text">
+                <span class="sci-name">🌳 Caretaker Assignment Changes</span>
+                <span class="sci-desc">When tree allocation or territory zones are updated.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setCtWorkload" checked />
+              <div class="sci-text">
+                <span class="sci-name">⚠️ Caretaker Workload Overload Alert</span>
+                <span class="sci-desc">Alert when a single caretaker exceeds 450 assigned trees.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Adopters & Partnerships -->
+        <div class="settings-card-group">
+          <h4 class="settings-group-title">🤝 Adopters &amp; Sponsorships</h4>
+          <div class="settings-checkbox-list">
+            <label class="setting-check-item">
+              <input type="checkbox" id="setAdoptNew" checked />
+              <div class="sci-text">
+                <span class="sci-name">🤝 New Adoption Request</span>
+                <span class="sci-desc">When an organization or individual submits a sponsorship application.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setAdoptExpire" checked />
+              <div class="sci-text">
+                <span class="sci-name">⏳ Adoption Expiring Soon (30 Days)</span>
+                <span class="sci-desc">Early alert before sponsorship contracts reach renewal date.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setAdoptTreeCrit" checked />
+              <div class="sci-text">
+                <span class="sci-name">⚠️ Adopted Tree In Critical State</span>
+                <span class="sci-desc">Special high-priority alert when sponsored trees experience distress.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- System & Security -->
+        <div class="settings-card-group">
+          <h4 class="settings-group-title">⚙️ System &amp; Security Alerts</h4>
+          <div class="settings-checkbox-list">
+            <label class="setting-check-item">
+              <input type="checkbox" id="setSysBackup" checked />
+              <div class="sci-text">
+                <span class="sci-name">💾 Database Backup Completed &amp; Failures</span>
+                <span class="sci-desc">Status of automatic night backups and cloud snapshots.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setSysSecurity" checked />
+              <div class="sci-text">
+                <span class="sci-name">🛡️ Multiple Failed Login Attempts &amp; Password Resets</span>
+                <span class="sci-desc">Security events and suspicious admin panel access.</span>
+              </div>
+            </label>
+            <label class="setting-check-item">
+              <input type="checkbox" id="setSysGps" checked />
+              <div class="sci-text">
+                <span class="sci-name">📡 GPS / Offline Mobile Sync Issues</span>
+                <span class="sci-desc">When field tablet queues fail to sync tree coordinates.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-outline-sm" id="btnCancelSettings">Cancel</button>
+        <button type="submit" class="btn-primary">
+          <span>Save Preferences</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 5. TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="ATAMAN-init.js"></script>
+  <script src="admin-notifications.js"></script>
+  <!-- Real-Time Sync Engine -->
+  <script src="realtime-admin.js"></script>
+</body>
+</html>

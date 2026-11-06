@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — Caretaker Tree Map (Catbalogan, Samar)</title>
+  <meta name="description" content="View the real-time location, telemetry, and condition of your assigned trees in Catbalogan City, Samar." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="caretaker-tree-map.css?v=20261001_hover_fix" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════ SIDEBAR ══════════════════════════════════ -->
+  <aside class="ct-sidebar" id="sidebar">
+
+    <!-- Brand Logo -->
+    <div class="ct-logo-wrap">
+      <a href="caretaker-dashboard.html" class="ct-brand-logo">
+        <svg class="ct-brand-icon" viewBox="0 0 48 48" fill="none">
+          <path d="M24 38V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M24 24C24 16 16 16 14 16C14 24 22 24 24 24Z" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M24 18C24 10 32 10 34 10C34 18 26 18 24 18Z" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M24 30C24 22 34 22 36 22C36 30 26 30 24 30Z" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 38H34" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div class="ct-brand-text">
+          <span class="ct-brand-name">ATAMAN</span>
+          <span class="ct-brand-tag">Tree Monitoring System</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Navigation List -->
+    <nav class="ct-nav">
+      <ul class="ct-nav-list">
+
+        <!-- 1. Dashboard -->
+        <li class="ct-nav-item">
+          <a href="caretaker-dashboard.html" class="ct-nav-link">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <!-- 2. My Trees -->
+        <li class="ct-nav-item">
+          <a href="my-trees.html" class="ct-nav-link" id="navMyTrees">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            </svg>
+            <span>My Trees</span>
+          </a>
+        </li>
+
+        <!-- 3. Tree Map (Active) -->
+        <li class="ct-nav-item active">
+          <a href="caretaker-tree-map.html" class="ct-nav-link" id="navTreeMap">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <!-- 4. Monitoring -->
+        <li class="ct-nav-item">
+          <a href="my-trees.html" class="ct-nav-link" id="navMonitoring">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span>Monitoring</span>
+          </a>
+        </li>
+
+        <!-- 5. Schedule -->
+        <li class="ct-nav-item">
+          <a href="caretaker-dashboard.html#schedule" class="ct-nav-link" id="navSchedule">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+            <span>Schedule</span>
+          </a>
+        </li>
+
+        <!-- 6. Maintenance -->
+        <li class="ct-nav-item">
+          <a href="#" class="ct-nav-link" id="navMaintenance">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+            <span>Maintenance</span>
+          </a>
+        </li>
+
+        <!-- 7. My Reports -->
+        <li class="ct-nav-item">
+          <a href="caretaker-dashboard.html#reports" class="ct-nav-link" id="navReports">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 20V10"/>
+              <path d="M12 20V4"/>
+              <path d="M6 20v-6"/>
+            </svg>
+            <span>My Reports</span>
+          </a>
+        </li>
+
+
+
+      </ul>
+    </nav>
+
+  </aside>
+
+  <!-- ══════════════════════════════════ MAIN CONTENT ══════════════════════════════════ -->
+  <div class="ct-main-content">
+
+    <!-- Top Navbar -->
+    <header class="ct-navbar">
+      <div class="ct-page-title-group">
+        <svg class="ct-page-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        <h2 class="ct-page-title">Caretaker Tree Map</h2>
+        <span class="ct-location-badge">📍 Catbalogan City, Samar</span>
+      </div>
+
+      <div class="ct-navbar-right">
+        <!-- Live Real-Time Date & Clock Pill -->
+        <div class="live-sync-pill" id="ctMapLiveDatePill" style="background:#f8fafc; border-color:#e2e8f0; color:#334155;" title="Live Real-Time Date & Clock">
+          <span>📅</span>
+          <span id="ctMapLiveDateText">Live Date</span>
+        </div>
+
+        <!-- Live Sync Pill -->
+        <div class="live-sync-pill" id="liveSyncPill" title="Live Telemetry Syncing">
+          <span class="live-pulse-dot"></span>
+          <span id="liveSyncText">Live Sync: Active (3s)</span>
+        </div>
+
+        <button class="btn-my-location" id="btnTopMyLocation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="7"/>
+            <line x1="12" y1="2" x2="12" y2="5"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="5" y2="12"/>
+            <line x1="19" y1="12" x2="22" y2="12"/>
+          </svg>
+          <span>📍 My Location</span>
+        </button>
+
+        <!-- Caretaker User Profile in Top Navbar -->
+        <div class="ct-user-profile ct-top-user-profile">
+          <div class="ct-avatar-badge" id="avatarText">CT</div>
+          <div class="ct-user-info">
+            <span class="ct-user-name" id="ctUserName">Caretaker</span>
+            <span class="ct-user-role">Field Caretaker (Catbalogan, Samar)</span>
+          </div>
+          <button class="ct-logout-btn" id="ctLogoutBtn" title="Log Out" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <main class="tree-map-container">
+
+      <!-- ─── 1. HEADER BANNER ─── -->
+      <section class="map-header-banner">
+        <div class="map-header-left">
+          <h1>🌳 Tree Map — Catbalogan, Samar</h1>
+          <p>“View the real-time location, telemetry, and condition of your assigned trees in Samar.”</p>
+        </div>
+        <div class="map-header-right">
+          <span class="ct-location-badge">📍 Current location: Catbalogan, Samar</span>
+          <button class="btn-my-location" id="btnBannerMyLocation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="7"/>
+              <line x1="12" y1="2" x2="12" y2="5"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="2" y1="12" x2="5" y2="12"/>
+              <line x1="19" y1="12" x2="22" y2="12"/>
+            </svg>
+            <span>My Location</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ─── REAL-TIME LIVE ACTIVITY MARQUEE & WEATHER TICKER ─── -->
+      <div class="realtime-alert-ticker">
+        <div class="ticker-left">
+          <span class="ticker-label">⚡ LIVE STREAM</span>
+          <span class="ticker-content" id="liveTickerMsg">
+            <strong>[Live]</strong> Telemetry feed active • Assigned trees synced in Catbalogan City, Samar
+          </span>
+        </div>
+        <div class="ticker-right">
+          <div class="ticker-weather">
+            <span>⛅ Catbalogan Samar: <strong>28.4°C</strong> • 79% Humidity • ENE 9 km/h</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 2. SUMMARY CARDS (5 METRIC CARDS) ─── -->
+      <section class="summary-cards-grid">
+        <!-- 1. All Assigned Trees -->
+        <div class="summary-card sc-card-all active" data-filter="all" id="cardFilterAll">
+          <div class="sc-info">
+            <span class="sc-label"><span class="sc-dot dot-all"></span> 🌳 My Assigned Trees</span>
+            <strong class="sc-value" id="cntAll">0</strong>
+          </div>
+          <span class="sc-badge">Total</span>
+        </div>
+
+        <!-- 2. Healthy -->
+        <div class="summary-card sc-card-healthy" data-filter="healthy" id="cardFilterHealthy">
+          <div class="sc-info">
+            <span class="sc-label"><span class="sc-dot dot-healthy"></span> 🟢 Healthy</span>
+            <strong class="sc-value" id="cntHealthy">0</strong>
+          </div>
+          <span class="sc-badge" id="pctHealthy">0%</span>
+        </div>
+
+        <!-- 3. Needs Care -->
+        <div class="summary-card sc-card-needs" data-filter="needs" id="cardFilterNeeds">
+          <div class="sc-info">
+            <span class="sc-label"><span class="sc-dot dot-needs"></span> 🟡 Needs Care</span>
+            <strong class="sc-value" id="cntNeeds">0</strong>
+          </div>
+          <span class="sc-badge" id="pctNeeds">0%</span>
+        </div>
+
+        <!-- 4. Critical -->
+        <div class="summary-card sc-card-critical" data-filter="critical" id="cardFilterCritical">
+          <div class="sc-info">
+            <span class="sc-label"><span class="sc-dot dot-critical"></span> 🔴 Critical</span>
+            <strong class="sc-value" id="cntCritical">0</strong>
+          </div>
+          <span class="sc-badge" id="pctCritical">0%</span>
+        </div>
+
+        <!-- 5. Dead -->
+        <div class="summary-card sc-card-dead" data-filter="dead" id="cardFilterDead">
+          <div class="sc-info">
+            <span class="sc-label"><span class="sc-dot dot-dead"></span> ⚫ Dead</span>
+            <strong class="sc-value" id="cntDead">0</strong>
+          </div>
+          <span class="sc-badge" id="pctDead">0%</span>
+        </div>
+      </section>
+
+      <!-- ─── 3. MAP CONTROLS BAR ─── -->
+      <section class="map-controls-card">
+        <!-- Top Row Filters -->
+        <div class="controls-top-row">
+          <!-- Search -->
+          <div class="map-search-box">
+            <svg class="map-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="mapSearchInput" class="map-search-input" placeholder="🔍 Search Tree ID / Species / Barangay in Catbalogan..." />
+          </div>
+
+          <!-- Health Status Dropdown -->
+          <select id="filterHealthSelect" class="map-filter-select">
+            <option value="all">Health Status (All)</option>
+            <option value="healthy">🟢 Healthy</option>
+            <option value="needs">🟡 Needs Care</option>
+            <option value="critical">🔴 Critical</option>
+            <option value="dead">⚫ Dead</option>
+          </select>
+
+          <!-- Species Dropdown -->
+          <select id="filterSpeciesSelect" class="map-filter-select">
+            <option value="all">Species (All)</option>
+            <option value="Narra">Narra</option>
+            <option value="Mahogany">Mahogany</option>
+            <option value="Acacia">Acacia</option>
+            <option value="Ipil-ipil">Ipil-ipil</option>
+            <option value="Tanguile">Tanguile</option>
+            <option value="Molave">Molave</option>
+          </select>
+
+          <!-- Barangay / Location Dropdown (All 57 Catbalogan City Barangays) -->
+          <select id="filterLocationSelect" class="map-filter-select">
+            <option value="all">Barangay (All 57 Barangays)</option>
+            <option value="Brgy. Canlapwas (Poblacion)">Brgy. Canlapwas (Poblacion)</option>
+            <option value="Brgy. Muñoz (Poblacion 14)">Brgy. Muñoz (Poblacion 14)</option>
+            <option value="Brgy. Poblacion 1 (Barangay 1)">Brgy. Poblacion 1 (Barangay 1)</option>
+            <option value="Brgy. Poblacion 2 (Barangay 2)">Brgy. Poblacion 2 (Barangay 2)</option>
+            <option value="Brgy. Poblacion 3 (Barangay 3)">Brgy. Poblacion 3 (Barangay 3)</option>
+            <option value="Brgy. Poblacion 4 (Barangay 4)">Brgy. Poblacion 4 (Barangay 4)</option>
+            <option value="Brgy. Poblacion 5 (Barangay 5)">Brgy. Poblacion 5 (Barangay 5)</option>
+            <option value="Brgy. Poblacion 6 (Barangay 6)">Brgy. Poblacion 6 (Barangay 6)</option>
+            <option value="Brgy. Poblacion 7 (Barangay 7)">Brgy. Poblacion 7 (Barangay 7)</option>
+            <option value="Brgy. Poblacion 8 (Barangay 8)">Brgy. Poblacion 8 (Barangay 8)</option>
+            <option value="Brgy. Poblacion 9 (Barangay 9)">Brgy. Poblacion 9 (Barangay 9)</option>
+            <option value="Brgy. Poblacion 10">Brgy. Poblacion 10</option>
+            <option value="Brgy. Poblacion 11">Brgy. Poblacion 11</option>
+            <option value="Brgy. Poblacion 12">Brgy. Poblacion 12</option>
+            <option value="Brgy. Poblacion 13">Brgy. Poblacion 13</option>
+            <option value="Brgy. San Andres">Brgy. San Andres</option>
+            <option value="Brgy. San Pablo">Brgy. San Pablo</option>
+            <option value="Brgy. San Roque">Brgy. San Roque</option>
+            <option value="Brgy. San Vicente">Brgy. San Vicente</option>
+            <option value="Brgy. Estaka">Brgy. Estaka</option>
+            <option value="Brgy. Cawayan">Brgy. Cawayan</option>
+            <option value="Brgy. Albalate">Brgy. Albalate</option>
+            <option value="Brgy. Bagongon">Brgy. Bagongon</option>
+            <option value="Brgy. Bangon">Brgy. Bangon</option>
+            <option value="Brgy. Basiao">Brgy. Basiao</option>
+            <option value="Brgy. Buluan">Brgy. Buluan</option>
+            <option value="Brgy. Bunuanan">Brgy. Bunuanan</option>
+            <option value="Brgy. Cabugawan">Brgy. Cabugawan</option>
+            <option value="Brgy. Cagudalo">Brgy. Cagudalo</option>
+            <option value="Brgy. Cagusipan">Brgy. Cagusipan</option>
+            <option value="Brgy. Cagutian">Brgy. Cagutian</option>
+            <option value="Brgy. Cagutsan">Brgy. Cagutsan</option>
+            <option value="Brgy. Canhawan Gote">Brgy. Canhawan Gote</option>
+            <option value="Brgy. Cinco">Brgy. Cinco</option>
+            <option value="Brgy. Darahuway Daco">Brgy. Darahuway Daco</option>
+            <option value="Brgy. Darahuway Gote">Brgy. Darahuway Gote</option>
+            <option value="Brgy. Guindaponan">Brgy. Guindaponan</option>
+            <option value="Brgy. Guinsorongan">Brgy. Guinsorongan</option>
+            <option value="Brgy. Ibol">Brgy. Ibol</option>
+            <option value="Brgy. Iguid">Brgy. Iguid</option>
+            <option value="Brgy. Lagundi">Brgy. Lagundi</option>
+            <option value="Brgy. Libas">Brgy. Libas</option>
+            <option value="Brgy. Lobo">Brgy. Lobo</option>
+            <option value="Brgy. Manguehay">Brgy. Manguehay</option>
+            <option value="Brgy. Maulong">Brgy. Maulong</option>
+            <option value="Brgy. Mercedes">Brgy. Mercedes</option>
+            <option value="Brgy. Mombon">Brgy. Mombon</option>
+            <option value="Brgy. New Mahayag">Brgy. New Mahayag</option>
+            <option value="Brgy. Old Mahayag">Brgy. Old Mahayag</option>
+            <option value="Brgy. Palanyogon">Brgy. Palanyogon</option>
+            <option value="Brgy. Pangdan">Brgy. Pangdan</option>
+            <option value="Brgy. Payao">Brgy. Payao</option>
+            <option value="Brgy. Pupua">Brgy. Pupua</option>
+            <option value="Brgy. Rama">Brgy. Rama</option>
+            <option value="Brgy. Silanga">Brgy. Silanga</option>
+            <option value="Brgy. Socorro">Brgy. Socorro</option>
+            <option value="Brgy. Totoringon">Brgy. Totoringon</option>
+          </select>
+
+          <!-- Monitoring Status Dropdown -->
+          <select id="filterMonitoringSelect" class="map-filter-select">
+            <option value="all">Monitoring Status (All)</option>
+            <option value="Due Today">Due Today</option>
+            <option value="Tomorrow">Tomorrow</option>
+            <option value="Overdue">Overdue</option>
+            <option value="Upcoming">Upcoming</option>
+          </select>
+
+          <!-- Show only Overdue checkbox -->
+          <label class="overdue-toggle-label" for="chkOnlyOverdue">
+            <input type="checkbox" id="chkOnlyOverdue" />
+            <span>☑ Show only overdue</span>
+          </label>
+        </div>
+
+        <!-- Bottom Row Legend -->
+        <div class="controls-bottom-row">
+          <div class="map-legend-pills">
+            <span class="legend-title">Map Legend:</span>
+            <button class="legend-pill active" data-status="healthy" id="pillHealthy">
+              <span class="pill-dot dot-healthy"></span>
+              <span>🟢 Healthy (<span id="legHealthy">0</span>)</span>
+            </button>
+            <button class="legend-pill active" data-status="needs" id="pillNeeds">
+              <span class="pill-dot dot-needs"></span>
+              <span>🟡 Needs Care (<span id="legNeeds">0</span>)</span>
+            </button>
+            <button class="legend-pill active" data-status="critical" id="pillCritical">
+              <span class="pill-dot dot-critical"></span>
+              <span>🔴 Critical (<span id="legCritical">0</span>)</span>
+            </button>
+            <button class="legend-pill active" data-status="dead" id="pillDead">
+              <span class="pill-dot dot-dead"></span>
+              <span>⚫ Dead (<span id="legDead">0</span>)</span>
+            </button>
+          </div>
+
+          <div class="filter-count-badge">
+            Showing <strong id="visibleTreeCount">0</strong> assigned trees in Catbalogan, Samar
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 4. MAP & SELECTED TREE SPLIT VIEW (FULL-WIDTH) ─── -->
+      <section class="map-split-stage">
+        <!-- Main Interactive Leaflet Map Area -->
+        <div class="map-wrapper-card">
+          <!-- Floating Navigation HUD when routing is active -->
+          <div class="map-nav-hud hide" id="navHud">
+            <svg class="hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+            </svg>
+            <div class="hud-text">
+              <span class="hud-dist" id="hudDistance">📍 240 meters away</span>
+              <span class="hud-sub" id="hudEstTime">~ 3 min walk to TR-10047 (Brgy. Canlapwas (Poblacion))</span>
+            </div>
+            <button class="hud-close-btn" id="closeNavHud" title="Stop Navigation">✕</button>
+          </div>
+
+          <div id="caretakerMapMain"></div>
+        </div>
+
+        <!-- ─── 6. RIGHT-SIDE SELECTED TREE PANEL ─── -->
+        <aside class="selected-tree-panel" id="selectedTreePanel">
+          <div class="panel-header-top">
+            <span class="panel-title-tag">Tree Profile</span>
+            <button class="btn-action-secondary" id="btnFocusMap" style="padding: 4px 8px; font-size: 11.5px;">📍 Center Map</button>
+          </div>
+
+          <div class="panel-body-content">
+            <!-- Featured Large Tree Photo -->
+            <div class="panel-featured-photo">
+              <img src="assets/tree.jpg" alt="Tree photo" id="panelTreeImg" class="featured-img" onerror="this.src='assets/nature.jpg'" />
+            </div>
+
+            <!-- Title & Status Badge Row -->
+            <div class="panel-title-badge-row">
+              <h2 class="panel-tree-title" id="pTreeTitle">No Tree Selected</h2>
+              <span class="panel-health-badge chip-healthy" id="pTreeStatus">—</span>
+            </div>
+
+            <!-- Specifications Table Box -->
+            <div class="specs-table-box">
+              <div class="spec-row">
+                <span class="s-key">📍 Location</span>
+                <strong class="s-val" id="pTreeLocation">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">📅 Planting Date</span>
+                <strong class="s-val" id="pTreePlantDate">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">📏 Height</span>
+                <strong class="s-val" id="pTreeHeight">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">⭕ Trunk Diameter</span>
+                <strong class="s-val" id="pTreeDiameter">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">🎂 Estimated Age</span>
+                <strong class="s-val" id="pTreeAge">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">👤 Caretaker</span>
+                <strong class="s-val" id="pTreeCaretaker">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">📍 GPS Location</span>
+                <strong class="s-val" id="pTreeGps">—</strong>
+              </div>
+              <div class="spec-row">
+                <span class="s-key">🕐 Last Monitoring</span>
+                <strong class="s-val" id="pTreeLastMon">—</strong>
+              </div>
+            </div>
+
+            <!-- Real-Time IoT Telemetry Box -->
+            <div class="panel-telemetry-box">
+              <div class="telemetry-title-row">
+                <span>📡 Live Sensor Telemetry</span>
+                <strong style="color: #64748b; font-size: 10.5px;">⚪ STANDBY</strong>
+              </div>
+              <div class="telemetry-grid">
+                <div class="tele-item">
+                  <span>💧 Moisture:</span> <strong id="teleMoisture">—</strong>
+                </div>
+                <div class="tele-item">
+                  <span>🌡️ Soil Temp:</span> <strong id="teleTemp">—</strong>
+                </div>
+                <div class="tele-item">
+                  <span>☀️ UV Index:</span> <strong id="teleUV">—</strong>
+                </div>
+                <div class="tele-item">
+                  <span>🔋 Battery:</span> <strong id="teleBattery">—</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Issue Alert (if any) -->
+            <div class="spec-item full-span" id="pTreeIssueRow" style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 8px 10px;">
+              <span class="spec-lbl" style="color: #dc2626; font-weight: 700;">⚠️ Active Issue:</span>
+              <span class="att-issue-tag" id="pTreeIssue" style="color: #991b1b; font-size: 12px; font-weight: 600;">Pest infestation detected</span>
+            </div>
+
+            <!-- Main Primary & Secondary Action Buttons -->
+            <div class="panel-action-buttons">
+              <!-- Wide Primary Green Record Button -->
+              <button class="btn-primary-record" id="btnOpenRecordMon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+                <span>Record Monitoring</span>
+              </button>
+
+              <!-- Secondary Buttons 2-column row -->
+              <div class="secondary-btn-row">
+                <button class="btn-sec-outline" id="btnOpenAddMaint">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                  </svg>
+                  <span>Add Maintenance</span>
+                </button>
+                <button class="btn-sec-outline" id="btnNavToTree">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                  </svg>
+                  <span>Navigate</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Monitoring History Timeline -->
+            <div class="panel-section">
+              <div class="sec-title-row">
+                <h4 class="sec-title">Monitoring History</h4>
+                <a href="#" class="sec-link" id="viewAllHistoryBtn">View All</a>
+              </div>
+              <div class="history-timeline-compact" id="historyTimeline">
+                <!-- Dynamically populated via JS -->
+              </div>
+            </div>
+
+            <!-- Photo History Gallery (4 thumbnails) -->
+            <div class="panel-section">
+              <div class="sec-title-row">
+                <h4 class="sec-title">Photo History</h4>
+                <a href="#" class="sec-link" id="viewAllPhotosBtn">View All</a>
+              </div>
+              <div class="photo-thumbs-row" id="photoThumbsRow">
+                <div class="p-thumb"><img src="assets/tree.jpg" alt="Tree photo" onerror="this.src='assets/nature.jpg'" /></div>
+                <div class="p-thumb"><img src="assets/nature.jpg" alt="Leaves" /></div>
+                <div class="p-thumb"><img src="assets/tree1.jpg" alt="Trunk" onerror="this.src='assets/tree.jpg'" /></div>
+                <div class="p-thumb thumb-more">
+                  <img src="assets/tree.jpg" alt="Environment" />
+                  <span class="more-overlay">+3</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </aside>
+      </section>
+
+      <!-- ─── 8. “TREES NEEDING ATTENTION” PANEL (50 Trees) ─── -->
+      <section class="attention-panel-card">
+        <div class="attention-header">
+          <div class="attention-title-group">
+            <div class="attention-icon-badge">🚨</div>
+            <div>
+              <h3 class="attention-title">Trees Needing Attention in Catbalogan — <span id="attTotalCount">0</span></h3>
+              <p style="font-size: 12px; color: var(--text-muted);">Urgent field checks, pest treatment, and overdue monitoring in Samar</p>
+            </div>
+          </div>
+
+          <div class="attention-sub-metrics">
+            <span class="att-metric-pill pill-red" id="attPillCritical">🔴 0 Critical</span>
+            <span class="att-metric-pill pill-amber" id="attPillNeeds">🟡 0 Needs Care</span>
+            <span class="att-metric-pill pill-blue" id="attPillDue">⏰ 0 Monitoring Overdue/Due</span>
+          </div>
+        </div>
+
+        <!-- Attention Trees Grid (Click to focus on Map) -->
+        <div class="attention-list-grid" id="attentionListGrid">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ══════════════════════════════════ MODALS ══════════════════════════════════ -->
+
+  <!-- Modal: Record Monitoring -->
+  <div class="modal-backdrop hide" id="recordMonModal">
+    <div class="custom-modal" role="dialog" aria-modal="true">
+      <div class="modal-hdr">
+        <div class="m-title-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <h3 class="modal-ttl" id="monModalTitle">Record Monitoring — TR-10021</h3>
+        </div>
+        <button class="modal-close-btn" id="closeRecordMonBtn">✕</button>
+      </div>
+
+      <form id="recordMonForm" class="modal-form">
+        <div class="m-form-group">
+          <label class="m-label">Updated Health Status *</label>
+          <div class="health-options-grid">
+            <label class="health-radio-card">
+              <input type="radio" name="mHealth" value="Healthy" checked />
+              <span>🟢 Healthy</span>
+            </label>
+            <label class="health-radio-card">
+              <input type="radio" name="mHealth" value="Needs Care" />
+              <span>🟡 Needs Care</span>
+            </label>
+            <label class="health-radio-card">
+              <input type="radio" name="mHealth" value="Critical" />
+              <span>🔴 Critical</span>
+            </label>
+            <label class="health-radio-card">
+              <input type="radio" name="mHealth" value="Dead" />
+              <span>⚫ Dead</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="m-row-2">
+          <div class="m-form-group">
+            <label for="monHeight" class="m-label">Height (meters)</label>
+            <input type="number" step="0.1" id="monHeight" class="m-input" placeholder="e.g. 2.5" />
+          </div>
+          <div class="m-form-group">
+            <label for="monDiameter" class="m-label">Trunk Diameter (cm)</label>
+            <input type="number" step="0.1" id="monDiameter" class="m-input" placeholder="e.g. 3.4" />
+          </div>
+        </div>
+
+        <div class="m-form-group">
+          <label for="monRemarks" class="m-label">Field Remarks & Observations *</label>
+          <textarea id="monRemarks" class="m-textarea" rows="3" placeholder="Foliage condition, soil moisture, pest presence, stakes in Samar zone..." required></textarea>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button type="button" class="btn-cancel" id="cancelRecordMonBtn">Cancel</button>
+          <button type="submit" class="btn-submit-green">Save Monitoring Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Maintenance -->
+  <div class="modal-backdrop hide" id="addMaintModal">
+    <div class="custom-modal" role="dialog" aria-modal="true">
+      <div class="modal-hdr">
+        <div class="m-title-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          <h3 class="modal-ttl" id="maintModalTitle">Log Maintenance — TR-10021</h3>
+        </div>
+        <button class="modal-close-btn" id="closeAddMaintBtn">✕</button>
+      </div>
+
+      <form id="addMaintForm" class="modal-form">
+        <div class="m-form-group">
+          <label class="m-label">Maintenance Activity *</label>
+          <select id="maintType" class="m-select" required>
+            <option value="Watering">💧 Watering & Soil Hydration</option>
+            <option value="Fertilizing">🌱 Organic Fertilizer / Compost Application</option>
+            <option value="Weeding">🌿 Weeding & Ring Cleaning</option>
+            <option value="Pruning">✂️ Pruning & Canopy Trimming</option>
+            <option value="Pest Control">🛡️ Eco-Friendly Pest Treatment</option>
+            <option value="Staking">🪵 Stake & Support Repair</option>
+          </select>
+        </div>
+
+        <div class="m-row-2">
+          <div class="m-form-group">
+            <label for="maintDate" class="m-label">Date Performed</label>
+            <input type="date" id="maintDate" class="m-input" value="2026-08-26" />
+          </div>
+          <div class="m-form-group">
+            <label for="maintQty" class="m-label">Quantity / Dose</label>
+            <input type="text" id="maintQty" class="m-input" placeholder="e.g. 5 Liters / 200g compost" />
+          </div>
+        </div>
+
+        <div class="m-form-group">
+          <label for="maintNotes" class="m-label">Work Notes</label>
+          <textarea id="maintNotes" class="m-textarea" rows="3" placeholder="Describe actions taken in Catbalogan sector..."></textarea>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button type="button" class="btn-cancel" id="cancelAddMaintBtn">Cancel</button>
+          <button type="submit" class="btn-submit-green">Log Maintenance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="ct-toast" id="ctToast">
+    <span id="ctToastMsg">Action completed</span>
+  </div>
+
+  <!-- Firebase SDK (Compat - Universal) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Caretaker Tree Map Logic -->
+  <script src="caretaker-tree-map.js"></script>
+  <!-- Connectivity Guard & Native Mobile Browser Escape Engine -->
+  <script src="ataman-connectivity.js"></script>
+  <!-- PWA Service Worker Registration & Project Updates -->
+  <script src="pwa-register.js" defer></script>
+</body>
+</html>

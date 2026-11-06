@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — Offline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#166534" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: radial-gradient(circle at 50% 20%, #104324 0%, #092e18 60%, #051a0d 100%);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .offline-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 40px 28px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: floatIn 0.4s ease-out;
+    }
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .badge-icon {
+      width: 76px;
+      height: 76px;
+      border-radius: 20px;
+      background: rgba(34, 197, 94, 0.14);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+      color: #4ade80;
+    }
+    .badge-icon svg {
+      width: 40px;
+      height: 40px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: #bbf7d0;
+      margin-bottom: 28px;
+    }
+    .offline-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 50px;
+      background: rgba(239, 68, 68, 0.16);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      color: #fca5a5;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .offline-status.online-now {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(74, 222, 128, 0.5);
+      color: #86efac;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: pulse 1.6s infinite;
+    }
+    .online-now .status-dot {
+      background: #22c55e;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .actions-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 13px 20px;
+      border-radius: 12px;
+      background: #22c55e;
+      color: #092e18;
+      font-size: 14.5px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-primary:hover {
+      background: #4ade80;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .footer-brand {
+      margin-top: 24px;
+      font-size: 12px;
+      color: rgba(187, 247, 208, 0.6);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-card">
+    <div class="badge-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+        <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+      </svg>
+    </div>
+
+    <div class="offline-status" id="statusBadge">
+      <span class="status-dot"></span>
+      <span id="statusText">Access Blocked — Offline</span>
+    </div>
+
+    <h1>Internet Connection Required</h1>
+    <p>
+      An active internet connection is required to authenticate users, access tree maps, and update registry data. Access is temporarily blocked while you are offline.
+    </p>
+
+    <div class="actions-group">
+      <button class="btn-primary" id="retryBtn" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+        </svg>
+        Check Connection & Reconnect
+      </button>
+    </div>
+
+    <div class="footer-brand">
+      ATAMAN • Tanom. Ataman. Padayon.
+    </div>
+  </div>
+
+  <script>
+    const retryBtn = document.getElementById('retryBtn');
+    const statusBadge = document.getElementById('statusBadge');
+    const statusText = document.getElementById('statusText');
+
+    async function checkConnection() {
+      retryBtn.textContent = 'Verifying connection...';
+      if (!navigator.onLine) {
+        onOffline();
+        return;
+      }
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2800);
+        const res = await fetch(`favicon.svg?_ping=${Date.now()}`, {
+          method: 'HEAD',
+          cache: 'no-store',
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+        if (res.ok || res.status === 304 || res.type === 'opaque') {
+          statusBadge.classList.add('online-now');
+          statusText.textContent = 'Connection Restored! Reloading...';
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 500);
+          return;
+        }
+        onOffline();
+      } catch (e) {
+        onOffline();
+      }
+    }
+
+    function onOffline() {
+      retryBtn.textContent = 'Still Offline — Tap to Try Again';
+      setTimeout(() => {
+        retryBtn.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+          </svg>
+          Check Connection & Reconnect
+        `;
+      }, 1800);
+    }
+
+    retryBtn.addEventListener('click', checkConnection);
+
+    window.addEventListener('online', () => {
+      checkConnection();
+    });
+  </script>
+</body>
+</html>

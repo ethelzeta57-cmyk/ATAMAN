@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — Caretakers (Admin)</title>
+  <meta name="description" content="ATAMAN Admin — Manage caretakers, assigned trees, monitoring activities, and field performance." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="admin-caretakers.css?v=20261001_save_btn_fix" />
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <svg class="sb-brand-icon" viewBox="0 0 48 48" fill="none">
+        <path d="M24 40V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" />
+        <path d="M24 26C24 18 16 18 14 18C14 26 22 26 24 26Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 20C24 12 32 12 34 12C34 20 26 20 24 20Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 32C24 24 34 24 36 24C36 32 26 32 24 32Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M12 40H36" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round" />
+      </svg>
+      <div class="sb-brand-text">
+        <span class="sb-brand-name">ATAMAN</span>
+        <span class="sb-brand-tag">Every Tree. Every Impact.</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">ADMIN PANEL</div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+
+        <li class="nav-item ">
+          <a href="dashboard.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-tree-map.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-trees.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span>Trees</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-adopters.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Adopters</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a href="admin-caretakers.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Caretakers</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-reports.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-analytics.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span>Analytics</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-impact.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 14 14" />
+              <path d="m16 8-8 8" />
+              <path d="M16 16V8H8" />
+            </svg>
+            <span>Impact</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-users.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-content.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="15" y2="12" />
+              <line x1="3" y1="18" x2="9" y2="18" />
+            </svg>
+            <span>Content</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-notifications.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span>Notifications</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-system-logs.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            <span>System Logs</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ================= MAIN CONTENT WRAPPER ================= -->
+  <div class="main-wrapper">
+
+    <!-- 1. PAGE HEADER -->
+    <header class="top-navbar">
+      <div class="nav-title-group">
+        <span class="nav-icon-emoji">👥</span>
+        <div>
+          <h1 class="nav-page-title">Caretakers</h1>
+          <p class="nav-page-subtitle">Manage caretakers, assigned trees, monitoring activities, and field performance.</p>
+        </div>
+      </div>
+      <div class="nav-actions-group">
+        <button class="btn btn-outline" id="importCaretakersBtn" type="button">📥 Import</button>
+        <button class="btn btn-outline" id="exportCaretakersBtn" type="button">📤 Export</button>
+        <button class="btn btn-primary" id="openAddCaretakerModalBtn" type="button">+ Add Caretaker</button>
+
+    <div class="sidebar-user-row">
+      <a href="admin-settings.html" class="sidebar-user " id="sidebarUserProfile" title="Open Admin Account & Settings" style="text-decoration:none; flex:1;">
+        <div class="sb-user-avatar">EZ</div>
+        <div class="sb-user-info">
+          <span class="sb-user-name">Ethel Zeta (Admin)</span>
+          <span class="sb-user-role">Super Administrator</span>
+        </div>
+        <span class="sb-user-expand" title="Admin Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;max-width:16px;max-height:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+      </a>
+      <a href="index.html" class="sb-logout-btn" title="Sign out of ATAMAN">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+      </div>
+    </header>
+
+    <main class="content-container">
+
+      <!-- 2. OVERVIEW CARDS (6 Cards) -->
+      <section class="summary-cards-grid">
+        <div class="card summary-card">
+          <div class="sc-header"><span class="sc-icon">👤</span><span class="sc-label">Total Caretakers</span></div>
+          <div class="sc-value" id="cardTotalCaretakers">0</div>
+          <div class="sc-subtext">Registered field personnel</div>
+        </div>
+        <div class="card summary-card">
+          <div class="sc-header"><span class="sc-icon">🟢</span><span class="sc-label">Active</span></div>
+          <div class="sc-value text-success" id="cardActiveCaretakers">0</div>
+          <div class="sc-subtext text-success">0% operational</div>
+        </div>
+        <div class="card summary-card">
+          <div class="sc-header"><span class="sc-icon">⚪</span><span class="sc-label">Inactive</span></div>
+          <div class="sc-value text-muted" id="cardInactiveCaretakers">0</div>
+          <div class="sc-subtext">On leave / deactivated</div>
+        </div>
+        <div class="card summary-card">
+          <div class="sc-header"><span class="sc-icon">🌳</span><span class="sc-label">Assigned Trees</span></div>
+          <div class="sc-value" id="cardAssignedTrees">0</div>
+          <div class="sc-subtext">Across 0 barangays</div>
+        </div>
+        <div class="card summary-card">
+          <div class="sc-header"><span class="sc-icon">📷</span><span class="sc-label">Monitoring Completed</span></div>
+          <div class="sc-value" id="cardMonitoringCompleted">0</div>
+          <div class="sc-subtext text-success">0% completion rate</div>
+        </div>
+        <div class="card summary-card">
+          <div class="sc-header"><span class="sc-icon">⚠️</span><span class="sc-label">Overdue Monitoring</span></div>
+          <div class="sc-value text-danger" id="cardOverdueMonitoring">0</div>
+          <div class="sc-subtext">Requires attention</div>
+        </div>
+      </section>
+
+      <!-- 3. SEARCH & FILTERS -->
+      <section class="card filter-card">
+        <div class="search-box-row">
+          <div class="search-input-wrapper">
+            <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search caretaker / employee ID / location..." />
+          </div>
+          <button class="btn btn-ghost" id="resetFiltersBtn" type="button">🔄 Reset Filters</button>
+        </div>
+
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="filterStatus">Status</label>
+            <select id="filterStatus">
+              <option value="ALL">All Statuses</option>
+              <option value="Active">🟢 Active</option>
+              <option value="Inactive">⚪ Inactive</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterArea">Assigned Area</label>
+            <select id="filterArea">
+              <option value="ALL">All Areas / Barangays</option>
+              <option value="Albalate">Albalate</option>
+              <option value="Bagongon">Bagongon</option>
+              <option value="Bangon">Bangon</option>
+              <option value="Basiao">Basiao</option>
+              <option value="Buluan">Buluan</option>
+              <option value="Bunuanan">Bunuanan</option>
+              <option value="Cabugawan">Cabugawan</option>
+              <option value="Cagudalo">Cagudalo</option>
+              <option value="Cagusipan">Cagusipan</option>
+              <option value="Cagutian">Cagutian</option>
+              <option value="Cagutsan">Cagutsan</option>
+              <option value="Canhawan Gote">Canhawan Gote</option>
+              <option value="Canlapwas">Canlapwas</option>
+              <option value="Cawayan">Cawayan</option>
+              <option value="Cinco">Cinco</option>
+              <option value="Darahuway Daco">Darahuway Daco</option>
+              <option value="Darahuway Gote">Darahuway Gote</option>
+              <option value="Estaka">Estaka</option>
+              <option value="Guinsorongan">Guinsorongan</option>
+              <option value="Ibol">Ibol</option>
+              <option value="Iguid">Iguid</option>
+              <option value="Lagundi">Lagundi</option>
+              <option value="Libas">Libas</option>
+              <option value="Lobo">Lobo</option>
+              <option value="Manguehay">Manguehay</option>
+              <option value="Maulong">Maulong</option>
+              <option value="Mercedes">Mercedes</option>
+              <option value="Mombon">Mombon</option>
+              <option value="New Mahayag">New Mahayag</option>
+              <option value="Old Mahayag">Old Mahayag</option>
+              <option value="Palanyogon">Palanyogon</option>
+              <option value="Pangdan">Pangdan</option>
+              <option value="Payao">Payao</option>
+              <option value="Poblacion 1">Poblacion 1</option>
+              <option value="Poblacion 2">Poblacion 2</option>
+              <option value="Poblacion 3">Poblacion 3</option>
+              <option value="Poblacion 4">Poblacion 4</option>
+              <option value="Poblacion 5">Poblacion 5</option>
+              <option value="Poblacion 6">Poblacion 6</option>
+              <option value="Poblacion 7">Poblacion 7</option>
+              <option value="Poblacion 8">Poblacion 8</option>
+              <option value="Poblacion 9">Poblacion 9</option>
+              <option value="Poblacion 10">Poblacion 10</option>
+              <option value="Poblacion 11">Poblacion 11</option>
+              <option value="Poblacion 12">Poblacion 12</option>
+              <option value="Poblacion 13">Poblacion 13</option>
+              <option value="Muñoz">Muñoz</option>
+              <option value="Pupua">Pupua</option>
+              <option value="Guindapunan">Guindapunan</option>
+              <option value="Rama">Rama</option>
+              <option value="San Andres">San Andres</option>
+              <option value="San Pablo">San Pablo</option>
+              <option value="San Roque">San Roque</option>
+              <option value="San Vicente">San Vicente</option>
+              <option value="Silanga">Silanga</option>
+              <option value="Socorro">Socorro</option>
+              <option value="Totoringon">Totoringon</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterTreeCount">Tree Count</label>
+            <select id="filterTreeCount">
+              <option value="ALL">All Counts</option>
+              <option value="1-100">1 - 100 Trees</option>
+              <option value="101-300">101 - 300 Trees</option>
+              <option value="301-500">301 - 500 Trees</option>
+              <option value="500+">500+ Trees</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterMonitoringStatus">Monitoring Status</label>
+            <select id="filterMonitoringStatus">
+              <option value="ALL">All Performance</option>
+              <option value="high">High (>90% Completed)</option>
+              <option value="normal">Normal (75% - 90%)</option>
+              <option value="attention">Needs Attention (<75%)</option>
+              <option value="overdue">With Overdue Records</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. MAIN CARETAKER TABLE -->
+      <section class="card table-card">
+        <div class="table-header-row">
+          <h2 class="table-title">Caretaker Directory</h2>
+          <span class="table-count-badge" id="tableCountBadge">Showing 0 caretakers</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="caretakers-table">
+            <thead>
+              <tr>
+                <th>Caretaker</th>
+                <th>Employee ID</th>
+                <th class="text-right">Assigned Trees</th>
+                <th class="text-right">Healthy</th>
+                <th class="text-right">Critical</th>
+                <th class="text-right">Pending</th>
+                <th>Status</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="caretakersTbody">
+              <!-- Dynamically rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ================= 5. CARETAKER PROFILE MODAL ================= -->
+  <div class="modal-overlay hidden" id="caretakerProfileModal">
+    <div class="modal-card modal-xl">
+      <!-- Profile Header Banner -->
+      <div class="profile-header-banner">
+        <div class="profile-title-group">
+          <div class="profile-avatar-lg" id="profAvatar">PR</div>
+          <div>
+            <h2 class="profile-name" id="profName">Pedro Reyes</h2>
+            <div class="profile-badges-row">
+              <span class="profile-pill-badge active-badge" id="profStatusBadge">🟢 ACTIVE</span>
+              <span class="profile-pill-badge" id="profEmpIdBadge">ID: CT-001</span>
+              <span class="profile-pill-badge" id="profAreaBadge">📍 San Miguel</span>
+            </div>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeProfileModalBtn" type="button" style="color: #ffffff;">✕</button>
+      </div>
+
+      <!-- 15. Admin Actions Bar -->
+      <div class="profile-actions-bar">
+        <button class="btn btn-outline" id="profEditBtn" type="button">✏️ Edit Caretaker</button>
+        <button class="btn btn-outline" id="profManageTreesBtn" type="button">🌳 Manage Tree Assignments</button>
+        <button class="btn btn-outline" id="profManageScheduleBtn" type="button">📅 Manage Schedule</button>
+        <button class="btn btn-outline" id="profViewMapBtn" type="button">📍 View Assigned Area</button>
+        <button class="btn btn-outline" id="profViewPerfBtn" type="button">📊 View Performance</button>
+        <button class="btn btn-outline" id="profMessageBtn" type="button">💬 Message</button>
+        <button class="btn btn-outline" id="profResetPassBtn" type="button">🔑 Reset Password</button>
+        
+        <!-- More Menu Dropdown -->
+        <div class="dropdown-container" id="profMoreDropdown">
+          <button class="btn btn-outline btn-icon-only" id="profMoreBtn" type="button" title="More Actions">⋮ More</button>
+          <div class="dropdown-menu">
+            <button class="dropdown-item" id="dropdownTransferTreesBtn" type="button">🔄 Transfer Trees</button>
+            <button class="dropdown-item" id="dropdownReassignAreaBtn" type="button">🗺️ Reassign Area</button>
+            <button class="dropdown-item" id="dropdownActivityLogBtn" type="button">📜 View Activity Log</button>
+            <button class="dropdown-item danger-item" id="dropdownToggleStatusBtn" type="button">🚫 Deactivate Account</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Content Grid (Scrollable) -->
+      <div class="profile-content-grid">
+
+        <!-- 5. Personal / Account Information -->
+        <div class="profile-card-sub">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">👤 Personal / Account Information</h3>
+          </div>
+          <div class="info-fields-grid">
+            <div class="info-item">
+              <span class="info-label">Full Name</span>
+              <span class="info-val" id="profFullName">Pedro Reyes</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Employee ID</span>
+              <span class="info-val id-badge" id="profEmpId" style="display:inline-block;width:fit-content;">CT-001</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Email Address</span>
+              <span class="info-val" id="profEmail">pedro.reyes@ATAMAN.org</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Phone Number</span>
+              <span class="info-val" id="profPhone">+63 917 123 4567</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Assigned Area</span>
+              <span class="info-val" id="profAssignedArea">San Miguel</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Date Joined</span>
+              <span class="info-val" id="profDateJoined">Jan 15, 2024</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Account Status</span>
+              <span class="info-val text-success" id="profAccountStatus">🟢 Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Assignment Summary -->
+        <div class="profile-card-sub">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">🌳 Assignment Summary</h3>
+            <button class="btn btn-outline btn-sm" id="btnViewAssignedTrees" type="button">View My Assigned Trees ↗</button>
+          </div>
+          <div class="assignment-details-block">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+              <span style="font-weight:700; color:var(--text-dark);" id="profTotalTreesHeader">485 Trees Total</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);" id="profProjectsCount">2 Projects • 3 Sites</span>
+            </div>
+
+            <!-- Breakdown Bar -->
+            <div class="tree-status-breakdown-bar">
+              <div class="ts-segment ts-healthy" id="tsBarHealthy" style="width: 86.8%;" title="Healthy"></div>
+              <div class="ts-segment ts-care" id="tsBarCare" style="width: 7.8%;" title="Needs Care"></div>
+              <div class="ts-segment ts-critical" id="tsBarCritical" style="width: 2.5%;" title="Critical"></div>
+              <div class="ts-segment ts-dead" id="tsBarDead" style="width: 2.9%;" title="Dead"></div>
+            </div>
+
+            <!-- Breakdown Chips -->
+            <div class="status-chips-grid">
+              <div class="status-chip chip-healthy">
+                <span class="chip-num" id="profHealthyCount">421</span>
+                <span class="chip-lbl">🟢 Healthy</span>
+              </div>
+              <div class="status-chip chip-care">
+                <span class="chip-num" id="profCareCount">38</span>
+                <span class="chip-lbl">🟡 Needs Care</span>
+              </div>
+              <div class="status-chip chip-critical">
+                <span class="chip-num" id="profCriticalCount">12</span>
+                <span class="chip-lbl">🔴 Critical</span>
+              </div>
+              <div class="status-chip chip-dead">
+                <span class="chip-num" id="profDeadCount">14</span>
+                <span class="chip-lbl">⚫ Dead</span>
+              </div>
+            </div>
+
+            <div style="margin-top:12px; font-size:0.8rem; display:flex; flex-direction:column; gap:4px; color:var(--text-muted);">
+              <div><strong>Assigned Barangays:</strong> <span id="profAssignedBarangays">None</span></div>
+              <div><strong>Assigned Tree Type:</strong> <span id="profAssignedTreeType">Native Hardwood</span></div>
+              <div><strong>Assigned Projects:</strong> <span id="profAssignedProjects">General Reforestation</span></div>
+              <div><strong>Assigned Sites:</strong> <span id="profAssignedFarms">Plot 1</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Monitoring Performance -->
+        <div class="profile-card-sub">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">📷 Monitoring Performance</h3>
+            <span class="status-badge active" id="profCompletionRateBadge">91% Completion</span>
+          </div>
+          <div class="perf-gauge-card">
+            <div class="completion-bar-wrapper">
+              <div class="completion-bar-fill" id="profCompletionBarFill" style="width: 91%;">91%</div>
+            </div>
+
+            <div style="display:flex; justify-content:space-around; font-size:0.82rem; font-weight:700; text-align:center;">
+              <div><span class="text-success" id="profCompletedCount">442</span> <span style="font-weight:500; color:var(--text-muted);">Completed</span></div>
+              <div><span class="text-warning" id="profPendingCount">26</span> <span style="font-weight:500; color:var(--text-muted);">Pending</span></div>
+              <div><span class="text-danger" id="profOverdueCount">17</span> <span style="font-weight:500; color:var(--text-muted);">Overdue</span></div>
+            </div>
+
+            <div class="perf-metrics-grid">
+              <div class="perf-mini-stat">
+                <span class="pms-val" id="profWeeklyAvg">48</span>
+                <span class="pms-lbl">Avg. Trees / Wk</span>
+              </div>
+              <div class="perf-mini-stat">
+                <span class="pms-val" id="profMonthTrees">442</span>
+                <span class="pms-lbl">Monitored Month</span>
+              </div>
+              <div class="perf-mini-stat">
+                <span class="pms-val" id="profOnTimeRate">88%</span>
+                <span class="pms-lbl">On-Time Rate</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 14. Monthly Performance Trend Chart -->
+        <div class="profile-card-sub">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">📊 3-Month Monitoring Trend</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted);">July → Aug → Sept</span>
+          </div>
+          <div class="perf-chart-bar-group">
+            <div class="chart-col">
+              <div class="chart-pillar" style="height: 65%;">
+                <span class="chart-pillar-val">84%</span>
+              </div>
+              <span class="chart-lbl">July</span>
+            </div>
+            <div class="chart-col">
+              <div class="chart-pillar" style="height: 85%;">
+                <span class="chart-pillar-val">91%</span>
+              </div>
+              <span class="chart-lbl">August</span>
+            </div>
+            <div class="chart-col">
+              <div class="chart-pillar" style="height: 92%; background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);">
+                <span class="chart-pillar-val">95%</span>
+              </div>
+              <span class="chart-lbl">September (Proj)</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-top:8px;">
+            <span>📸 Total Photos: <strong id="profPhotosCount" style="color:var(--text-dark);">1,126</strong></span>
+            <span>🔧 Maintenance Logs: <strong id="profMaintLogsCount" style="color:var(--text-dark);">87</strong></span>
+          </div>
+        </div>
+
+        <!-- 8. Recent Monitoring Activity -->
+        <div class="profile-card-sub">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">⏱️ Recent Monitoring Activity</h3>
+            <button class="btn btn-outline btn-sm" id="btnViewMonitoringHistory" type="button">View History</button>
+          </div>
+          <div class="activity-feed-list" id="profActivityList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- 9. Assigned Areas -->
+        <div class="profile-card-sub">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">📍 Assigned Areas</h3>
+            <button class="btn btn-outline btn-sm" id="btnViewOnTreeMap" type="button">View on Tree Map 🗺️</button>
+          </div>
+          <div class="areas-bars-list" id="profAreasList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- 10. Monitoring Schedule -->
+        <div class="profile-card-sub">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">📅 Upcoming Field Schedule</h3>
+            <button class="btn btn-outline btn-sm" id="btnViewFullSchedule" type="button">Full Schedule</button>
+          </div>
+          <table class="schedule-table-mini">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Location</th>
+                <th class="text-right">Trees</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="profScheduleTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 11. Critical Trees Assigned -->
+        <div class="profile-card-sub">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">🚨 Critical Trees Assigned (<span id="profCritBadge">12</span>)</h3>
+            <button class="btn btn-outline btn-sm" id="btnViewCriticalTrees" type="button">View Critical Trees</button>
+          </div>
+          <div class="critical-trees-list" id="profCriticalTreesList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- 12. Maintenance Activity -->
+        <div class="profile-card-sub">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">🔧 Maintenance Activity</h3>
+          </div>
+          <div class="maint-chips-row">
+            <span class="maint-chip">💧 Watering — <strong id="maintWatering">25 trees</strong></span>
+            <span class="maint-chip">🌱 Fertilization — <strong id="maintFert">18 trees</strong></span>
+            <span class="maint-chip">🐛 Pest Control — <strong id="maintPest">7 trees</strong></span>
+            <span class="maint-chip">🌾 Weed Removal — <strong id="maintWeed">32 trees</strong></span>
+            <span class="maint-chip">✂️ Pruning — <strong id="maintPrune">5 trees</strong></span>
+          </div>
+          <div class="maint-log-box" id="profRecentMaintLog">
+            <strong>TR-10047 — Pest Control</strong>
+            <span>Organic neem oil pesticide applied to leaf blight cluster</span>
+            <span style="color:var(--text-muted); font-size:0.72rem;">Aug 26, 2026 • Result: Monitoring required</span>
+          </div>
+        </div>
+
+        <!-- 13. Photos Uploaded (Field Evidence) -->
+        <div class="profile-card-sub full-width">
+          <div class="subcard-title-row">
+            <h3 class="subcard-title">📷 Field Photos Uploaded by Caretaker</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Click any photo to inspect high-resolution GPS & audit details</span>
+          </div>
+          <div class="photo-gallery-grid" id="profPhotoGallery">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="footerCloseProfileBtn" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 16. ADD CARETAKER MODAL ================= -->
+  <div class="modal-overlay hidden" id="addCaretakerModal">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <h2 class="modal-title"><span>➕</span> Add New Caretaker</h2>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button class="btn btn-primary btn-sm" type="submit" form="addCaretakerForm" id="headerSaveCaretakerBtn" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; padding:6px 14px; font-size:13px;">
+            <span>💾</span> Save Caretaker
+          </button>
+          <button class="modal-close-btn" id="closeAddModalBtn" type="button">✕</button>
+        </div>
+      </div>
+      <form id="addCaretakerForm">
+        <div class="modal-body">
+          <!-- Section 1: Account Information -->
+          <div class="form-section">
+            <div class="form-section-title">1. Account Information</div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="addFullName">Full Name *</label>
+                <input type="text" id="addFullName" placeholder="e.g. Mateo Dimaculangan" required />
+              </div>
+              <div class="form-group">
+                <label for="addEmpId">Employee ID *</label>
+                <input type="text" id="addEmpId" placeholder="e.g. CT-009" required />
+              </div>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="addEmail">Email Address *</label>
+                <input type="email" id="addEmail" placeholder="mateo.d@ATAMAN.org" required />
+              </div>
+              <div class="form-group">
+                <label for="addPhone">Phone Number *</label>
+                <input type="tel" id="addPhone" placeholder="+63 917 000 0000" required />
+              </div>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="addUsername">Username *</label>
+                <input type="text" id="addUsername" placeholder="mateo_caretaker" required />
+              </div>
+              <div class="form-group">
+                <label for="addPassword">Initial Password / Invite</label>
+                <input type="password" id="addPassword" placeholder="Auto-generate or type password" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Assignment -->
+          <div class="form-section">
+            <div class="form-section-title">2. Field Assignment</div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="addProvince">Province</label>
+                <select id="addProvince" class="form-control">
+                  <option value="Samar" selected>Samar</option>
+                  <option value="Eastern Samar">Eastern Samar</option>
+                  <option value="Northern Samar">Northern Samar</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="addMunicipality">Municipality</label>
+                <select id="addMunicipality" class="form-control">
+                  <option value="Catbalogan City" selected>Catbalogan City</option>
+                  <option value="Calbayog City">Calbayog City</option>
+                  <option value="Jiabong">Jiabong</option>
+                  <option value="Tarangnan">Tarangnan</option>
+                  <option value="Paranas">Paranas (Wright)</option>
+                  <option value="Hinabangan">Hinabangan</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="addBarangay">Primary Barangay *</label>
+                <select id="addBarangay" class="form-control" required>
+                  <option value="">Select Barangay</option>
+                  <option value="Albalate">Albalate</option>
+                  <option value="Bagongon">Bagongon</option>
+                  <option value="Bangon">Bangon</option>
+                  <option value="Basiao">Basiao</option>
+                  <option value="Buluan">Buluan</option>
+                  <option value="Bunuanan">Bunuanan</option>
+                  <option value="Cabugawan">Cabugawan</option>
+                  <option value="Cagudalo">Cagudalo</option>
+                  <option value="Cagusipan">Cagusipan</option>
+                  <option value="Cagutian">Cagutian</option>
+                  <option value="Cagutsan">Cagutsan</option>
+                  <option value="Canhawan Gote">Canhawan Gote</option>
+                  <option value="Canlapwas">Canlapwas</option>
+                  <option value="Cawayan">Cawayan</option>
+                  <option value="Cinco">Cinco</option>
+                  <option value="Darahuway Daco">Darahuway Daco</option>
+                  <option value="Darahuway Gote">Darahuway Gote</option>
+                  <option value="Estaka">Estaka</option>
+                  <option value="Guinsorongan">Guinsorongan</option>
+                  <option value="Ibol">Ibol</option>
+                  <option value="Iguid">Iguid</option>
+                  <option value="Lagundi">Lagundi</option>
+                  <option value="Libas">Libas</option>
+                  <option value="Lobo">Lobo</option>
+                  <option value="Manguehay">Manguehay</option>
+                  <option value="Maulong">Maulong</option>
+                  <option value="Mercedes">Mercedes</option>
+                  <option value="Mombon">Mombon</option>
+                  <option value="New Mahayag">New Mahayag</option>
+                  <option value="Old Mahayag">Old Mahayag</option>
+                  <option value="Palanyogon">Palanyogon</option>
+                  <option value="Pangdan">Pangdan</option>
+                  <option value="Payao">Payao</option>
+                  <option value="Poblacion 1">Poblacion 1</option>
+                  <option value="Poblacion 2">Poblacion 2</option>
+                  <option value="Poblacion 3">Poblacion 3</option>
+                  <option value="Poblacion 4">Poblacion 4</option>
+                  <option value="Poblacion 5">Poblacion 5</option>
+                  <option value="Poblacion 6">Poblacion 6</option>
+                  <option value="Poblacion 7">Poblacion 7</option>
+                  <option value="Poblacion 8">Poblacion 8</option>
+                  <option value="Poblacion 9">Poblacion 9</option>
+                  <option value="Poblacion 10">Poblacion 10</option>
+                  <option value="Poblacion 11">Poblacion 11</option>
+                  <option value="Poblacion 12">Poblacion 12</option>
+                  <option value="Poblacion 13">Poblacion 13</option>
+                  <option value="Muñoz">Muñoz</option>
+                  <option value="Pupua">Pupua</option>
+                  <option value="Guindapunan">Guindapunan</option>
+                  <option value="Rama">Rama</option>
+                  <option value="San Andres">San Andres</option>
+                  <option value="San Pablo">San Pablo</option>
+                  <option value="San Roque">San Roque</option>
+                  <option value="San Vicente">San Vicente</option>
+                  <option value="Silanga">Silanga</option>
+                  <option value="Socorro">Socorro</option>
+                  <option value="Totoringon">Totoringon</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="addProject">Assigned Project</label>
+                <input type="text" id="addProject" placeholder="e.g. Community Reforestation 2026" />
+              </div>
+            </div>
+            <!-- Assigned Adopter -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="addAdopter">
+                Assigned Adopter
+                <span style="font-weight:400; font-size:0.78rem; color:#94a3b8; margin-left:4px;">(tracks tree consumption per adopter)</span>
+              </label>
+              <select id="addAdopter" class="form-control">
+                <option value="">— No Adopter Assigned —</option>
+                <optgroup label="Corporate / Organization Adopters">
+                  <option value="ADO-C001">ADO-C001 · GreenPH Foundation</option>
+                  <option value="ADO-C002">ADO-C002 · PLDT Sustainability Program</option>
+                  <option value="ADO-C003">ADO-C003 · SM Cares — Tree for Every Purchase</option>
+                  <option value="ADO-C004">ADO-C004 · Ayala Foundation — Eco Initiative</option>
+                  <option value="ADO-C005">ADO-C005 · Jollibee Group Foundation</option>
+                  <option value="ADO-C006">ADO-C006 · BPI SINAG Green Bonds</option>
+                  <option value="ADO-C007">ADO-C007 · Globe Telecom — Planet Care</option>
+                </optgroup>
+                <optgroup label="Individual Adopters (User Management)" id="registeredAdoptersGroup">
+                  <!-- Populated in real-time from User Management data -->
+                </optgroup>
+                <optgroup label="School / Barangay Programs">
+                  <option value="ADO-S001">ADO-S001 · Catbalogan National High School</option>
+                  <option value="ADO-S002">ADO-S002 · Brgy. San Andres LGU Program</option>
+                  <option value="ADO-S003">ADO-S003 · Western Samar State University</option>
+                  <option value="ADO-S004">ADO-S004 · Brgy. Payao Youth Council</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="addTreeType">Assigned Tree Type / Species *</label>
+                <select id="addTreeType" class="form-control" required>
+                  <option value="Native Hardwood">Native Hardwood (Narra, Molave, Yakal)</option>
+                  <option value="Fruit-Bearing">Fruit-Bearing (Mango, Cacao, Coffee, Avocado)</option>
+                  <option value="Mangrove / Coastal">Mangrove / Coastal (Bakawan, Api-api)</option>
+                  <option value="Fast-Growing Timber">Fast-Growing Timber (Mahogany, Acacia)</option>
+                  <option value="Bamboo & Agroforestry">Bamboo &amp; Agroforestry</option>
+                  <option value="Mixed Reforestation">Mixed Reforestation Species</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="addInitialTrees">Initial Trees Assigned (Count)</label>
+                <input type="number" id="addInitialTrees" placeholder="e.g. 0" min="0" value="0" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Permissions -->
+          <div class="form-section">
+            <div class="form-section-title">3. Caretaker Permissions (Role Separation)</div>
+            <div class="permissions-grid">
+              <label class="perm-checkbox-label">
+                <input type="checkbox" checked disabled />
+                <span>☑ View assigned trees</span>
+              </label>
+              <label class="perm-checkbox-label">
+                <input type="checkbox" checked disabled />
+                <span>☑ Record monitoring</span>
+              </label>
+              <label class="perm-checkbox-label">
+                <input type="checkbox" checked disabled />
+                <span>☑ Upload photos</span>
+              </label>
+              <label class="perm-checkbox-label">
+                <input type="checkbox" checked disabled />
+                <span>☑ Record maintenance</span>
+              </label>
+              <label class="perm-checkbox-label">
+                <input type="checkbox" checked disabled />
+                <span>☑ View assigned schedule</span>
+              </label>
+              <label class="perm-checkbox-label disabled-perm">
+                <input type="checkbox" disabled />
+                <span style="color:#94a3b8;">☐ Manage other caretakers</span>
+              </label>
+              <label class="perm-checkbox-label disabled-perm">
+                <input type="checkbox" disabled />
+                <span style="color:#94a3b8;">☐ Manage adopters</span>
+              </label>
+              <label class="perm-checkbox-label disabled-perm">
+                <input type="checkbox" disabled />
+                <span style="color:#94a3b8;">☐ Manage system users</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" id="cancelAddBtn" type="button">Cancel</button>
+          <button class="btn btn-primary" id="saveCaretakerBtn" type="submit" style="display:inline-flex; align-items:center; gap:6px; font-weight:700;">
+            <span>💾</span> Save Caretaker
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= PHOTO VIEWER LIGHTBOX MODAL ================= -->
+  <div class="modal-overlay hidden" id="photoViewerModal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title"><span id="pvTitle">📷 TR-10021 Evidence</span></h2>
+        <button class="modal-close-btn" id="closePhotoViewerBtn" type="button">✕</button>
+      </div>
+      <div class="modal-body" style="align-items: center; gap: 14px;">
+        <div style="width: 100%; height: 260px; border-radius: 10px; overflow: hidden; background: #0f172a; display: flex; align-items: center; justify-content: center;">
+          <img id="pvImage" src="" alt="Tree Field Photo" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+        </div>
+        <div class="card" style="width: 100%; padding: 14px; font-size: 0.82rem; background: #f8fafc; border-color: #e2e8f0; display: flex; flex-direction: column; gap: 6px;">
+          <div><strong>Tree ID:</strong> <span class="id-badge" id="pvTreeId">TR-10021</span> • <strong>Category:</strong> <span id="pvCategory">Foliage / Leaves</span></div>
+          <div><strong>Timestamp:</strong> <span id="pvTimestamp">Aug 29, 2026 • 09:42 AM</span></div>
+          <div><strong>GPS Coordinates:</strong> <span id="pvGps">14.0722° N, 121.3289° E</span></div>
+          <div><strong>Field Notes:</strong> <span id="pvNotes">Healthy canopy expansion with zero parasite clusters observed.</span></div>
+          <div><strong>Uploaded By:</strong> <span id="pvUploader">Pedro Reyes (CT-001)</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="closePvBtn2" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= GENERIC SUB-MODAL (Assigned Trees, Full Schedule, Critical Trees, History) ================= -->
+  <div class="modal-overlay hidden" id="subListModal">
+    <div class="modal-card modal-xl">
+      <div class="modal-header">
+        <h2 class="modal-title" id="subListTitle">📋 Details List</h2>
+        <button class="modal-close-btn" id="closeSubListModalBtn" type="button">✕</button>
+      </div>
+      <div class="modal-body" id="subListBody">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="closeSubListBtn2" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ACTION PROMPT / MESSAGE MODAL ================= -->
+  <div class="modal-overlay hidden" id="actionPromptModal">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="actionModalTitle">💬 Message Caretaker</h2>
+        <button class="modal-close-btn" id="closeActionModalBtn" type="button">✕</button>
+      </div>
+      <div class="modal-body" id="actionModalBody">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer" id="actionModalFooter">
+        <button class="btn btn-outline" id="cancelActionBtn" type="button">Cancel</button>
+        <button class="btn btn-primary" id="confirmActionBtn" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- JavaScript -->
+  <script src="ATAMAN-init.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js?v=20260928_dedup"></script>
+  <!-- Real-Time Sync Engine -->
+  <script src="realtime-admin.js?v=20260928_dedup"></script>
+  <script src="admin-caretakers.js?v=20261001_realtimedate"></script>
+</body>
+
+</html>

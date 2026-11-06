@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — Program Impact (Admin)</title>
+  <meta name="description" content="ATAMAN Admin — Measure the environmental, community, and tree-survival impact of ATAMAN." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="admin-impact.css" />
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <svg class="sb-brand-icon" viewBox="0 0 48 48" fill="none">
+        <path d="M24 40V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" />
+        <path d="M24 26C24 18 16 18 14 18C14 26 22 26 24 26Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 20C24 12 32 12 34 12C34 20 26 20 24 20Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 32C24 24 34 24 36 24C36 32 26 32 24 32Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M12 40H36" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round" />
+      </svg>
+      <div class="sb-brand-text">
+        <span class="sb-brand-name">ATAMAN</span>
+        <span class="sb-brand-tag">Every Tree. Every Impact.</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">ADMIN PANEL</div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+
+        <li class="nav-item ">
+          <a href="dashboard.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-tree-map.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-trees.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span>Trees</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-adopters.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Adopters</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-caretakers.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Caretakers</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-reports.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-analytics.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span>Analytics</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a href="admin-impact.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 14 14" />
+              <path d="m16 8-8 8" />
+              <path d="M16 16V8H8" />
+            </svg>
+            <span>Impact</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-users.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-content.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="15" y2="12" />
+              <line x1="3" y1="18" x2="9" y2="18" />
+            </svg>
+            <span>Content</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-notifications.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span>Notifications</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-system-logs.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            <span>System Logs</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content" id="mainContent">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="topbar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title">
+        <h1>🌱 Program Impact</h1>
+        <span class="topbar-sub">Measure the environmental, community, and tree-survival impact of ATAMAN.</span>
+      </div>
+      <div class="topbar-actions">
+        <div class="filter-pill" id="dateRangeBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="dateRangeLabel">Live Date &amp; Time</span>
+        </div>
+        <select class="filter-select" id="impactLocationFilter">
+          <option value="">📍 All Locations</option>
+          <option value="san-isidro">San Isidro</option>
+          <option value="mabini">Mabini</option>
+          <option value="santiago">Santiago</option>
+          <option value="san-juan">San Juan</option>
+          <option value="san-miguel">San Miguel</option>
+          <option value="banahaw">Mt. Banahaw</option>
+        </select>
+        <select class="filter-select" id="impactProjectFilter">
+          <option value="">🌱 All Projects</option>
+          <option value="reforestation">Reforestation 2026</option>
+          <option value="community">Community Trees</option>
+          <option value="school">School Tree Program</option>
+        </select>
+        <select class="filter-select" id="impactAdopterFilter">
+          <option value="">🤝 All Adopters</option>
+        </select>
+        <button class="btn-outline-sm" id="exportImpactCsvBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Report
+        </button>
+        <button class="btn-primary" id="openImpactReportModalBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          Generate Impact PDF
+        </button>
+
+    <div class="sidebar-user-row">
+      <a href="admin-settings.html" class="sidebar-user " id="sidebarUserProfile" title="Open Admin Account & Settings" style="text-decoration:none; flex:1;">
+        <div class="sb-user-avatar">EZ</div>
+        <div class="sb-user-info">
+          <span class="sb-user-name">Ethel Zeta (Admin)</span>
+          <span class="sb-user-role">Super Administrator</span>
+        </div>
+        <span class="sb-user-expand" title="Admin Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;max-width:16px;max-height:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+      </a>
+      <a href="index.html" class="sb-logout-btn" title="Sign out of ATAMAN">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+      </div>
+    </header>
+
+    <!-- IN-PAGE TABS -->
+    <div class="page-tabs-bar">
+      <div class="tab-list" role="tablist">
+        <button class="tab-btn active" data-tab="tab-overview">Overview</button>
+        <button class="tab-btn" data-tab="tab-trees">Tree Outcomes</button>
+        <button class="tab-btn" data-tab="tab-communities">Communities &amp; Farmers</button>
+        <button class="tab-btn" data-tab="tab-adopters">Adopters</button>
+        <button class="tab-btn" data-tab="tab-projects">Projects &amp; Goals</button>
+      </div>
+      <div class="tab-meta">
+        <span class="verified-tag">🛡️ Verified Environmental Data</span>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- ════════════════════════════════════════
+           1. IMPACT SUMMARY CARDS (2 Rows + Eco Badges)
+      ════════════════════════════════════════ -->
+      <section class="section" id="secImpactSummary">
+        <div class="section-hd">
+          <h2 class="section-title">Program Impact Summary</h2>
+          <span class="pulse-badge"><span class="pulse-dot"></span>Real-world Results</span>
+        </div>
+
+        <div class="impact-summary-grid">
+          <div class="imp-card imp-green">
+            <div class="imp-icon">🌳</div>
+            <div class="imp-body">
+              <span class="imp-label">Trees Planted</span>
+              <span class="imp-val" id="valPlanted">0</span>
+              <span class="imp-sub">0% of annual target</span>
+            </div>
+          </div>
+          <div class="imp-card imp-emerald">
+            <div class="imp-icon">🌱</div>
+            <div class="imp-body">
+              <span class="imp-label">Trees Survived</span>
+              <span class="imp-val" id="valSurvived">0</span>
+              <span class="imp-sub text-success">0% survival rate</span>
+            </div>
+          </div>
+          <div class="imp-card imp-teal">
+            <div class="imp-icon">🤝</div>
+            <div class="imp-body">
+              <span class="imp-label">Adopters Supporting</span>
+              <span class="imp-val">0</span>
+              <span class="imp-sub">0 trees adopted</span>
+            </div>
+          </div>
+          <div class="imp-card imp-blue">
+            <div class="imp-icon">📍</div>
+            <div class="imp-body">
+              <span class="imp-label">Areas Covered</span>
+              <span class="imp-val">0</span>
+              <span class="imp-sub">0 Barangays &amp; sites</span>
+            </div>
+          </div>
+          <div class="imp-card imp-amber">
+            <div class="imp-icon">👨‍🌾</div>
+            <div class="imp-body">
+              <span class="imp-label">Farmers &amp; Landowners</span>
+              <span class="imp-val">0</span>
+              <span class="imp-sub">0 Community partners</span>
+            </div>
+          </div>
+          <div class="imp-card imp-violet">
+            <div class="imp-icon">👤</div>
+            <div class="imp-body">
+              <span class="imp-label">Field Caretakers</span>
+              <span class="imp-val">0</span>
+              <span class="imp-sub">0 active on-ground</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verified Ecosystem Metrics Banner -->
+        <div class="eco-metrics-card">
+          <div class="eco-badge-title">
+            <span>🌿 Verified Environmental Impact Metrics</span>
+            <small>Methodology: DENR Forestry carbon sequestration tables &amp; canopy radius standards</small>
+          </div>
+          <div class="eco-grid">
+            <div class="eco-item">
+              <div class="eco-icon">🍃</div>
+              <div class="eco-text">
+                <span class="eco-val">0 Metric Tons</span>
+                <span class="eco-lbl">CO₂e Estimated Carbon Sequestered / Year</span>
+              </div>
+            </div>
+            <div class="eco-item">
+              <div class="eco-icon">🌳</div>
+              <div class="eco-text">
+                <span class="eco-val">0 Hectares</span>
+                <span class="eco-lbl">Restored Forest Canopy Area Coverage</span>
+              </div>
+            </div>
+            <div class="eco-item">
+              <div class="eco-icon">💧</div>
+              <div class="eco-text">
+                <span class="eco-val">0 Liters</span>
+                <span class="eco-lbl">Annual Groundwater Retention &amp; Soil Protection</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           2. TREE SURVIVAL IMPACT & TRENDS
+      ════════════════════════════════════════ -->
+      <section class="section" id="secSurvivalImpact">
+        <div class="section-hd">
+          <h2 class="section-title">🌳 Tree Survival Impact</h2>
+          <span class="section-sub">Connecting plantings directly with sustained survival outcomes</span>
+        </div>
+
+        <div class="two-col">
+          <!-- Survival Breakdown & Ring -->
+          <div class="card survival-card">
+            <h3 class="card-title">Overall Survival Status</h3>
+            <div class="survival-status-row">
+              <div class="surv-ring-box">
+                <svg viewBox="0 0 120 120" class="ring-svg">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="#e2e8f0" stroke-width="12"/>
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="#22c55e" stroke-width="12"
+                    stroke-dasharray="314.15" stroke-dashoffset="314.15"
+                    stroke-linecap="round" transform="rotate(-90 60 60)"/>
+                </svg>
+                <div class="surv-ring-center">
+                  <span class="surv-num">0%</span>
+                  <span class="surv-lbl">Survival</span>
+                </div>
+              </div>
+              <div class="surv-stats-col">
+                <div class="surv-stat-item">
+                  <span class="ss-dot" style="background:#22c55e;"></span>
+                  <div class="ss-info"><span>Planted</span><strong>0 trees</strong></div>
+                </div>
+                <div class="surv-stat-item">
+                  <span class="ss-dot" style="background:#16a34a;"></span>
+                  <div class="ss-info"><span>Surviving</span><strong class="text-success">0 trees</strong></div>
+                </div>
+                <div class="surv-stat-item">
+                  <span class="ss-dot" style="background:#ef4444;"></span>
+                  <div class="ss-info"><span>Lost / Dead</span><strong class="text-danger">0 trees (0%)</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="prog-wrapper">
+              <div class="prog-label"><span>Survival Progress</span><strong>0% (Target: 0%)</strong></div>
+              <div class="prog-bar-track">
+                <div class="prog-bar-fill" style="width:0%; background: linear-gradient(90deg, #16a34a, #22c55e);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2026 Survival Progression Trend -->
+          <div class="card">
+            <h3 class="card-title">2026 Monthly Survival Progression</h3>
+            <div class="trend-month-bar-wrap">
+              <div class="month-prog-item">
+                <span class="mp-pct">0%</span>
+                <div class="mp-bar"><div class="mp-fill" style="height:0%"></div></div>
+                <span class="mp-label">Jan</span>
+              </div>
+              <div class="month-prog-item">
+                <span class="mp-pct">0%</span>
+                <div class="mp-bar"><div class="mp-fill" style="height:0%"></div></div>
+                <span class="mp-label">Feb</span>
+              </div>
+              <div class="month-prog-item">
+                <span class="mp-pct">0%</span>
+                <div class="mp-bar"><div class="mp-fill" style="height:0%"></div></div>
+                <span class="mp-label">Mar</span>
+              </div>
+              <div class="month-prog-item">
+                <span class="mp-pct">0%</span>
+                <div class="mp-bar"><div class="mp-fill" style="height:0%"></div></div>
+                <span class="mp-label">Apr</span>
+              </div>
+              <div class="month-prog-item">
+                <span class="mp-pct">0%</span>
+                <div class="mp-bar"><div class="mp-fill" style="height:0%"></div></div>
+                <span class="mp-label">May</span>
+              </div>
+              <div class="month-prog-item">
+                <span class="mp-pct">0%</span>
+                <div class="mp-bar"><div class="mp-fill" style="height:0%"></div></div>
+                <span class="mp-label">Jun</span>
+              </div>
+              <div class="month-prog-item">
+                <span class="mp-pct">0%</span>
+                <div class="mp-bar"><div class="mp-fill" style="height:0%"></div></div>
+                <span class="mp-label">Jul</span>
+              </div>
+              <div class="month-prog-item active">
+                <span class="mp-pct">0%</span>
+                <div class="mp-bar"><div class="mp-fill highlight" style="height:0%"></div></div>
+                <span class="mp-label">Aug</span>
+              </div>
+            </div>
+            <div class="callout-tip">
+              💡 <strong>Impact Insight:</strong> No monthly survival trends recorded yet.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           3. TREES PLANTED OVER TIME & GOALS
+      ════════════════════════════════════════ -->
+      <section class="section" id="secPlantingProgress">
+        <div class="section-hd">
+          <h2 class="section-title">🌱 Planting Progress vs. Annual Target</h2>
+        </div>
+
+        <div class="two-col">
+          <!-- Planting Curve Chart -->
+          <div class="card">
+            <div class="card-hd-flex">
+              <h3 class="card-title">Cumulative Trees Planted in 2026</h3>
+              <span class="badge-soft-green">+0 this month</span>
+            </div>
+            <div class="svg-chart-container">
+              <svg class="trend-svg" viewBox="0 0 500 180" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="plantGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#4ade80" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="#4ade80" stop-opacity="0.0"/>
+                  </linearGradient>
+                </defs>
+                <!-- Grid -->
+                <line x1="0" y1="30" x2="500" y2="30" stroke="#f1f5f9" stroke-width="1"/>
+                <line x1="0" y1="75" x2="500" y2="75" stroke="#f1f5f9" stroke-width="1"/>
+                <line x1="0" y1="120" x2="500" y2="120" stroke="#f1f5f9" stroke-width="1"/>
+                <!-- Target Line (3000) -->
+                
+                <!-- Area -->
+                <path d="M40,170 L480,170 L480,180 L40,180 Z" fill="url(#plantGrad)"/>
+                <!-- Line -->
+                <polyline points="40,170 480,170" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/>
+                <!-- X labels -->
+                <text x="32" y="172" fill="#94a3b8" font-size="10">Jan</text>
+                <text x="92" y="172" fill="#94a3b8" font-size="10">Feb</text>
+                <text x="152" y="172" fill="#94a3b8" font-size="10">Mar</text>
+                <text x="217" y="172" fill="#94a3b8" font-size="10">Apr</text>
+                <text x="282" y="172" fill="#94a3b8" font-size="10">May</text>
+                <text x="347" y="172" fill="#94a3b8" font-size="10">Jun</text>
+                <text x="412" y="172" fill="#94a3b8" font-size="10">Jul</text>
+                <text x="470" y="172" fill="#166534" font-size="10" font-weight="700">Aug</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Goals Card with Progress Bars -->
+          <div class="card goals-card">
+            <h3 class="card-title">2026 ATAMAN Strategic Impact Goals</h3>
+            <div class="goal-item">
+              <div class="goal-hd">
+                <span>🌳 Trees Planted</span>
+                <strong>0 / 0 <em class="goal-pct">0%</em></strong>
+              </div>
+              <div class="prog-bar-track"><div class="prog-bar-fill" style="width:0%; background:#22c55e;"></div></div>
+            </div>
+
+            <div class="goal-item">
+              <div class="goal-hd">
+                <span>🌱 Survival Rate Target</span>
+                <strong>0% / 0% <em class="goal-pct">0%</em></strong>
+              </div>
+              <div class="prog-bar-track"><div class="prog-bar-fill" style="width:0%; background:#10b981;"></div></div>
+            </div>
+
+            <div class="goal-item">
+              <div class="goal-hd">
+                <span>🤝 Adopter Engagement</span>
+                <strong>0 / 0 <em class="goal-pct">0%</em></strong>
+              </div>
+              <div class="prog-bar-track"><div class="prog-bar-fill" style="width:0%; background:#3b82f6;"></div></div>
+            </div>
+
+            <div class="goal-item">
+              <div class="goal-hd">
+                <span>🏘️ Barangay &amp; Site Coverage</span>
+                <strong>0 / 0 <em class="goal-pct">0%</em></strong>
+              </div>
+              <div class="prog-bar-track"><div class="prog-bar-fill" style="width:0%; background:#8b5cf6;"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           4. GEOGRAPHIC IMPACT & ACTION AREAS
+      ════════════════════════════════════════ -->
+      <section class="section" id="secGeoImpact">
+        <div class="section-hd">
+          <h2 class="section-title">📍 Geographic Impact by Barangay</h2>
+          <div class="section-actions">
+            <a href="admin-tree-map.html" class="btn-outline-sm">View on Tree Map 🗺️</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <table class="impact-table">
+            <thead>
+              <tr>
+                <th>Location / Barangay</th>
+                <th>Trees Planted</th>
+                <th>Survival Rate</th>
+                <th>Farmers Participating</th>
+                <th>Adopters Active</th>
+                <th>Impact Level</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="7" style="text-align:center; padding:36px; color:#94a3b8; font-weight:600;">📍 No geographic impact data recorded yet.</td></tr>
+              </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           5. ADOPTER IMPACT & COMMUNITY PARTICIPATION
+      ════════════════════════════════════════ -->
+      <section class="section" id="secCommunityAdopter">
+        <div class="two-col">
+
+          <!-- Adopter Impact -->
+          <div class="card">
+            <div class="card-hd-flex">
+              <h3 class="card-title">🤝 Adopter Contribution Impact</h3>
+              <span class="badge-soft-green">0% Adopted Survival</span>
+            </div>
+            <div class="adopter-kpi-row">
+              <div class="ak-item"><span>Total Adopters</span><strong>0</strong></div>
+              <div class="ak-item"><span>Active Sponsoring</span><strong>0</strong></div>
+              <div class="ak-item"><span>Adopted Trees</span><strong>0</strong></div>
+              <div class="ak-item"><span>Surviving</span><strong class="text-success">0</strong></div>
+            </div>
+
+            <h4 class="sub-hd">Top Sponsoring Partners</h4>
+            <table class="mini-table">
+              <thead><tr><th>Adopter</th><th>Trees Adopted</th><th>Survival Rate</th></tr></thead>
+              <tbody>
+                <tr><td colspan="3" style="text-align:center; padding:20px; color:#94a3b8; font-weight:600;">🤝 No sponsoring partner records yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Community & Farmer Impact -->
+          <div class="card">
+            <div class="card-hd-flex">
+              <h3 class="card-title">👨‍🌾 Community Participation Impact</h3>
+              <span class="badge-soft-green">0 Landowners</span>
+            </div>
+            <div class="community-metric-grid">
+              <div class="cm-card">
+                <span class="cm-ico">👨‍🌾</span>
+                <span class="cm-val">0</span>
+                <span class="cm-lbl">Participating Farmers</span>
+              </div>
+              <div class="cm-card">
+                <span class="cm-ico">🏘️</span>
+                <span class="cm-val">0</span>
+                <span class="cm-lbl">Barangay Units</span>
+              </div>
+              <div class="cm-card">
+                <span class="cm-ico">👤</span>
+                <span class="cm-val">0</span>
+                <span class="cm-lbl">Local Caretakers</span>
+              </div>
+              <div class="cm-card">
+                <span class="cm-ico">🌾</span>
+                <span class="cm-val">₱0</span>
+                <span class="cm-lbl">Livelihood Distributed</span>
+              </div>
+            </div>
+
+            <div class="callout-green">
+              🤝 <strong>Community Empowerment:</strong> Community participation, landowner stipends, and local caretaker metrics will appear here in real time.
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           6. SPECIES IMPACT & MAINTENANCE EFFECTIVENESS
+      ════════════════════════════════════════ -->
+      <section class="section" id="secSpeciesMaint">
+        <div class="two-col">
+
+          <!-- Species Impact -->
+          <div class="card">
+            <h3 class="card-title">🌳 Impact by Tree Species</h3>
+            <table class="mini-table">
+              <thead><tr><th>Species</th><th>Planted</th><th>Surviving</th><th>Survival Rate</th></tr></thead>
+              <tbody>
+                <tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8; font-weight:600;">🌿 No species impact data recorded yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Maintenance Effectiveness (Connecting work to outcomes) -->
+          <div class="card">
+            <div class="card-hd-flex">
+              <h3 class="card-title">🔧 Maintenance Intervention Effectiveness</h3>
+              <span class="badge-soft-green">0% Recovery Rate</span>
+            </div>
+            <p class="section-desc">Shows whether field maintenance interventions actually improved tree health condition.</p>
+
+            <div class="maint-impact-box">
+              <div class="mib-item">
+                <span>Treated Trees</span>
+                <strong>0</strong>
+              </div>
+              <div class="mib-item">
+                <span>Improved / Recovered</span>
+                <strong class="text-success">0</strong>
+              </div>
+              <div class="mib-item">
+                <span>Overall Improvement</span>
+                <strong class="text-success">0%</strong>
+              </div>
+            </div>
+
+            <table class="mini-table" style="margin-top:12px;">
+              <thead><tr><th>Intervention Type</th><th>Treated</th><th>Improved</th><th>Efficacy</th></tr></thead>
+              <tbody>
+                <tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8; font-weight:600;">🔧 No maintenance intervention records yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           7. PROJECT COMPARISON & PROBLEM AREAS
+      ════════════════════════════════════════ -->
+      <section class="section" id="secProjectsProblems">
+        <div class="two-col">
+
+          <!-- Project Comparison -->
+          <div class="card">
+            <h3 class="card-title">🏆 Impact Comparison by Project</h3>
+            <table class="impact-table">
+              <thead><tr><th>Project</th><th>Trees</th><th>Survival</th><th>Adopters</th><th>Sites</th></tr></thead>
+              <tbody>
+                <tr><td colspan="5" style="text-align:center; padding:20px; color:#94a3b8; font-weight:600;">🏆 No project comparison records yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Problem Areas / Action Required -->
+          <div class="card alert-card">
+            <div class="card-hd-flex">
+              <h3 class="card-title text-success">✅ Problem Areas Requiring Action</h3>
+              <span class="badge-soft-green">0 Priority Sites</span>
+            </div>
+            <div style="text-align:center; padding:24px; color:#16a34a; font-weight:600;">✅ No problem areas or critical sites requiring immediate intervention.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           8. HUMAN IMPACT STORIES (Before & After)
+      ════════════════════════════════════════ -->
+      <section class="section" id="secStories">
+        <div class="section-hd">
+          <h2 class="section-title">📸 Real-World Impact Stories</h2>
+          <span class="section-sub">Demonstrable community and environmental restoration highlights</span>
+        </div>
+
+        <div class="stories-grid">
+          <div style="grid-column: span 2; text-align:center; padding:48px 20px; background:#f8fafc; border-radius:12px; border:1px dashed #cbd5e1; color:#94a3b8; font-weight:600;">
+            📸 No impact photo showcases uploaded yet. Field before &amp; after stories will appear here as reforestation milestones are logged.
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /.page-body -->
+  </main>
+
+  <!-- ════════════════════════════════════════
+       GENERATE IMPACT REPORT MODAL
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="impactModalOverlay">
+    <div class="modal-card">
+      <div class="modal-hd">
+        <h3>📄 Generate Official Impact Report</h3>
+        <button class="modal-close-btn" id="closeImpactModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro">Compile a comprehensive, presentation-ready ATAMAN Program Impact Report for donors, board members, and adopters.</p>
+
+        <div class="form-group">
+          <label>Report Period</label>
+          <select class="form-control" id="modalPeriod">
+            <option>January – August 2026 (Year-to-Date)</option>
+            <option>Q2 2026 (April – June)</option>
+            <option>Q3 2026 (July – September)</option>
+            <option>All Time (2025 – 2026)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Project Scope</label>
+          <select class="form-control" id="modalProject">
+            <option>All Projects (Reforestation, Community, School)</option>
+            <option>Reforestation 2026</option>
+            <option>Community Trees Program</option>
+            <option>School Tree Program</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Inclusions</label>
+          <div class="checkbox-grid">
+            <label class="cb-label"><input type="checkbox" checked id="incSurvival"> ☑ Tree Survival &amp; Health</label>
+            <label class="cb-label"><input type="checkbox" checked id="incGeo"> ☑ Geographic Impact &amp; Maps</label>
+            <label class="cb-label"><input type="checkbox" checked id="incAdopters"> ☑ Adopter Contributions</label>
+            <label class="cb-label"><input type="checkbox" checked id="incCommunity"> ☑ Community Participation</label>
+            <label class="cb-label"><input type="checkbox" checked id="incMaint"> ☑ Maintenance Results</label>
+            <label class="cb-label"><input type="checkbox" checked id="incPhotos"> ☑ Before &amp; After Photos</label>
+            <label class="cb-label"><input type="checkbox" checked id="incGoals"> ☑ 2026 Strategic Goals</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Export Format</label>
+          <div class="format-radios">
+            <label class="radio-pill active"><input type="radio" name="impactFormat" value="pdf" checked> 📄 Formal PDF Document</label>
+            <label class="radio-pill"><input type="radio" name="impactFormat" value="csv"> 📊 CSV Data Summary</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn btn-secondary" id="cancelImpactModalBtn">Cancel</button>
+        <button class="btn btn-primary" id="confirmGenerateImpactBtn">⚡ Compile &amp; Download Impact Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast hidden" id="toastMsg"></div>
+
+  <script src="ATAMAN-init.js"></script>
+  <!-- Real-Time Sync Engine -->
+  <script src="realtime-admin.js?v=20260906_realtime"></script>
+  <script src="admin-impact.js?v=20260906_realtime"></script>
+</body>
+</html>

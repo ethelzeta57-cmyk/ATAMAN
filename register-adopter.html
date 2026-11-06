@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault(); return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN - Register as Adopter</title>
+  <meta name="description"
+    content="Create your ATAMAN Adopter account to start tracking and supporting trees in your community." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+    rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <link rel="stylesheet" href="register.css" />
+</head>
+
+<body>
+  <div class="reg-page">
+
+    <!-- Leaf decorations -->
+    <svg class="leaf-deco leaf-deco-tl" viewBox="0 0 80 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M40 0 C20 20 0 40 10 70 C20 100 60 95 70 65 C80 35 60 10 40 0Z" />
+      <line x1="40" y1="5" x2="35" y2="85" stroke="#15803d" stroke-width="1.5" />
+    </svg>
+    <svg class="leaf-deco leaf-deco-br" viewBox="0 0 80 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M40 0 C20 20 0 40 10 70 C20 100 60 95 70 65 C80 35 60 10 40 0Z" />
+    </svg>
+
+    <!-- Logo -->
+    <div class="reg-logo-wrap">
+      <img src="assets/ataman-logo-stacked.png" alt="ATAMAN - Tanom. Ataman. Padayon." class="reg-logo-img" />
+    </div>
+
+    <!-- Registration Card -->
+    <div class="reg-card">
+      <!-- Header -->
+      <div class="reg-card-header">
+        <h1 class="reg-card-title">Create an Account</h1>
+        <p class="reg-card-subtitle">Fill in the details below to register a new account.</p>
+      </div>
+
+      <!-- Form -->
+      <form class="reg-form" id="regForm" novalidate>
+
+        <!-- Row 1: Complete Name + Email -->
+        <div class="form-row">
+          <!-- Complete Name -->
+          <div class="form-group">
+            <label for="nameInput" class="form-label">Complete Name <span class="req-star">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </span>
+              <input type="text" id="nameInput" name="fullname" class="form-input" placeholder="Enter complete name"
+                autocomplete="name" required />
+            </div>
+          </div>
+
+          <!-- Email Address -->
+          <div class="form-group">
+            <label for="emailInput" class="form-label">Email Address <span class="req-star">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+              </span>
+              <input type="email" id="emailInput" name="email" class="form-input" placeholder="youremail@example.com"
+                autocomplete="email" required />
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Create Password + Confirm Password -->
+        <div class="form-row">
+          <!-- Create Password -->
+          <div class="form-group">
+            <label for="passwordInput" class="form-label">Create Password <span class="req-star">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </span>
+              <input type="password" id="passwordInput" name="password" class="form-input" placeholder="Enter password"
+                autocomplete="new-password" required />
+              <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility"
+                tabindex="-1">
+                <svg class="eye-icon eye-open hide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <svg class="eye-icon eye-slash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                  <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                  <line x1="2" x2="22" y1="2" y2="22" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="confirmPasswordInput" class="form-label">Confirm Password <span
+                class="req-star">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </span>
+              <input type="password" id="confirmPasswordInput" name="confirmPassword" class="form-input"
+                placeholder="Confirm password" autocomplete="new-password" />
+              <button type="button" class="password-toggle" id="confirmPasswordToggle"
+                aria-label="Toggle confirm password visibility" tabindex="-1">
+                <svg class="eye-icon eye-open hide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <svg class="eye-icon eye-slash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                  <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                  <line x1="2" x2="22" y1="2" y2="22" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password Requirements Box -->
+        <div class="password-requirements" id="passwordRequirements">
+          <p>Password must contain:</p>
+          <ul class="req-list">
+            <li class="req-item met" id="req-length">
+              <span class="req-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              At least 8 characters
+            </li>
+            <li class="req-item met" id="req-upper">
+              <span class="req-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              One uppercase letter (A-Z)
+            </li>
+            <li class="req-item met" id="req-lower">
+              <span class="req-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              One lowercase letter (a-z)
+            </li>
+            <li class="req-item met" id="req-number">
+              <span class="req-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              One number (0-9)
+            </li>
+          </ul>
+        </div>
+
+        <!-- Set Role -->
+        <div class="form-group">
+          <label for="roleSelect" class="form-label">Set Role <span class="req-star">*</span></label>
+          <div class="select-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </span>
+            <select id="roleSelect" name="role" class="form-select" required>
+              <option value="adopter" selected>Tree Adopter</option>
+            </select>
+            <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Info Note -->
+        <div class="info-note">
+          <svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4" />
+            <path d="M12 8h.01" />
+          </svg>
+          <span><strong>Note:</strong> Only administrators can create new accounts.</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="reg-submit-btn" id="submitBtn">
+          <span class="btn-spinner hide" id="btnSpinner"></span>
+          <svg class="btn-icon" id="btnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" x2="19" y1="8" y2="14" />
+            <line x1="22" x2="16" y1="11" y2="11" />
+          </svg>
+          <span id="btnText">Register Account</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="reg-divider"><span>Or</span></div>
+
+        <!-- Back to Login -->
+        <a href="login.html" class="reg-back-link" id="backToLoginBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M19 12H5" />
+            <path d="M12 5l-7 7 7 7" />
+          </svg>
+          Back to Login
+        </a>
+
+      </form>
+    </div><!-- /.reg-card -->
+
+  </div><!-- /.reg-page -->
+
+  <!-- Toast -->
+  <div class="toast-notification" id="toast">
+    <div class="toast-content">
+      <span class="toast-icon" id="toastIcon">🌱</span>
+      <span class="toast-message" id="toastMessage">Welcome to ATAMAN!</span>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        'use strict';
+
+        const authAPI = window.ATAMAN_AUTH;
+
+        // --- Elements ---
+        const regForm = document.getElementById('regForm');
+        const nameInput = document.getElementById('nameInput');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const confirmInput = document.getElementById('confirmPasswordInput');
+        const roleSelect = document.getElementById('roleSelect');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const btnIcon = document.getElementById('btnIcon');
+        const btnText = document.getElementById('btnText');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = document.getElementById('toastIcon');
+
+        // Role select styling
+        roleSelect.addEventListener('change', function () {
+          this.classList.toggle('placeholder-selected', !this.value);
+        });
+
+        // --- Password toggle ---
+        function setupToggle(toggleBtn, input) {
+          const eyeOpen = toggleBtn.querySelector('.eye-open');
+          const eyeSlash = toggleBtn.querySelector('.eye-slash');
+          toggleBtn.addEventListener('click', () => {
+            const isPass = input.type === 'password';
+            input.type = isPass ? 'text' : 'password';
+            eyeSlash.classList.toggle('hide', isPass);
+            eyeOpen.classList.toggle('hide', !isPass);
+            toggleBtn.setAttribute('aria-label', isPass ? 'Hide password' : 'Show password');
+          });
+        }
+        setupToggle(document.getElementById('passwordToggle'), passwordInput);
+        setupToggle(document.getElementById('confirmPasswordToggle'), confirmInput);
+
+        // --- Live password requirements ---
+        const reqLength = document.getElementById('req-length');
+        const reqUpper = document.getElementById('req-upper');
+        const reqLower = document.getElementById('req-lower');
+        const reqNumber = document.getElementById('req-number');
+
+        function checkReq(el, condition) {
+          el.classList.toggle('met', condition);
+          el.classList.toggle('unmet', !condition);
+        }
+
+        passwordInput.addEventListener('input', () => {
+          const v = passwordInput.value;
+          checkReq(reqLength, v.length >= 8);
+          checkReq(reqUpper, /[A-Z]/.test(v));
+          checkReq(reqLower, /[a-z]/.test(v));
+          checkReq(reqNumber, /[0-9]/.test(v));
+        });
+
+        // initialise as unmet
+        [reqLength, reqUpper, reqLower, reqNumber].forEach(el => {
+          el.classList.remove('met');
+          el.classList.add('unmet');
+        });
+
+        // --- Form Submit ---
+        regForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          if (window.ATAMAN_NETWORK) {
+            const isOnline = await window.ATAMAN_NETWORK.verifyOnline();
+            if (!isOnline) {
+              showToast('Internet connection required to create an account.', '❌');
+              window.ATAMAN_NETWORK.showOfflineBlocker();
+              return;
+            }
+          } else if (!navigator.onLine) {
+            showToast('You are offline. Internet connection required.', '❌');
+            return;
+          }
+
+          const name = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+          const confirm = confirmInput.value;
+          const selectedRole = (roleSelect && roleSelect.value) ? roleSelect.value : 'adopter';
+
+          if (!name) { nameInput.focus(); showToast('Please enter your complete name.', '⚠️'); return; }
+          if (!email) { emailInput.focus(); showToast('Please enter your email address.', '⚠️'); return; }
+
+          const passOk = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password);
+          if (!passOk) { passwordInput.focus(); showToast('Password does not meet all requirements.', '⚠️'); return; }
+          if (password !== confirm) { confirmInput.focus(); showToast('Passwords do not match. Please re-enter.', '⚠️'); return; }
+
+          setLoading(true, 'Creating account...');
+
+          try {
+            let destination = selectedRole === 'caretaker' ? 'caretaker-dashboard.html' : (selectedRole === 'admin' ? 'dashboard.html' : 'adopter-dashboard.html');
+            if (authAPI && typeof authAPI.signUp === 'function') {
+              const res = await authAPI.signUp(email, password, name, selectedRole);
+              if (res && res.dashboardUrl) {
+                destination = res.dashboardUrl;
+              }
+            } else {
+              localStorage.setItem('ATAMAN_user_role', selectedRole);
+              localStorage.setItem('ATAMAN_user_name', name);
+              localStorage.setItem('ATAMAN_user_email', email.toLowerCase().trim());
+              localStorage.setItem('ATAMAN_logged_in', 'true');
+            }
+
+            // ── Save to registered users (Admin → Users) ──────────────────
+            try {
+              const regKey = 'ATAMAN_registered_users';
+              const existing = JSON.parse(localStorage.getItem(regKey) || '[]');
+              const now = new Date().toISOString();
+              const alreadyExists = existing.some(u =>
+                (u.email || '').toLowerCase() === email.toLowerCase()
+              );
+              if (!alreadyExists) {
+                existing.push({
+                  id: 'USR-' + Date.now(),
+                  name: name,
+                  email: email.toLowerCase().trim(),
+                  role: selectedRole,
+                  status: 'Active',
+                  createdAt: now,
+                  joinedDate: now.slice(0, 10),
+                  lastLogin: now
+                });
+                localStorage.setItem(regKey, JSON.stringify(existing));
+              }
+            } catch (_) { }
+
+            // ── Create a Pending adopter profile (Admin → Adopters) ────────
+            // Status is 'Pending' — trees will only count as Taken
+            // after an admin approves and sets status to 'Active'.
+            if (selectedRole === 'adopter') {
+              try {
+                const adKey = 'ATAMAN_adopters_cache';
+                const existingAd = JSON.parse(localStorage.getItem(adKey) || '[]');
+                const alreadyAdopter = existingAd.some(a =>
+                  (a.email || '').toLowerCase() === email.toLowerCase()
+                );
+                if (!alreadyAdopter) {
+                  const now = new Date().toISOString();
+                  existingAd.push({
+                    id: 'ADP-' + Date.now(),
+                    name: name,
+                    email: email.toLowerCase().trim(),
+                    type: 'Individual',
+                    status: 'Pending',
+                    treesCount: 0,
+                    funding: 0,
+                    joinedDate: now.slice(0, 10),
+                    createdAt: now,
+                    treesList: []
+                  });
+                  localStorage.setItem(adKey, JSON.stringify(existingAd));
+                }
+              } catch (_) { }
+            }
+
+            showToast(`🎉 Account created! Welcome, ${name}!`, '🌳');
+            setTimeout(() => { window.location.href = destination; }, 900);
+          } catch (err) {
+            console.error('Registration error:', err);
+            showToast(getFriendlyError(err.code || err.message), '❌');
+            setLoading(false, 'Register Account');
+          }
+        });
+
+        function setLoading(on, text) {
+          submitBtn.disabled = on;
+          btnSpinner.classList.toggle('hide', !on);
+          btnIcon.classList.toggle('hide', on);
+          btnText.textContent = text;
+        }
+
+        function getFriendlyError(code) {
+          const map = {
+            'auth/email-already-in-use': 'An account with this email already exists. Please sign in.',
+            'auth/weak-password': 'Password is too weak. Use at least 6 characters.',
+            'auth/invalid-email': 'Please enter a valid email address.',
+            'auth/network-request-failed': 'Network error. Check your internet connection.'
+          };
+          return map[code] || (typeof code === 'string' && code.length > 5 ? code : 'Registration failed. Please check your details.');
+        }
+
+        let toastTimer = null;
+        function showToast(message, icon = '🌱') {
+          if (!toast) return;
+          if (toastTimer) clearTimeout(toastTimer);
+          toastMessage.textContent = message;
+          toastIcon.textContent = icon;
+          toast.classList.add('show');
+          toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+      })();
+    }); // DOMContentLoaded
+  </script>
+  <script src="ataman-connectivity.js"></script>
+  <script src="pwa-register.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — Admin Account & Settings</title>
+  <meta name="description" content="ATAMAN Admin — Manage your personal administrator profile, security credentials, notification rules, and system preferences." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="admin-settings.css" />
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <svg class="sb-brand-icon" viewBox="0 0 48 48" fill="none">
+        <path d="M24 40V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" />
+        <path d="M24 26C24 18 16 18 14 18C14 26 22 26 24 26Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 20C24 12 32 12 34 12C34 20 26 20 24 20Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 32C24 24 34 24 36 24C36 32 26 32 24 32Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M12 40H36" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round" />
+      </svg>
+      <div class="sb-brand-text">
+        <span class="sb-brand-name">ATAMAN</span>
+        <span class="sb-brand-tag">Every Tree. Every Impact.</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">ADMIN PANEL</div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+
+        <li class="nav-item ">
+          <a href="dashboard.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-tree-map.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-trees.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span>Trees</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-adopters.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Adopters</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-caretakers.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Caretakers</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-reports.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-analytics.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span>Analytics</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-impact.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 14 14" />
+              <path d="m16 8-8 8" />
+              <path d="M16 16V8H8" />
+            </svg>
+            <span>Impact</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-users.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-content.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="15" y2="12" />
+              <line x1="3" y1="18" x2="9" y2="18" />
+            </svg>
+            <span>Content</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-notifications.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span>Notifications</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-system-logs.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            <span>System Logs</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content" id="mainContent">
+
+    <!-- ── TOPBAR ── -->
+    <header class="topbar">
+      <button class="topbar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
+      <div class="topbar-title">
+        <h1>⚙️ Admin Account &amp; Settings</h1>
+        <span class="topbar-sub">Manage your personal admin profile, security credentials, notification rules, and system configurations.</span>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn-outline-sm" id="btnDiscardChanges">
+          <span>Discard</span>
+        </button>
+        <button class="btn-primary" id="btnSaveAllSettings">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Save Changes</span>
+        </button>
+
+    <div class="sidebar-user-row">
+      <a href="admin-settings.html" class="sidebar-user active-user-card" id="sidebarUserProfile" title="Open Admin Account & Settings" style="text-decoration:none; flex:1;">
+        <div class="sb-user-avatar">EZ</div>
+        <div class="sb-user-info">
+          <span class="sb-user-name">Ethel Zeta (Admin)</span>
+          <span class="sb-user-role">Super Administrator</span>
+        </div>
+        <span class="sb-user-expand" title="Admin Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;max-width:16px;max-height:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+      </a>
+      <a href="index.html" class="sb-logout-btn" title="Sign out of ATAMAN">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+      </div>
+    </header>
+
+    <div class="page-body">
+
+      <!-- ════════════════════════════════════════
+           1. ADMIN ACCOUNT HEADER BANNER
+      ════════════════════════════════════════ -->
+      <section class="account-hero-card">
+        <div class="ah-left">
+          <div class="ah-avatar-wrapper">
+            <div class="ah-avatar" id="avatarDisplay">EZ</div>
+            <button class="ah-avatar-edit-btn" id="btnChangeAvatar" title="Upload new photo">📷</button>
+          </div>
+          <div class="ah-details">
+            <div class="ah-name-row">
+              <h2 class="ah-name" id="heroAdminName">Ethel Zeta</h2>
+              <span class="ah-badge super-badge">Super Administrator</span>
+              <span class="ah-status-dot" title="Active Admin Session"></span>
+            </div>
+            <p class="ah-email" id="heroAdminEmail">ethel.zeta@ATAMAN.org</p>
+            <div class="ah-meta-tags">
+              <span class="ah-tag">🏛️ Central Operations &amp; Forestry Lead</span>
+              <span class="ah-tag">🔑 Full System Privileges</span>
+              <span class="ah-tag">🛡️ 2FA Enabled</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ah-quick-stats">
+          <div class="ah-stat-box">
+            <span class="as-lbl">Role Level</span>
+            <span class="as-val">Level 1 (Super)</span>
+          </div>
+          <div class="ah-stat-box">
+            <span class="as-lbl">Last Active</span>
+            <span class="as-val">Today, 08:54 AM</span>
+          </div>
+          <div class="ah-stat-box">
+            <span class="as-lbl">Security Score</span>
+            <span class="as-val text-green">98% Secure</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           2. SETTINGS NAVIGATION TABS
+      ════════════════════════════════════════ -->
+      <div class="settings-tabs-bar" role="tablist">
+        <button class="tab-btn active" data-tab="tabProfile" role="tab" aria-selected="true">
+          <span class="tab-icon">👤</span>
+          <span>Profile &amp; Account</span>
+        </button>
+        <button class="tab-btn" data-tab="tabSecurity" role="tab" aria-selected="false">
+          <span class="tab-icon">🔐</span>
+          <span>Security &amp; Password</span>
+        </button>
+        <button class="tab-btn" data-tab="tabNotifications" role="tab" aria-selected="false">
+          <span class="tab-icon">🔔</span>
+          <span>Notification Rules</span>
+        </button>
+        <button class="tab-btn" data-tab="tabPreferences" role="tab" aria-selected="false">
+          <span class="tab-icon">🎨</span>
+          <span>UI &amp; System Preferences</span>
+        </button>
+        <button class="tab-btn" data-tab="tabSessions" role="tab" aria-selected="false">
+          <span class="tab-icon">💻</span>
+          <span>Active Sessions &amp; Logs</span>
+        </button>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           TAB 1: PROFILE & PERSONAL INFO
+      ════════════════════════════════════════ -->
+      <section class="tab-pane active" id="tabProfile">
+        <div class="settings-grid-layout">
+
+          <!-- Card 1: Personal Details -->
+          <div class="settings-section-card">
+            <div class="ssc-header">
+              <div class="ssc-icon green-icon">👤</div>
+              <div>
+                <h3 class="ssc-title">Personal Administrator Information</h3>
+                <p class="ssc-sub">Update your contact details and display profile across ATAMAN.</p>
+              </div>
+            </div>
+
+            <form id="formAdminProfile" class="settings-form">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="profFirstName">First Name *</label>
+                  <input type="text" id="profFirstName" class="form-input" value="Ethel" required />
+                </div>
+                <div class="form-group">
+                  <label for="profLastName">Last Name *</label>
+                  <input type="text" id="profLastName" class="form-input" value="Zeta" required />
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="profEmail">Official Work Email *</label>
+                  <input type="email" id="profEmail" class="form-input" value="ethel.zeta@ATAMAN.org" required />
+                </div>
+                <div class="form-group">
+                  <label for="profPhone">Mobile / Emergency Hotline *</label>
+                  <input type="tel" id="profPhone" class="form-input" value="+63 917 555 0192" required />
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="profStaffId">Admin Staff Reference ID</label>
+                  <input type="text" id="profStaffId" class="form-input" value="ADM-SAP-001" readonly />
+                </div>
+                <div class="form-group">
+                  <label for="profRoleTitle">Assigned Position / Job Title</label>
+                  <input type="text" id="profRoleTitle" class="form-input" value="Super Administrator &amp; Forestry Operations Lead" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="profBio">Administrative Focus &amp; Notes</label>
+                <textarea id="profBio" class="form-textarea" rows="3">Lead administrator responsible for Laguna tree conservation monitoring, caretaker task dispatching, GIS geo-fencing, and corporate adopter relations.</textarea>
+              </div>
+
+              <div class="form-actions-inline">
+                <button type="submit" class="btn-primary-sm">Save Profile Changes</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Card 2: Role & System Privileges Overview -->
+          <div class="settings-section-card">
+            <div class="ssc-header">
+              <div class="ssc-icon blue-icon">🛡️</div>
+              <div>
+                <h3 class="ssc-title">Administrative Role &amp; Permissions</h3>
+                <p class="ssc-sub">Your account has unrestricted super administrator privileges.</p>
+              </div>
+            </div>
+
+            <div class="privileges-list">
+              <div class="priv-item">
+                <div class="priv-icon check-icon">✓</div>
+                <div class="priv-info">
+                  <span class="priv-title">Full Tree Registry Management</span>
+                  <span class="priv-desc">Create, edit, reassign, and delete tree GIS markers and health records.</span>
+                </div>
+              </div>
+              <div class="priv-item">
+                <div class="priv-icon check-icon">✓</div>
+                <div class="priv-info">
+                  <span class="priv-title">Staff &amp; Caretaker Task Dispatch</span>
+                  <span class="priv-desc">Assign maintenance orders, trigger emergency alerts, and adjust workloads.</span>
+                </div>
+              </div>
+              <div class="priv-item">
+                <div class="priv-icon check-icon">✓</div>
+                <div class="priv-info">
+                  <span class="priv-title">Financial &amp; Sponsorship Approvals</span>
+                  <span class="priv-desc">Review corporate adoption requests, generate certificates, and export audit reports.</span>
+                </div>
+              </div>
+              <div class="priv-item">
+                <div class="priv-icon check-icon">✓</div>
+                <div class="priv-info">
+                  <span class="priv-title">System Configuration &amp; Backups</span>
+                  <span class="priv-desc">Manage API keys, database snapshots, security rules, and user roles.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           TAB 2: SECURITY & PASSWORD
+      ════════════════════════════════════════ -->
+      <section class="tab-pane" id="tabSecurity">
+        <div class="settings-grid-layout">
+
+          <!-- Change Password Form -->
+          <div class="settings-section-card">
+            <div class="ssc-header">
+              <div class="ssc-icon amber-icon">🔑</div>
+              <div>
+                <h3 class="ssc-title">Change Account Password</h3>
+                <p class="ssc-sub">Ensure your account uses a strong password of at least 10 characters.</p>
+              </div>
+            </div>
+
+            <form id="formChangePassword" class="settings-form">
+              <div class="form-group">
+                <label for="currPassword">Current Password *</label>
+                <input type="password" id="currPassword" class="form-input" placeholder="••••••••••••" required />
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="newPassword">New Password *</label>
+                  <input type="password" id="newPassword" class="form-input" placeholder="Min. 10 characters" required />
+                </div>
+                <div class="form-group">
+                  <label for="confirmPassword">Confirm New Password *</label>
+                  <input type="password" id="confirmPassword" class="form-input" placeholder="Re-enter new password" required />
+                </div>
+              </div>
+
+              <!-- Password Strength Meter -->
+              <div class="strength-meter-box">
+                <div class="sm-bar-row">
+                  <div class="sm-bar" id="smBar1"></div>
+                  <div class="sm-bar" id="smBar2"></div>
+                  <div class="sm-bar" id="smBar3"></div>
+                  <div class="sm-bar" id="smBar4"></div>
+                </div>
+                <span class="sm-text" id="smText">Password strength: Strong (includes uppercase, numbers &amp; symbols)</span>
+              </div>
+
+              <div class="form-actions-inline">
+                <button type="submit" class="btn-primary-sm">Update Password</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Two-Factor Authentication (2FA) -->
+          <div class="settings-section-card">
+            <div class="ssc-header">
+              <div class="ssc-icon green-icon">🛡️</div>
+              <div>
+                <h3 class="ssc-title">Two-Factor Authentication (2FA)</h3>
+                <p class="ssc-sub">Add an extra layer of protection to your super admin account.</p>
+              </div>
+            </div>
+
+            <div class="tfa-status-box">
+              <div class="tfa-badge-row">
+                <span class="tfa-chip active">✓ 2FA Active</span>
+                <span class="tfa-method">Method: Authenticator App (TOTP)</span>
+              </div>
+              <p class="tfa-desc">You will be required to enter a 6-digit verification code from Google Authenticator or Authy when signing in from an unrecognized device.</p>
+              
+              <div class="tfa-actions-row">
+                <button class="btn-outline-sm" id="btnReconfig2fa">Reconfigure 2FA</button>
+                <button class="btn-outline-sm text-danger" id="btnBackupCodes">View Backup Codes (8 remaining)</button>
+              </div>
+            </div>
+
+            <div class="security-toggle-list">
+              <label class="setting-toggle-item">
+                <div class="sti-info">
+                  <span class="sti-title">Require 2FA for Critical Operations</span>
+                  <span class="sti-desc">Prompt for code before bulk tree deletion or database backup purge.</span>
+                </div>
+                <input type="checkbox" class="switch-input" checked />
+              </label>
+
+              <label class="setting-toggle-item">
+                <div class="sti-info">
+                  <span class="sti-title">Login Alert Email Notifications</span>
+                  <span class="sti-desc">Receive immediate email alerts when a new browser logs into this admin account.</span>
+                </div>
+                <input type="checkbox" class="switch-input" checked />
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           TAB 3: NOTIFICATION RULES
+      ════════════════════════════════════════ -->
+      <section class="tab-pane" id="tabNotifications">
+        <div class="settings-grid-layout">
+
+          <!-- Delivery Channels -->
+          <div class="settings-section-card">
+            <div class="ssc-header">
+              <div class="ssc-icon blue-icon">🔔</div>
+              <div>
+                <h3 class="ssc-title">Notification Delivery Channels</h3>
+                <p class="ssc-sub">Choose where you want to receive operational alerts and urgent dispatches.</p>
+              </div>
+            </div>
+
+            <div class="settings-toggle-grid">
+              <label class="setting-toggle-item">
+                <div class="sti-info">
+                  <span class="sti-title">In-App Live Alerts</span>
+                  <span class="sti-desc">Real-time toasts and badge counters in Admin panel.</span>
+                </div>
+                <input type="checkbox" class="switch-input" id="setInApp" checked />
+              </label>
+
+              <label class="setting-toggle-item">
+                <div class="sti-info">
+                  <span class="sti-title">Email Incident Digests</span>
+                  <span class="sti-desc">Send daily summaries and critical alerts to ethel.zeta@ATAMAN.org.</span>
+                </div>
+                <input type="checkbox" class="switch-input" id="setEmailDigest" checked />
+              </label>
+
+              <label class="setting-toggle-item">
+                <div class="sti-info">
+                  <span class="sti-title">Emergency SMS Alerts</span>
+                  <span class="sti-desc">Instant SMS to +63 917 555 0192 for dead tree clusters or system down.</span>
+                </div>
+                <input type="checkbox" class="switch-input" id="setSmsAlert" checked />
+              </label>
+
+              <label class="setting-toggle-item">
+                <div class="sti-info">
+                  <span class="sti-title">Audio Chime</span>
+                  <span class="sti-desc">Play subtle alert sound when a 🔴 Critical notification arrives.</span>
+                </div>
+                <input type="checkbox" class="switch-input" id="setSoundAlert" checked />
+              </label>
+            </div>
+          </div>
+
+          <!-- Alert Subscriptions -->
+          <div class="settings-section-card">
+            <div class="ssc-header">
+              <div class="ssc-icon green-icon">🌳</div>
+              <div>
+                <h3 class="ssc-title">Subscribed Alert Categories</h3>
+                <p class="ssc-sub">Select which operational events trigger alerts on your admin dashboard.</p>
+              </div>
+            </div>
+
+            <div class="settings-checkbox-list">
+              <label class="setting-check-item">
+                <input type="checkbox" checked />
+                <div class="sci-text">
+                  <span class="sci-name">🔴 Critical Tree Alerts &amp; Tree Mortality</span>
+                  <span class="sci-desc">When a tree health is flagged critical or dead by field caretakers.</span>
+                </div>
+              </label>
+              <label class="setting-check-item">
+                <input type="checkbox" checked />
+                <div class="sci-text">
+                  <span class="sci-name">⚠️ Overdue Monitoring &amp; Maintenance Tasks</span>
+                  <span class="sci-desc">When periodic photo inspections or pest treatments pass deadline.</span>
+                </div>
+              </label>
+              <label class="setting-check-item">
+                <input type="checkbox" checked />
+                <div class="sci-text">
+                  <span class="sci-name">🤝 Adopter Requests &amp; Sponsorship Expiring</span>
+                  <span class="sci-desc">New corporate sponsorships and expiring 30-day adoption agreements.</span>
+                </div>
+              </label>
+              <label class="setting-check-item">
+                <input type="checkbox" checked />
+                <div class="sci-text">
+                  <span class="sci-name">👤 Caretaker Workload Alerts (>450 Trees)</span>
+                  <span class="sci-desc">Alert when a caretaker is assigned too many trees in high-density sectors.</span>
+                </div>
+              </label>
+              <label class="setting-check-item">
+                <input type="checkbox" checked />
+                <div class="sci-text">
+                  <span class="sci-name">⚙️ System Cloud Backups &amp; Sync Alerts</span>
+                  <span class="sci-desc">Automated database backup status and offline tablet sync queues.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           TAB 4: UI & PREFERENCES
+      ════════════════════════════════════════ -->
+      <section class="tab-pane" id="tabPreferences">
+        <div class="settings-grid-layout">
+
+          <div class="settings-section-card">
+            <div class="ssc-header">
+              <div class="ssc-icon green-icon">🎨</div>
+              <div>
+                <h3 class="ssc-title">Display &amp; Dashboard Preferences</h3>
+                <p class="ssc-sub">Customize your default view, map zoom, and regional formats.</p>
+              </div>
+            </div>
+
+            <form class="settings-form" id="formDisplayPrefs">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="prefDefaultLanding">Default Landing Page upon Sign In</label>
+                  <select id="prefDefaultLanding" class="form-input">
+                    <option value="dashboard.html" selected>📊 Admin Dashboard (Overview)</option>
+                    <option value="admin-tree-map.html">🗺️ Interactive Tree Map</option>
+                    <option value="admin-notifications.html">🔔 Notifications &amp; Alert Center</option>
+                    <option value="admin-trees.html">🌳 Tree Registry &amp; Health</option>
+                    <option value="admin-reports.html">📋 Reports &amp; Downloads</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="prefDefaultMapZone">Default Tree Map Center Zone</label>
+                  <select id="prefDefaultMapZone" class="form-input">
+                    <option value="all" selected>All Barangays (Full Extent)</option>
+                    <option value="santiago">Brgy. Santiago (Sector 1 &amp; 3)</option>
+                    <option value="isidro">San Isidro (Protected Reserve)</option>
+                    <option value="miguel">San Miguel (Urban Green Corridor)</option>
+                    <option value="poblacion">Poblacion (Heritage Trees)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="prefTimezone">Timezone</label>
+                  <select id="prefTimezone" class="form-input">
+                    <option value="Asia/Manila" selected>Asia/Manila (GMT+8) — Philippine Standard Time</option>
+                    <option value="UTC">UTC (Universal Time Coordinated)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="prefDateFormat">Date &amp; Time Display Format</label>
+                  <select id="prefDateFormat" class="form-input">
+                    <option value="MM/DD/YYYY" selected>Month DD, YYYY (e.g. August 31, 2026)</option>
+                    <option value="DD/MM/YYYY">DD/MM/YYYY (e.g. 31/08/2026)</option>
+                    <option value="YYYY-MM-DD">YYYY-MM-DD (ISO Format)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="prefSessionTimeout">Inactivity Session Timeout</label>
+                  <select id="prefSessionTimeout" class="form-input">
+                    <option value="30">30 Minutes (Recommended)</option>
+                    <option value="60" selected>1 Hour</option>
+                    <option value="120">2 Hours</option>
+                    <option value="never">Never (Stay signed in)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="prefLanguage">System Interface Language</label>
+                  <select id="prefLanguage" class="form-input">
+                    <option value="en" selected>English (Official)</option>
+                    <option value="fil">Filipino / Tagalog</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-actions-inline">
+                <button type="submit" class="btn-primary-sm">Apply UI Preferences</button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           TAB 5: ACTIVE SESSIONS & LOGS
+      ════════════════════════════════════════ -->
+      <section class="tab-pane" id="tabSessions">
+        <div class="settings-grid-layout">
+
+          <div class="settings-section-card" style="grid-column: 1 / -1;">
+            <div class="ssc-header">
+              <div class="ssc-icon blue-icon">💻</div>
+              <div>
+                <h3 class="ssc-title">Active Signed-In Devices &amp; Security Sessions</h3>
+                <p class="ssc-sub">Review active sessions currently authorized with your super administrator credentials.</p>
+              </div>
+            </div>
+
+            <div class="sessions-list">
+              <!-- Current Session -->
+              <div class="session-item current-session">
+                <div class="sess-icon">🖥️</div>
+                <div class="sess-details">
+                  <div class="sess-title-row">
+                    <span class="sess-title">Windows 11 PC — Chrome Browser</span>
+                    <span class="sess-badge current-badge">Current Device</span>
+                  </div>
+                  <span class="sess-meta">📍 Laguna, Philippines • IP: 112.198.102.44 • Active Now</span>
+                </div>
+                <span class="sess-status-online">🟢 Active</span>
+              </div>
+
+              <!-- Other Session -->
+              <div class="session-item">
+                <div class="sess-icon">📱</div>
+                <div class="sess-details">
+                  <div class="sess-title-row">
+                    <span class="sess-title">iPhone 15 Pro — Safari Mobile</span>
+                  </div>
+                  <span class="sess-meta">📍 Manila, Philippines • IP: 112.198.88.19 • Last active: Yesterday, 6:15 PM</span>
+                </div>
+                <button class="btn-outline-sm text-danger" onclick="window.adminSettings.revokeSession('iPhone 15 Pro')">Revoke</button>
+              </div>
+
+              <!-- Other Session 2 -->
+              <div class="session-item">
+                <div class="sess-icon">💻</div>
+                <div class="sess-details">
+                  <div class="sess-title-row">
+                    <span class="sess-title">MacBook Air — Firefox (Field Command Tablet)</span>
+                  </div>
+                  <span class="sess-meta">📍 San Isidro Field Station • IP: 175.176.64.12 • Last active: August 28, 2026</span>
+                </div>
+                <button class="btn-outline-sm text-danger" onclick="window.adminSettings.revokeSession('MacBook Air')">Revoke</button>
+              </div>
+            </div>
+
+            <div class="session-actions-footer">
+              <button class="btn-outline-sm text-danger" id="btnRevokeAllOthers">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                Sign Out from All Other Devices
+              </button>
+              <button class="btn-outline-sm" id="btnExportSecurityAudit">
+                📥 Export Admin Audit Log (CSV)
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div><!-- /.page-body -->
+  </main>
+
+  <!-- ════════════════════════════════════════
+       TOAST STACK
+  ════════════════════════════════════════ -->
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="ATAMAN-init.js"></script>
+  <script src="admin-settings.js"></script>
+  <!-- Real-Time Sync Engine -->
+  <script src="realtime-admin.js"></script>
+</body>
+</html>

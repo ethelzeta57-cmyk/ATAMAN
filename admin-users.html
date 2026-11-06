@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — User Management (Admin)</title>
+  <meta name="description" content="ATAMAN Admin — Central management of user accounts, roles, permissions, access security, and audit activity logs." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="admin-users.css" />
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <svg class="sb-brand-icon" viewBox="0 0 48 48" fill="none">
+        <path d="M24 40V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" />
+        <path d="M24 26C24 18 16 18 14 18C14 26 22 26 24 26Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 20C24 12 32 12 34 12C34 20 26 20 24 20Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 32C24 24 34 24 36 24C36 32 26 32 24 32Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M12 40H36" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round" />
+      </svg>
+      <div class="sb-brand-text">
+        <span class="sb-brand-name">ATAMAN</span>
+        <span class="sb-brand-tag">Every Tree. Every Impact.</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">ADMIN PANEL</div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+
+        <li class="nav-item ">
+          <a href="dashboard.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-tree-map.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-trees.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span>Trees</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-adopters.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Adopters</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-caretakers.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Caretakers</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-reports.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-analytics.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span>Analytics</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-impact.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 14 14" />
+              <path d="m16 8-8 8" />
+              <path d="M16 16V8H8" />
+            </svg>
+            <span>Impact</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a href="admin-users.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-content.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="15" y2="12" />
+              <line x1="3" y1="18" x2="9" y2="18" />
+            </svg>
+            <span>Content</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-notifications.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span>Notifications</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-system-logs.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            <span>System Logs</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content" id="mainContent">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="topbar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title">
+        <h1>👥 User Management</h1>
+        <span class="topbar-sub">Manage ATAMAN user accounts, roles, permissions, and account access.</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-outline-sm" id="importUsersBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Import Users
+        </button>
+        <button class="btn-outline-sm" id="exportUsersBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Export
+        </button>
+        <button class="btn-primary" id="openAddUserModalBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          + Add User
+        </button>
+
+    <div class="sidebar-user-row">
+      <a href="admin-settings.html" class="sidebar-user " id="sidebarUserProfile" title="Open Admin Account & Settings" style="text-decoration:none; flex:1;">
+        <div class="sb-user-avatar">EZ</div>
+        <div class="sb-user-info">
+          <span class="sb-user-name">Ethel Zeta (Admin)</span>
+          <span class="sb-user-role">Super Administrator</span>
+        </div>
+        <span class="sb-user-expand" title="Admin Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;max-width:16px;max-height:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+      </a>
+      <a href="index.html" class="sb-logout-btn" title="Sign out of ATAMAN">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+      </div>
+    </header>
+
+    <div class="page-body">
+
+      <!-- ════════════════════════════════════════
+           1. SUMMARY CARDS
+      ════════════════════════════════════════ -->
+      <section class="user-summary-grid">
+        <div class="summary-card" data-filter="all" title="View all registered users">
+          <div class="sc-icon">👥</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Total Users</span>
+            <span class="sc-val" id="cntTotalUsers">0</span>
+            <span class="sc-sub">Registered accounts</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-purple" data-filter="adopter" title="Filter to Adopter accounts">
+          <div class="sc-icon">🤝</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Adopters</span>
+            <span class="sc-val text-purple" id="cntAdopterUsers" style="color:#7c3aed;">0</span>
+            <span class="sc-sub">Tree sponsors</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-emerald" data-filter="caretaker" title="Filter to Caretaker accounts">
+          <div class="sc-icon">👨‍🌾</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Caretakers</span>
+            <span class="sc-val text-success" id="cntCaretakerUsers">0</span>
+            <span class="sc-sub">Field personnel</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-red" data-filter="admin" title="Filter to Administrator accounts">
+          <div class="sc-icon">🔐</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Administrators</span>
+            <span class="sc-val text-danger" id="cntAdminUsers">0</span>
+            <span class="sc-sub">Full system control</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-green" data-filter="active" title="Filter to Active accounts">
+          <div class="sc-icon">🟢</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Active</span>
+            <span class="sc-val text-success" id="cntActiveUsers">0</span>
+            <span class="sc-sub">0% operational</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-amber" data-filter="pending" title="Filter to Pending/Inactive accounts">
+          <div class="sc-icon">🟡</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Pending / Inactive</span>
+            <span class="sc-val text-warning" id="cntPendingUsers">0</span>
+            <span class="sc-sub">Needs attention</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           2. SEARCH & FILTER TOOLBAR
+      ════════════════════════════════════════ -->
+      <section class="filter-toolbar card">
+        <div class="search-input-wrap">
+          <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="userSearchInput" class="search-input" placeholder="Search name, email, username, employee ID..." />
+        </div>
+
+        <div class="filter-group">
+          <select class="filter-select" id="roleFilter">
+            <option value="">All Roles</option>
+            <option value="Adopter">🟣 Tree Adopter</option>
+            <option value="Caretaker">🟢 Caretaker</option>
+            <option value="Administrator">🔴 Administrator</option>
+            <option value="Staff">🔵 Staff</option>
+            <option value="Farmer">🟡 Farmer / Landowner</option>
+          </select>
+
+          <select class="filter-select" id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="Active">🟢 Active</option>
+            <option value="Pending">🟡 Pending</option>
+            <option value="Inactive">⚪ Inactive</option>
+            <option value="Suspended">🔴 Suspended</option>
+          </select>
+
+          <select class="filter-select" id="locationFilter">
+              <option value="">All Locations / Barangays</option>
+              <option value="Albalate">Albalate</option>
+              <option value="Bagongon">Bagongon</option>
+              <option value="Bangon">Bangon</option>
+              <option value="Basiao">Basiao</option>
+              <option value="Buluan">Buluan</option>
+              <option value="Bunuanan">Bunuanan</option>
+              <option value="Cabugawan">Cabugawan</option>
+              <option value="Cagudalo">Cagudalo</option>
+              <option value="Cagusipan">Cagusipan</option>
+              <option value="Cagutian">Cagutian</option>
+              <option value="Cagutsan">Cagutsan</option>
+              <option value="Canhawan Gote">Canhawan Gote</option>
+              <option value="Canlapwas">Canlapwas</option>
+              <option value="Cawayan">Cawayan</option>
+              <option value="Cinco">Cinco</option>
+              <option value="Darahuway Daco">Darahuway Daco</option>
+              <option value="Darahuway Gote">Darahuway Gote</option>
+              <option value="Estaka">Estaka</option>
+              <option value="Guinsorongan">Guinsorongan</option>
+              <option value="Ibol">Ibol</option>
+              <option value="Iguid">Iguid</option>
+              <option value="Lagundi">Lagundi</option>
+              <option value="Libas">Libas</option>
+              <option value="Lobo">Lobo</option>
+              <option value="Manguehay">Manguehay</option>
+              <option value="Maulong">Maulong</option>
+              <option value="Mercedes">Mercedes</option>
+              <option value="Mombon">Mombon</option>
+              <option value="New Mahayag">New Mahayag</option>
+              <option value="Old Mahayag">Old Mahayag</option>
+              <option value="Palanyogon">Palanyogon</option>
+              <option value="Pangdan">Pangdan</option>
+              <option value="Payao">Payao</option>
+              <option value="Poblacion 1">Poblacion 1</option>
+              <option value="Poblacion 2">Poblacion 2</option>
+              <option value="Poblacion 3">Poblacion 3</option>
+              <option value="Poblacion 4">Poblacion 4</option>
+              <option value="Poblacion 5">Poblacion 5</option>
+              <option value="Poblacion 6">Poblacion 6</option>
+              <option value="Poblacion 7">Poblacion 7</option>
+              <option value="Poblacion 8">Poblacion 8</option>
+              <option value="Poblacion 9">Poblacion 9</option>
+              <option value="Poblacion 10">Poblacion 10</option>
+              <option value="Poblacion 11">Poblacion 11</option>
+              <option value="Poblacion 12">Poblacion 12</option>
+              <option value="Poblacion 13">Poblacion 13</option>
+              <option value="Muñoz">Muñoz</option>
+              <option value="Pupua">Pupua</option>
+              <option value="Guindapunan">Guindapunan</option>
+              <option value="Rama">Rama</option>
+              <option value="San Andres">San Andres</option>
+              <option value="San Pablo">San Pablo</option>
+              <option value="San Roque">San Roque</option>
+              <option value="San Vicente">San Vicente</option>
+              <option value="Silanga">Silanga</option>
+              <option value="Socorro">Socorro</option>
+              <option value="Totoringon">Totoringon</option>
+          </select>
+
+          <button class="btn-outline-sm" id="resetFiltersBtn">Reset Filters</button>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           3. FLOATING BULK ACTIONS BAR (Visible when items checked)
+      ════════════════════════════════════════ -->
+      <div class="bulk-action-bar hidden" id="bulkActionBar">
+        <span class="bulk-count" id="bulkCountText">0 users selected</span>
+        <div class="bulk-btns">
+          <button class="btn-bulk btn-bulk-green" id="bulkActivateBtn">🟢 Activate</button>
+          <button class="btn-bulk btn-bulk-slate" id="bulkDeactivateBtn">⚪ Deactivate</button>
+          <button class="btn-bulk btn-bulk-amber" id="bulkChangeRoleBtn">🔐 Change Role</button>
+          <button class="btn-bulk btn-bulk-export" id="bulkExportBtn">📤 Export Selected</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           4. MAIN USER TABLE
+      ════════════════════════════════════════ -->
+      <section class="card table-card">
+        <div class="table-responsive">
+          <table class="users-table" id="usersTable">
+            <thead>
+              <tr>
+                <th width="40"><input type="checkbox" id="selectAllCheckbox" aria-label="Select all users"></th>
+                <th>User</th>
+                <th>Contact &amp; ID</th>
+                <th>Role</th>
+                <th>Location</th>
+                <th>Last Login</th>
+                <th>2FA</th>
+                <th>Status</th>
+                <th width="110" style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <!-- Dynamically rendered or pre-populated with realistic records -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-footer">
+          <span class="table-info" id="tablePaginationInfo">Showing 0 users</span>
+          <div class="pagination-controls">
+            <button class="btn-page" id="prevPageBtn" disabled>&laquo; Prev</button>
+            <button class="btn-page" id="nextPageBtn" disabled>Next &raquo;</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           5. SYSTEM-WIDE USER ACTIVITY AUDIT LOG
+      ════════════════════════════════════════ -->
+      <section class="section" id="activityLogSection">
+        <div class="section-hd">
+          <h2 class="section-title">📝 User Activity &amp; Audit Log</h2>
+          <span class="section-sub">Real-time system-wide account actions, permission changes, and authentication logs</span>
+        </div>
+
+        <div class="card">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>Date / Time</th>
+                <th>User Account</th>
+                <th>Role</th>
+                <th>Action Performed</th>
+                <th>Target Module</th>
+                <th>Status / Result</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogBody">
+              <tr>
+                <td colspan="6" style="text-align:center; padding:40px 20px; color:var(--text-muted, #94a3b8);">
+                  <div style="font-size:2rem; margin-bottom:10px;">📋</div>
+                  <p style="font-weight:700; margin-bottom:4px;">No activity logs yet.</p>
+                  <p style="font-size:0.82rem;">User actions and system events will appear here once users are added and active.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div><!-- /.page-body -->
+  </main>
+
+  <!-- ════════════════════════════════════════
+       USER PROFILE SLIDE-OVER DRAWER
+  ════════════════════════════════════════ -->
+  <div class="drawer-overlay hidden" id="userDrawerOverlay"></div>
+  <aside class="user-drawer hidden" id="userDrawer">
+    <div class="drawer-header">
+      <div class="dh-user-box">
+        <div class="dh-avatar" id="drawerAvatar">—</div>
+        <div class="dh-titles">
+          <h3 id="drawerFullName">Select a User</h3>
+          <span class="dh-username" id="drawerUsername">@username · Employee ID</span>
+        </div>
+      </div>
+      <div class="dh-actions">
+        <span class="status-badge" id="drawerStatusBadge">—</span>
+        <button class="drawer-close" id="closeDrawerBtn">&times;</button>
+      </div>
+    </div>
+
+    <!-- Drawer In-Page Tabs -->
+    <div class="drawer-tabs">
+      <button class="d-tab-btn active" data-dtab="dtab-info">Account Info</button>
+      <button class="d-tab-btn" data-dtab="dtab-perms">Roles &amp; Permissions</button>
+      <button class="d-tab-btn" data-dtab="dtab-activity">Recent Activity</button>
+      <button class="d-tab-btn" data-dtab="dtab-security">Security &amp; Auth</button>
+      <button class="d-tab-btn" data-dtab="dtab-caretaker" id="dtabCaretakerBtn">Field Connection</button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- 1. ACCOUNT INFO -->
+      <div class="dtab-pane active" id="dtab-info">
+        <div class="info-group-card">
+          <h4 class="sub-hd">Personal &amp; Contact Details</h4>
+          <div class="info-grid">
+            <div class="ig-field"><label>Email Address</label><span id="dEmail">—</span></div>
+            <div class="ig-field"><label>Phone Number</label><span id="dPhone">—</span></div>
+            <div class="ig-field"><label>Employee / Partner ID</label><span id="dEmpId">—</span></div>
+            <div class="ig-field"><label>Primary Location</label><span id="dLocation">—</span></div>
+            <div class="ig-field"><label>Assigned System Role</label><span id="dRole" class="role-badge">—</span></div>
+            <div class="ig-field"><label>Account Created Date</label><span id="dCreated">—</span></div>
+            <div class="ig-field"><label>Last Active Login</label><span id="dLastLogin">Aug 29, 2026 · 10:42 AM</span></div>
+            <div class="ig-field"><label>2FA Authentication</label><span class="badge-soft-green">Enabled (Authenticator App)</span></div>
+          </div>
+        </div>
+
+        <div class="status-manage-box">
+          <h4 class="sub-hd">Account Lifecycle Actions</h4>
+          <div class="status-action-btns">
+            <button class="btn btn-outline-sm" id="btnDrawerDeactivate">⚪ Deactivate Account</button>
+            <button class="btn btn-outline-danger" id="btnDrawerSuspend">🔴 Suspend Account</button>
+            <button class="btn btn-primary" id="btnDrawerResetPass">🔑 Reset Password</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. ROLES & PERMISSIONS -->
+      <div class="dtab-pane" id="dtab-perms">
+        <div class="perm-role-select-box">
+          <label>Assigned Access Role</label>
+          <select class="form-control" id="permRoleSelect">
+            <option value="Administrator">🔴 Administrator (Full System Control)</option>
+            <option value="Caretaker" selected>🟢 Caretaker (Field Monitoring &amp; Worklogs)</option>
+            <option value="Staff">🔵 Staff (Operations &amp; Reporting)</option>
+            <option value="Farmer">🟡 Farmer / Landowner (Site Verification)</option>
+            <option value="Adopter">🟣 Adopter (Sponsorship Portal)</option>
+          </select>
+        </div>
+
+        <h4 class="sub-hd" style="margin-top:16px;">Granular Feature Permissions</h4>
+        <div class="perm-checklist" id="permChecklist">
+          <div class="perm-section-title">🌳 Tree &amp; Field Monitoring Module</div>
+          <label class="perm-item"><input type="checkbox" checked> View Assigned Trees</label>
+          <label class="perm-item"><input type="checkbox" checked> Record Field Monitoring</label>
+          <label class="perm-item"><input type="checkbox" checked> Upload Field Growth Photos</label>
+          <label class="perm-item"><input type="checkbox" checked> Record Maintenance Interventions</label>
+          <label class="perm-item"><input type="checkbox"> Manage All System Trees (Global Override)</label>
+          <label class="perm-item"><input type="checkbox"> Delete Tree Records</label>
+
+          <div class="perm-section-title" style="margin-top:12px;">👥 Personnel &amp; Platform Administration</div>
+          <label class="perm-item"><input type="checkbox" checked> View Assigned Work Schedules</label>
+          <label class="perm-item"><input type="checkbox" checked> View Assigned Reports</label>
+          <label class="perm-item"><input type="checkbox"> Manage Caretakers</label>
+          <label class="perm-item"><input type="checkbox"> Manage Adopters</label>
+          <label class="perm-item"><input type="checkbox"> Manage Farmers / Landowners</label>
+          <label class="perm-item"><input type="checkbox"> Manage System User Accounts</label>
+          <label class="perm-item"><input type="checkbox"> Modify Global System Settings</label>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top:16px;" id="savePermsBtn">💾 Save Permission Overrides</button>
+      </div>
+
+      <!-- 3. RECENT ACTIVITY -->
+      <div class="dtab-pane" id="dtab-activity">
+        <div class="timeline" id="userActivityTimeline">
+          <div class="tl-item">
+            <span class="tl-icon">📋</span>
+            <div class="tl-body">
+              <strong>No recent field activity recorded yet</strong>
+              <p>Activity logs will appear here as monitoring and system actions are performed.</p>
+              <small>—</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. SECURITY & AUTH -->
+      <div class="dtab-pane" id="dtab-security">
+        <div class="info-group-card">
+          <h4 class="sub-hd">Login &amp; Credential Security</h4>
+          <div class="info-grid">
+            <div class="ig-field"><label>Password Status</label><span>Active</span></div>
+            <div class="ig-field"><label>Failed Login Attempts</label><span class="text-success">0 (No lockouts)</span></div>
+            <div class="ig-field"><label>Two-Factor Auth (2FA)</label><span class="badge-soft-green">Standard</span></div>
+            <div class="ig-field"><label>Active Sessions</label><span>1 session active</span></div>
+          </div>
+        </div>
+
+        <div class="security-action-box" style="margin-top:14px;">
+          <h4 class="sub-hd">Security Enforcement</h4>
+          <div class="sec-btns">
+            <button class="btn btn-outline-sm" id="btnSendResetLink">📧 Send Password Reset Email</button>
+            <button class="btn btn-outline-danger" id="btnSignOutSessions">⚠️ Force Sign Out All Sessions</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. CARETAKER FIELD CONNECTION -->
+      <div class="dtab-pane" id="dtab-caretaker">
+        <div class="field-connect-card">
+          <div class="fc-hero">
+            <span class="fc-num">0</span>
+            <span class="fc-lbl">Assigned Trees Under Monitoring</span>
+          </div>
+
+          <div class="fc-details">
+            <div class="fcd-item"><label>Assigned Areas:</label><span>—</span></div>
+            <div class="fcd-item"><label>Monitoring Completion Rate:</label><strong class="text-success">0%</strong></div>
+            <div class="fcd-item"><label>Assigned Project:</label><span>—</span></div>
+          </div>
+
+          <a href="admin-caretakers.html" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:6px; margin-top:14px;">
+            👤 Open Full Caretaker Performance Module &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ════════════════════════════════════════
+       + ADD USER MULTI-STEP MODAL
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="addUserModalOverlay">
+    <div class="modal-card modal-lg">
+      <div class="modal-hd">
+        <h3>➕ Add New ATAMAN User Account</h3>
+        <button class="modal-close-btn" id="closeAddUserModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-stepper">
+        <div class="step-item active" data-step="1">1. User Info</div>
+        <div class="step-item" data-step="2">2. Role</div>
+        <div class="step-item" data-step="3">3. Access</div>
+        <div class="step-item" data-step="4">4. Assignment</div>
+        <div class="step-item" data-step="5">5. Setup</div>
+      </div>
+
+      <div class="modal-body">
+        <!-- Step 1: User Info -->
+        <div class="wizard-step active" id="step1">
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Full Name *</label>
+              <input type="text" class="form-control" id="addFullName" placeholder="e.g. Juanita Reyes" required />
+            </div>
+            <div class="form-group flex-1">
+              <label>Username *</label>
+              <input type="text" class="form-control" id="addUsername" placeholder="e.g. juanita.reyes" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Email Address *</label>
+              <input type="email" class="form-control" id="addEmail" placeholder="juanita@example.com" required />
+            </div>
+            <div class="form-group flex-1">
+              <label>Phone Number</label>
+              <input type="tel" class="form-control" id="addPhone" placeholder="+63 917 123 4567" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Employee / Partner Reference ID</label>
+            <input type="text" class="form-control" id="addEmpId" placeholder="e.g. EMP-2026-088" />
+          </div>
+        </div>
+
+        <!-- Step 2: Role Selection -->
+        <div class="wizard-step" id="step2">
+          <label class="wizard-lbl">Select System Role *</label>
+          <div class="role-cards-grid">
+            <label class="role-select-card active">
+              <input type="radio" name="addRole" value="Caretaker" checked>
+              <span class="rsc-icon">🟢</span>
+              <strong>Caretaker</strong>
+              <small>Field monitoring, inspection logs, growth photo uploads</small>
+            </label>
+            <label class="role-select-card">
+              <input type="radio" name="addRole" value="Administrator">
+              <span class="rsc-icon">🔴</span>
+              <strong>Administrator</strong>
+              <small>Full administrative control across all trees, users, and reports</small>
+            </label>
+            <label class="role-select-card">
+              <input type="radio" name="addRole" value="Staff">
+              <span class="rsc-icon">🔵</span>
+              <strong>Staff</strong>
+              <small>Logistics coordination, reporting access, and operational dispatch</small>
+            </label>
+            <label class="role-select-card">
+              <input type="radio" name="addRole" value="Farmer">
+              <span class="rsc-icon">🟡</span>
+              <strong>Farmer / Landowner</strong>
+              <small>Land parcel management and stewardship verification</small>
+            </label>
+            <label class="role-select-card">
+              <input type="radio" name="addRole" value="Adopter">
+              <span class="rsc-icon">🟣</span>
+              <strong>Tree Adopter</strong>
+              <small>Tree sponsorship tracking, certificates, and impact updates</small>
+            </label>
+          </div>
+        </div>
+
+        <!-- Step 3: Access & Permissions -->
+        <div class="wizard-step" id="step3">
+          <p class="section-desc">Default permissions automatically populate based on the chosen role. Modify below if custom access is required:</p>
+          <div class="perm-checklist">
+            <label class="perm-item"><input type="checkbox" checked id="pViewTrees"> View assigned trees</label>
+            <label class="perm-item"><input type="checkbox" checked id="pRecMon"> Record monitoring inspections</label>
+            <label class="perm-item"><input type="checkbox" checked id="pUploadPhoto"> Upload tree photos</label>
+            <label class="perm-item"><input type="checkbox" checked id="pRecMaint"> Record maintenance tasks</label>
+            <label class="perm-item"><input type="checkbox" id="pManageAllTrees"> Manage all trees</label>
+            <label class="perm-item"><input type="checkbox" id="pManageUsers"> Manage users &amp; accounts</label>
+          </div>
+        </div>
+
+        <!-- Step 4: Assignment -->
+        <div class="wizard-step" id="step4">
+          <div class="form-group">
+            <label>Assigned Location / Barangay</label>
+            <select class="form-control" id="addLocation">
+              <option value="">Select Barangay</option>
+                            <option value="Albalate">Albalate</option>
+              <option value="Bagongon">Bagongon</option>
+              <option value="Bangon">Bangon</option>
+              <option value="Basiao">Basiao</option>
+              <option value="Buluan">Buluan</option>
+              <option value="Bunuanan">Bunuanan</option>
+              <option value="Cabugawan">Cabugawan</option>
+              <option value="Cagudalo">Cagudalo</option>
+              <option value="Cagusipan">Cagusipan</option>
+              <option value="Cagutian">Cagutian</option>
+              <option value="Cagutsan">Cagutsan</option>
+              <option value="Canhawan Gote">Canhawan Gote</option>
+              <option value="Canlapwas">Canlapwas</option>
+              <option value="Cawayan">Cawayan</option>
+              <option value="Cinco">Cinco</option>
+              <option value="Darahuway Daco">Darahuway Daco</option>
+              <option value="Darahuway Gote">Darahuway Gote</option>
+              <option value="Estaka">Estaka</option>
+              <option value="Guinsorongan">Guinsorongan</option>
+              <option value="Ibol">Ibol</option>
+              <option value="Iguid">Iguid</option>
+              <option value="Lagundi">Lagundi</option>
+              <option value="Libas">Libas</option>
+              <option value="Lobo">Lobo</option>
+              <option value="Manguehay">Manguehay</option>
+              <option value="Maulong">Maulong</option>
+              <option value="Mercedes">Mercedes</option>
+              <option value="Mombon">Mombon</option>
+              <option value="New Mahayag">New Mahayag</option>
+              <option value="Old Mahayag">Old Mahayag</option>
+              <option value="Palanyogon">Palanyogon</option>
+              <option value="Pangdan">Pangdan</option>
+              <option value="Payao">Payao</option>
+              <option value="Poblacion 1">Poblacion 1</option>
+              <option value="Poblacion 2">Poblacion 2</option>
+              <option value="Poblacion 3">Poblacion 3</option>
+              <option value="Poblacion 4">Poblacion 4</option>
+              <option value="Poblacion 5">Poblacion 5</option>
+              <option value="Poblacion 6">Poblacion 6</option>
+              <option value="Poblacion 7">Poblacion 7</option>
+              <option value="Poblacion 8">Poblacion 8</option>
+              <option value="Poblacion 9">Poblacion 9</option>
+              <option value="Poblacion 10">Poblacion 10</option>
+              <option value="Poblacion 11">Poblacion 11</option>
+              <option value="Poblacion 12">Poblacion 12</option>
+              <option value="Poblacion 13">Poblacion 13</option>
+              <option value="Muñoz">Muñoz</option>
+              <option value="Pupua">Pupua</option>
+              <option value="Guindapunan">Guindapunan</option>
+              <option value="Rama">Rama</option>
+              <option value="San Andres">San Andres</option>
+              <option value="San Pablo">San Pablo</option>
+              <option value="San Roque">San Roque</option>
+              <option value="San Vicente">San Vicente</option>
+              <option value="Silanga">Silanga</option>
+              <option value="Socorro">Socorro</option>
+              <option value="Totoringon">Totoringon</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Assigned Project</label>
+            <select class="form-control" id="addProject">
+              <option value="Reforestation 2026">Reforestation 2026</option>
+              <option value="Community Trees">Community Trees Program</option>
+              <option value="School Tree Program">School Tree Program</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Step 5: Account Setup & Credentials -->
+        <div class="wizard-step" id="step5">
+          <div class="callout-tip">
+            💡 <strong>Security Setup:</strong> A temporary password will be securely generated and emailed to the user with a setup invitation link.
+          </div>
+          <div class="form-group" style="margin-top:14px;">
+            <label class="perm-item"><input type="checkbox" checked id="sendEmailInvite"> ☑ Send account invitation email with login credentials</label>
+            <label class="perm-item"><input type="checkbox" checked id="requirePassChange"> ☑ Require password change upon first login</label>
+            <label class="perm-item"><input type="checkbox" checked id="require2FA"> ☑ Enforce Two-Factor Authentication (2FA)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-ft">
+        <button class="btn btn-secondary" id="prevWizardBtn" disabled>&larr; Back</button>
+        <button class="btn btn-primary" id="nextWizardBtn">Next Step &rarr;</button>
+        <button class="btn btn-primary hidden" id="submitCreateUserBtn">⚡ Create User Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       CARETAKER DEACTIVATION WARNING MODAL
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="deactivateWarningModal">
+    <div class="modal-card">
+      <div class="modal-hd">
+        <h3 class="text-danger">⚠️ Caretaker Deactivation Warning</h3>
+        <button class="modal-close-btn" id="closeDeactivateWarnBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>You are about to deactivate <strong id="warnCaretakerName">Pedro Reyes</strong>.</p>
+        <div class="warning-alert-box">
+          ⚠️ <strong>Critical Field Rule:</strong> This caretaker currently has <strong id="warnTreeCount">485 assigned trees</strong> across Brgy. San Isidro and Mabini.
+        </div>
+        <p style="font-size:.82rem; color:var(--text-m); margin-top:10px;">
+          Please reassign these trees to another caretaker to ensure continuity of monitoring, or proceed only if another field officer has been designated.
+        </p>
+      </div>
+      <div class="modal-ft">
+        <a href="admin-caretakers.html" class="btn btn-secondary">Reassign Trees First</a>
+        <button class="btn btn-danger" id="confirmDeactivateBtn">Proceed with Deactivation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast hidden" id="toastMsg"></div>
+
+  <script src="ATAMAN-init.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js?v=20260928_dedup"></script>
+  <script src="realtime-admin.js?v=20260928_dedup"></script>
+  <script src="admin-users.js?v=20260928_dedup"></script>
+</body>
+</html>

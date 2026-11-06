@@ -1,0 +1,22 @@
+# Temporary test profiles and scratch files
+temp_edge_profile/
+scratch/
+
+# IDE & Editor settings
+.vscode/
+.idea/
+
+# Firebase local cache
+.firebase/
+
+# OS metadata
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Node modules
+node_modules/

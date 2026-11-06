@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    function solveSimpleChallenge() { return true; }
+    var solveSimpleChallenge = solveSimpleChallenge;
+    window.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof globalThis !== 'undefined') globalThis.solveSimpleChallenge = solveSimpleChallenge;
+    if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChallenge;
+    window.addEventListener('error', function (e) {
+      if (e && e.message && e.message.indexOf('solveSimpleChallenge') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATAMAN — Content Management (Admin)</title>
+  <meta name="description" content="ATAMAN Admin — Manage public portal information, announcements, educational guides, media library, FAQs, and homepage banners." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="admin-content.css" />
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <svg class="sb-brand-icon" viewBox="0 0 48 48" fill="none">
+        <path d="M24 40V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" />
+        <path d="M24 26C24 18 16 18 14 18C14 26 22 26 24 26Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 20C24 12 32 12 34 12C34 20 26 20 24 20Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M24 32C24 24 34 24 36 24C36 32 26 32 24 32Z" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M12 40H36" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round" />
+      </svg>
+      <div class="sb-brand-text">
+        <span class="sb-brand-name">ATAMAN</span>
+        <span class="sb-brand-tag">Every Tree. Every Impact.</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">ADMIN PANEL</div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+
+        <li class="nav-item ">
+          <a href="dashboard.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-tree-map.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>Tree Map</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-trees.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span>Trees</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-adopters.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Adopters</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-caretakers.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Caretakers</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-reports.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-analytics.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span>Analytics</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-impact.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 14 14" />
+              <path d="m16 8-8 8" />
+              <path d="M16 16V8H8" />
+            </svg>
+            <span>Impact</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-users.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a href="admin-content.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="15" y2="12" />
+              <line x1="3" y1="18" x2="9" y2="18" />
+            </svg>
+            <span>Content</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-notifications.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span>Notifications</span>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="admin-system-logs.html" class="nav-link">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            <span>System Logs</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content" id="mainContent">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="topbar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title">
+        <h1>📝 Content Management</h1>
+        <span class="topbar-sub">Create and manage the information, announcements, educational materials, and media displayed in ATAMAN.</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-outline-sm" id="btnOpenMediaLibrary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+          📁 Media Library
+        </button>
+        <button class="btn-outline-sm" id="btnQuickSearchFocus">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          🔍 Search
+        </button>
+        <button class="btn-primary" id="openAddContentModalBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          + Add Content
+        </button>
+
+    <div class="sidebar-user-row">
+      <a href="admin-settings.html" class="sidebar-user " id="sidebarUserProfile" title="Open Admin Account & Settings" style="text-decoration:none; flex:1;">
+        <div class="sb-user-avatar">EZ</div>
+        <div class="sb-user-info">
+          <span class="sb-user-name">Ethel Zeta (Admin)</span>
+          <span class="sb-user-role">Super Administrator</span>
+        </div>
+        <span class="sb-user-expand" title="Admin Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;max-width:16px;max-height:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+      </a>
+      <a href="index.html" class="sb-logout-btn" title="Sign out of ATAMAN">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+      </div>
+    </header>
+
+    <!-- IN-PAGE TABS BAR -->
+    <div class="content-tabs-bar">
+      <div class="tab-list">
+        <button class="tab-btn active" data-tab="all">All Content <span class="tab-badge" id="badgeAllCount">0</span></button>
+        <button class="tab-btn" data-tab="announcements">📢 Announcements <span class="tab-badge">0</span></button>
+        <button class="tab-btn" data-tab="news">📰 News &amp; Updates <span class="tab-badge">0</span></button>
+        <button class="tab-btn" data-tab="education">🌱 Educational Guides <span class="tab-badge">0</span></button>
+        <button class="tab-btn" data-tab="faqs">❓ FAQs <span class="tab-badge">0</span></button>
+        <button class="tab-btn" data-tab="pages">📄 Static Pages <span class="tab-badge">0</span></button>
+        <button class="tab-btn" data-tab="banners">🖼️ Banners <span class="tab-badge">0</span></button>
+        <button class="tab-btn" data-tab="homepage">🏠 Homepage Layout</button>
+        <button class="tab-btn" data-tab="history">📝 Audit History</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- ════════════════════════════════════════
+           1. SUMMARY CARDS
+      ════════════════════════════════════════ -->
+      <section class="content-summary-grid">
+        <div class="summary-card" data-filter="all">
+          <div class="sc-icon">📝</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Total Content</span>
+            <span class="sc-val" id="cntTotal">0</span>
+            <span class="sc-sub">Portal articles &amp; notices</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-green" data-filter="published">
+          <div class="sc-icon">🟢</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Published</span>
+            <span class="sc-val text-success" id="cntPublished">0</span>
+            <span class="sc-sub">Live &amp; visible to users</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-amber" data-filter="draft">
+          <div class="sc-icon">🟡</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Drafts</span>
+            <span class="sc-val text-warning" id="cntDrafts">0</span>
+            <span class="sc-sub">Work in progress</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-blue" data-filter="scheduled">
+          <div class="sc-icon">📅</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Scheduled</span>
+            <span class="sc-val" style="color:var(--blue);" id="cntScheduled">0</span>
+            <span class="sc-sub">Auto-publish upcoming</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-violet" id="cardMediaFiles">
+          <div class="sc-icon">🖼️</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Media Files</span>
+            <span class="sc-val" style="color:var(--violet);">0</span>
+            <span class="sc-sub">Photos &amp; illustrations</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-emerald" data-filter="announcement">
+          <div class="sc-icon">📢</div>
+          <div class="sc-body">
+            <span class="sc-lbl">Announcements</span>
+            <span class="sc-val text-success">0</span>
+            <span class="sc-sub">Important field alerts</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           2. FILTER TOOLBAR
+      ════════════════════════════════════════ -->
+      <section class="filter-toolbar card" id="filterToolbarSec">
+        <div class="search-input-wrap">
+          <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="contentSearchInput" class="search-input" placeholder="Search title, excerpt, keyword, or author..." />
+        </div>
+
+        <div class="filter-group">
+          <select class="filter-select" id="contentTypeFilter">
+            <option value="">All Content Types</option>
+            <option value="Announcement">📢 Announcements</option>
+            <option value="News">📰 News &amp; Updates</option>
+            <option value="Education">🌱 Educational Guides</option>
+            <option value="FAQ">❓ FAQs</option>
+            <option value="Page">📄 Static Pages</option>
+            <option value="Banner">🖼️ Banners</option>
+          </select>
+
+          <select class="filter-select" id="contentStatusFilter">
+            <option value="">All Statuses</option>
+            <option value="Published">🟢 Published</option>
+            <option value="Draft">🟡 Draft</option>
+            <option value="Scheduled">📅 Scheduled</option>
+            <option value="Archived">🔴 Archived</option>
+          </select>
+
+          <select class="filter-select" id="contentAuthorFilter">
+            <option value="">All Authors</option>
+            <option value="Admin">Admin (Ethel Zeta)</option>
+            <option value="Editorial Team">Editorial Team</option>
+            <option value="Agronomy Lead">Agronomy Lead</option>
+          </select>
+
+          <button class="btn-outline-sm" id="resetContentFiltersBtn">Reset Filters</button>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           3. MAIN CONTENT TAB PANE (Table)
+      ════════════════════════════════════════ -->
+      <div class="tab-pane active" id="paneTable">
+        <section class="card table-card">
+          <div class="table-responsive">
+            <table class="content-table" id="contentTable">
+              <thead>
+                <tr>
+                  <th width="40"><input type="checkbox" id="selectAllContentCheckbox"></th>
+                  <th>Title &amp; Summary</th>
+                  <th>Type</th>
+                  <th>Category / Section</th>
+                  <th>Author</th>
+                  <th>Last Updated</th>
+                  <th>Status</th>
+                  <th width="120" style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="contentTableBody">
+                <!-- Dynamically rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-footer">
+            <span class="table-info" id="contentPaginationInfo">Showing 0 content items</span>
+            <div class="pagination-controls">
+              <button class="btn-page" disabled>&laquo; Prev</button>
+              <button class="btn-page" disabled>Next &raquo;</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           4. HOMEPAGE LAYOUT CONFIGURATOR PANE
+      ════════════════════════════════════════ -->
+      <div class="tab-pane" id="paneHomepage">
+        <section class="section">
+          <div class="section-hd">
+            <h2 class="section-title">🏠 Public Portal &amp; Homepage Section Manager</h2>
+            <span class="section-sub">Configure and reorder featured banners, pinned announcements, and highlighted stories shown on the homepage</span>
+          </div>
+
+          <div class="homepage-manager-grid">
+            <!-- Hero Banner Card -->
+            <div class="card hm-section-card">
+              <div class="hm-hd">
+                <div>
+                  <span class="hm-badge">Section 1</span>
+                  <h4>Hero Banner &amp; Headline</h4>
+                </div>
+                <label class="switch-toggle"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+              <div class="hm-content-preview hero-banner-bg">
+                <span class="hero-preview-tag">🌱 GROW TODAY, PROTECT TOMORROW</span>
+                <h3>Transform Deforested Watersheds Into Thriving Native Sanctuaries</h3>
+                <p>Track every tree in real time with certified GPS &amp; Caretaker verification.</p>
+              </div>
+              <div class="hm-actions">
+                <button class="btn-outline-sm" id="btnEditHeroBanner">✏️ Edit Hero Copy &amp; Image</button>
+                <button class="btn-outline-sm">Replace Background</button>
+              </div>
+            </div>
+
+            <!-- Pinned Announcements Card -->
+            <div class="card hm-section-card">
+              <div class="hm-hd">
+                <div>
+                  <span class="hm-badge">Section 2</span>
+                  <h4>Pinned Announcement Banner</h4>
+                </div>
+                <label class="switch-toggle"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+              <div class="pinned-notice-preview">
+                <span class="pnp-ico">📢</span>
+                <div class="pnp-body">
+                  <strong>2026 ATAMAN Tree Planting Program Begins</strong>
+                  <small>Active until September 15, 2026 · Shown on portal top banner</small>
+                </div>
+                <span class="badge-soft-green">Active Live</span>
+              </div>
+              <div class="hm-actions">
+                <button class="btn-outline-sm" id="btnChangePinnedAnnouncement">🔄 Select Active Announcement</button>
+              </div>
+            </div>
+
+            <!-- Featured Projects Card -->
+            <div class="card hm-section-card">
+              <div class="hm-hd">
+                <div>
+                  <span class="hm-badge">Section 3</span>
+                  <h4>Featured Adoption Projects</h4>
+                </div>
+                <label class="switch-toggle"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+              <div class="featured-proj-list">
+                <div class="fp-item"><span>1. Reforestation 2026 · Mt. Banahaw</span><small class="text-success">Featured</small></div>
+                <div class="fp-item"><span>2. Community Urban Trees · San Isidro</span><small class="text-success">Featured</small></div>
+                <div class="fp-item"><span>3. School Agro-Forestry Network</span><small class="text-success">Featured</small></div>
+              </div>
+              <div class="hm-actions">
+                <button class="btn-outline-sm">Reorder Projects</button>
+                <button class="btn-outline-sm">+ Add Project to Home</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           5. MEDIA LIBRARY PANE / SECTION
+      ════════════════════════════════════════ -->
+      <div class="tab-pane" id="paneMedia">
+        <section class="section">
+          <div class="section-hd-flex">
+            <div>
+              <h2 class="section-title">🖼️ Media &amp; Asset Library</h2>
+              <span class="section-sub">0 photos, illustrations, and banners used across public pages and adoption portals</span>
+            </div>
+            <button class="btn-primary" id="btnUploadMediaAsset">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              + Upload Media File
+            </button>
+          </div>
+
+          <div class="media-grid">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: var(--text-muted, #94a3b8);">
+              <div style="font-size: 2.5rem; margin-bottom: 12px;">🖼️</div>
+              <p style="font-weight: 700; font-size: 1rem; margin-bottom: 6px;">No media files uploaded yet.</p>
+              <p style="font-size: 0.82rem;">Click <strong>+ Upload Media File</strong> above to add photos, banners, or diagrams.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           6. CONTENT AUDIT & HISTORY PANE
+      ════════════════════════════════════════ -->
+      <div class="tab-pane" id="paneHistory">
+        <section class="section">
+          <div class="section-hd">
+            <h2 class="section-title">📝 Content Change &amp; Publishing Audit Log</h2>
+            <span class="section-sub">Immutable record of content creations, edits, scheduling, and archiving</span>
+          </div>
+
+          <div class="card">
+            <table class="audit-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Editor / Admin</th>
+                  <th>Action</th>
+                  <th>Content Item</th>
+                  <th>Status / Outcome</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="5" style="text-align:center; padding:40px 20px; color:var(--text-muted, #94a3b8);">
+                    <div style="font-size:2rem; margin-bottom:10px;">📋</div>
+                    <p style="font-weight:700; margin-bottom:4px;">No content audit logs yet.</p>
+                    <p style="font-size:0.82rem;">Changes and publishing events will appear here once content is published.</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+    </div><!-- /.page-body -->
+  </main>
+
+  <!-- ════════════════════════════════════════
+       CONTENT EDITOR MODAL (Rich Editor)
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="contentEditorModal">
+    <div class="modal-card modal-xl">
+      <div class="modal-hd">
+        <h3 id="editorModalTitle">✏️ Create New Content Item</h3>
+        <button class="modal-close-btn" id="closeEditorModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body editor-body">
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>Content Type *</label>
+            <select class="form-control" id="edType">
+              <option value="Announcement">📢 Announcement</option>
+              <option value="News">📰 News / Update</option>
+              <option value="Education">🌱 Educational Article</option>
+              <option value="FAQ">❓ FAQ</option>
+              <option value="Page">📄 Static Page</option>
+              <option value="Banner">🖼️ Banner / Hero</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label>Category / Topic</label>
+            <input type="text" class="form-control" id="edCategory" placeholder="e.g. Field Operations, Tree Planting, FAQs" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" class="form-control" id="edTitle" placeholder="e.g. Tree Monitoring Activities — September 2026" required />
+        </div>
+
+        <div class="form-group">
+          <label>Short Description / Excerpt</label>
+          <input type="text" class="form-control" id="edExcerpt" placeholder="Brief summary displayed on cards and search results..." />
+        </div>
+
+        <!-- Rich Text Editor Simulation -->
+        <div class="form-group">
+          <label>Article Body &amp; Content</label>
+          <div class="rich-toolbar">
+            <button type="button" class="rt-btn" title="Bold"><strong>B</strong></button>
+            <button type="button" class="rt-btn" title="Italic"><em>I</em></button>
+            <button type="button" class="rt-btn" title="Underline"><u>U</u></button>
+            <span class="rt-sep"></span>
+            <button type="button" class="rt-btn" title="Heading 2">H2</button>
+            <button type="button" class="rt-btn" title="Heading 3">H3</button>
+            <span class="rt-sep"></span>
+            <button type="button" class="rt-btn" title="Bullet List">• List</button>
+            <button type="button" class="rt-btn" title="Numbered List">1. List</button>
+            <span class="rt-sep"></span>
+            <button type="button" class="rt-btn" title="Insert Link">🔗 Link</button>
+            <button type="button" class="rt-btn" title="Insert Media Image">🖼️ Image</button>
+          </div>
+          <textarea class="form-control rich-textarea" id="edBody" rows="8" placeholder="Type or paste formatted article content here..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>Featured Image</label>
+            <div class="upload-dropzone">
+              <span class="dz-ico">📷</span>
+              <span>Click to upload or drag image here</span>
+              <small>Supported: JPG, PNG, WEBP (Max 5MB)</small>
+            </div>
+          </div>
+          <div class="form-group flex-1">
+            <label>Publishing Status *</label>
+            <select class="form-control" id="edStatus">
+              <option value="Published">🟢 Published (Live Immediately)</option>
+              <option value="Draft" selected>🟡 Draft (Work in progress)</option>
+              <option value="Scheduled">📅 Scheduled (Auto-publish)</option>
+              <option value="Archived">🔴 Archived</option>
+            </select>
+
+            <label style="margin-top:10px;">Publish Date</label>
+            <input type="date" class="form-control" id="edDate" value="2026-08-29" />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-ft">
+        <button class="btn btn-secondary" id="btnPreviewInModal">👁️ Live Preview</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline-sm" id="btnSaveDraft">💾 Save Draft</button>
+          <button class="btn btn-primary" id="btnPublishContent">⚡ Publish Content</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       LIVE PREVIEW MODAL
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="previewModal">
+    <div class="modal-card">
+      <div class="modal-hd">
+        <h3>👁️ Public Reader Preview</h3>
+        <button class="modal-close-btn" id="closePreviewModalBtn">&times;</button>
+      </div>
+      <div class="modal-body preview-container">
+        <div class="prev-badge" id="prevBadge">📢 ANNOUNCEMENT</div>
+        <h2 class="prev-title" id="prevTitle">Tree Monitoring Activities — September 2026</h2>
+        <div class="prev-meta">
+          <span>By <strong>Ethel Zeta</strong></span> · <span id="prevDate">August 29, 2026</span>
+        </div>
+        <div class="prev-featured-img">
+          <span>🌳 Featured Image Preview</span>
+        </div>
+        <p class="prev-excerpt" id="prevExcerpt">Scheduled monitoring activities will begin on September 1 across all watershed sectors.</p>
+        <div class="prev-body" id="prevBody">
+          Scheduled tree monitoring activities for September will begin on September 1. Caretakers are reminded to complete their assigned monitoring records and verify sapling leaf vigor.
+        </div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn btn-secondary" id="btnBackToEdit">Back to Editor</button>
+        <button class="btn btn-primary" id="btnPublishFromPreview">Confirm &amp; Publish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast hidden" id="toastMsg"></div>
+
+  <script src="ATAMAN-init.js"></script>
+  <script src="admin-content.js"></script>
+  <!-- Real-Time Sync Engine -->
+  <script src="realtime-admin.js"></script>
+</body>
+</html>
