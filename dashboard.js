@@ -315,7 +315,7 @@ function updateTopKpis() {
 /* ─── 2.2 Tree Health Donut Chart ─── */
 function initDonutChart(counts) {
   const ctx = document.getElementById('healthChart');
-  if (!ctx) return;
+  if (!ctx || typeof Chart === 'undefined') return;
 
   const dataCounts = counts || [0, 0, 0, 0];
   const total = dataCounts.reduce((a, b) => a + b, 0);
@@ -412,7 +412,7 @@ function updateHealthDonut() {
 /* ─── 2.3 Interactive Leaflet Map ─── */
 function initLeafletMap() {
   const mapElement = document.getElementById('leafletMap');
-  if (!mapElement) return;
+  if (!mapElement || typeof L === 'undefined') return;
 
   try {
     leafletMap = L.map('leafletMap', {

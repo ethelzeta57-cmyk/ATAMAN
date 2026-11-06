@@ -426,7 +426,7 @@ function renderDonutChart(data) {
   if (legCritical) legCritical.textContent = `${data.critical.toLocaleString()} (${calcPct(data.critical)})`;
   if (legDead) legDead.textContent = `${data.dead.toLocaleString()} (${calcPct(data.dead)})`;
 
-  if (!ctx) return;
+  if (!ctx || typeof Chart === 'undefined') return;
 
   if (healthChartInstance) {
     healthChartInstance.destroy();
@@ -478,7 +478,7 @@ function renderDonutChart(data) {
 /* ─── 5. Interactive Leaflet Map with Adopter Tree Pins ─── */
 function renderAdopterMap(data, filterSpecies = 'All Species') {
   const mapEl = document.getElementById('adopterMap');
-  if (!mapEl) return;
+  if (!mapEl || typeof L === 'undefined') return;
 
   // Initialize Map if not yet created
   if (!adopterMapInstance) {
