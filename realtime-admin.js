@@ -542,7 +542,7 @@
           transform: scale(0.95);
         }
         .sidebar-close-btn {
-          display: none;
+          display: none !important;
           align-items: center;
           justify-content: center;
           width: 32px;
