@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v1.3.2';
+const CACHE_NAME = 'ataman-pwa-v1.3.3';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
@@ -59,26 +59,91 @@ const EXCLUDED_HOSTS = [
   'googleapis.com'
 ];
 
+/**
+ * Safe CacheStorage Helpers with Self-Healing Recovery
+ * Prevents "DOMException: Failed to execute 'open' on 'CacheStorage': Unexpected internal error"
+ * from crashing the service worker during debugging or temporary profile storage locks.
+ */
+async function safeOpenCache(name = CACHE_NAME) {
+  try {
+    if (typeof caches === 'undefined' || !caches.open) return null;
+    return await caches.open(name);
+  } catch (err) {
+    console.warn('[ATAMAN ServiceWorker] Cache open error, attempting recovery:', err?.message || err);
+    try {
+      if (typeof caches !== 'undefined' && caches.delete) {
+        await caches.delete(name);
+      }
+      return await caches.open(name);
+    } catch (retryErr) {
+      console.warn('[ATAMAN ServiceWorker] CacheStorage unavailable; running in direct-network mode.');
+      return null;
+    }
+  }
+}
+
+async function safeMatch(req) {
+  try {
+    if (typeof caches === 'undefined' || !caches.match) return null;
+    return await caches.match(req);
+  } catch (err) {
+    return null;
+  }
+}
+
+async function safePut(cache, req, response) {
+  try {
+    if (!cache || !req || !response) return;
+    await cache.put(req, response);
+  } catch (err) {
+    // Quota exceeded or cache write locked -> silently ignore
+  }
+}
+
+async function safeKeys() {
+  try {
+    if (typeof caches === 'undefined' || !caches.keys) return [];
+    return await caches.keys();
+  } catch (err) {
+    return [];
+  }
+}
+
+async function safeDelete(name) {
+  try {
+    if (typeof caches === 'undefined' || !caches.delete) return false;
+    return await caches.delete(name);
+  } catch (err) {
+    return false;
+  }
+}
+
 // ============================================================================
 // 1. INSTALL LIFECYCLE
 // ============================================================================
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      // Robust caching: add files individually so one missing asset doesn't abort install
-      const cachePromises = PRECACHE_ASSETS.map(async (url) => {
-        try {
-          const response = await fetch(url, { cache: 'no-cache' });
-          if (response && response.ok) {
-            await cache.put(url, response);
-          }
-        } catch (err) {
-          console.warn('[ATAMAN ServiceWorker] Pre-cache item skipped:', url, err.message);
+    (async () => {
+      try {
+        const cache = await safeOpenCache(CACHE_NAME);
+        if (cache) {
+          const cachePromises = PRECACHE_ASSETS.map(async (url) => {
+            try {
+              const response = await fetch(url, { cache: 'no-cache' });
+              if (response && response.ok) {
+                await safePut(cache, url, response);
+              }
+            } catch (err) {
+              // Silently ignore single pre-cache asset misses
+            }
+          });
+          await Promise.all(cachePromises);
         }
-      });
-      await Promise.all(cachePromises);
+      } catch (err) {
+        console.warn('[ATAMAN ServiceWorker] Pre-cache install error bypassed:', err?.message || err);
+      }
       return self.skipWaiting();
-    })
+    })()
   );
 });
 
@@ -87,16 +152,22 @@ self.addEventListener('install', (event) => {
 // ============================================================================
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME && name.startsWith('ataman-pwa-')) {
-            console.log('[ATAMAN ServiceWorker] Purging legacy cache:', name);
-            return caches.delete(name);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    (async () => {
+      try {
+        const cacheNames = await safeKeys();
+        await Promise.all(
+          cacheNames.map(async (name) => {
+            if (name !== CACHE_NAME && name.startsWith('ataman-pwa-')) {
+              console.log('[ATAMAN ServiceWorker] Purging legacy cache:', name);
+              await safeDelete(name);
+            }
+          })
+        );
+      } catch (err) {
+        console.warn('[ATAMAN ServiceWorker] Cache purge encountered error:', err?.message || err);
+      }
+      return self.clients.claim();
+    })()
   );
 });
 
@@ -109,7 +180,12 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (req.method !== 'GET') return;
 
-  const url = new URL(req.url);
+  let url;
+  try {
+    url = new URL(req.url);
+  } catch (_) {
+    return;
+  }
 
   // Skip browser extensions, chrome-extension://, or non-http protocols
   if (!url.protocol.startsWith('http')) return;
@@ -122,20 +198,20 @@ self.addEventListener('fetch', (event) => {
   // A. NAVIGATION REQUESTS (HTML Pages) -> Network-First, Block with Offline Page if Offline
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req)
-        .then((networkResponse) => {
+      (async () => {
+        try {
+          const networkResponse = await fetch(req);
           if (networkResponse && networkResponse.ok) {
             const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+            safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => {});
           }
           return networkResponse;
-        })
-        .catch(async () => {
-          // User requested: Block access while offline -> serve blocking offline page
-          const offlineFallback = await caches.match('./offline.html');
+        } catch (fetchErr) {
+          const offlineFallback = (await safeMatch('./offline.html')) || (await safeMatch('/offline.html'));
           if (offlineFallback) return offlineFallback;
-          return caches.match('/offline.html');
-        })
+          throw fetchErr;
+        }
+      })()
     );
     return;
   }
@@ -156,38 +232,55 @@ self.addEventListener('fetch', (event) => {
 
   if (isStaticAsset) {
     event.respondWith(
-      caches.match(req).then((cachedResponse) => {
+      (async () => {
+        const cachedResponse = await safeMatch(req);
+
         // Fetch latest version in background to update cache
-        const fetchPromise = fetch(req)
-          .then((networkResponse) => {
+        const networkFetch = (async () => {
+          try {
+            const networkResponse = await fetch(req);
             if (networkResponse && networkResponse.ok) {
               const clone = networkResponse.clone();
-              caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+              safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => {});
             }
             return networkResponse;
-          })
-          .catch(() => {
-            // Silently ignore background fetch failure when offline
-          });
+          } catch (_) {
+            return null;
+          }
+        })();
 
-        // Return cached version immediately if available, otherwise wait for network
-        return cachedResponse || fetchPromise;
-      })
+        // Return cached version immediately if available
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        // Otherwise wait for network response
+        const res = await networkFetch;
+        if (res) return res;
+
+        // Fallback for missing asset
+        return new Response('Asset unavailable offline', { status: 503, statusText: 'Service Unavailable' });
+      })()
     );
     return;
   }
 
   // C. DEFAULT -> Network First
   event.respondWith(
-    fetch(req)
-      .then((networkResponse) => {
+    (async () => {
+      try {
+        const networkResponse = await fetch(req);
         if (networkResponse && networkResponse.ok) {
           const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+          safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => {});
         }
         return networkResponse;
-      })
-      .catch(() => caches.match(req))
+      } catch (err) {
+        const cached = await safeMatch(req);
+        if (cached) return cached;
+        throw err;
+      }
+    })()
   );
 });
 
