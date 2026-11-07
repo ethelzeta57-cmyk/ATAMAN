@@ -1,0 +1,9 @@
+{
+  "name": "ataman",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ATAMAN Tree Management and Monitoring System",
+  "scripts": {
+    "build": "echo 'ATAMAN static site ready'"
+  }
+}

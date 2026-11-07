@@ -1,6 +1,7 @@
 # Netlify Configuration for ATAMAN Tree Management and Monitoring System
 [build]
   publish = "."
+  command = "echo 'ATAMAN static deploy ready'"
 
 # Service Worker header - Never cache so PWA updates deploy immediately
 [[headers]]
