@@ -1,0 +1,30 @@
+# Netlify Configuration for ATAMAN Tree Management and Monitoring System
+[build]
+  publish = "."
+
+# Service Worker header - Never cache so PWA updates deploy immediately
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Service-Worker-Allowed = "/"
+
+# Web App Manifest header
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "no-cache, must-revalidate"
+
+# Connectivity guard script
+[[headers]]
+  for = "/ataman-connectivity.js"
+  [headers.values]
+    Cache-Control = "no-cache, must-revalidate"
+
+# Global security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
