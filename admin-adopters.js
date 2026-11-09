@@ -1310,11 +1310,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function getContactPersonValue() {
     const sel = document.getElementById('newContact');
-    const customInp = document.getElementById('newContactCustom');
-    if (sel && sel.value === '__custom__' && customInp) {
-      return customInp.value.trim();
+    if (!sel || !sel.value) return '';
+    const chosen = sel.options[sel.selectedIndex];
+    if (chosen && chosen.dataset && chosen.dataset.name) {
+      return chosen.dataset.name.trim();
     }
-    return sel ? sel.value.trim() : '';
+    if (window._selectedAdopterUser && window._selectedAdopterUser.name) {
+      return window._selectedAdopterUser.name.trim();
+    }
+    return sel.value.trim();
   }
 
   function calcTotalsFromSelection() {
@@ -1544,86 +1548,230 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ── Populate Contact Person Dropdown from Registered Users ──
+  // ── Populate Adopter Dropdown from Registered Adopter Accounts ──
+  let registeredAdoptersMap = new Map();
+
   function populateContactPersonDropdown() {
+    populateAdopterDropdown();
+  }
+
+  function populateAdopterDropdown() {
     const sel = document.getElementById('newContact');
     if (!sel) return;
+    const searchInp = document.getElementById('adopterSearchInput');
+    const feedback = document.getElementById('adopterSelectFeedback');
+    const badge = document.getElementById('adopterLinkedBadge');
+    if (feedback) feedback.style.display = 'none';
+    if (badge) badge.style.display = 'none';
 
-    // Collect all registered users from localStorage (no hardcoded seeds)
-    const seen = new Map(); // email → { name, email, phone }
-    const storageKeys = [
+    registeredAdoptersMap = new Map();
+
+    function addAdopterCandidate(c, sourceKey) {
+      if (!c) return;
+      const em = (c.email || '').toLowerCase().trim();
+      if (!em) return;
+
+      // Filter: only users registered as Adopters (exclude admin, caretaker, staff, farmer)
+      const roleRaw = String(c.role || '').toLowerCase().trim();
+      const isAdmin = roleRaw.includes('admin');
+      const isCaretaker = roleRaw.includes('care') || roleRaw.includes('farm') || roleRaw.includes('staff');
+      if (isAdmin || isCaretaker) return;
+
+      const isAdopter = !roleRaw || roleRaw === 'adopter' || roleRaw.includes('adopter') || sourceKey.includes('adopter');
+      if (!isAdopter) return;
+
+      const name = c.displayName || c.fullName || c.name || c.contactPerson || em.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, function(ch) { return ch.toUpperCase(); });
+      const phone = c.phone || c.contact || c.contactNumber || '';
+      const address = c.address || c.location || c.completeAddress || '';
+      const type = c.type || c.adopterType || (c.organization ? 'Organization' : 'Individual');
+      const org = c.organization || c.company || c.orgName || '';
+      const uid = c.uid || c.id || c.userId || '';
+
+      if (!registeredAdoptersMap.has(em)) {
+        registeredAdoptersMap.set(em, {
+          id: uid,
+          name: name,
+          email: em,
+          phone: phone !== '—' ? phone : '',
+          address: address !== '—' ? address : '',
+          type: type,
+          organization: org,
+          status: c.status || 'Active',
+          source: sourceKey
+        });
+      } else {
+        const ex = registeredAdoptersMap.get(em);
+        if (!ex.phone && phone && phone !== '—') ex.phone = phone;
+        if (!ex.address && address && address !== '—') ex.address = address;
+        if ((!ex.name || ex.name === em) && name) ex.name = name;
+        if (!ex.organization && org) ex.organization = org;
+        if ((!ex.id || String(ex.id).startsWith('ad-')) && uid) ex.id = uid;
+        if (ex.type === 'Individual' && type && type !== 'Individual') ex.type = type;
+      }
+    }
+
+    // 1. Scan registered users caches
+    const userKeys = [
       'ATAMAN_registered_users', 'saplink_registered_users',
       'ATAMAN_users_cache', 'saplink_users_cache'
     ];
-
-    storageKeys.forEach(key => {
+    userKeys.forEach(function(k) {
       try {
-        const raw = JSON.parse(localStorage.getItem(key) || '[]');
-        if (!Array.isArray(raw)) return;
-        raw.forEach(r => {
-          if (!r.email) return;
-          const em = (r.email || '').toLowerCase().trim();
-          const roleRaw = (r.role || '').toLowerCase();
-          // Include all adopters (and entries with no role — treat as adopter by default)
-          const isAdopter = !roleRaw || roleRaw === 'adopter' || roleRaw.includes('adopter');
-          if (!isAdopter) return;
-          const name = r.displayName || r.name || em.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-          if (!seen.has(em)) {
-            seen.set(em, { name, email: em, phone: r.phone || r.contact || '—' });
-          }
-        });
-      } catch (e) {}
+        const raw = JSON.parse(localStorage.getItem(k) || '[]');
+        if (Array.isArray(raw)) raw.forEach(function(u) { addAdopterCandidate(u, k); });
+      } catch (_) {}
     });
 
-    // Also pull from adopters cache (contactPerson entries)
-    try {
-      const ads = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
-      if (Array.isArray(ads)) {
-        ads.forEach(a => {
-          if (!a.contactPerson || !a.email) return;
-          const em = (a.email || '').toLowerCase().trim();
-          if (!seen.has(em)) {
-            seen.set(em, { name: a.contactPerson, email: em, phone: a.phone || '—' });
-          }
-        });
-      }
-    } catch (e) {}
+    // 2. Scan adopters cache
+    const adopterKeys = ['ATAMAN_adopters_cache', 'saplink_adopters_cache'];
+    adopterKeys.forEach(function(k) {
+      try {
+        const raw = JSON.parse(localStorage.getItem(k) || '[]');
+        if (Array.isArray(raw)) raw.forEach(function(a) { addAdopterCandidate(a, k); });
+      } catch (_) {}
+    });
 
-    // Sort by name and rebuild the select
-    const users = Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name));
+    // 3. Scan window.ATAMAN_DB local users if available
+    if (window.ATAMAN_DB && typeof window.ATAMAN_DB.getLocalUsers === 'function') {
+      try {
+        const d = window.ATAMAN_DB.getLocalUsers();
+        if (Array.isArray(d)) d.forEach(function(u) { addAdopterCandidate(u, 'firestore'); });
+      } catch (_) {}
+    }
 
-    sel.innerHTML = '<option value="" disabled selected>— Select a registered adopter user —</option>';
-    users.forEach(u => {
+    const adopters = Array.from(registeredAdoptersMap.values()).sort(function(a, b) { return a.name.localeCompare(b.name); });
+
+    // Clear and build the select options
+    sel.innerHTML = '';
+    if (adopters.length === 0) {
       const opt = document.createElement('option');
-      opt.value = u.name;
+      opt.value = '';
+      opt.disabled = true;
+      opt.selected = true;
+      opt.textContent = '— No registered Adopters found (register an adopter account first) —';
+      sel.appendChild(opt);
+      if (searchInp) searchInp.style.display = 'none';
+      return;
+    }
+
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    placeholder.textContent = `— Select a registered Adopter (${adopters.length} available) —`;
+    sel.appendChild(placeholder);
+
+    adopters.forEach(function(u) {
+      const opt = document.createElement('option');
+      opt.value = u.email;
       opt.dataset.email = u.email;
+      opt.dataset.name = u.name;
       opt.dataset.phone = u.phone;
-      opt.textContent = `${u.name} (${u.email})`;
+      opt.dataset.address = u.address;
+      opt.dataset.type = u.type;
+      opt.dataset.org = u.organization;
+      opt.dataset.userId = u.id;
+      const typeTag = u.type && u.type !== 'Individual' ? ` [${u.type}]` : '';
+      opt.textContent = `${u.name}${typeTag} · ${u.email}`;
       sel.appendChild(opt);
     });
 
-    // Option for custom contact person
-    const customOpt = document.createElement('option');
-    customOpt.value = '__custom__';
-    customOpt.textContent = '✏️ + Enter custom contact person...';
-    sel.appendChild(customOpt);
-
-    // Auto-fill email & phone when a user is selected
-    const customInp = document.getElementById('newContactCustom');
-    sel.onchange = function () {
-      if (sel.value === '__custom__') {
-        if (customInp) {
-          customInp.style.display = 'block';
-          customInp.focus();
+    // Enable instant live search if 3 or more adopters exist
+    if (searchInp) {
+      searchInp.style.display = adopters.length >= 3 ? 'block' : 'none';
+      searchInp.value = '';
+      searchInp.oninput = function() {
+        const query = (searchInp.value || '').toLowerCase().trim();
+        for (let i = 1; i < sel.options.length; i++) {
+          const opt = sel.options[i];
+          const match = !query ||
+            opt.textContent.toLowerCase().includes(query) ||
+            (opt.dataset.email || '').toLowerCase().includes(query) ||
+            (opt.dataset.name || '').toLowerCase().includes(query);
+          opt.hidden = !match;
+          opt.style.display = match ? '' : 'none';
         }
+      };
+    }
+
+    // Auto-populate when an Adopter is selected
+    sel.onchange = function() {
+      const chosenEmail = sel.value;
+      const chosen = registeredAdoptersMap.get(chosenEmail);
+      if (!chosen) {
+        window._selectedAdopterUser = null;
+        if (feedback) feedback.style.display = 'none';
+        if (badge) badge.style.display = 'none';
         return;
       }
-      if (customInp) customInp.style.display = 'none';
-      const chosen = sel.options[sel.selectedIndex];
+
+      window._selectedAdopterUser = chosen;
+
+      // 1. Full Name / Organization Name
+      const nameInp = document.getElementById('newName');
+      if (nameInp) {
+        nameInp.value = chosen.organization || chosen.name || '';
+        nameInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 2. Email Address
       const emailInp = document.getElementById('newEmail');
+      if (emailInp) {
+        emailInp.value = chosen.email || '';
+        emailInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 3. Contact Number
       const phoneInp = document.getElementById('newPhone');
-      if (emailInp && chosen?.dataset?.email) emailInp.value = chosen.dataset.email;
-      if (phoneInp && chosen?.dataset?.phone && chosen.dataset.phone !== '—') phoneInp.value = chosen.dataset.phone;
+      if (phoneInp) {
+        phoneInp.value = chosen.phone || '';
+        phoneInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 4. Complete Address
+      const addressInp = document.getElementById('newAddress');
+      if (addressInp) {
+        addressInp.value = chosen.address || '';
+        addressInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 5. Adopter Type
+      const typeSel = document.getElementById('newType');
+      if (typeSel && chosen.type) {
+        const matchOpt = Array.from(typeSel.options).find(function(o) { return o.value.toLowerCase() === chosen.type.toLowerCase(); });
+        if (matchOpt) {
+          typeSel.value = matchOpt.value;
+        } else if (chosen.organization) {
+          typeSel.value = 'Organization';
+        } else {
+          typeSel.value = 'Individual';
+        }
+        typeSel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // 6. Visual Confirmation & Account Link Badge
+      if (feedback) {
+        feedback.style.display = 'flex';
+        const feedbackText = document.getElementById('adopterSelectFeedbackText');
+        if (feedbackText) {
+          feedbackText.textContent = `✓ Auto-filled and linked to registered account: ${chosen.name} (${chosen.email})`;
+        }
+      }
+      if (badge) {
+        badge.style.display = 'inline-block';
+      }
+
+      // Subtle pulse highlight on auto-populated inputs
+      [nameInp, emailInp, phoneInp, addressInp, typeSel].forEach(function(el) {
+        if (!el) return;
+        el.style.transition = 'background-color 0.4s ease, border-color 0.4s ease';
+        el.style.backgroundColor = '#f0fdf4';
+        el.style.borderColor = '#86efac';
+        setTimeout(function() {
+          el.style.backgroundColor = '';
+          el.style.borderColor = '';
+        }, 1200);
+      });
     };
   }
 
@@ -1631,14 +1779,17 @@ document.addEventListener('DOMContentLoaded', () => {
     openAddAdopterModalBtn.addEventListener('click', () => {
       selectedTreeIds = [];
       treeQuantities = {};
+      window._selectedAdopterUser = null;
       if (treeSearchInput) treeSearchInput.value = '';
-      const customInp = document.getElementById('newContactCustom');
-      if (customInp) {
-        customInp.value = '';
-        customInp.style.display = 'none';
-      }
+      const feedback = document.getElementById('adopterSelectFeedback');
+      if (feedback) feedback.style.display = 'none';
+      const badge = document.getElementById('adopterLinkedBadge');
+      if (badge) badge.style.display = 'none';
+      const searchInp = document.getElementById('adopterSearchInput');
+      if (searchInp) searchInp.value = '';
+
       loadSyncedTrees();
-      populateContactPersonDropdown();
+      populateAdopterDropdown();
       renderWizardStep(1);
       addAdopterModal.classList.remove('hidden');
       updateLiveSummary();
@@ -1660,14 +1811,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const contactVal = getContactPersonValue();
         const emailVal = document.getElementById('newEmail')?.value.trim();
 
+        const selVal = document.getElementById('newContact')?.value;
+        if (!contactVal || !selVal) {
+          alert('⚠️ Please select a registered Adopter from the dropdown.');
+          document.getElementById('newContact')?.focus();
+          return;
+        }
         if (!nameVal) {
           alert('⚠️ Please enter an Organization or Individual Name.');
           document.getElementById('newName')?.focus();
-          return;
-        }
-        if (!contactVal) {
-          alert('⚠️ Please select or enter a Contact Person.');
-          document.getElementById('newContact')?.focus();
           return;
         }
         if (!emailVal) {
@@ -1700,17 +1852,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const contactVal = getContactPersonValue();
     const emailVal = document.getElementById('newEmail')?.value.trim();
 
+    const selVal = document.getElementById('newContact')?.value;
+    if (!contactVal || !selVal) {
+      alert('⚠️ Missing Adopter selection. Returning to Step 1.');
+      renderWizardStep(1);
+      document.getElementById('newContact')?.focus();
+      return;
+    }
+
     if (!nameVal) {
       alert('⚠️ Missing Adopter Name. Returning to Step 1.');
       renderWizardStep(1);
       document.getElementById('newName')?.focus();
-      return;
-    }
-
-    if (!contactVal) {
-      alert('⚠️ Missing Contact Person. Returning to Step 1.');
-      renderWizardStep(1);
-      document.getElementById('newContact')?.focus();
       return;
     }
 
@@ -1751,14 +1904,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const isGuinsoronganAdopter = inputAddress.toLowerCase().includes('guinsorongan') || adopterName.toLowerCase().includes('john sho');
 
     const adopterLocation = isGuinsoronganAdopter ? 'Brgy. Guinsorongan' : (selectedTrees[0]?.barangay ? `Brgy. ${selectedTrees[0].barangay}` : 'Catbalogan City');
+    const selectedAdopter = window._selectedAdopterUser;
 
     const newObj = {
-      id: 'ad-' + Date.now(),
+      id: (selectedAdopter && selectedAdopter.id && String(selectedAdopter.id).startsWith('ad-')) ? selectedAdopter.id : ('ad-' + Date.now()),
+      userId: selectedAdopter?.id || '',
+      userEmail: emailVal,
+      accountLinked: true,
+      registeredAdopter: true,
       name: adopterName,
-      type: document.getElementById('newType')?.value || 'Company',
+      type: document.getElementById('newType')?.value || (selectedAdopter?.type || 'Individual'),
       contactPerson: contactVal,
+      adopterUser: contactVal,
       email: emailVal,
-      phone: document.getElementById('newPhone')?.value.trim() || '+63 917 000 0000',
+      phone: document.getElementById('newPhone')?.value.trim() || (selectedAdopter?.phone || '+63 917 000 0000'),
       address: inputAddress,
       regId: 'REG-2026-' + Math.floor(1000 + Math.random() * 9000),
       dateReg: formatDateDisplay(new Date().toISOString()),
@@ -1864,11 +2023,13 @@ document.addEventListener('DOMContentLoaded', () => {
     addAdopterModal.classList.add('hidden');
     const form = document.getElementById('addAdopterForm');
     if (form) form.reset();
-    const customInpReset = document.getElementById('newContactCustom');
-    if (customInpReset) {
-      customInpReset.value = '';
-      customInpReset.style.display = 'none';
-    }
+    window._selectedAdopterUser = null;
+    const feedbackReset = document.getElementById('adopterSelectFeedback');
+    if (feedbackReset) feedbackReset.style.display = 'none';
+    const badgeReset = document.getElementById('adopterLinkedBadge');
+    if (badgeReset) badgeReset.style.display = 'none';
+    const searchInpReset = document.getElementById('adopterSearchInput');
+    if (searchInpReset) searchInpReset.value = '';
     selectedTreeIds = [];
     treeQuantities = {};
     updateLiveSummary();
