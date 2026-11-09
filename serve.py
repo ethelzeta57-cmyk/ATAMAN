@@ -23,3 +23,4 @@ except OSError:
     print(f"Serving HTTP on port {PORT} (server already active) ...", flush=True)
     while True:
         time.sleep(3600)
+
