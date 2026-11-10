@@ -580,10 +580,15 @@
   } catch (pwaErr) {
     console.warn('[ATAMAN PWA] Auto-registration notice:', pwaErr);
   }
-  // One-time Service Worker self-healer (v2.0.2) to immediately restore external map & chart CDNs
+  // One-time Service Worker self-healer (v2.0.5) to immediately refresh latest mobile & analytics assets
   try {
-    if ('serviceWorker' in navigator && !localStorage.getItem('ATAMAN_sw_healed_v202')) {
-      localStorage.setItem('ATAMAN_sw_healed_v202', 'done');
+    if ('serviceWorker' in navigator && !localStorage.getItem('ATAMAN_sw_healed_v205')) {
+      localStorage.setItem('ATAMAN_sw_healed_v205', 'done');
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          names.forEach(function(n) { caches.delete(n); });
+        }).catch(function() {});
+      }
       navigator.serviceWorker.getRegistrations().then(function(regs) {
         if (regs && regs.length > 0) {
           Promise.all(regs.map(function(r) { return r.unregister(); })).then(function() {
@@ -692,8 +697,8 @@
             flex-shrink: 0;
           }
 
-          /* TABLET & MOBILE BREAKPOINT (<= 992px) */
-          @media (max-width: 992px) {
+          /* TABLET & MOBILE BREAKPOINT (<= 1024px or Touch Mobile Device) */
+          @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
             body {
               display: flex !important;
               flex-direction: column !important;
@@ -834,14 +839,32 @@
             .ad-bot-grid,
             .ct-mid-grid,
             .ct-bot-grid,
+            .two-col,
+            .three-col,
+            .survival-layout,
+            .insights-grid,
             .trees-split-container,
             .map-workspace-layout,
             .map-split-stage,
             .profile-content-grid {
-              grid-template-columns: 1fr !important;
+              grid-template-columns: minmax(0, 1fr) !important;
             }
 
-            /* Responsive Tables with Smooth Touch Scroll */
+            /* Ensure Cards & Grid Items Never Overflow Mobile Viewport */
+            .card,
+            .chart-card,
+            .table-card,
+            .panel-card,
+            .section-card,
+            .impact-card,
+            .audit-card {
+              min-width: 0 !important;
+              max-width: 100% !important;
+              overflow-x: auto !important;
+              -webkit-overflow-scrolling: touch !important;
+            }
+
+            /* Responsive Tables & Tab Bars with Smooth Touch Scroll */
             .table-responsive,
             .table-wrap,
             .table-container,
@@ -849,20 +872,57 @@
             .adopters-table-wrap,
             .caretakers-table-wrap,
             .users-table-wrap,
-            .logs-table-wrap {
+            .logs-table-wrap,
+            .tab-list,
+            .tabs-bar {
               display: block !important;
               width: 100% !important;
+              max-width: 100% !important;
               overflow-x: auto !important;
               -webkit-overflow-scrolling: touch !important;
             }
+
+            .tab-list {
+              display: flex !important;
+              flex-wrap: nowrap !important;
+              gap: 6px !important;
+            }
+
+            .bulk-action-bar,
+            .bulk-btns-group,
+            .tabs-header,
+            .tab-meta {
+              flex-wrap: wrap !important;
+              max-width: 100% !important;
+              gap: 6px !important;
+            }
+
+            /* Keep Closed Off-Canvas Detail Drawers Off-Screen Without Expanding Viewport */
+            .drill-panel.hidden,
+            .user-drawer:not(.open):not(.active),
+            .detail-drawer:not(.open):not(.active),
+            .notif-drawer:not(.open):not(.active),
+            .log-drawer:not(.open):not(.active),
+            #userDrawer:not(.open):not(.active),
+            #detailDrawer:not(.open):not(.active),
+            #notifDrawer:not(.open):not(.active),
+            #logDrawer:not(.open):not(.active) {
+              position: fixed !important;
+              right: 0 !important;
+              transform: translateX(105%) !important;
+              visibility: hidden !important;
+              pointer-events: none !important;
+              max-width: 100vw !important;
+            }
           }
 
-          /* CELLPHONE BREAKPOINT (<= 640px) */
-          @media (max-width: 640px) {
+          /* CELLPHONE BREAKPOINT (<= 768px or Touch Mobile Device) */
+          @media (max-width: 768px), (hover: none) and (pointer: coarse) {
             /* 2-Column Compact KPI Cards on Cellphones */
             .stats-grid,
             .summary-cards-grid,
             .metrics-grid,
+            .kpi-grid,
             .ad-stats-grid,
             .mytrees-stats-grid,
             .ct-stats-grid,
@@ -873,9 +933,14 @@
               gap: 10px !important;
             }
 
+            .kpi-grid .kpi-card:last-child:nth-child(odd) {
+              grid-column: 1 / -1 !important;
+            }
+
             .stat-card,
             .summary-card,
             .metric-card,
+            .kpi-card,
             .ad-stat-card,
             .ct-stat-card {
               padding: 12px !important;
@@ -885,6 +950,7 @@
             .stat-value,
             .sc-value,
             .mc-value,
+            .kpi-value,
             .ad-stat-val,
             .ct-stat-val {
               font-size: 18px !important;

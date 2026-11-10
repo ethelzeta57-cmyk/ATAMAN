@@ -648,7 +648,7 @@
     }
 
     // Ensure Hamburger Toggle Button exists
-    let menuBtn = document.getElementById('mobileMenuBtn') || document.querySelector('.mobile-nav-toggle');
+    let menuBtn = document.getElementById('mobileMenuBtn') || document.getElementById('sidebarToggle') || document.querySelector('.mobile-nav-toggle, .topbar-toggle');
     if (!menuBtn) {
       const headerLeft = document.querySelector('.dash-header .header-left, .topbar .topbar-left, .page-header .header-left, .header-left, .dash-header');
       if (headerLeft) {
