@@ -903,12 +903,15 @@ body {
   color: #ffffff !important;
   flex-shrink: 0 !important;
   border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
-  position: sticky !important;
+  position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   bottom: 0 !important;
+  max-width: 260px !important;
+  max-height: 100vh !important;
   overflow-y: auto !important;
-  z-index: 50 !important;
+  overflow-x: hidden !important;
+  z-index: 1000 !important;
 }
 
 .sidebar::-webkit-scrollbar {
@@ -1133,13 +1136,49 @@ body {
 
 .main-content,
 .main-wrapper {
-  margin-left: 0 !important;
+  margin-left: 260px !important;
   flex: 1 1 auto !important;
   width: calc(100% - 260px) !important;
   min-width: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   position: relative !important;
+}
+
+@media (max-width: 1024px), (hover: none) and (pointer: coarse), (max-height: 600px) {
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 285px !important;
+    min-width: 285px !important;
+    max-width: 86vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100vh !important;
+    z-index: 10000 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s ease !important;
+    visibility: hidden !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background-color: var(--sidebar-bg, #092e18) !important;
+  }
+
+  .sidebar.mobile-open,
+  .sidebar.open {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+    box-shadow: 12px 0 35px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .main-content,
+  .main-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
 }
 
 .topbar,

@@ -78,11 +78,13 @@ html, body {
   color: #ffffff;
   flex-shrink: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100vh;
   min-height: 100vh;
-  height: auto;
-  align-self: stretch;
+  max-height: 100vh;
   overflow-y: auto;
   z-index: 50;
 }
@@ -1726,13 +1728,14 @@ aside > .sidebar-user {
   color: #ffffff !important;
   flex-shrink: 0 !important;
   border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
-  position: sticky !important;
+  position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   bottom: 0 !important;
+  max-height: 100vh !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  z-index: 50 !important;
+  z-index: 1000 !important;
 }
 
 .sidebar::-webkit-scrollbar {
@@ -1965,7 +1968,7 @@ body {
 
 .main-content,
 .main-wrapper {
-  margin-left: 0 !important;
+  margin-left: 260px !important;
   flex: 1 1 auto !important;
   width: calc(100% - 260px) !important;
   min-width: 0 !important;
@@ -2258,7 +2261,7 @@ body {
   }
 
   .sidebar {
-    position: sticky !important;
+    position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     width: 260px !important;
@@ -2290,7 +2293,7 @@ body {
     flex: 1 1 auto !important;
     width: calc(100% - 260px) !important;
     min-width: 0 !important;
-    margin-left: 0 !important;
+    margin-left: 260px !important;
   }
 }
 
