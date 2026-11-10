@@ -638,15 +638,17 @@
             -webkit-text-size-adjust: 100%;
           }
 
-          /* Ensure Sidebar Always Extends Full Height to the Very Bottom Across All Dashboards */
+          /* Ensure Sidebar Always Keeps Full Green Background & Extends Full Height to the Very Bottom Across All Dashboards */
           #sidebar,
           aside.sidebar,
           aside.ad-sidebar,
           aside.ct-sidebar {
+            background-color: var(--sidebar-bg, var(--sb-bg, #092e18)) !important;
+            color: #ffffff !important;
             min-height: 100vh !important;
             height: auto !important;
             align-self: stretch !important;
-            box-shadow: 0 5000px 0 0 var(--sidebar-bg, var(--sb-bg, #0b331b));
+            box-shadow: 0 5000px 0 0 var(--sidebar-bg, var(--sb-bg, #092e18)) !important;
           }
 
           /* Universal Hamburger Toggle Button */

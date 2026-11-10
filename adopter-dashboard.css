@@ -72,9 +72,10 @@ html, body {
    SIDEBAR
    ========================================================================== */
 
--height: 100vh;
-  height: auto;
-  align-self: stretch;
+.ad-sidebar {
+  width: 250px;
+  background-color: var(--sidebar-bg);
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   color: #ffffff;
@@ -82,7 +83,9 @@ html, body {
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   position: sticky;
   top: 0;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
+  align-self: stretch;
   overflow-y: auto;
   z-index: 50;
 }

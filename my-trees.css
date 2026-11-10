@@ -68,7 +68,10 @@ html, body {
    SIDEBAR
    ========================================================================== */
 
--height: 100vh;
+.ct-sidebar {
+  width: 250px;
+  background-color: var(--sidebar-bg);
+  min-height: 100vh;
   height: auto;
   align-self: stretch;
   display: flex;
