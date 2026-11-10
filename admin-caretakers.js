@@ -1696,26 +1696,302 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('ataman:users-updated', populateRealtimeAdopters);
   window.addEventListener('ATAMAN:users-updated', populateRealtimeAdopters);
 
+  // ── Populate Caretaker Dropdown from Registered Caretaker Accounts ──
+  let registeredCaretakersMap = new Map();
+
+  function populateCaretakersDropdown() {
+    const sel = document.getElementById('selectCaretakerUser');
+    if (!sel) return;
+    const searchInp = document.getElementById('caretakerSearchInput');
+    const feedback = document.getElementById('caretakerSelectFeedback');
+    const badge = document.getElementById('caretakerLinkedBadge');
+    if (feedback) feedback.style.display = 'none';
+    if (badge) badge.style.display = 'none';
+
+    registeredCaretakersMap = new Map();
+
+    function addCaretakerCandidate(c, sourceKey) {
+      if (!c) return;
+      const em = (c.email || '').toLowerCase().trim();
+      const name = c.displayName || c.fullName || c.name || '';
+      if (!em && !name) return;
+
+      // Filter: must be registered as Caretaker; explicitly exclude admin and adopter
+      const roleRaw = String(c.role || '').toLowerCase().trim();
+      const isAdmin = roleRaw.includes('admin');
+      const isAdopter = roleRaw.includes('adopter');
+      if (isAdmin || isAdopter) return;
+
+      const isCaretaker = !roleRaw || roleRaw.includes('care') || roleRaw.includes('farm') || roleRaw === 'caretaker' || sourceKey.includes('caretaker');
+      if (!isCaretaker) return;
+
+      const key = em || (name.toLowerCase().trim());
+      const phone = c.phone || c.contact || c.contactNumber || '';
+      const address = c.address || c.location || c.completeAddress || c.primaryArea || '';
+      const empId = c.empId || c.employeeId || '';
+      const username = c.username || (em ? em.split('@')[0] : name.toLowerCase().replace(/\s+/g, '.'));
+      const uid = c.uid || c.id || c.userId || '';
+      const barangay = c.primaryArea || c.barangay || (address.includes('Guinsorongan') ? 'Guinsorongan' : '');
+      const mun = c.municipality || 'Catbalogan City';
+      const prov = c.province || 'Samar';
+
+      if (!registeredCaretakersMap.has(key)) {
+        registeredCaretakersMap.set(key, {
+          id: uid,
+          name: name || (em ? em.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, function(ch) { return ch.toUpperCase(); }) : 'Field Caretaker'),
+          email: em,
+          phone: phone !== '—' ? phone : '',
+          address: address !== '—' ? address : '',
+          empId: empId,
+          username: username,
+          barangay: barangay,
+          municipality: mun,
+          province: prov,
+          status: c.status || 'Active',
+          source: sourceKey
+        });
+      } else {
+        const ex = registeredCaretakersMap.get(key);
+        if (!ex.phone && phone && phone !== '—') ex.phone = phone;
+        if (!ex.address && address && address !== '—') ex.address = address;
+        if ((!ex.name || ex.name === em) && name) ex.name = name;
+        if (!ex.empId && empId) ex.empId = empId;
+        if (!ex.barangay && barangay) ex.barangay = barangay;
+        if ((!ex.id || String(ex.id).startsWith('ct-custom-')) && uid) ex.id = uid;
+      }
+    }
+
+    // 1. Scan registered users caches (accounts created via register-caretaker.html or Admin Users)
+    const userKeys = [
+      'ATAMAN_registered_users', 'saplink_registered_users',
+      'ATAMAN_users_cache', 'saplink_users_cache'
+    ];
+    userKeys.forEach(function(k) {
+      try {
+        const raw = JSON.parse(localStorage.getItem(k) || '[]');
+        if (Array.isArray(raw)) raw.forEach(function(u) { addCaretakerCandidate(u, k); });
+      } catch (_) {}
+    });
+
+    // 2. Scan caretakers cache
+    const caretakerKeys = ['ATAMAN_caretakers_cache', 'saplink_caretakers_cache'];
+    caretakerKeys.forEach(function(k) {
+      try {
+        const raw = JSON.parse(localStorage.getItem(k) || '[]');
+        if (Array.isArray(raw)) raw.forEach(function(c) { addCaretakerCandidate(c, k); });
+      } catch (_) {}
+    });
+
+    // 3. Scan window.ATAMAN_DB local users if available
+    if (window.ATAMAN_DB && typeof window.ATAMAN_DB.getLocalUsers === 'function') {
+      try {
+        const d = window.ATAMAN_DB.getLocalUsers();
+        if (Array.isArray(d)) d.forEach(function(u) { addCaretakerCandidate(u, 'firestore'); });
+      } catch (_) {}
+    }
+
+    const caretakers = Array.from(registeredCaretakersMap.values()).sort(function(a, b) { return a.name.localeCompare(b.name); });
+
+    // Clear and build the select options
+    sel.innerHTML = '';
+    if (caretakers.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.disabled = true;
+      opt.selected = true;
+      opt.textContent = '— No registered Caretakers found (register a caretaker account first) —';
+      sel.appendChild(opt);
+      if (searchInp) searchInp.style.display = 'none';
+      return;
+    }
+
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    placeholder.textContent = `— Select a registered Caretaker (${caretakers.length} available) —`;
+    sel.appendChild(placeholder);
+
+    caretakers.forEach(function(u) {
+      const opt = document.createElement('option');
+      const optVal = u.email || u.name;
+      opt.value = optVal;
+      opt.dataset.email = u.email;
+      opt.dataset.name = u.name;
+      opt.dataset.phone = u.phone;
+      opt.dataset.address = u.address;
+      opt.dataset.empId = u.empId;
+      opt.dataset.username = u.username;
+      opt.dataset.barangay = u.barangay;
+      opt.dataset.userId = u.id;
+      const idTag = u.empId ? ` [${u.empId}]` : '';
+      const emailDetail = u.email ? ` · ${u.email}` : '';
+      opt.textContent = `${u.name}${idTag}${emailDetail}`;
+      sel.appendChild(opt);
+    });
+
+    // Enable instant live search if 3 or more caretakers exist
+    if (searchInp) {
+      searchInp.style.display = caretakers.length >= 3 ? 'block' : 'none';
+      searchInp.value = '';
+      searchInp.oninput = function() {
+        const query = (searchInp.value || '').toLowerCase().trim();
+        for (let i = 1; i < sel.options.length; i++) {
+          const opt = sel.options[i];
+          const match = !query ||
+            opt.textContent.toLowerCase().includes(query) ||
+            (opt.dataset.email || '').toLowerCase().includes(query) ||
+            (opt.dataset.name || '').toLowerCase().includes(query) ||
+            (opt.dataset.empId || '').toLowerCase().includes(query);
+          opt.hidden = !match;
+          opt.style.display = match ? '' : 'none';
+        }
+      };
+    }
+
+    // Auto-populate when a Caretaker is selected
+    sel.onchange = function() {
+      const chosenKey = sel.value;
+      const chosen = registeredCaretakersMap.get(chosenKey) || registeredCaretakersMap.get(chosenKey.toLowerCase().trim());
+      if (!chosen) {
+        window._selectedCaretakerUser = null;
+        if (feedback) feedback.style.display = 'none';
+        if (badge) badge.style.display = 'none';
+        return;
+      }
+
+      window._selectedCaretakerUser = chosen;
+
+      // 1. Full Name
+      const nameInp = document.getElementById('addFullName');
+      if (nameInp) {
+        nameInp.value = chosen.name || '';
+        nameInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 2. Employee ID (use registered if present, else keep auto-generated)
+      const empInp = document.getElementById('addEmpId');
+      if (empInp && chosen.empId) {
+        empInp.value = chosen.empId;
+        empInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 3. Email Address
+      const emailInp = document.getElementById('addEmail');
+      if (emailInp) {
+        emailInp.value = chosen.email || '';
+        emailInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 4. Contact Number / Phone
+      const phoneInp = document.getElementById('addPhone');
+      if (phoneInp) {
+        phoneInp.value = chosen.phone || '';
+        phoneInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 5. Username
+      const userInp = document.getElementById('addUsername');
+      if (userInp) {
+        userInp.value = chosen.username || (chosen.email ? chosen.email.split('@')[0] : chosen.name.toLowerCase().replace(/\s+/g, '.'));
+        userInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 6. Complete Address
+      const addressInp = document.getElementById('addAddress');
+      if (addressInp) {
+        addressInp.value = chosen.address || '';
+        addressInp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // 7. Primary Barangay in Section 2 (Field Assignment)
+      const brgySel = document.getElementById('addBarangay');
+      if (brgySel && chosen.barangay) {
+        const matchOpt = Array.from(brgySel.options).find(function(o) {
+          return o.value.toLowerCase() === chosen.barangay.toLowerCase() ||
+                 chosen.barangay.toLowerCase().includes(o.value.toLowerCase()) ||
+                 (chosen.address && chosen.address.toLowerCase().includes(o.value.toLowerCase()));
+        });
+        if (matchOpt) {
+          brgySel.value = matchOpt.value;
+          brgySel.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+
+      // 8. Visual Confirmation & Account Link Badge
+      if (feedback) {
+        feedback.style.display = 'flex';
+        const feedbackText = document.getElementById('caretakerSelectFeedbackText');
+        if (feedbackText) {
+          feedbackText.textContent = `✓ Auto-filled and linked to registered account: ${chosen.name} (${chosen.email || chosen.empId || 'Verified'})`;
+        }
+      }
+      if (badge) {
+        badge.style.display = 'inline-block';
+      }
+
+      // Subtle pulse highlight on auto-populated inputs
+      [nameInp, empInp, emailInp, phoneInp, userInp, addressInp, brgySel].forEach(function(el) {
+        if (!el) return;
+        el.style.transition = 'background-color 0.4s ease, border-color 0.4s ease';
+        el.style.backgroundColor = '#f0fdf4';
+        el.style.borderColor = '#86efac';
+        setTimeout(function() {
+          el.style.backgroundColor = '';
+          el.style.borderColor = '';
+        }, 1200);
+      });
+    };
+  }
+
   openAddCaretakerModalBtn.addEventListener('click', () => {
     updateCaretakerBarangays();
     populateRealtimeAdopters();
     addCaretakerForm.reset();
+    window._selectedCaretakerUser = null;
+    const feedback = document.getElementById('caretakerSelectFeedback');
+    if (feedback) feedback.style.display = 'none';
+    const badge = document.getElementById('caretakerLinkedBadge');
+    if (badge) badge.style.display = 'none';
+    const searchInp = document.getElementById('caretakerSearchInput');
+    if (searchInp) searchInp.value = '';
+
     // Auto-generate next employee ID
     const nextIdNum = caretakersList.length + 1;
     document.getElementById('addEmpId').value = `CT-${String(nextIdNum).padStart(3, '0')}`;
+    populateCaretakersDropdown();
     addCaretakerModal.classList.remove('hidden');
   });
 
-  const closeAddModal = () => addCaretakerModal.classList.add('hidden');
+  const closeAddModal = () => {
+    addCaretakerModal.classList.add('hidden');
+    window._selectedCaretakerUser = null;
+    const feedback = document.getElementById('caretakerSelectFeedback');
+    if (feedback) feedback.style.display = 'none';
+    const badge = document.getElementById('caretakerLinkedBadge');
+    if (badge) badge.style.display = 'none';
+    const searchInp = document.getElementById('caretakerSearchInput');
+    if (searchInp) searchInp.value = '';
+  };
   closeAddModalBtn.addEventListener('click', closeAddModal);
   cancelAddBtn.addEventListener('click', closeAddModal);
 
   addCaretakerForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    const selUserEl = document.getElementById('selectCaretakerUser');
+    const selectedCaretaker = window._selectedCaretakerUser;
+
+    if (!selUserEl?.value || !selectedCaretaker) {
+      alert('⚠️ Please select a registered Caretaker from the dropdown.');
+      selUserEl?.focus();
+      return;
+    }
+
     const fullName = document.getElementById('addFullName').value.trim();
     const empId = document.getElementById('addEmpId').value.trim();
     const email = document.getElementById('addEmail').value.trim();
     const phone = document.getElementById('addPhone').value.trim();
+    const address = document.getElementById('addAddress')?.value.trim() || selectedCaretaker?.address || '';
     const barangay = document.getElementById('addBarangay').value;
     const treeType = document.getElementById('addTreeType')?.value || 'Native Hardwood';
     const project = document.getElementById('addProject').value.trim() || 'General Reforestation';
@@ -1724,12 +2000,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const assignedAdopter = adopterSelect ? adopterSelect.value : '';
     const assignedAdopterName = (adopterSelect && adopterSelect.selectedIndex > 0) ? adopterSelect.options[adopterSelect.selectedIndex].text : '';
 
+    if (!fullName) {
+      alert('⚠️ Missing Caretaker Name.');
+      document.getElementById('addFullName')?.focus();
+      return;
+    }
+
     const newCt = {
-      id: `ct-custom-${Date.now()}`,
+      id: (selectedCaretaker && selectedCaretaker.id && String(selectedCaretaker.id).startsWith('ct-')) ? selectedCaretaker.id : (selectedCaretaker?.id || `ct-custom-${Date.now()}`),
+      userId: selectedCaretaker?.id || '',
+      userEmail: email,
+      accountLinked: true,
+      registeredCaretaker: true,
       name: fullName,
       empId: empId,
       email: email,
       phone: phone,
+      address: address,
       status: 'Active',
       primaryArea: barangay,
       assignedTreeType: treeType,
@@ -1759,7 +2046,21 @@ document.addEventListener('DOMContentLoaded', () => {
       photos: []
     };
 
-    caretakersList.unshift(newCt);
+    // Check if caretaker already exists in list (by empId, email, or id)
+    const existingIdx = caretakersList.findIndex(c => {
+      if (!c) return false;
+      const em = (c.email || '').toLowerCase().trim();
+      const idMatch = c.empId && c.empId.toLowerCase().trim() === empId.toLowerCase().trim();
+      const emailMatch = em && email && em === email.toLowerCase().trim();
+      return idMatch || emailMatch;
+    });
+
+    if (existingIdx >= 0) {
+      caretakersList[existingIdx] = { ...caretakersList[existingIdx], ...newCt };
+    } else {
+      caretakersList.unshift(newCt);
+    }
+
     try {
       localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakersList));
       if (window.ATAMAN_SYNC && typeof window.ATAMAN_SYNC.notifyCaretakers === 'function') {
@@ -1772,7 +2073,7 @@ document.addEventListener('DOMContentLoaded', () => {
     closeAddModal();
     updateOverviewCards();
     renderTable();
-    showToast(`Caretaker ${fullName} created successfully!`, 'success');
+    showToast(`🎉 Caretaker ${fullName} (${empId}) linked and saved successfully!`, 'success');
   });
 
   // Search & Filter Listeners
