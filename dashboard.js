@@ -1098,7 +1098,7 @@ function initQuickActions() {
   const qaReport = document.getElementById('qaReport');
   if (qaReport) {
     qaReport.addEventListener('click', () => {
-      window.location.href = 'admin-reports.html';
+      window.location.href = 'admin-reports.html?action=generate';
     });
   }
 

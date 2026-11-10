@@ -272,6 +272,7 @@
         <button class="report-tab-link" data-target="secMonitoring">📷 Monitoring & Maintenance</button>
         <button class="report-tab-link" data-target="secCritical">🚨 Critical Trees</button>
         <button class="report-tab-link" data-target="secAdopters">🤝 Adopters & Funding</button>
+        <button class="report-tab-link" data-target="secAllDashboards">🌍 Impact & System</button>
         <button class="report-tab-link" data-target="secRecentReports">📋 Report History</button>
       </div>
 
@@ -282,41 +283,46 @@
           <div class="card summary-card card-total-trees">
             <div class="sc-header"><span class="sc-icon">🌳</span><span class="sc-label">Total Trees</span></div>
             <div class="sc-value" id="cardTotalTrees">0</div>
-            <div class="sc-subtext">Across 0 barangay sectors</div>
+            <div class="sc-subtext" id="subTotalTrees">Across 0 barangay sectors</div>
           </div>
           <div class="card summary-card card-survival-rate">
             <div class="sc-header"><span class="sc-icon">📈</span><span class="sc-label">Survival Rate</span></div>
             <div class="sc-value text-success" id="cardSurvivalRate">0%</div>
-            <div class="sc-subtext text-success">—</div>
+            <div class="sc-subtext text-success" id="subSurvivalRate">—</div>
           </div>
           <div class="card summary-card card-caretakers">
             <div class="sc-header"><span class="sc-icon">👤</span><span class="sc-label">Caretakers</span></div>
             <div class="sc-value" id="cardTotalCaretakers">0</div>
-            <div class="sc-subtext">0 active on duty</div>
+            <div class="sc-subtext" id="subCaretakers">0 active on duty</div>
           </div>
           <div class="card summary-card card-adopters">
             <div class="sc-header"><span class="sc-icon">🤝</span><span class="sc-label">Adopters</span></div>
             <div class="sc-value" id="cardTotalAdopters">0</div>
-            <div class="sc-subtext">0 active sponsorship plans</div>
+            <div class="sc-subtext" id="subAdopters">0 active sponsorship plans</div>
           </div>
         </div>
 
         <!-- Row 2: Tree Condition Statistics -->
-        <div class="summary-cards-row-2">
+        <div class="summary-cards-row-2" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
           <div class="card summary-card card-healthy">
             <div class="sc-header"><span class="sc-icon">🟢</span><span class="sc-label">Healthy Trees</span></div>
             <div class="sc-value text-success" id="cardHealthyTrees">0</div>
-            <div class="sc-subtext">0% of total population</div>
+            <div class="sc-subtext" id="subHealthyTrees">0% of total population</div>
+          </div>
+          <div class="card summary-card card-care">
+            <div class="sc-header"><span class="sc-icon">🟡</span><span class="sc-label">Needs Care</span></div>
+            <div class="sc-value text-warning" id="cardNeedsCareTrees">0</div>
+            <div class="sc-subtext text-warning" id="subNeedsCareTrees">Scheduled field care</div>
           </div>
           <div class="card summary-card card-critical">
             <div class="sc-header"><span class="sc-icon">🔴</span><span class="sc-label">Critical Condition</span></div>
             <div class="sc-value text-danger" id="cardCriticalTrees">0</div>
-            <div class="sc-subtext text-danger">Priority intervention needed</div>
+            <div class="sc-subtext text-danger" id="subCriticalTrees">Priority intervention needed</div>
           </div>
           <div class="card summary-card card-dead">
             <div class="sc-header"><span class="sc-icon">⚫</span><span class="sc-label">Dead Trees</span></div>
             <div class="sc-value text-muted" id="cardDeadTrees">0</div>
-            <div class="sc-subtext">Replacement seedlings queued</div>
+            <div class="sc-subtext" id="subDeadTrees">0.0% mortality rate</div>
           </div>
         </div>
       </section>
@@ -810,14 +816,85 @@
         </div>
 
         <!-- 14. Project Performance -->
-        <div class="card">
+        <div class="card" id="cardProjectPerf">
           <div class="section-header-row">
             <h3 class="section-title">🌱 Project Performance</h3>
-            <span class="status-badge active">0 Active Programs</span>
+            <span class="status-badge active" id="badgeProjectCount">0 Active Programs</span>
           </div>
-          <div style="display:flex; flex-direction:column; gap:12px; font-size:0.82rem;">
+          <div id="projectPerfContainer" style="display:flex; flex-direction:column; gap:12px; font-size:0.82rem;">
             <div style="padding:24px 12px; text-align:center; color:#94a3b8; font-weight:600;">
               🌱 No active project data recorded yet.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15. CROSS-DASHBOARD IMPACT, USERS & SYSTEM AUDIT SUMMARY -->
+      <section class="report-grid-3" id="secAllDashboards">
+        <!-- 15A. Environmental & Carbon Impact (from Impact Dashboard) -->
+        <div class="card">
+          <div class="section-header-row">
+            <h3 class="section-title">🌍 Environmental Impact</h3>
+            <a href="admin-impact.html" class="btn btn-outline btn-sm">Impact Hub ↗</a>
+          </div>
+          <div id="repImpactContainer" style="display:flex; flex-direction:column; gap:10px; font-size:0.84rem;">
+            <div style="display:flex; justify-content:space-between;"><span>CO₂ Sequestered (Annual):</span>
+              <strong class="text-success" id="repCo2Val">0 kg/yr</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Oxygen Produced:</span>
+              <strong id="repO2Val">0 kg/yr</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Stormwater Intercepted:</span>
+              <strong id="repWaterVal">0 L/yr</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Restored Canopy Area:</span>
+              <strong id="repCanopyVal">0 m²</strong></div>
+            <hr style="border:none; border-top:1px solid var(--border-subtle);" />
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Ecological Health Index:</span>
+              <span class="stat-pill healthy" id="repEcoBadge">🟢 91.9% Optimal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 15B. Registered Portal Users & Roles (from Users Dashboard) -->
+        <div class="card">
+          <div class="section-header-row">
+            <h3 class="section-title">👥 Portal Users & Accounts</h3>
+            <a href="admin-users.html" class="btn btn-outline btn-sm">Users ↗</a>
+          </div>
+          <div id="repUsersContainer" style="display:flex; flex-direction:column; gap:10px; font-size:0.84rem;">
+            <div style="display:flex; justify-content:space-between;"><span>Total Verified Accounts:</span>
+              <strong id="repTotalUsersVal">3</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Super Administrators:</span>
+              <strong id="repAdminUsersVal">1 (Ethel Zeta)</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Field Caretakers:</span>
+              <strong class="text-success" id="repCaretakerUsersVal">1 (Dodong Zeta)</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Tree Adopters:</span>
+              <strong class="text-success" id="repAdopterUsersVal">1 (Nikki Maga)</strong></div>
+            <hr style="border:none; border-top:1px solid var(--border-subtle);" />
+            <div style="font-size:0.75rem; color:var(--text-muted);" id="repUsersSub">
+              All accounts active & synced with Firestore / Local Registry
+            </div>
+          </div>
+        </div>
+
+        <!-- 15C. System Logs, Content & Notifications Summary -->
+        <div class="card">
+          <div class="section-header-row">
+            <h3 class="section-title">🛡️ System Audit & Alerts</h3>
+            <a href="admin-system-logs.html" class="btn btn-outline btn-sm">Audit Logs ↗</a>
+          </div>
+          <div id="repSystemContainer" style="display:flex; flex-direction:column; gap:10px; font-size:0.84rem;">
+            <div style="display:flex; justify-content:space-between;"><span>GIS Map Markers Active:</span>
+              <strong class="text-success" id="repGisBatchesVal">10 Batches (310 Trees)</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Active System Alerts:</span>
+              <strong class="text-warning" id="repNotifAlertsVal">2 Field Alerts</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Audit Log Events:</span>
+              <strong id="repAuditCountVal">18 Logged Actions</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>CMS Public Stories:</span>
+              <strong id="repContentCountVal">Active & Published</strong></div>
+            <hr style="border:none; border-top:1px solid var(--border-subtle);" />
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Cross-Dashboard Sync:</span>
+              <span class="stat-pill healthy" id="repSyncStatusBadge">🟢 Live (Present)</span>
             </div>
           </div>
         </div>
@@ -828,8 +905,7 @@
         <div class="table-header-row">
           <div>
             <h3 class="section-title">📋 Recent Generated Reports Archive</h3>
-            <span style="font-size:0.75rem; color:var(--text-muted);">Audit history of compiled PDF, Excel, and CSV
-              downloads</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Live compiled reports across all ATAMAN dashboards (View, Print, or Download PDF/Excel/CSV)</span>
           </div>
           <button class="btn btn-primary btn-sm" id="btnGenNewTop" type="button">+ Compile New Report</button>
         </div>
@@ -838,17 +914,16 @@
           <table class="reports-table">
             <thead>
               <tr>
-                <th>Report Title</th>
+                <th>Report Title & Dashboard Scope</th>
                 <th>Generated By</th>
-                <th>Compiled Date</th>
+                <th>Compiled Date & Period</th>
                 <th>Format</th>
                 <th class="text-center">Action</th>
               </tr>
             </thead>
             <tbody id="tbodyArchive">
               <tr>
-                <td colspan="5" style="text-align:center; padding:32px; color:#94a3b8; font-weight:600;">📄 No archived
-                  reports yet. Click "⚡ Generate Report" to compile your first report.</td>
+                <td colspan="5" style="text-align:center; padding:32px; color:#94a3b8; font-weight:600;">📄 Loading compiled reports...</td>
               </tr>
             </tbody>
           </table>
@@ -978,7 +1053,7 @@
   <div class="modal-overlay hidden" id="critTreesModal">
     <div class="modal-card modal-xl">
       <div class="modal-header">
-        <h2 class="modal-title">🚨 Complete Critical Tree Registry (62 Trees)</h2>
+        <h2 class="modal-title" id="critModalTitle">🚨 Complete Critical & Needs-Care Tree Registry</h2>
         <button class="modal-close-btn" id="closeCritTreesModalBtn" type="button">✕</button>
       </div>
       <div class="modal-body">
@@ -1008,14 +1083,34 @@
     </div>
   </div>
 
+  <!-- ================= LIVE COMPILED REPORT PREVIEW MODAL ================= -->
+  <div class="modal-overlay hidden" id="reportPreviewModal">
+    <div class="modal-card modal-xl" style="max-width: 960px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="previewModalTitle">📊 Official ATAMAN Compiled Report</h2>
+        <button class="modal-close-btn" id="closePreviewModalBtn" type="button">✕</button>
+      </div>
+      <div class="modal-body" id="previewModalBody" style="overflow-y: auto; flex: 1; padding: 20px;">
+        <!-- Dynamically populated with full dashboard data -->
+      </div>
+      <div class="modal-footer" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+        <button class="btn btn-outline" id="closePreviewModalBtn2" type="button">Close</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-outline" id="previewDownloadCsvBtn" type="button">📑 Download CSV / Excel</button>
+          <button class="btn btn-primary" id="previewPrintPdfBtn" type="button">🖨️ Print / Save PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- JavaScript -->
-  <script src="ATAMAN-init.js?v=20261110_v12"></script>
+  <script src="ATAMAN-init.js?v=20261110_v13"></script>
   <!-- Real-Time Sync Engine -->
-  <script src="realtime-admin.js?v=20261110_v12"></script>
-  <script src="admin-reports.js?v=20261110_v8"></script>
+  <script src="realtime-admin.js?v=20261110_v13"></script>
+  <script src="admin-reports.js?v=20261110_v13"></script>
 </body>
 
 </html>
