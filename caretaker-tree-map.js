@@ -151,7 +151,7 @@ function generateAssignedTrees() {
         const assignedOnly = parsed.filter(t => {
           if (!t) return false;
           const hasAdopter = Boolean((t.adopter && t.adopter !== 'None' && t.adopter !== 'Not yet adopted' && t.adopter !== 'Available for Adoption') || (t.sponsorName && t.sponsorName !== 'None' && t.sponsorName !== 'Available for Adoption') || (parseInt(t.takenCount) || 0) > 0);
-          const hasCaretaker = Boolean(t.caretaker && t.caretaker !== 'Unassigned' && (hasAdopter || t.customCaretaker));
+          const hasCaretaker = Boolean(t.caretaker && t.caretaker !== 'Unassigned' && t.caretaker !== 'None');
           return hasAdopter || hasCaretaker;
         });
         return assignedOnly.map((t, idx) => mapRawTreeToCaretakerTreeMap(t, idx));

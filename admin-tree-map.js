@@ -278,7 +278,7 @@ let RELOCATING_TREE_ID = null;
 function isTreeAssignedOrMapped(tree) {
   if (!tree) return false;
   const hasAdopter = Boolean((tree.adopter && tree.adopter !== 'None' && tree.adopter !== 'Not yet adopted' && tree.adopter !== 'Available for Adoption') || (tree.sponsorName && tree.sponsorName !== 'None' && tree.sponsorName !== 'Available for Adoption') || (parseInt(tree.takenCount) || 0) > 0);
-  const hasCaretaker = Boolean(tree.caretaker && tree.caretaker !== 'Unassigned' && (hasAdopter || tree.customCaretaker));
+  const hasCaretaker = Boolean(tree.caretaker && tree.caretaker !== 'Unassigned' && tree.caretaker !== 'None');
   const hasExplicitLocation = Boolean(tree.barangay || (tree.customGps && tree.lat != null && tree.lng != null));
   return hasAdopter || hasCaretaker || hasExplicitLocation;
 }

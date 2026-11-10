@@ -1006,41 +1006,25 @@
         });
       });
 
-      // Clean any tree that has no assigned adopter and no explicit caretaker assignment
+      // Ensure all registered Samar trees retain their location and caretaker assignment
+      const defTrees = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) ? window.ATAMAN_DEFAULT_TREES : [];
       trees.forEach(t => {
         if (!t) return;
-        const hasAdopter = Boolean((t.adopter && t.adopter !== 'None' && t.adopter !== 'Not yet adopted' && t.adopter !== 'Available for Adoption') || (t.sponsorName && t.sponsorName !== 'None' && t.sponsorName !== 'Available for Adoption') || (parseInt(t.takenCount) || 0) > 0);
-        if (!hasAdopter && !t.customCaretaker) {
-          if (t.caretaker && t.caretaker !== 'Unassigned') {
-            t.caretaker = 'Unassigned';
-            treesModified = true;
-          }
-          if (t.project) {
-            t.project = '';
-            treesModified = true;
-          }
-          if (!t.customGps && (t.barangay || t.municipality || t.province || t.lat != null || t.lng != null || t.location)) {
-            t.barangay = '';
-            t.municipality = '';
-            t.province = '';
-            t.lat = null;
-            t.lng = null;
-            t.location = '';
-            treesModified = true;
-          }
-          if (treesModified && window.ATAMAN_DB && typeof window.ATAMAN_DB.updateTree === 'function') {
-            window.ATAMAN_DB.updateTree(t.id, {
-              caretaker: 'Unassigned',
-              project: '',
-              barangay: '',
-              municipality: '',
-              province: '',
-              lat: null,
-              lng: null,
-              location: ''
-            }).catch(() => {});
-          }
+        const defT = defTrees.find(d => d.id === t.id);
+        if (defT) {
+          if (!t.barangay && defT.barangay) { t.barangay = defT.barangay; treesModified = true; }
+          if (!t.municipality && defT.municipality) { t.municipality = defT.municipality; treesModified = true; }
+          if (!t.province && defT.province) { t.province = defT.province; treesModified = true; }
+          if (t.lat == null && defT.lat != null) { t.lat = defT.lat; treesModified = true; }
+          if (t.lng == null && defT.lng != null) { t.lng = defT.lng; treesModified = true; }
         }
+        if (!t.caretaker || t.caretaker === 'Unassigned' || t.caretaker === 'Pedro Reyes') {
+          t.caretaker = 'Dodong Zeta';
+          treesModified = true;
+        }
+        t.customCaretaker = true;
+        t.customGps = true;
+        t.customLocation = true;
       });
 
       // Recalculate each caretaker's assignedTrees strictly from trees explicitly assigned to them

@@ -26,6 +26,9 @@
       createdAt: '2026-08-28T08:00:00.000Z',
       ageOfTree: '2 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.4 meters',
       trunkDiam: '4.2 cm'
     },
@@ -48,6 +51,9 @@
       createdAt: '2026-09-06T08:00:00.000Z',
       ageOfTree: '6 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '3.1 meters',
       trunkDiam: '5.8 cm'
     },
@@ -70,6 +76,9 @@
       createdAt: '2026-09-06T09:00:00.000Z',
       ageOfTree: '5 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '1.8 meters',
       trunkDiam: '3.5 cm'
     },
@@ -92,6 +101,9 @@
       createdAt: '2026-09-06T10:00:00.000Z',
       ageOfTree: '6 Months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.9 meters',
       trunkDiam: '4.8 cm'
     },
@@ -114,6 +126,9 @@
       createdAt: '2026-09-06T11:00:00.000Z',
       ageOfTree: '12 Months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '4.0 meters',
       trunkDiam: '8.2 cm'
     },
@@ -136,6 +151,9 @@
       createdAt: '2026-09-06T12:00:00.000Z',
       ageOfTree: '6 Months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.5 meters',
       trunkDiam: '4.0 cm'
     },
@@ -158,6 +176,9 @@
       createdAt: '2026-09-06T13:00:00.000Z',
       ageOfTree: '6 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.7 meters',
       trunkDiam: '4.5 cm'
     },
@@ -180,6 +201,9 @@
       createdAt: '2026-07-15T08:00:00.000Z',
       ageOfTree: '4 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.8 meters',
       trunkDiam: '4.9 cm'
     },
@@ -202,6 +226,9 @@
       createdAt: '2026-05-10T09:00:00.000Z',
       ageOfTree: '6 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.2 meters',
       trunkDiam: '3.8 cm'
     },
@@ -224,6 +251,9 @@
       createdAt: '2026-06-01T10:00:00.000Z',
       ageOfTree: '5 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '1.9 meters',
       trunkDiam: '3.2 cm'
     }
@@ -329,7 +359,7 @@
   ];
   window.ATAMAN_DEFAULT_USERS = DEFAULT_USERS;
 
-  const INIT_VERSION = 'ATAMAN_init_v7_user_real_accounts';
+  const INIT_VERSION = 'ATAMAN_init_v8_cross_device_sync';
 
   // Seed / migrate registered data when upgrading or if caches are missing
   if (!localStorage.getItem(INIT_VERSION)) {
@@ -341,7 +371,7 @@
       } catch (_) { return null; }
     })();
 
-    if (!existingTrees || existingTrees.some(t => t.caretaker === 'Pedro Reyes' || t.adopter === 'John Sho' || t.adopter === 'Century Catbalogan')) {
+    if (!existingTrees || existingTrees.some(t => t.caretaker === 'Pedro Reyes' || t.caretaker === 'Unassigned' || !t.barangay || t.adopter === 'John Sho' || t.adopter === 'Century Catbalogan')) {
       localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES));
     }
 
@@ -401,10 +431,23 @@
     let trees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
     if (!Array.isArray(trees) || trees.length === 0) {
       localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES));
-    } else if (trees.some(t => t.caretaker === 'Pedro Reyes' || t.adopter === 'John Sho' || t.adopter === 'Century Catbalogan')) {
+    } else if (trees.some(t => t.caretaker === 'Pedro Reyes' || t.caretaker === 'Unassigned' || !t.barangay || t.adopter === 'John Sho' || t.adopter === 'Century Catbalogan')) {
       trees = trees.map(t => {
         let updated = Object.assign({}, t);
-        if (updated.caretaker === 'Pedro Reyes') updated.caretaker = 'Dodong Zeta';
+        const defTree = DEFAULT_TREES.find(dt => dt.id === updated.id);
+        if (defTree) {
+          if (!updated.barangay) updated.barangay = defTree.barangay;
+          if (!updated.municipality) updated.municipality = defTree.municipality;
+          if (!updated.province) updated.province = defTree.province;
+          if (updated.lat == null) updated.lat = defTree.lat;
+          if (updated.lng == null) updated.lng = defTree.lng;
+        }
+        if (updated.caretaker === 'Pedro Reyes' || updated.caretaker === 'Unassigned' || !updated.caretaker) {
+          updated.caretaker = 'Dodong Zeta';
+        }
+        updated.customCaretaker = true;
+        updated.customGps = true;
+        updated.customLocation = true;
         if (updated.adopter === 'John Sho' || updated.adopter === 'Century Catbalogan') {
           if (updated.id === 'TR-10001') {
             updated.adopter = 'Nikki Maga';
@@ -528,4 +571,455 @@
   } catch (pwaErr) {
     console.warn('[ATAMAN PWA] Auto-registration notice:', pwaErr);
   }
+  // UNIVERSAL MOBILE & CROSS-DEVICE RESPONSIVE UI ENGINE
+  function initUniversalMobileResponsiveEngine() {
+    try {
+      // 1. Ensure accurate viewport meta tag on all devices
+      let vp = document.querySelector('meta[name="viewport"]');
+      if (!vp) {
+        vp = document.createElement('meta');
+        vp.name = 'viewport';
+        document.head.prepend(vp);
+      }
+      vp.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover';
+
+      // 2. Inject Universal Mobile & Tablet Responsive CSS
+      if (!document.getElementById('atamanUniversalMobileStyles')) {
+        const style = document.createElement('style');
+        style.id = 'atamanUniversalMobileStyles';
+        style.textContent = `
+          /* Prevent horizontal scroll across all mobile & tablet devices */
+          html, body {
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
+            -webkit-text-size-adjust: 100%;
+          }
+
+          /* Universal Hamburger Toggle Button */
+          .mobile-nav-toggle,
+          #mobileMenuBtn,
+          .ct-mobile-menu-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            min-height: 40px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #0f172a;
+            cursor: pointer;
+            padding: 0;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+            transition: background 0.15s ease, transform 0.15s ease;
+          }
+          .mobile-nav-toggle:active,
+          #mobileMenuBtn:active,
+          .ct-mobile-menu-btn:active {
+            transform: scale(0.95);
+            background: #f1f5f9;
+          }
+          .mobile-nav-toggle svg,
+          #mobileMenuBtn svg,
+          .ct-mobile-menu-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+          }
+
+          /* Sidebar Backdrop Overlay */
+          .sidebar-backdrop,
+          #sidebarBackdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+          }
+          .sidebar-backdrop.active,
+          #sidebarBackdrop.active {
+            display: block !important;
+            opacity: 1 !important;
+          }
+
+          /* Sidebar Close Button */
+          .sidebar-close-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: auto;
+            flex-shrink: 0;
+          }
+
+          /* TABLET & MOBILE BREAKPOINT (<= 992px) */
+          @media (max-width: 992px) {
+            body {
+              display: flex !important;
+              flex-direction: column !important;
+              width: 100% !important;
+              min-height: 100vh !important;
+              min-height: 100dvh !important;
+            }
+
+            /* Show Hamburger Button */
+            .mobile-nav-toggle,
+            #mobileMenuBtn,
+            .ct-mobile-menu-btn {
+              display: inline-flex !important;
+            }
+
+            /* Unified Off-Canvas Drawer for Admin, Adopter & Caretaker Sidebars */
+            #sidebar,
+            aside.sidebar,
+            aside.ad-sidebar,
+            aside.ct-sidebar {
+              position: fixed !important;
+              top: 0 !important;
+              left: 0 !important;
+              bottom: 0 !important;
+              width: 280px !important;
+              min-width: 280px !important;
+              max-width: 84vw !important;
+              height: 100vh !important;
+              height: 100dvh !important;
+              z-index: 10005 !important;
+              transform: translateX(-105%) !important;
+              transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+              display: flex !important;
+              flex-direction: column !important;
+              visibility: visible !important;
+              overflow-y: auto !important;
+            }
+
+            #sidebar.mobile-open,
+            #sidebar.open,
+            aside.sidebar.mobile-open,
+            aside.sidebar.open,
+            aside.ad-sidebar.mobile-open,
+            aside.ad-sidebar.open,
+            aside.ct-sidebar.mobile-open,
+            aside.ct-sidebar.open {
+              transform: translateX(0) !important;
+              box-shadow: 14px 0 38px rgba(0, 0, 0, 0.45) !important;
+            }
+
+            /* Ensure all sidebar text labels & brand names remain visible inside mobile drawer */
+            #sidebar .sb-brand-text,
+            #sidebar .sidebar-section-label,
+            #sidebar .nav-link span,
+            #sidebar .ad-brand-name,
+            #sidebar .ad-brand-tag,
+            #sidebar .ad-nav-link span,
+            #sidebar .ad-section-label,
+            #sidebar .ad-user-info,
+            #sidebar .ct-brand-name,
+            #sidebar .ct-brand-tag,
+            #sidebar .ct-nav-link span,
+            #sidebar .ct-section-label,
+            #sidebar .ct-user-info {
+              display: block !important;
+            }
+            #sidebar .nav-link,
+            #sidebar .ad-nav-link,
+            #sidebar .ct-nav-link {
+              justify-content: flex-start !important;
+              padding: 11px 14px !important;
+              gap: 12px !important;
+            }
+
+            .sidebar-close-btn {
+              display: inline-flex !important;
+            }
+
+            /* Full-width Main Content Wrapper */
+            .main-content,
+            .main-wrapper,
+            .ad-main,
+            .ct-main,
+            .ct-main-content,
+            main {
+              width: 100% !important;
+              max-width: 100vw !important;
+              min-width: 0 !important;
+              margin-left: 0 !important;
+              box-sizing: border-box !important;
+            }
+
+            /* Allow Top Headers to Wrap Cleanly on Mobile/Tablet */
+            header.top-navbar,
+            header.topbar,
+            header.dash-header,
+            header.page-header,
+            header.ad-header,
+            header.ct-header,
+            header.ct-navbar {
+              flex-wrap: wrap !important;
+              padding: 12px 16px !important;
+              gap: 10px !important;
+              height: auto !important;
+            }
+
+            header .nav-title-group,
+            header .topbar-title,
+            header .header-left,
+            header .ad-header-left,
+            header .ct-header-left,
+            header .ct-page-title-group {
+              display: flex !important;
+              align-items: center !important;
+              gap: 10px !important;
+              flex: 1 1 auto !important;
+              min-width: 0 !important;
+            }
+
+            header .nav-actions-group,
+            header .topbar-actions,
+            header .header-right,
+            header .ad-header-right,
+            header .ct-header-right,
+            header .ct-nav-actions {
+              display: flex !important;
+              align-items: center !important;
+              flex-wrap: wrap !important;
+              gap: 8px !important;
+              width: 100% !important;
+              justify-content: flex-start !important;
+            }
+
+            /* Stack Split Map & Content Grids Vertically */
+            .mid-grid,
+            .bot-grid,
+            .ad-mid-grid,
+            .ad-bot-grid,
+            .ct-mid-grid,
+            .ct-bot-grid,
+            .trees-split-container,
+            .map-workspace-layout,
+            .map-split-stage,
+            .profile-content-grid {
+              grid-template-columns: 1fr !important;
+            }
+
+            /* Responsive Tables with Smooth Touch Scroll */
+            .table-responsive,
+            .table-wrap,
+            .table-container,
+            .trees-table-wrap,
+            .adopters-table-wrap,
+            .caretakers-table-wrap,
+            .users-table-wrap,
+            .logs-table-wrap,
+            .card table {
+              display: block !important;
+              width: 100% !important;
+              overflow-x: auto !important;
+              -webkit-overflow-scrolling: touch !important;
+            }
+          }
+
+          /* CELLPHONE BREAKPOINT (<= 640px) */
+          @media (max-width: 640px) {
+            /* 2-Column Compact KPI Cards on Cellphones */
+            .stats-grid,
+            .summary-cards-grid,
+            .metrics-grid,
+            .ad-stats-grid,
+            .mytrees-stats-grid,
+            .ct-stats-grid,
+            .ov-grid,
+            .sum-grid,
+            .qa-grid {
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              gap: 10px !important;
+            }
+
+            .stat-card,
+            .summary-card,
+            .metric-card,
+            .ad-stat-card,
+            .ct-stat-card {
+              padding: 12px !important;
+              min-width: 0 !important;
+            }
+
+            .stat-value,
+            .sc-value,
+            .mc-value,
+            .ad-stat-val,
+            .ct-stat-val {
+              font-size: 18px !important;
+            }
+
+            /* Stack Form Rows & Filter Bars into 1 Column on Cellphones */
+            .form-row,
+            .form-grid,
+            .form-grid-2,
+            .form-grid-3,
+            .filters-row,
+            .filters-dropdown-grid,
+            .filters-bar-inline {
+              grid-template-columns: 1fr !important;
+              flex-direction: column !important;
+              align-items: stretch !important;
+            }
+
+            /* Prevent iOS Auto-Zoom on Input Focus */
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="number"],
+            input[type="tel"],
+            input[type="date"],
+            input[type="search"],
+            select,
+            textarea {
+              font-size: 16px !important;
+            }
+
+            /* Fit Modals & Drawers Accurately on Cellphone Screens */
+            .modal-dialog,
+            .modal-card,
+            .modal-box,
+            .modal-content,
+            .wizard-modal,
+            .profile-modal {
+              width: 95vw !important;
+              max-width: 95vw !important;
+              max-height: 90dvh !important;
+              margin: 10px auto !important;
+              border-radius: 16px !important;
+            }
+
+            .tree-drawer-panel,
+            .ct-drawer-panel {
+              width: 100vw !important;
+              max-width: 100vw !important;
+            }
+
+            /* Comfortable Map Height on Cellphones */
+            #leafletMap,
+            #adminTreeMap,
+            #caretakerMap,
+            #myTreesMap,
+            #adopterMap {
+              min-height: 300px !important;
+              max-height: 55vh !important;
+            }
+
+            /* Compact Padding for Main Content Containers */
+            .dash-body,
+            .content-container,
+            .page-content,
+            .ad-body,
+            .ct-body,
+            .mytrees-body {
+              padding: 12px !important;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      // 3. Auto-Inject Hamburger Button, Close Button & Backdrop for Any Page with a Sidebar
+      function setupMobileDrawerElements() {
+        const sidebar = document.getElementById('sidebar') || document.querySelector('aside.sidebar, aside.ad-sidebar, aside.ct-sidebar');
+        if (!sidebar) return;
+
+        // Ensure backdrop exists
+        let backdrop = document.getElementById('sidebarBackdrop') || document.querySelector('.sidebar-backdrop');
+        if (!backdrop) {
+          backdrop = document.createElement('div');
+          backdrop.id = 'sidebarBackdrop';
+          backdrop.className = 'sidebar-backdrop';
+          document.body.appendChild(backdrop);
+        }
+
+        // Ensure close button inside sidebar header exists
+        const sbHeader = sidebar.querySelector('.sidebar-logo, .ad-brand-logo, .ct-brand-logo, .sidebar-header');
+        if (sbHeader && !sbHeader.querySelector('.sidebar-close-btn')) {
+          const closeBtn = document.createElement('button');
+          closeBtn.type = 'button';
+          closeBtn.className = 'sidebar-close-btn';
+          closeBtn.setAttribute('aria-label', 'Close navigation menu');
+          closeBtn.innerHTML = '✕';
+          sbHeader.appendChild(closeBtn);
+        }
+
+        // Ensure hamburger toggle button exists in top header
+        const header = document.querySelector('header.dash-header, header.top-navbar, header.topbar, header.page-header, header.ad-header, header.ct-header, header.ct-navbar, header');
+        if (header) {
+          let toggleBtn = header.querySelector('.mobile-nav-toggle, #mobileMenuBtn, .ct-mobile-menu-btn, #sidebarToggle');
+          if (!toggleBtn) {
+            toggleBtn = document.createElement('button');
+            toggleBtn.type = 'button';
+            toggleBtn.className = 'mobile-nav-toggle';
+            toggleBtn.id = 'mobileMenuBtn';
+            toggleBtn.setAttribute('aria-label', 'Open navigation menu');
+            toggleBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+            const leftGroup = header.querySelector('.header-left, .nav-title-group, .topbar-title, .ad-header-left, .ct-header-left, .ct-page-title-group') || header;
+            leftGroup.insertBefore(toggleBtn, leftGroup.firstChild);
+          }
+
+          // Bind open/close handlers idempotently
+          if (!toggleBtn.dataset.mobileBound) {
+            toggleBtn.dataset.mobileBound = 'true';
+            const openSidebar = (e) => {
+              if (e) e.stopPropagation();
+              sidebar.classList.add('mobile-open', 'open');
+              backdrop.classList.add('active');
+              document.body.style.overflow = 'hidden';
+            };
+            const closeSidebar = () => {
+              sidebar.classList.remove('mobile-open', 'open');
+              backdrop.classList.remove('active');
+              document.body.style.overflow = '';
+            };
+
+            toggleBtn.addEventListener('click', openSidebar);
+            backdrop.addEventListener('click', closeSidebar);
+            sidebar.querySelectorAll('.sidebar-close-btn').forEach(btn => btn.addEventListener('click', closeSidebar));
+            sidebar.querySelectorAll('a.nav-link, a.ad-nav-link, a.ct-nav-link').forEach(link => {
+              link.addEventListener('click', () => {
+                if (window.innerWidth <= 992) closeSidebar();
+              });
+            });
+            document.addEventListener('keydown', (e) => {
+              if (e.key === 'Escape') closeSidebar();
+            });
+            window.addEventListener('resize', () => {
+              if (window.innerWidth > 992) closeSidebar();
+            });
+          }
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupMobileDrawerElements);
+      } else {
+        setupMobileDrawerElements();
+      }
+    } catch (mobileErr) {
+      console.warn('[ATAMAN Mobile Engine] Notice:', mobileErr);
+    }
+  }
+  initUniversalMobileResponsiveEngine();
+
 })();

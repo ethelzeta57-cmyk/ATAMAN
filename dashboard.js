@@ -516,7 +516,7 @@ function renderMapMarkers(filterSpecies = 'All Species') {
   const mappedTrees = currentTrees.filter(t => {
     if (!t) return false;
     const hasAdopter = Boolean((t.adopter && t.adopter !== 'None' && t.adopter !== 'Not yet adopted' && t.adopter !== 'Available for Adoption') || (t.sponsorName && t.sponsorName !== 'None' && t.sponsorName !== 'Available for Adoption') || (parseInt(t.takenCount) || 0) > 0);
-    const hasCaretaker = Boolean(t.caretaker && t.caretaker !== 'Unassigned' && (hasAdopter || t.customCaretaker));
+    const hasCaretaker = Boolean(t.caretaker && t.caretaker !== 'Unassigned' && t.caretaker !== 'None');
     const hasExplicitLocation = Boolean(t.barangay || (t.customGps && t.lat != null && t.lng != null));
     return hasAdopter || hasCaretaker || hasExplicitLocation;
   });

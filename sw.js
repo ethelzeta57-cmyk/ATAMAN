@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v1.3.3';
+const CACHE_NAME = 'ataman-pwa-v2.0.0';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
@@ -230,12 +230,32 @@ self.addEventListener('fetch', (event) => {
     url.hostname.includes('fonts.gstatic.com') ||
     url.hostname.includes('unpkg.com');
 
+  const isCodeAsset = url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname.endsWith('.json');
+
+  if (isCodeAsset) {
+    // Network-First for JS/CSS/JSON so cellphones and other devices always run the latest code
+    event.respondWith(
+      (async () => {
+        try {
+          const networkResponse = await fetch(req);
+          if (networkResponse && networkResponse.ok) {
+            const clone = networkResponse.clone();
+            safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => {});
+            return networkResponse;
+          }
+        } catch (_) {}
+        const cachedResponse = await safeMatch(req);
+        if (cachedResponse) return cachedResponse;
+        return new Response('Code asset unavailable offline', { status: 503, statusText: 'Service Unavailable' });
+      })()
+    );
+    return;
+  }
+
   if (isStaticAsset) {
     event.respondWith(
       (async () => {
         const cachedResponse = await safeMatch(req);
-
-        // Fetch latest version in background to update cache
         const networkFetch = (async () => {
           try {
             const networkResponse = await fetch(req);
@@ -248,17 +268,9 @@ self.addEventListener('fetch', (event) => {
             return null;
           }
         })();
-
-        // Return cached version immediately if available
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        // Otherwise wait for network response
+        if (cachedResponse) return cachedResponse;
         const res = await networkFetch;
         if (res) return res;
-
-        // Fallback for missing asset
         return new Response('Asset unavailable offline', { status: 503, statusText: 'Service Unavailable' });
       })()
     );

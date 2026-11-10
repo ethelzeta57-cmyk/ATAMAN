@@ -1535,6 +1535,7 @@ body {
 /* =========================================================
    TOP HEADER USER ACCOUNT PILL & SINGLE-ROW FIT OVERRIDES
    ========================================================= */
+@media (min-width: 993px) {
 header.top-navbar,
 header.topbar,
 header.dash-header {
@@ -1681,4 +1682,5 @@ header .sidebar-user-row .sb-logout-btn {
 header .sidebar-user-row .sb-logout-btn:hover {
   color: #ef4444 !important;
   background: rgba(239, 68, 68, 0.1) !important;
+}
 }

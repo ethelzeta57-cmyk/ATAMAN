@@ -14,7 +14,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   'use strict';
 
   // Ensure one-time cache reset runs on every dashboard (even pages that don't load ATAMAN-init.js)
-  const INIT_VERSION = 'ATAMAN_init_v7_user_real_accounts';
+  const INIT_VERSION = 'ATAMAN_init_v8_cross_device_sync';
   if (!localStorage.getItem(INIT_VERSION)) {
     const existingTrees = (() => {
       try {
@@ -120,39 +120,115 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     console.warn("Firebase initialization warning:", err);
   }
 
-  // One-time Cloud Firestore clean slate for v4 reset so old cloud docs & non-admin users don't repopulate
-  const FIRESTORE_CLEAN_FLAG = 'ATAMAN_firestore_cleaned_v4';
+  // Cross-Device Cloud Firestore Synchronization & Real Account Seeding (v8)
+  const FIRESTORE_SYNC_FLAG = 'ATAMAN_firestore_sync_v8';
   let firestoreCleanPromise = Promise.resolve();
-  if (isFirestoreReady && firestoreDb && !localStorage.getItem(FIRESTORE_CLEAN_FLAG)) {
+  if (isFirestoreReady && firestoreDb) {
     firestoreCleanPromise = (async () => {
       try {
-        const cols = ['adopters', 'caretakers', 'monitoring_logs'];
-        for (const colName of cols) {
-          const snap = await firestoreDb.collection(colName).get();
-          if (!snap.empty) {
-            const batch = firestoreDb.batch();
-            snap.forEach(doc => batch.delete(doc.ref));
-            await batch.commit();
-          }
-        }
-        // Also remove all non-admin user docs from Firestore 'users' collection
+        // 1. Sync & Seed Users across devices (remove only deprecated sample accounts)
         const usersSnap = await firestoreDb.collection('users').get();
-        if (!usersSnap.empty) {
-          const userBatch = firestoreDb.batch();
-          usersSnap.forEach(doc => {
-            const d = doc.data() || {};
-            const em = (d.email || '').toLowerCase().trim();
-            if (em !== 'ethelzeta57@gmail.com') {
-              userBatch.delete(doc.ref);
-            }
+        const batch = firestoreDb.batch();
+        let hasBatchOps = false;
+        const deprecatedEmails = ['pedro.reyes@ataman.org', 'john.sho@gmail.com', 'contact@centurycatbalogan.com'];
+        const cloudUsers = [];
+
+        usersSnap.forEach(doc => {
+          const d = doc.data() || {};
+          const em = (d.email || '').toLowerCase().trim();
+          if (deprecatedEmails.includes(em)) {
+            batch.delete(doc.ref);
+            hasBatchOps = true;
+          } else if (em) {
+            cloudUsers.push(d);
+          }
+        });
+
+        const defaultUsers = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_USERS)) ? window.ATAMAN_DEFAULT_USERS : DEFAULT_ACCOUNTS;
+        defaultUsers.forEach(u => {
+          const em = (u.email || '').toLowerCase().trim();
+          if (em && !cloudUsers.some(cu => (cu.email || '').toLowerCase().trim() === em)) {
+            const ref = firestoreDb.collection('users').doc(u.uid || u.id || em);
+            batch.set(ref, {
+              uid: u.uid || u.id,
+              id: u.id || u.uid,
+              email: em,
+              displayName: u.displayName || u.name,
+              name: u.name || u.displayName,
+              role: u.role,
+              empId: u.empId || '',
+              phone: u.phone || '',
+              address: u.address || '',
+              status: u.status || 'Active',
+              createdAt: u.createdAt || new Date().toISOString()
+            }, { merge: true });
+            hasBatchOps = true;
+          }
+        });
+
+        // 2. Clean deprecated sample adopters/caretakers & seed real ones if missing
+        const adoptersSnap = await firestoreDb.collection('adopters').get();
+        let validAdoptersCount = 0;
+        adoptersSnap.forEach(doc => {
+          const d = doc.data() || {};
+          if (d.name === 'John Sho' || d.name === 'Century Catbalogan' || d.email === 'john.sho@gmail.com') {
+            batch.delete(doc.ref);
+            hasBatchOps = true;
+          } else {
+            validAdoptersCount++;
+          }
+        });
+        if (validAdoptersCount === 0 && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS)) {
+          window.ATAMAN_DEFAULT_ADOPTERS.forEach(ad => {
+            batch.set(firestoreDb.collection('adopters').doc(ad.id), ad, { merge: true });
+            hasBatchOps = true;
           });
-          await userBatch.commit();
         }
-        localStorage.setItem(FIRESTORE_CLEAN_FLAG, 'done');
-        localStorage.setItem('ATAMAN_adopters_cache', '[]');
-        localStorage.setItem('ATAMAN_caretakers_cache', '[]');
-      } catch (cleanErr) {
-        localStorage.setItem(FIRESTORE_CLEAN_FLAG, 'done');
+
+        const caretakersSnap = await firestoreDb.collection('caretakers').get();
+        let validCaretakersCount = 0;
+        caretakersSnap.forEach(doc => {
+          const d = doc.data() || {};
+          if (d.name === 'Pedro Reyes' || d.email === 'pedro.reyes@ataman.org') {
+            batch.delete(doc.ref);
+            hasBatchOps = true;
+          } else {
+            validCaretakersCount++;
+          }
+        });
+        if (validCaretakersCount === 0 && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS)) {
+          window.ATAMAN_DEFAULT_CARETAKERS.forEach(ct => {
+            batch.set(firestoreDb.collection('caretakers').doc(ct.id), ct, { merge: true });
+            hasBatchOps = true;
+          });
+        }
+
+        if (hasBatchOps) {
+          await batch.commit();
+        }
+
+        // Merge any cloud-registered users into local storage so cellphone & PC stay in sync
+        if (cloudUsers.length > 0) {
+          try {
+            let localReg = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || '[]');
+            if (!Array.isArray(localReg)) localReg = [];
+            cloudUsers.forEach(cu => {
+              const em = (cu.email || '').toLowerCase().trim();
+              if (em && !localReg.some(lu => (lu.email || '').toLowerCase().trim() === em)) {
+                localReg.push(cu);
+              }
+            });
+            const uJson = JSON.stringify(localReg);
+            localStorage.setItem('ATAMAN_registered_users', uJson);
+            localStorage.setItem('saplink_registered_users', uJson);
+            localStorage.setItem('ATAMAN_users_cache', uJson);
+            localStorage.setItem('saplink_users_cache', uJson);
+          } catch (_) {}
+        }
+
+        localStorage.setItem(FIRESTORE_SYNC_FLAG, 'done');
+      } catch (syncErr) {
+        localStorage.setItem(FIRESTORE_SYNC_FLAG, 'done');
       }
     })();
   }
@@ -1055,12 +1131,45 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       if (this.isFirestore) {
         try {
           const snapshot = await firestoreDb.collection('trees').get();
-          const trees = [];
+          let trees = [];
           snapshot.forEach(doc => {
             trees.push({ id: doc.id, ...doc.data() });
           });
-          this.setLocalTrees(trees);
-          return { data: trees, source: 'firestore' };
+          if (trees.length > 0) {
+            const defTrees = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) ? window.ATAMAN_DEFAULT_TREES : [];
+            trees = trees.map(t => {
+              const defT = defTrees.find(d => d.id === t.id);
+              const copy = { ...t };
+              if (defT) {
+                if (!copy.barangay) copy.barangay = defT.barangay;
+                if (!copy.municipality) copy.municipality = defT.municipality;
+                if (!copy.province) copy.province = defT.province;
+                if (copy.lat == null) copy.lat = defT.lat;
+                if (copy.lng == null) copy.lng = defT.lng;
+              }
+              if (copy.caretaker === 'Pedro Reyes' || copy.caretaker === 'Unassigned' || !copy.caretaker) {
+                copy.caretaker = 'Dodong Zeta';
+              }
+              if (copy.adopter === 'John Sho' || copy.adopter === 'Century Catbalogan') {
+                copy.adopter = copy.id === 'TR-10001' ? 'Nikki Maga' : '';
+                copy.sponsorName = copy.adopter;
+                if (!copy.adopter) copy.takenCount = 0;
+              }
+              copy.customCaretaker = true;
+              copy.customGps = true;
+              copy.customLocation = true;
+              return copy;
+            });
+            this.setLocalTrees(trees);
+            return { data: trees, source: 'firestore' };
+          } else {
+            const fallback = this.getLocalTrees() || [];
+            if (fallback.length > 0) {
+              this.seedInitialTrees(fallback);
+              this.setLocalTrees(fallback);
+            }
+            return { data: fallback, source: 'local-seeded' };
+          }
         } catch (error) {
           console.warn("Firestore fetch error, reading local cache:", error);
         }
@@ -1234,9 +1343,17 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         try {
           const snapshot = await firestoreDb.collection('adopters').get();
           const list = [];
-          snapshot.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
-          this.setLocalAdopters(list);
-          return list;
+          snapshot.forEach(doc => {
+            const d = doc.data() || {};
+            if (d.name !== 'John Sho' && d.name !== 'Century Catbalogan') {
+              list.push({ id: doc.id, ...d });
+            }
+          });
+          if (list.length > 0) {
+            this.setLocalAdopters(list);
+            return list;
+          }
+          return this.getLocalAdopters();
         } catch (err) {
           console.warn("Firestore getAdopters error:", err);
         }
@@ -1360,9 +1477,17 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         try {
           const snapshot = await firestoreDb.collection('caretakers').get();
           const list = [];
-          snapshot.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
-          this.setLocalCaretakers(list);
-          return list;
+          snapshot.forEach(doc => {
+            const d = doc.data() || {};
+            if (d.name !== 'Pedro Reyes') {
+              list.push({ id: doc.id, ...d });
+            }
+          });
+          if (list.length > 0) {
+            this.setLocalCaretakers(list);
+            return list;
+          }
+          return this.getLocalCaretakers();
         } catch (err) {
           console.warn("Firestore getCaretakers error:", err);
         }

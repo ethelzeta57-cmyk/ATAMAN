@@ -60,6 +60,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-08-28T08:00:00.000Z',
       ageOfTree: '2 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.4 meters',
       trunkDiam: '4.2 cm'
     },
@@ -82,6 +85,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-09-06T08:00:00.000Z',
       ageOfTree: '6 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '3.1 meters',
       trunkDiam: '5.8 cm'
     },
@@ -104,6 +110,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-09-06T09:00:00.000Z',
       ageOfTree: '5 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '1.8 meters',
       trunkDiam: '3.5 cm'
     },
@@ -126,6 +135,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-09-06T10:00:00.000Z',
       ageOfTree: '6 Months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.9 meters',
       trunkDiam: '4.8 cm'
     },
@@ -148,6 +160,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-09-06T11:00:00.000Z',
       ageOfTree: '12 Months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '4.0 meters',
       trunkDiam: '8.2 cm'
     },
@@ -170,6 +185,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-09-06T12:00:00.000Z',
       ageOfTree: '6 Months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.5 meters',
       trunkDiam: '4.0 cm'
     },
@@ -192,6 +210,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-09-06T13:00:00.000Z',
       ageOfTree: '6 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.7 meters',
       trunkDiam: '4.5 cm'
     },
@@ -214,6 +235,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-07-15T08:00:00.000Z',
       ageOfTree: '4 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.8 meters',
       trunkDiam: '4.9 cm'
     },
@@ -236,6 +260,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-05-10T09:00:00.000Z',
       ageOfTree: '6 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '2.2 meters',
       trunkDiam: '3.8 cm'
     },
@@ -258,6 +285,9 @@ const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATA
       createdAt: '2026-06-01T10:00:00.000Z',
       ageOfTree: '5 months',
       caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
       height: '1.9 meters',
       trunkDiam: '3.2 cm'
     }
@@ -478,30 +508,24 @@ document.addEventListener('DOMContentLoaded', () => {
 function harmonizeAdopterTreeLocations(trees) {
   if (!Array.isArray(trees)) return false;
   let changed = false;
+  const defTrees = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) ? window.ATAMAN_DEFAULT_TREES : DEFAULT_TREES;
   trees.forEach(t => {
     if (!t) return;
-    const hasAdopter = Boolean((t.adopter && t.adopter !== 'None' && t.adopter !== 'Not yet adopted' && t.adopter !== 'Available for Adoption') || (t.sponsorName && t.sponsorName !== 'None' && t.sponsorName !== 'Available for Adoption') || (parseInt(t.takenCount) || 0) > 0);
-    if (!hasAdopter && !t.customCaretaker) {
-      if (t.caretaker && t.caretaker !== 'Unassigned') {
-        t.caretaker = 'Unassigned';
-        changed = true;
-      }
-      if (t.project) {
-        t.project = '';
-        changed = true;
-      }
+    const defT = Array.isArray(defTrees) ? defTrees.find(d => d.id === t.id) : null;
+    if (defT) {
+      if (!t.barangay && defT.barangay) { t.barangay = defT.barangay; changed = true; }
+      if (!t.municipality && defT.municipality) { t.municipality = defT.municipality; changed = true; }
+      if (!t.province && defT.province) { t.province = defT.province; changed = true; }
+      if (t.lat == null && defT.lat != null) { t.lat = defT.lat; changed = true; }
+      if (t.lng == null && defT.lng != null) { t.lng = defT.lng; changed = true; }
     }
-    if (!t.customLocation && !t.customGps && !hasAdopter) {
-      if (t.barangay || t.municipality || t.province || t.lat != null || t.lng != null || t.location) {
-        t.barangay = '';
-        t.municipality = '';
-        t.province = '';
-        t.lat = null;
-        t.lng = null;
-        t.location = '';
-        changed = true;
-      }
+    if (!t.caretaker || t.caretaker === 'Unassigned' || t.caretaker === 'Pedro Reyes') {
+      t.caretaker = 'Dodong Zeta';
+      changed = true;
     }
+    t.customCaretaker = true;
+    t.customGps = true;
+    t.customLocation = true;
   });
   return changed;
 }
