@@ -27,6 +27,11 @@
   if ('serviceWorker' in navigator) {
     let isRefreshing = false;
 
+    // On localhost/127.0.0.1 development servers, purge any stale CacheStorage entries immediately
+    if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && 'caches' in window) {
+      caches.keys().then((names) => names.forEach((n) => caches.delete(n))).catch(() => {});
+    }
+
     // When the new service worker activates and claims clients, refresh to load all latest project features
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (isRefreshing) return;

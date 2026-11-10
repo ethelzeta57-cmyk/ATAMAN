@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.0.2';
+const CACHE_NAME = 'ataman-pwa-v2.0.3';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
@@ -191,8 +191,13 @@ self.addEventListener('fetch', (event) => {
   if (!url.protocol.startsWith('http')) return;
 
   // Bypass all external cross-origin requests (Leaflet CDN, Chart.js CDN, Map Tiles, Firebase, Google Fonts)
-  // so opaque cross-origin responses are never rejected or turned into 503s by the Service Worker
-  if (url.origin !== self.location.origin || EXCLUDED_HOSTS.some(host => url.hostname.includes(host))) {
+  // and local development servers (localhost / 127.0.0.1) so live edits are never served stale from CacheStorage
+  if (
+    url.origin !== self.location.origin ||
+    url.hostname === 'localhost' ||
+    url.hostname === '127.0.0.1' ||
+    EXCLUDED_HOSTS.some(host => url.hostname.includes(host))
+  ) {
     return;
   }
 

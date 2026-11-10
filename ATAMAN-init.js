@@ -6,6 +6,15 @@
 (function() {
   'use strict';
 
+  // Ensure localhost / 127.0.0.1 dev sessions never serve stale JS/CSS from older Service Worker CacheStorage
+  try {
+    if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && 'caches' in window) {
+      caches.keys().then(function(names) {
+        names.forEach(function(n) { caches.delete(n); });
+      }).catch(function() {});
+    }
+  } catch (_) {}
+
   const DEFAULT_TREES = [
     {
       id: 'TR-10001',
@@ -16,8 +25,8 @@
       barangay: 'Guinsorongan',
       municipality: 'Catbalogan City',
       province: 'Samar',
-      lat: 11.7850,
-      lng: 124.8860,
+      lat: 11.7598,
+      lng: 124.8861,
       sponsorName: 'Nikki Maga',
       adopter: 'Nikki Maga',
       takenCount: 10,

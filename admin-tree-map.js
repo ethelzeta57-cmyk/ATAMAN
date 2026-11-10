@@ -441,7 +441,9 @@ function openTreeDetails(treeId) {
 
   // Adopter and location match detection
   const adopterInfo = getAdopterInfoForTree(tree);
-  const isLocationMismatch = Boolean(adopterInfo && adopterInfo.targetCoords && lat !== null && lng !== null && (
+  const sameBarangay = Boolean(tree.barangay && adopterInfo?.barangay &&
+    tree.barangay.toLowerCase().replace(/^brgy\.?\s*/i, '').trim() === adopterInfo.barangay.toLowerCase().replace(/^brgy\.?\s*/i, '').trim());
+  const isLocationMismatch = Boolean(adopterInfo && adopterInfo.targetCoords && !sameBarangay && lat !== null && lng !== null && (
     Math.abs(lat - adopterInfo.targetCoords.lat) > 0.0035 ||
     Math.abs(lng - adopterInfo.targetCoords.lng) > 0.0035 ||
     (tree.barangay && adopterInfo.barangay && !tree.barangay.toLowerCase().includes(adopterInfo.barangay.toLowerCase()))
@@ -450,7 +452,7 @@ function openTreeDetails(treeId) {
   body.innerHTML = `
     <!-- Tree Photo -->
     <div class="drawer-photo-wrap">
-      <img src="${tree.photoUrl || ''}" alt="${speciesCommon}" class="drawer-photo-img"
+      <img src="${tree.photoUrl || 'assets/tree1.jpg'}" alt="${speciesCommon}" class="drawer-photo-img"
         onerror="this.style.display='none'" />
       <span class="drawer-health-badge ${tree.status || ''}">${ statusLabel }</span>
     </div>
@@ -646,6 +648,16 @@ function initFilterEvents() {
   }
 }
 
+function getTreeSpeciesName(t) {
+  if (!t || !t.species) return 'Tree';
+  return typeof t.species === 'object' ? (t.species.common || 'Tree') : String(t.species);
+}
+
+function getTreeTypeName(t) {
+  if (!t) return 'Native';
+  return (typeof t.species === 'object' && t.species?.type) || t.treeType || t.type || 'Native';
+}
+
 function applyAllFilters() {
   const keyword = (document.getElementById('filterKeywordInput')?.value || '').toLowerCase().trim();
   const species = document.getElementById('filterSpecies')?.value || 'all';
@@ -661,27 +673,38 @@ function applyAllFilters() {
   const treeType = document.getElementById('filterTreeType')?.value || 'all';
 
   CURRENT_FILTERED_TREES = ALL_TREES.filter(t => {
+    const speciesName = getTreeSpeciesName(t);
+    const scientificName = (typeof t.species === 'object' && t.species?.scientific) || t.botanical || '';
+    const landownerName = t.landowner || t.farmer || '';
+    const caretakerName = t.caretaker || '';
+    const barangayName = t.barangay || '';
+    const adopterName = t.adopter || t.sponsorName || '';
+    const treeTypeVal = getTreeTypeName(t);
+    const plantingYr = t.plantingYear || String(t.datePlanted || t.plantingDate || t.createdAt || '').slice(0, 4);
+
     if (keyword) {
-      const match = t.id.toLowerCase().includes(keyword) ||
-                    t.species.toLowerCase().includes(keyword) ||
-                    t.landowner.toLowerCase().includes(keyword) ||
-                    t.caretaker.toLowerCase().includes(keyword) ||
-                    t.barangay.toLowerCase().includes(keyword) ||
-                    (t.issue && t.issue.toLowerCase().includes(keyword));
+      const match = String(t.id || '').toLowerCase().includes(keyword) ||
+                    speciesName.toLowerCase().includes(keyword) ||
+                    scientificName.toLowerCase().includes(keyword) ||
+                    landownerName.toLowerCase().includes(keyword) ||
+                    caretakerName.toLowerCase().includes(keyword) ||
+                    barangayName.toLowerCase().includes(keyword) ||
+                    adopterName.toLowerCase().includes(keyword) ||
+                    (t.issue && String(t.issue).toLowerCase().includes(keyword));
       if (!match) return false;
     }
 
-    if (species !== 'all' && t.species !== species) return false;
+    if (species !== 'all' && speciesName.toLowerCase() !== species.toLowerCase()) return false;
     if (health !== 'all' && t.status !== health) return false;
     if (province !== 'all' && t.province !== province) return false;
     if (municipality !== 'all' && t.municipality !== municipality) return false;
-    if (barangay !== 'all' && t.barangay !== barangay) return false;
-    if (caretaker !== 'all' && t.caretaker !== caretaker) return false;
-    if (adopter !== 'all' && t.adopter !== adopter) return false;
-    if (plantingDate !== 'all' && t.plantingYear !== plantingDate) return false;
+    if (barangay !== 'all' && barangayName !== barangay) return false;
+    if (caretaker !== 'all' && caretakerName !== caretaker) return false;
+    if (adopter !== 'all' && adopterName !== adopter) return false;
+    if (plantingDate !== 'all' && plantingYr !== plantingDate) return false;
     if (monitoringStatus !== 'all' && t.monitoringStatus !== monitoringStatus) return false;
     if (project !== 'all' && t.project !== project) return false;
-    if (treeType !== 'all' && t.type !== treeType) return false;
+    if (treeType !== 'all' && !treeTypeVal.toLowerCase().includes(treeType.toLowerCase())) return false;
 
     return true;
   });
@@ -771,10 +794,10 @@ function renderAttentionPanel() {
     list.innerHTML = urgentTrees.map(t => `
       <div class="attention-tree-row" onclick="openTreeDetails('${t.id}')">
         <div>
-          <span class="att-tree-id">${t.id} — ${t.species}</span>
+          <span class="att-tree-id">${t.id} — ${getTreeSpeciesName(t)}</span>
           <div class="att-tree-issue">⚠️ ${t.issue || 'Requires inspection'}</div>
         </div>
-        <span class="popup-status-badge ${t.status}">${t.status.toUpperCase()}</span>
+        <span class="popup-status-badge ${t.status}">${(t.status || '').toUpperCase()}</span>
       </div>
     `).join('');
   }
@@ -1057,13 +1080,24 @@ function initAdminModalEvents() {
   // Save Edit Tree
   document.getElementById('btnSaveEditTree')?.addEventListener('click', () => {
     if (!SELECTED_TREE) return;
-    SELECTED_TREE.species = document.getElementById('editSpecies').value;
-    SELECTED_TREE.status = document.getElementById('editHealthStatus').value;
-    SELECTED_TREE.landowner = document.getElementById('editLandowner').value;
-    SELECTED_TREE.issue = document.getElementById('editIssues').value || 'None';
-    SELECTED_TREE.height = Number(document.getElementById('editHeight').value);
-    SELECTED_TREE.dbh = Number(document.getElementById('editDbh').value);
+    const newSp = document.getElementById('editSpecies')?.value || getTreeSpeciesName(SELECTED_TREE);
+    if (typeof SELECTED_TREE.species === 'object' && SELECTED_TREE.species) {
+      SELECTED_TREE.species.common = newSp;
+    } else {
+      SELECTED_TREE.species = { common: newSp, scientific: '', type: 'Native' };
+    }
+    SELECTED_TREE.status = document.getElementById('editHealthStatus')?.value || 'healthy';
+    SELECTED_TREE.landowner = document.getElementById('editLandowner')?.value || '';
+    SELECTED_TREE.issue = document.getElementById('editIssues')?.value || 'None';
+    const hVal = parseFloat(document.getElementById('editHeight')?.value);
+    const dVal = parseFloat(document.getElementById('editDbh')?.value);
+    if (!isNaN(hVal)) SELECTED_TREE.height = `${hVal} meters`;
+    if (!isNaN(dVal)) {
+      SELECTED_TREE.dbh = dVal;
+      SELECTED_TREE.trunkDiam = `${dVal} cm`;
+    }
 
+    try { localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(ALL_TREES)); } catch (_) {}
     renderTreeMarkers(CURRENT_FILTERED_TREES);
     openTreeDetails(SELECTED_TREE.id);
     closeAdminModal('modalEditTree');
@@ -1385,14 +1419,15 @@ window.openEditTreeModal = function (treeId) {
   if (!tree) return;
   SELECTED_TREE = tree;
 
-  document.getElementById('editModalTreeTitle').textContent = `✏️ Edit ${tree.id} (${tree.species})`;
+  const spName = getTreeSpeciesName(tree);
+  document.getElementById('editModalTreeTitle').textContent = `✏️ Edit ${tree.id} (${spName})`;
   document.getElementById('editTreeId').value = tree.id;
-  document.getElementById('editSpecies').value = tree.species;
-  document.getElementById('editHealthStatus').value = tree.status;
-  document.getElementById('editLandowner').value = tree.landowner;
-  document.getElementById('editIssues').value = tree.issue === 'None — Optimal growth condition' ? '' : tree.issue;
-  document.getElementById('editHeight').value = tree.height;
-  document.getElementById('editDbh').value = tree.dbh;
+  document.getElementById('editSpecies').value = spName;
+  document.getElementById('editHealthStatus').value = tree.status || 'healthy';
+  document.getElementById('editLandowner').value = tree.landowner || tree.farmer || '';
+  document.getElementById('editIssues').value = (!tree.issue || tree.issue === 'None — Optimal growth condition' || tree.issue === 'None') ? '' : tree.issue;
+  document.getElementById('editHeight').value = parseFloat(tree.height) || '';
+  document.getElementById('editDbh').value = parseFloat(tree.dbh ?? tree.trunkDiam) || '';
 
   openAdminModal('modalEditTree');
 };
@@ -1402,8 +1437,18 @@ window.openReassignModal = function (treeId) {
   if (!tree) return;
   SELECTED_TREE = tree;
 
-  document.getElementById('reassignSubtext').textContent = `Reassign tree ${tree.id} (${tree.species}) to another registered field caretaker.`;
-  document.getElementById('reassignCaretakerSelect').value = tree.caretaker;
+  const spName = getTreeSpeciesName(tree);
+  document.getElementById('reassignSubtext').textContent = `Reassign tree ${tree.id} (${spName}) to another registered field caretaker.`;
+  const sel = document.getElementById('reassignCaretakerSelect');
+  if (sel) {
+    let caretakers = [];
+    try { caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]'); } catch (_) {}
+    if (!Array.isArray(caretakers) || caretakers.length === 0) {
+      caretakers = [{ name: 'Dodong Zeta' }];
+    }
+    sel.innerHTML = caretakers.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    sel.value = tree.caretaker || caretakers[0]?.name || 'Dodong Zeta';
+  }
 
   openAdminModal('modalReassignCaretaker');
 };
@@ -1455,14 +1500,14 @@ function exportGeoJSON() {
       geometry: { type: 'Point', coordinates: [t.lng, t.lat] },
       properties: {
         id: t.id,
-        species: t.species,
+        species: getTreeSpeciesName(t),
         status: t.status,
-        barangay: t.barangay,
-        municipality: t.municipality,
-        caretaker: t.caretaker,
-        landowner: t.landowner,
-        project: t.project,
-        issue: t.issue
+        barangay: t.barangay || '',
+        municipality: t.municipality || '',
+        caretaker: t.caretaker || '',
+        landowner: t.landowner || t.farmer || '',
+        project: t.project || '',
+        issue: t.issue || ''
       }
     }))
   };
@@ -1475,7 +1520,7 @@ function exportGeoJSON() {
 function exportCSV() {
   const headers = ['Tree ID', 'Species', 'Health Status', 'Latitude', 'Longitude', 'Barangay', 'Municipality', 'Caretaker', 'Landowner', 'Project', 'Last Monitoring', 'Issue'];
   const rows = CURRENT_FILTERED_TREES.map(t => [
-    t.id, t.species, t.status, t.lat, t.lng, `"${t.barangay}"`, `"${t.municipality}"`, `"${t.caretaker}"`, `"${t.landowner}"`, `"${t.project}"`, t.lastMonitoring, `"${t.issue}"`
+    t.id, getTreeSpeciesName(t), t.status || 'healthy', t.lat || '', t.lng || '', `"${t.barangay || ''}"`, `"${t.municipality || ''}"`, `"${t.caretaker || ''}"`, `"${t.landowner || t.farmer || ''}"`, `"${t.project || ''}"`, t.lastMonitoring || '', `"${t.issue || ''}"`
   ]);
 
   const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');

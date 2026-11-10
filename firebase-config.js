@@ -103,6 +103,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         try {
           firestoreDb.settings({
             experimentalForceLongPolling: true,
+            ignoreUndefinedProperties: true,
             merge: true
           });
         } catch (settingsErr) {
@@ -1611,18 +1612,19 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         timestamp: new Date().toISOString(),
         id: 'LOG-' + Date.now()
       };
+      const treeUpdates = {
+        status: logData.status || 'healthy',
+        lastCheck: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        ...(logData.height ? { height: logData.height } : {}),
+        ...(logData.trunkDiam ? { trunkDiam: logData.trunkDiam } : {})
+      };
 
       if (this.isFirestore) {
         try {
           await firestoreDb.collection('monitoring_logs').add(logRecord);
           // Also update lastCheck and status on the tree document
           if (logData.treeId) {
-            await this.updateTree(logData.treeId, {
-              status: logData.status || 'healthy',
-              lastCheck: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-              height: logData.height || undefined,
-              trunkDiam: logData.trunkDiam || undefined
-            });
+            await this.updateTree(logData.treeId, treeUpdates);
           }
         } catch (e) {
           console.warn("Firestore addMonitoringLog error:", e);
@@ -1631,12 +1633,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
 
       // Update tree in local cache
       if (logData.treeId) {
-        await this.updateTree(logData.treeId, {
-          status: logData.status || 'healthy',
-          lastCheck: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          height: logData.height || undefined,
-          trunkDiam: logData.trunkDiam || undefined
-        });
+        await this.updateTree(logData.treeId, treeUpdates);
       }
 
       return logRecord;

@@ -590,7 +590,7 @@ function initCaretakerTreeMap() {
   const btnNavToTree = document.getElementById('btnNavToTree');
   if (btnNavToTree) {
     btnNavToTree.addEventListener('click', () => {
-      startNavigationTo(selectedTree.id);
+      if (selectedTree) startNavigationTo(selectedTree.id);
     });
   }
 
@@ -598,7 +598,7 @@ function initCaretakerTreeMap() {
   const btnFocusMap = document.getElementById('btnFocusMap');
   if (btnFocusMap) {
     btnFocusMap.addEventListener('click', () => {
-      map.flyTo([selectedTree.lat, selectedTree.lng], 17);
+      if (selectedTree) map.flyTo([selectedTree.lat, selectedTree.lng], 17);
     });
   }
 
@@ -736,26 +736,28 @@ function initCaretakerTreeMap() {
 
   window.openRecordMonModalFor = function(treeId) {
     const tree = treesData.find(t => t.id === treeId) || selectedTree;
+    if (!tree) return;
     if (monTitle) monTitle.textContent = `Record Monitoring — ${tree.id} (${tree.species})`;
     if (recordModal) recordModal.classList.remove('hide');
   };
 
   window.openAddMaintModalFor = function(treeId) {
     const tree = treesData.find(t => t.id === treeId) || selectedTree;
+    if (!tree) return;
     if (maintTitle) maintTitle.textContent = `Log Maintenance — ${tree.id} (${tree.species})`;
     if (maintModal) maintModal.classList.remove('hide');
   };
 
   const btnOpenRecordMon = document.getElementById('btnOpenRecordMon');
-  if (btnOpenRecordMon) btnOpenRecordMon.addEventListener('click', () => openRecordMonModalFor(selectedTree.id));
+  if (btnOpenRecordMon) btnOpenRecordMon.addEventListener('click', () => { if (selectedTree) openRecordMonModalFor(selectedTree.id); });
 
   const btnOpenAddMaint = document.getElementById('btnOpenAddMaint');
-  if (btnOpenAddMaint) btnOpenAddMaint.addEventListener('click', () => openAddMaintModalFor(selectedTree.id));
+  if (btnOpenAddMaint) btnOpenAddMaint.addEventListener('click', () => { if (selectedTree) openAddMaintModalFor(selectedTree.id); });
 
   const viewAllHist = document.getElementById('viewAllHistoryBtn');
-  if (viewAllHist) viewAllHist.addEventListener('click', (e) => { e.preventDefault(); showCtToast('Displaying full monitoring timeline for ' + selectedTree.id); });
+  if (viewAllHist) viewAllHist.addEventListener('click', (e) => { e.preventDefault(); if (selectedTree) showCtToast('Displaying full monitoring timeline for ' + selectedTree.id); });
   const viewAllPhotos = document.getElementById('viewAllPhotosBtn');
-  if (viewAllPhotos) viewAllPhotos.addEventListener('click', (e) => { e.preventDefault(); showCtToast('Opening full photo gallery for ' + selectedTree.id); });
+  if (viewAllPhotos) viewAllPhotos.addEventListener('click', (e) => { e.preventDefault(); if (selectedTree) showCtToast('Opening full photo gallery for ' + selectedTree.id); });
 
   const navMonitoring = document.getElementById('navMonitoring');
   if (navMonitoring) {
