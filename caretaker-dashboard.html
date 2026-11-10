@@ -157,6 +157,21 @@
           </a>
         </li>
 
+        <!-- 8. Rewards & Incentives -->
+        <li class="ct-nav-item">
+          <a href="#ctRewardsIncentivesSection" class="ct-nav-link" id="navRewards">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+              <path d="M4 22h16" />
+              <path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34" />
+              <path d="M18 4H6v7a6 6 0 0 0 12 0V4Z" />
+            </svg>
+            <span>Rewards &amp; Incentives</span>
+          </a>
+        </li>
+
       </ul>
     </nav>
 
@@ -457,6 +472,68 @@
           </div>
         </div>
 
+      </section>
+
+      <!-- ─── REWARDS & INCENTIVES + MONTHLY HEALTH VALIDATION + MORTALITY DEDUCTION ─── -->
+      <section class="ct-card" id="ctRewardsIncentivesSection" style="margin-bottom:20px; padding:20px; border:1px solid #bbf7d0; background:linear-gradient(135deg,#f0fdf4 0%,#ffffff 68%);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:16px;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:6px; background:#dcfce7; color:#166534; font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;">
+              🏆 Caretaker Rewards &amp; Incentives • ₱50.00 / Tree Rate
+            </div>
+            <h2 style="margin:0; font-size:1.12rem; font-weight:800; color:#0f172a;">Earned Stewardship Incentives &amp; Monthly Status Validation</h2>
+            <p style="margin:4px 0 0; font-size:0.82rem; color:#475569;">Incentives are computed at <strong>₱50 PHP per active assigned tree</strong>, validated strictly via mandatory monthly health logs, with an automatic <strong>-₱50 PHP deduction per dead tree</strong>.</p>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <button type="button" id="ctOpenMonthlyLogModalBtn" style="display:inline-flex; align-items:center; gap:7px; background:#16a34a; color:#ffffff; border:none; padding:9px 15px; border-radius:10px; font-weight:700; font-size:0.82rem; cursor:pointer; box-shadow:0 4px 12px rgba(22,163,74,0.2);">
+              📋 Log Monthly Status Update
+            </button>
+            <button type="button" id="ctOpenCertBtn" style="display:inline-flex; align-items:center; gap:7px; background:#1e293b; color:#ffffff; border:none; padding:9px 15px; border-radius:10px; font-weight:700; font-size:0.82rem; cursor:pointer;">
+              📜 Certificate of Recognition
+            </button>
+            <button type="button" id="ctOpenQrHubBtn" style="display:inline-flex; align-items:center; gap:7px; background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; padding:9px 15px; border-radius:10px; font-weight:700; font-size:0.82rem; cursor:pointer;">
+              📱 Tree QR Codes
+            </button>
+          </div>
+        </div>
+
+        <div class="ct-stats-grid" style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px; margin-bottom:14px;">
+          <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
+            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Gross Earned Incentive</div>
+            <div style="font-size:1.35rem; font-weight:800; color:#0f172a; margin:4px 0;" id="ctIncGrossAmount">₱15,500</div>
+            <div style="font-size:0.75rem; color:#475569;" id="ctIncGrossSub">310 assigned trees × ₱50</div>
+          </div>
+          <div style="background:#ffffff; border:1px solid #fee2e2; border-radius:12px; padding:14px;">
+            <div style="font-size:0.74rem; font-weight:700; color:#dc2626; text-transform:uppercase;">Tree Mortality Deduction</div>
+            <div style="font-size:1.35rem; font-weight:800; color:#dc2626; margin:4px 0;" id="ctIncDeadDeduction">-₱0</div>
+            <div style="font-size:0.75rem; color:#64748b;" id="ctIncDeadSub">0 dead trees × -₱50 PHP</div>
+          </div>
+          <div style="background:#ffffff; border:1px solid #bbf7d0; border-radius:12px; padding:14px;">
+            <div style="font-size:0.74rem; font-weight:700; color:#15803d; text-transform:uppercase;">Net Receivable Incentive</div>
+            <div style="font-size:1.38rem; font-weight:800; color:#15803d; margin:4px 0;" id="ctIncNetReceivable">₱15,500</div>
+            <div style="font-size:0.75rem; color:#166534; font-weight:600;" id="ctIncNetSub">310 surviving trees × ₱50</div>
+          </div>
+          <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
+            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Monthly Status Validation</div>
+            <div style="font-size:1.05rem; font-weight:800; color:#15803d; margin:6px 0 4px;" id="ctIncValidationBadge">✅ Validated for Release</div>
+            <div style="font-size:0.75rem; color:#475569;" id="ctIncValidationSub">10 / 10 batches logged this month</div>
+          </div>
+        </div>
+
+        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div style="flex:1; min-width:220px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.78rem; font-weight:700; color:#334155; margin-bottom:6px;">
+              <span id="ctMonthlyProgressLabel">Mandatory Monthly Health Log Compliance</span>
+              <span id="ctMonthlyProgressPct" style="color:#16a34a;">100% Complete</span>
+            </div>
+            <div style="height:8px; width:100%; background:#f1f5f9; border-radius:999px; overflow:hidden;">
+              <div id="ctMonthlyProgressBar" style="height:100%; width:100%; background:linear-gradient(90deg,#16a34a,#22c55e); border-radius:999px; transition:width 0.3s ease;"></div>
+            </div>
+          </div>
+          <div style="font-size:0.76rem; color:#475569;" id="ctAdopterPoolLinkNote">
+            🤝 Linked Adopter Pool: <strong>Nikki Maga</strong> (10 funded trees • ₱500 allocated)
+          </div>
+        </div>
       </section>
 
       <!-- ─── MIDDLE ROW: Map (My Assigned Trees) + Pending Monitoring Table ─── -->

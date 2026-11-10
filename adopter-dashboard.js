@@ -574,8 +574,9 @@ function renderAdopterMap(data, filterSpecies = 'All Species') {
             <span style="font-size:11px; font-weight:600; color:${statusClass}">
               ● Status: ${statusLabel}
             </span><br>
-            <span style="font-size:11px; color:#475569;">Quantity: ${t.count} tree(s)</span><br>
-            <span style="font-size:10px; color:#64748b;">Location: Brgy. ${t.barangay}</span>
+            <span style="font-size:11px; color:#475569;">Quantity: ${t.count} tree(s) • Funded: ₱${t.count * 50}</span><br>
+            <span style="font-size:10px; color:#64748b;">Location: Brgy. ${t.barangay} (${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E)</span><br>
+            <button type="button" onclick="window.ATAMAN_INCENTIVES && window.ATAMAN_INCENTIVES.openTreeQrModal('${t.id}')" style="margin-top:6px;width:100%;background:#15803d;color:#fff;border:none;padding:5px 8px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">📱 QR Code Location Tag</button>
           </div>
         `)
         .addTo(adopterMapInstance);
@@ -622,10 +623,10 @@ function renderRecentActivities(data) {
           </svg>
         </div>
         <div class="ad-act-body">
-          <p class="ad-act-title"><strong>Adopted ${t.count} ${t.species} tree(s)</strong> (UUID: ${t.id})</p>
-          <p class="ad-act-author">Assigned Caretaker: ${t.caretaker} • Brgy. ${t.barangay}</p>
+          <p class="ad-act-title"><strong>Adopted ${t.count} ${t.species} tree(s)</strong> (UUID: ${t.id} • ₱${t.count * 50} PHP)</p>
+          <p class="ad-act-author">Assigned Caretaker: ${t.caretaker} (Deducted from pool) • Brgy. ${t.barangay}</p>
         </div>
-        <span class="ad-act-time">Active</span>
+        <button type="button" onclick="window.ATAMAN_INCENTIVES && window.ATAMAN_INCENTIVES.openTreeQrModal('${t.id}')" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">📱 QR</button>
       </div>
     `;
   });

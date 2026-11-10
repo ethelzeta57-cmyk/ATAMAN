@@ -535,19 +535,29 @@ function initCaretakerActions() {
       const caretakerName = localStorage.getItem('ATAMAN_user_name') || 'Caretaker';
       const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
 
-      // Update local cache
+      // Update local cache & mandatory monthly status log / mortality deduction
       try {
         const raw = localStorage.getItem('ATAMAN_trees_cache');
         if (raw) {
           const cache = JSON.parse(raw);
           const idx = cache.findIndex(t => t.id === currentMonTreeId);
           if (idx !== -1) {
-            cache[idx].status = mappedHealth === 'needs' ? 'needs-care' : mappedHealth;
+            const normSt = mappedHealth === 'needs' ? 'needs-care' : mappedHealth;
+            cache[idx].status = normSt;
             cache[idx].lastMon = todayStr;
             if (heightVal) cache[idx].height = Number(heightVal);
             if (diamVal) cache[idx].trunkDiam = Number(diamVal);
             localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(cache));
           }
+        }
+        if (window.ATAMAN_INCENTIVES && typeof window.ATAMAN_INCENTIVES.recordMonthlyTreeUpdate === 'function') {
+          window.ATAMAN_INCENTIVES.recordMonthlyTreeUpdate({
+            treeId: currentMonTreeId,
+            status: mappedHealth === 'needs' ? 'needs-care' : mappedHealth,
+            height: heightVal ? `${heightVal} meters` : undefined,
+            notes: remarksVal,
+            caretakerName: caretakerName
+          });
         }
       } catch (_) {}
 

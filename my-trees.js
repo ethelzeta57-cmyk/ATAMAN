@@ -287,18 +287,24 @@ function applyAdopterModeUI() {
         </a>
       </li>
       <li class="ct-nav-item">
-        <a href="adopter-dashboard.html" class="ct-nav-link">
+        <a href="#" class="ct-nav-link" id="adMyTreesCertQrLink">
           <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-            <path d="M4 22h16"/>
-            <path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/>
-            <path d="M18 4H6v7a6 6 0 0 0 12 0V4Z"/>
+            <circle cx="12" cy="8" r="6"/>
+            <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
           </svg>
-          <span>Rewards</span>
+          <span>Certificate &amp; QR</span>
         </a>
       </li>
     `;
+    const certLink = document.getElementById('adMyTreesCertQrLink');
+    if (certLink) {
+      certLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window.ATAMAN_INCENTIVES && typeof window.ATAMAN_INCENTIVES.openCertificateModal === 'function') {
+          window.ATAMAN_INCENTIVES.openCertificateModal({ role: 'adopter' });
+        }
+      });
+    }
   }
 
   // 3. Top Header Role & Dropdown Menu for Adopter
@@ -834,6 +840,25 @@ function updateProfilePanel(tree) {
   document.getElementById('specGps').textContent = tree.gps;
   document.getElementById('specLastMon').textContent = tree.lastCheck;
 
+  // Ensure a QR Code Location Tag button is shown in the profile panel
+  const gpsEl = document.getElementById('specGps');
+  if (gpsEl && gpsEl.parentElement) {
+    let qrInlineBtn = document.getElementById('myTreesProfileQrBtn');
+    if (!qrInlineBtn) {
+      qrInlineBtn = document.createElement('button');
+      qrInlineBtn.type = 'button';
+      qrInlineBtn.id = 'myTreesProfileQrBtn';
+      qrInlineBtn.style.cssText = 'margin-top:6px;display:inline-flex;align-items:center;gap:5px;background:#15803d;color:#fff;border:none;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;';
+      qrInlineBtn.innerHTML = '📱 QR Code Location Tag';
+      gpsEl.parentElement.appendChild(qrInlineBtn);
+    }
+    qrInlineBtn.onclick = () => {
+      if (window.ATAMAN_INCENTIVES && typeof window.ATAMAN_INCENTIVES.openTreeQrModal === 'function') {
+        window.ATAMAN_INCENTIVES.openTreeQrModal(tree.id);
+      }
+    };
+  }
+
   // Timeline
   const timelineEl = document.getElementById('historyTimeline');
   timelineEl.innerHTML = '';
@@ -1002,6 +1027,16 @@ function initModals() {
     updateSummaryStats(treesData);
     updateProfilePanel(selectedTree);
     renderTreeTable(currentFilteredTrees, currentTablePage);
+
+    if (window.ATAMAN_INCENTIVES && typeof window.ATAMAN_INCENTIVES.recordMonthlyTreeUpdate === 'function') {
+      window.ATAMAN_INCENTIVES.recordMonthlyTreeUpdate({
+        treeId: selectedTree.id,
+        status: selectedTree.health === 'needs' ? 'needs-care' : selectedTree.health,
+        height: selectedTree.height,
+        notes: `Field inspection by ${getActiveCaretakerName()}`,
+        caretakerName: getActiveCaretakerName()
+      });
+    }
 
     if (window.ATAMAN_DB) {
       window.ATAMAN_DB.updateTree(selectedTree.id, {
