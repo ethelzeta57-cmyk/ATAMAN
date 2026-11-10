@@ -127,6 +127,11 @@ function generateSystemWideTrees() {
     }
   } catch (e) {}
 
+  if (trees.length === 0 && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0) {
+    trees = [...window.ATAMAN_DEFAULT_TREES];
+    try { localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(trees)); } catch (_) {}
+  }
+
   return trees;
 }
 

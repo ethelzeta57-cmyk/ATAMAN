@@ -95,22 +95,29 @@ function loadDashboardData() {
   // 1. Load Trees
   try {
     const cachedTrees = localStorage.getItem('ATAMAN_trees_cache');
+    let parsed = null;
     if (cachedTrees) {
-      const parsed = JSON.parse(cachedTrees);
-      if (Array.isArray(parsed)) {
-        let treesChanged = false;
-        parsed.forEach(t => {
-          if (t && !t.customFunding && (t.fundingAmount === 50 || t.totalFunding)) {
-            t.fundingAmount = 0;
-            t.totalFunding = 0;
-            treesChanged = true;
-          }
-        });
-        if (treesChanged) {
-          localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(parsed));
-        }
-        currentTrees = parsed;
+      try { parsed = JSON.parse(cachedTrees); } catch (_) {}
+    }
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      if (typeof window.ATAMAN_DEFAULT_TREES !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
+        parsed = [...window.ATAMAN_DEFAULT_TREES];
+        try { localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(parsed)); } catch (_) {}
       }
+    }
+    if (Array.isArray(parsed)) {
+      let treesChanged = false;
+      parsed.forEach(t => {
+        if (t && !t.customFunding && (t.fundingAmount === 50 || t.totalFunding)) {
+          t.fundingAmount = 0;
+          t.totalFunding = 0;
+          treesChanged = true;
+        }
+      });
+      if (treesChanged) {
+        localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(parsed));
+      }
+      currentTrees = parsed;
     }
   } catch (e) {
     console.warn('Error reading ATAMAN_trees_cache:', e);
@@ -862,7 +869,14 @@ function initRealtimeSync() {
   if (window.ATAMAN_DB) {
     if (typeof window.ATAMAN_DB.onTreesChange === 'function') {
       window.ATAMAN_DB.onTreesChange((trees) => {
-        if (trees && Array.isArray(trees)) { currentTrees = trees; renderAllDashboardMetrics(); }
+        if (trees && Array.isArray(trees)) {
+          if (trees.length > 0) {
+            currentTrees = trees;
+          } else if (currentTrees.length === 0 && typeof window.ATAMAN_DEFAULT_TREES !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
+            currentTrees = [...window.ATAMAN_DEFAULT_TREES];
+          }
+          renderAllDashboardMetrics();
+        }
       });
     }
     if (typeof window.ATAMAN_DB.onAdoptersChange === 'function') {

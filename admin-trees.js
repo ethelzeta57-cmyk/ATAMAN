@@ -37,9 +37,246 @@ const MONITORING_DATES = [];
 const NEXT_MONITOR_DATES = [];
 const PLANTING_DATES = [];
 
+// Default registered Samar reforestation tree registry
+const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0)
+  ? window.ATAMAN_DEFAULT_TREES
+  : [
+    {
+      id: 'TR-10001',
+      species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
+      treeCount: 10,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Guinsorongan',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7850,
+      lng: 124.8860,
+      sponsorName: 'John Sho',
+      adopter: 'John Sho',
+      takenCount: 10,
+      fundingAmount: 50,
+      datePlanted: '2026-08-28',
+      createdAt: '2026-08-28T08:00:00.000Z',
+      ageOfTree: '2 months',
+      caretaker: 'Pedro Reyes',
+      height: '2.4 meters',
+      trunkDiam: '4.2 cm'
+    },
+    {
+      id: 'TR-10002',
+      species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Endemic' },
+      treeCount: 50,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Canlapwas',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7820,
+      lng: 124.8870,
+      sponsorName: 'Century Catbalogan',
+      adopter: 'Century Catbalogan',
+      takenCount: 10,
+      fundingAmount: 50,
+      datePlanted: '2026-03-06',
+      createdAt: '2026-09-06T08:00:00.000Z',
+      ageOfTree: '6 months',
+      caretaker: 'Pedro Reyes',
+      height: '3.1 meters',
+      trunkDiam: '5.8 cm'
+    },
+    {
+      id: 'TR-10003',
+      species: { common: 'Supa', scientific: 'Sindora supa', type: 'Endemic' },
+      treeCount: 10,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Bunuanan',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7910,
+      lng: 124.8790,
+      sponsorName: '',
+      adopter: '',
+      takenCount: 0,
+      fundingAmount: 50,
+      datePlanted: '2026-04-06',
+      createdAt: '2026-09-06T09:00:00.000Z',
+      ageOfTree: '5 months',
+      caretaker: 'Pedro Reyes',
+      height: '1.8 meters',
+      trunkDiam: '3.5 cm'
+    },
+    {
+      id: 'TR-10004',
+      species: { common: 'Yakal', scientific: 'Shorea astylosa', type: 'Native' },
+      treeCount: 100,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Iguid',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.8020,
+      lng: 124.8810,
+      sponsorName: '',
+      adopter: '',
+      takenCount: 0,
+      fundingAmount: 50,
+      datePlanted: '2026-03-06',
+      createdAt: '2026-09-06T10:00:00.000Z',
+      ageOfTree: '6 Months',
+      caretaker: 'Pedro Reyes',
+      height: '2.9 meters',
+      trunkDiam: '4.8 cm'
+    },
+    {
+      id: 'TR-10005',
+      species: { common: 'Tanguile', scientific: 'Shorea polysperma', type: 'Native' },
+      treeCount: 20,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Mercedes',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7690,
+      lng: 124.8940,
+      sponsorName: 'Century Catbalogan',
+      adopter: 'Century Catbalogan',
+      takenCount: 5,
+      fundingAmount: 50,
+      datePlanted: '2025-09-06',
+      createdAt: '2026-09-06T11:00:00.000Z',
+      ageOfTree: '12 Months',
+      caretaker: 'Pedro Reyes',
+      height: '4.0 meters',
+      trunkDiam: '8.2 cm'
+    },
+    {
+      id: 'TR-10006',
+      species: { common: 'White Lauan', scientific: 'Shorea contorta', type: 'Native' },
+      treeCount: 20,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Maulong',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7710,
+      lng: 124.8690,
+      sponsorName: '',
+      adopter: '',
+      takenCount: 0,
+      fundingAmount: 50,
+      datePlanted: '2026-03-06',
+      createdAt: '2026-09-06T12:00:00.000Z',
+      ageOfTree: '6 Months',
+      caretaker: 'Pedro Reyes',
+      height: '2.5 meters',
+      trunkDiam: '4.0 cm'
+    },
+    {
+      id: 'TR-10007',
+      species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
+      treeCount: 50,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Silanga',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.8150,
+      lng: 124.8640,
+      sponsorName: 'Century Catbalogan',
+      adopter: 'Century Catbalogan',
+      takenCount: 2,
+      fundingAmount: 50,
+      datePlanted: '2026-04-06',
+      createdAt: '2026-09-06T13:00:00.000Z',
+      ageOfTree: '6 months',
+      caretaker: 'Pedro Reyes',
+      height: '2.7 meters',
+      trunkDiam: '4.5 cm'
+    },
+    {
+      id: 'TR-10021',
+      species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
+      treeCount: 25,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Guinsorongan',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7875,
+      lng: 124.8825,
+      sponsorName: 'John Sho',
+      adopter: 'John Sho',
+      takenCount: 25,
+      fundingAmount: 50,
+      datePlanted: '2026-07-15',
+      createdAt: '2026-07-15T08:00:00.000Z',
+      ageOfTree: '4 months',
+      caretaker: 'Pedro Reyes',
+      height: '2.8 meters',
+      trunkDiam: '4.9 cm'
+    },
+    {
+      id: 'TR-10035',
+      species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Endemic' },
+      treeCount: 15,
+      status: 'needs-care',
+      health: 'Needs Care',
+      barangay: 'Canlapwas',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7810,
+      lng: 124.8890,
+      sponsorName: '',
+      adopter: '',
+      takenCount: 0,
+      fundingAmount: 50,
+      datePlanted: '2026-05-10',
+      createdAt: '2026-05-10T09:00:00.000Z',
+      ageOfTree: '6 months',
+      caretaker: 'Pedro Reyes',
+      height: '2.2 meters',
+      trunkDiam: '3.8 cm'
+    },
+    {
+      id: 'TR-10047',
+      species: { common: 'Acacia', scientific: 'Samanea saman', type: 'Native' },
+      treeCount: 10,
+      status: 'critical',
+      health: 'Critical',
+      barangay: 'Canlapwas',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7795,
+      lng: 124.8910,
+      sponsorName: '',
+      adopter: '',
+      takenCount: 0,
+      fundingAmount: 50,
+      datePlanted: '2026-06-01',
+      createdAt: '2026-06-01T10:00:00.000Z',
+      ageOfTree: '5 months',
+      caretaker: 'Pedro Reyes',
+      height: '1.9 meters',
+      trunkDiam: '3.2 cm'
+    }
+  ];
+window.ATAMAN_DEFAULT_TREES = DEFAULT_TREES;
+
 // Load persisted data from localStorage (fallback when Firestore is not available)
-const _cachedTrees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
-let ALL_TREES = Array.isArray(_cachedTrees) && _cachedTrees.length > 0 ? _cachedTrees : [];
+const _cachedTrees = (() => {
+  try {
+    const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
+    return Array.isArray(raw) && raw.length > 0 ? raw : null;
+  } catch (_) { return null; }
+})();
+let ALL_TREES = _cachedTrees || [...DEFAULT_TREES];
+if (!_cachedTrees) {
+  try {
+    localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(ALL_TREES));
+  } catch (_) {}
+}
 
 let filteredTrees = [...ALL_TREES];
 
@@ -292,7 +529,17 @@ async function initDatabaseSync() {
 
     // Listen for live Firestore / local updates
     window.ATAMAN_DB.onTreesChange((trees, source) => {
-      ALL_TREES = Array.isArray(trees) ? trees : [];
+      if (Array.isArray(trees) && trees.length > 0) {
+        ALL_TREES = trees;
+      } else {
+        const local = (() => {
+          try {
+            const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
+            return Array.isArray(raw) && raw.length > 0 ? raw : null;
+          } catch (_) { return null; }
+        })();
+        ALL_TREES = local || [...DEFAULT_TREES];
+      }
       harmonizeAdopterTreeLocations(ALL_TREES);
       filteredTrees = [...ALL_TREES];
       // Also persist to localStorage so we have offline fallback

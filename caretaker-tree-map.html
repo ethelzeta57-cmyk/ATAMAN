@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <script>
     function solveSimpleChallenge() { return true; }
@@ -17,12 +18,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ATAMAN — Caretaker Tree Map (Catbalogan, Samar)</title>
-  <meta name="description" content="View the real-time location, telemetry, and condition of your assigned trees in Catbalogan City, Samar." />
+  <meta name="description"
+    content="View the real-time location, telemetry, and condition of your assigned trees in Catbalogan City, Samar." />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -35,6 +38,7 @@
   <!-- Stylesheet -->
   <link rel="stylesheet" href="caretaker-tree-map.css?v=20261001_hover_fix" />
 </head>
+
 <body>
 
   <!-- ══════════════════════════════════ SIDEBAR ══════════════════════════════════ -->
@@ -44,15 +48,18 @@
     <div class="ct-logo-wrap">
       <a href="caretaker-dashboard.html" class="ct-brand-logo">
         <svg class="ct-brand-icon" viewBox="0 0 48 48" fill="none">
-          <path d="M24 38V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M24 24C24 16 16 16 14 16C14 24 22 24 24 24Z" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M24 18C24 10 32 10 34 10C34 18 26 18 24 18Z" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M24 30C24 22 34 22 36 22C36 30 26 30 24 30Z" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M14 38H34" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M24 38V14" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" />
+          <path d="M24 24C24 16 16 16 14 16C14 24 22 24 24 24Z" stroke="#4ade80" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M24 18C24 10 32 10 34 10C34 18 26 18 24 18Z" stroke="#4ade80" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M24 30C24 22 34 22 36 22C36 30 26 30 24 30Z" stroke="#4ade80" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M14 38H34" stroke="#5a9970" stroke-width="2.5" stroke-linecap="round" />
         </svg>
         <div class="ct-brand-text">
           <span class="ct-brand-name">ATAMAN</span>
-          <span class="ct-brand-tag">Tree Monitoring System</span>
+          <span class="ct-brand-tag">Tano.Ataman.Padayon</span>
         </div>
       </a>
     </div>
@@ -64,9 +71,10 @@
         <!-- 1. Dashboard -->
         <li class="ct-nav-item">
           <a href="caretaker-dashboard.html" class="ct-nav-link">
-            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
             <span>Dashboard</span>
           </a>
@@ -75,9 +83,10 @@
         <!-- 2. My Trees -->
         <li class="ct-nav-item">
           <a href="my-trees.html" class="ct-nav-link" id="navMyTrees">
-            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
-              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
             </svg>
             <span>My Trees</span>
           </a>
@@ -86,9 +95,10 @@
         <!-- 3. Tree Map (Active) -->
         <li class="ct-nav-item active">
           <a href="caretaker-tree-map.html" class="ct-nav-link" id="navTreeMap">
-            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
-              <circle cx="12" cy="10" r="3"/>
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+              <circle cx="12" cy="10" r="3" />
             </svg>
             <span>Tree Map</span>
           </a>
@@ -97,9 +107,10 @@
         <!-- 4. Monitoring -->
         <li class="ct-nav-item">
           <a href="my-trees.html" class="ct-nav-link" id="navMonitoring">
-            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
             </svg>
             <span>Monitoring</span>
           </a>
@@ -108,11 +119,12 @@
         <!-- 5. Schedule -->
         <li class="ct-nav-item">
           <a href="caretaker-dashboard.html#schedule" class="ct-nav-link" id="navSchedule">
-            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-              <line x1="16" x2="16" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="2" y2="6"/>
-              <line x1="3" x2="21" y1="10" y2="10"/>
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+              <line x1="16" x2="16" y1="2" y2="6" />
+              <line x1="8" x2="8" y1="2" y2="6" />
+              <line x1="3" x2="21" y1="10" y2="10" />
             </svg>
             <span>Schedule</span>
           </a>
@@ -121,8 +133,10 @@
         <!-- 6. Maintenance -->
         <li class="ct-nav-item">
           <a href="#" class="ct-nav-link" id="navMaintenance">
-            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
             </svg>
             <span>Maintenance</span>
           </a>
@@ -131,10 +145,11 @@
         <!-- 7. My Reports -->
         <li class="ct-nav-item">
           <a href="caretaker-dashboard.html#reports" class="ct-nav-link" id="navReports">
-            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 20V10"/>
-              <path d="M12 20V4"/>
-              <path d="M6 20v-6"/>
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 20V10" />
+              <path d="M12 20V4" />
+              <path d="M6 20v-6" />
             </svg>
             <span>My Reports</span>
           </a>
@@ -153,9 +168,10 @@
     <!-- Top Navbar -->
     <header class="ct-navbar">
       <div class="ct-page-title-group">
-        <svg class="ct-page-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
-          <circle cx="12" cy="10" r="3"/>
+        <svg class="ct-page-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+          <circle cx="12" cy="10" r="3" />
         </svg>
         <h2 class="ct-page-title">Caretaker Tree Map</h2>
         <span class="ct-location-badge">📍 Catbalogan City, Samar</span>
@@ -163,7 +179,8 @@
 
       <div class="ct-navbar-right">
         <!-- Live Real-Time Date & Clock Pill -->
-        <div class="live-sync-pill" id="ctMapLiveDatePill" style="background:#f8fafc; border-color:#e2e8f0; color:#334155;" title="Live Real-Time Date & Clock">
+        <div class="live-sync-pill" id="ctMapLiveDatePill"
+          style="background:#f8fafc; border-color:#e2e8f0; color:#334155;" title="Live Real-Time Date & Clock">
           <span>📅</span>
           <span id="ctMapLiveDateText">Live Date</span>
         </div>
@@ -176,11 +193,11 @@
 
         <button class="btn-my-location" id="btnTopMyLocation">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="7"/>
-            <line x1="12" y1="2" x2="12" y2="5"/>
-            <line x1="12" y1="19" x2="12" y2="22"/>
-            <line x1="2" y1="12" x2="5" y2="12"/>
-            <line x1="19" y1="12" x2="22" y2="12"/>
+            <circle cx="12" cy="12" r="7" />
+            <line x1="12" y1="2" x2="12" y2="5" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+            <line x1="2" y1="12" x2="5" y2="12" />
+            <line x1="19" y1="12" x2="22" y2="12" />
           </svg>
           <span>📍 My Location</span>
         </button>
@@ -193,10 +210,11 @@
             <span class="ct-user-role">Field Caretaker (Catbalogan, Samar)</span>
           </div>
           <button class="ct-logout-btn" id="ctLogoutBtn" title="Log Out" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
             </svg>
           </button>
         </div>
@@ -216,11 +234,11 @@
           <span class="ct-location-badge">📍 Current location: Catbalogan, Samar</span>
           <button class="btn-my-location" id="btnBannerMyLocation">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="7"/>
-              <line x1="12" y1="2" x2="12" y2="5"/>
-              <line x1="12" y1="19" x2="12" y2="22"/>
-              <line x1="2" y1="12" x2="5" y2="12"/>
-              <line x1="19" y1="12" x2="22" y2="12"/>
+              <circle cx="12" cy="12" r="7" />
+              <line x1="12" y1="2" x2="12" y2="5" />
+              <line x1="12" y1="19" x2="12" y2="22" />
+              <line x1="2" y1="12" x2="5" y2="12" />
+              <line x1="19" y1="12" x2="22" y2="12" />
             </svg>
             <span>My Location</span>
           </button>
@@ -297,10 +315,11 @@
           <!-- Search -->
           <div class="map-search-box">
             <svg class="map-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <input type="text" id="mapSearchInput" class="map-search-input" placeholder="🔍 Search Tree ID / Species / Barangay in Catbalogan..." />
+            <input type="text" id="mapSearchInput" class="map-search-input"
+              placeholder="🔍 Search Tree ID / Species / Barangay in Catbalogan..." />
           </div>
 
           <!-- Health Status Dropdown -->
@@ -436,7 +455,7 @@
           <!-- Floating Navigation HUD when routing is active -->
           <div class="map-nav-hud hide" id="navHud">
             <svg class="hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+              <polygon points="3 11 22 2 13 21 11 13 3 11" />
             </svg>
             <div class="hud-text">
               <span class="hud-dist" id="hudDistance">📍 240 meters away</span>
@@ -452,13 +471,15 @@
         <aside class="selected-tree-panel" id="selectedTreePanel">
           <div class="panel-header-top">
             <span class="panel-title-tag">Tree Profile</span>
-            <button class="btn-action-secondary" id="btnFocusMap" style="padding: 4px 8px; font-size: 11.5px;">📍 Center Map</button>
+            <button class="btn-action-secondary" id="btnFocusMap" style="padding: 4px 8px; font-size: 11.5px;">📍 Center
+              Map</button>
           </div>
 
           <div class="panel-body-content">
             <!-- Featured Large Tree Photo -->
             <div class="panel-featured-photo">
-              <img src="assets/tree.jpg" alt="Tree photo" id="panelTreeImg" class="featured-img" onerror="this.src='assets/nature.jpg'" />
+              <img src="assets/tree.jpg" alt="Tree photo" id="panelTreeImg" class="featured-img"
+                onerror="this.src='assets/nature.jpg'" />
             </div>
 
             <!-- Title & Status Badge Row -->
@@ -526,9 +547,11 @@
             </div>
 
             <!-- Active Issue Alert (if any) -->
-            <div class="spec-item full-span" id="pTreeIssueRow" style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 8px 10px;">
+            <div class="spec-item full-span" id="pTreeIssueRow"
+              style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 8px 10px;">
               <span class="spec-lbl" style="color: #dc2626; font-weight: 700;">⚠️ Active Issue:</span>
-              <span class="att-issue-tag" id="pTreeIssue" style="color: #991b1b; font-size: 12px; font-weight: 600;">Pest infestation detected</span>
+              <span class="att-issue-tag" id="pTreeIssue"
+                style="color: #991b1b; font-size: 12px; font-weight: 600;">Pest infestation detected</span>
             </div>
 
             <!-- Main Primary & Secondary Action Buttons -->
@@ -536,8 +559,8 @@
               <!-- Wide Primary Green Record Button -->
               <button class="btn-primary-record" id="btnOpenRecordMon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                  <circle cx="12" cy="13" r="4"/>
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
                 </svg>
                 <span>Record Monitoring</span>
               </button>
@@ -546,13 +569,14 @@
               <div class="secondary-btn-row">
                 <button class="btn-sec-outline" id="btnOpenAddMaint">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
-                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                    <path
+                      d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
                   </svg>
                   <span>Add Maintenance</span>
                 </button>
                 <button class="btn-sec-outline" id="btnNavToTree">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2">
-                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                    <polygon points="3 11 22 2 13 21 11 13 3 11" />
                   </svg>
                   <span>Navigate</span>
                 </button>
@@ -577,9 +601,11 @@
                 <a href="#" class="sec-link" id="viewAllPhotosBtn">View All</a>
               </div>
               <div class="photo-thumbs-row" id="photoThumbsRow">
-                <div class="p-thumb"><img src="assets/tree.jpg" alt="Tree photo" onerror="this.src='assets/nature.jpg'" /></div>
+                <div class="p-thumb"><img src="assets/tree.jpg" alt="Tree photo"
+                    onerror="this.src='assets/nature.jpg'" /></div>
                 <div class="p-thumb"><img src="assets/nature.jpg" alt="Leaves" /></div>
-                <div class="p-thumb"><img src="assets/tree1.jpg" alt="Trunk" onerror="this.src='assets/tree.jpg'" /></div>
+                <div class="p-thumb"><img src="assets/tree1.jpg" alt="Trunk" onerror="this.src='assets/tree.jpg'" />
+                </div>
                 <div class="p-thumb thumb-more">
                   <img src="assets/tree.jpg" alt="Environment" />
                   <span class="more-overlay">+3</span>
@@ -598,7 +624,8 @@
             <div class="attention-icon-badge">🚨</div>
             <div>
               <h3 class="attention-title">Trees Needing Attention in Catbalogan — <span id="attTotalCount">0</span></h3>
-              <p style="font-size: 12px; color: var(--text-muted);">Urgent field checks, pest treatment, and overdue monitoring in Samar</p>
+              <p style="font-size: 12px; color: var(--text-muted);">Urgent field checks, pest treatment, and overdue
+                monitoring in Samar</p>
             </div>
           </div>
 
@@ -626,8 +653,8 @@
       <div class="modal-hdr">
         <div class="m-title-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-            <circle cx="12" cy="13" r="4"/>
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+            <circle cx="12" cy="13" r="4" />
           </svg>
           <h3 class="modal-ttl" id="monModalTitle">Record Monitoring — TR-10021</h3>
         </div>
@@ -670,7 +697,8 @@
 
         <div class="m-form-group">
           <label for="monRemarks" class="m-label">Field Remarks & Observations *</label>
-          <textarea id="monRemarks" class="m-textarea" rows="3" placeholder="Foliage condition, soil moisture, pest presence, stakes in Samar zone..." required></textarea>
+          <textarea id="monRemarks" class="m-textarea" rows="3"
+            placeholder="Foliage condition, soil moisture, pest presence, stakes in Samar zone..." required></textarea>
         </div>
 
         <div class="modal-footer-actions">
@@ -687,7 +715,8 @@
       <div class="modal-hdr">
         <div class="m-title-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            <path
+              d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
           </svg>
           <h3 class="modal-ttl" id="maintModalTitle">Log Maintenance — TR-10021</h3>
         </div>
@@ -720,7 +749,8 @@
 
         <div class="m-form-group">
           <label for="maintNotes" class="m-label">Work Notes</label>
-          <textarea id="maintNotes" class="m-textarea" rows="3" placeholder="Describe actions taken in Catbalogan sector..."></textarea>
+          <textarea id="maintNotes" class="m-textarea" rows="3"
+            placeholder="Describe actions taken in Catbalogan sector..."></textarea>
         </div>
 
         <div class="modal-footer-actions">
@@ -751,4 +781,5 @@
   <!-- PWA Service Worker Registration & Project Updates -->
   <script src="pwa-register.js" defer></script>
 </body>
+
 </html>

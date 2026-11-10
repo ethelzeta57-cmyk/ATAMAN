@@ -14,7 +14,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   'use strict';
 
   // Ensure one-time cache reset runs on every dashboard (even pages that don't load ATAMAN-init.js)
-  const INIT_VERSION = 'ATAMAN_init_v4_admin_only';
+  const INIT_VERSION = 'ATAMAN_init_v5_preserve_trees';
   if (!localStorage.getItem(INIT_VERSION)) {
     const adminOnly = JSON.stringify([{
       uid: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
@@ -29,7 +29,17 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       password: 'Password123!',
       createdAt: '2026-08-26T00:00:00.000Z'
     }]);
-    localStorage.setItem('ATAMAN_trees_cache', '[]');
+
+    const existingTrees = (() => {
+      try {
+        const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
+        return Array.isArray(raw) && raw.length > 0 ? raw : null;
+      } catch (_) { return null; }
+    })();
+    if (!existingTrees && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
+      localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(window.ATAMAN_DEFAULT_TREES));
+    }
+
     localStorage.setItem('ATAMAN_adopters_cache', '[]');
     localStorage.setItem('ATAMAN_caretakers_cache', '[]');
     localStorage.setItem('ATAMAN_users_cache', adminOnly);
@@ -115,7 +125,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   if (isFirestoreReady && firestoreDb && !localStorage.getItem(FIRESTORE_CLEAN_FLAG)) {
     firestoreCleanPromise = (async () => {
       try {
-        const cols = ['trees', 'adopters', 'caretakers', 'monitoring_logs'];
+        const cols = ['adopters', 'caretakers', 'monitoring_logs'];
         for (const colName of cols) {
           const snap = await firestoreDb.collection(colName).get();
           if (!snap.empty) {
@@ -138,7 +148,6 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
           await userBatch.commit();
         }
         localStorage.setItem(FIRESTORE_CLEAN_FLAG, 'done');
-        localStorage.setItem('ATAMAN_trees_cache', '[]');
         localStorage.setItem('ATAMAN_adopters_cache', '[]');
         localStorage.setItem('ATAMAN_caretakers_cache', '[]');
       } catch (cleanErr) {
@@ -931,7 +940,12 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     getLocalTrees() {
       try {
         const stored = localStorage.getItem('ATAMAN_trees_cache');
-        return stored ? JSON.parse(stored) : null;
+        const parsed = stored ? JSON.parse(stored) : null;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0) {
+          return window.ATAMAN_DEFAULT_TREES;
+        }
+        return null;
       } catch (e) {
         return null;
       }
@@ -1028,8 +1042,23 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
               snapshot.forEach(doc => {
                 trees.push({ id: doc.id, ...doc.data() });
               });
-              this.setLocalTrees(trees);
-              callback(trees, 'firestore');
+              if (trees.length > 0) {
+                this.setLocalTrees(trees);
+                callback(trees, 'firestore');
+              } else {
+                const local = this.getLocalTrees();
+                const fallback = (Array.isArray(local) && local.length > 0)
+                  ? local
+                  : (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) ? window.ATAMAN_DEFAULT_TREES : []);
+                if (fallback.length > 0) {
+                  this.seedInitialTrees(fallback);
+                  this.setLocalTrees(fallback);
+                  callback(fallback, 'local-fallback');
+                } else {
+                  this.setLocalTrees([]);
+                  callback([], 'firestore');
+                }
+              }
             }, error => {
               console.warn('Firestore onSnapshot error:', error);
               callback(this.getLocalTrees() || [], 'local');
@@ -1135,9 +1164,26 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       return { success: true, source: 'local' };
     },
 
-    // Seeding disabled — clean slate for user data
+    // Seed initial registered trees if collection is currently empty
     async seedInitialTrees(treesArray) {
-      return;
+      if (!this.isFirestore || !Array.isArray(treesArray) || treesArray.length === 0) return;
+      try {
+        await firestoreCleanPromise;
+        const snap = await firestoreDb.collection('trees').limit(1).get();
+        if (snap.empty) {
+          const batch = firestoreDb.batch();
+          treesArray.forEach(t => {
+            if (t && t.id) {
+              const docRef = firestoreDb.collection('trees').doc(t.id);
+              batch.set(docRef, t);
+            }
+          });
+          await batch.commit();
+          console.log(`[ATAMAN DB] Seeded ${treesArray.length} registered trees to Firestore.`);
+        }
+      } catch (err) {
+        console.warn('[ATAMAN DB] Error seeding trees to Firestore:', err);
+      }
     },
 
     /* ── ADOPTERS CRUD & REAL-TIME ── */
