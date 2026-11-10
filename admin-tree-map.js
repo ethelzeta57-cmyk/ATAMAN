@@ -100,14 +100,17 @@ function getAdopterInfoForTree(tree) {
     }
   } catch (e) {}
 
-  let loc = '';
-  loc = adopterRecord?.location || adopterRecord?.area || adopterRecord?.barangay || '';
-  const cleanBrgy = loc ? loc.replace(/^Brgy\.\s*/i, '').trim() : '';
-  const targetCoords = cleanBrgy ? SAMAR_BARANGAY_COORDS[cleanBrgy] : null;
+  const matchedTreeEntry = Array.isArray(adopterRecord?.treesList)
+    ? adopterRecord.treesList.find(t => String(t.id) === String(tree.id))
+    : null;
+  let loc = matchedTreeEntry?.location || adopterRecord?.location || adopterRecord?.area || adopterRecord?.barangay || adopterRecord?.address || tree.barangay || '';
+  const firstSegment = loc ? loc.split(',')[0].trim() : '';
+  const cleanBrgy = firstSegment ? firstSegment.replace(/^Brgy\.?\s*/i, '').trim() : '';
+  const targetCoords = (cleanBrgy && SAMAR_BARANGAY_COORDS[cleanBrgy]) || (firstSegment && SAMAR_BARANGAY_COORDS[firstSegment]) || null;
 
   return {
     name: adopterRecord?.name || adopterName || 'Active Adopter',
-    location: loc ? (loc.startsWith('Brgy.') ? loc : `Brgy. ${loc}`) : '—',
+    location: firstSegment ? (firstSegment.toLowerCase().startsWith('brgy') ? firstSegment : `Brgy. ${firstSegment}`) : '—',
     barangay: cleanBrgy,
     targetCoords: targetCoords
   };
@@ -438,10 +441,10 @@ function openTreeDetails(treeId) {
 
   // Adopter and location match detection
   const adopterInfo = getAdopterInfoForTree(tree);
-  const isLocationMismatch = Boolean(adopterInfo && lat !== null && lng !== null && (
+  const isLocationMismatch = Boolean(adopterInfo && adopterInfo.targetCoords && lat !== null && lng !== null && (
     Math.abs(lat - adopterInfo.targetCoords.lat) > 0.0035 ||
     Math.abs(lng - adopterInfo.targetCoords.lng) > 0.0035 ||
-    (tree.barangay && !tree.barangay.toLowerCase().includes(adopterInfo.barangay.toLowerCase()))
+    (tree.barangay && adopterInfo.barangay && !tree.barangay.toLowerCase().includes(adopterInfo.barangay.toLowerCase()))
   ));
 
   body.innerHTML = `
