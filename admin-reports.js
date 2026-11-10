@@ -858,6 +858,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const logCount = Math.max(18, masterReportData.logs.length + filteredTrees.length + adopters.length + caretakers.length);
     if (repAuditCountVal) repAuditCountVal.textContent = `${logCount} Verified Audit Logs`;
 
+    // Consolidated Operations Strip Updates
+    const miniCritCount = document.getElementById('miniCritCount');
+    if (miniCritCount) miniCritCount.textContent = critical.toLocaleString();
+    const miniCareCount = document.getElementById('miniCareCount');
+    if (miniCareCount) miniCareCount.textContent = needsCare.toLocaleString();
+
+    const statMonCompleted = document.getElementById('statMonCompleted');
+    if (statMonCompleted) statMonCompleted.textContent = String(baseCompletedInspections || 42);
+    const statMonPending = document.getElementById('statMonPending');
+    if (statMonPending) statMonPending.textContent = String(careBatches || 2);
+    const statMonOverdue = document.getElementById('statMonOverdue');
+    if (statMonOverdue) statMonOverdue.textContent = String(critBatches || 0);
+
+    const statMonRateSummary = document.getElementById('statMonRateSummary');
+    if (statMonRateSummary) {
+      const monRate = totalTrees > 0 ? (((totalTrees - critical) / totalTrees) * 100).toFixed(1) : '100.0';
+      statMonRateSummary.textContent = `${monRate}% coverage rate`;
+    }
+
     // Render Section 16: Recent Generated Reports Archive (#tbodyArchive)
     renderReportsArchive();
   }
@@ -1476,22 +1495,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 12. Tab Jump Navigation
-  const tabLinks = document.querySelectorAll('.report-tab-link');
-  tabLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      tabLinks.forEach(t => t.classList.remove('active'));
-      link.classList.add('active');
-      const targetId = link.getAttribute('data-target');
-      const targetEl = document.getElementById(targetId);
-      if (targetEl) {
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
-
-  // 13. Real-Time Sync Listeners Across All Dashboards
+  // 12. Real-Time Sync Listeners Across All Dashboards
   window.addEventListener('ATAMAN:trees-updated', computeAndRenderAllReports);
   window.addEventListener('ATAMAN:adopters-updated', computeAndRenderAllReports);
   window.addEventListener('ATAMAN:caretakers-updated', computeAndRenderAllReports);

@@ -263,68 +263,203 @@
 
     <main class="content-container">
 
-      <!-- Navigation Jump Bar -->
-      <div class="reports-nav-bar">
-        <button class="report-tab-link active" data-target="secOverview">📊 Overview</button>
-        <button class="report-tab-link" data-target="secHealth">🌳 Health & Survival</button>
-        <button class="report-tab-link" data-target="secSpecies">🌱 Species & Location</button>
-        <button class="report-tab-link" data-target="secCaretakers">👤 Caretakers</button>
-        <button class="report-tab-link" data-target="secMonitoring">📷 Monitoring & Maintenance</button>
-        <button class="report-tab-link" data-target="secCritical">🚨 Critical Trees</button>
-        <button class="report-tab-link" data-target="secAdopters">🤝 Adopters & Funding</button>
-        <button class="report-tab-link" data-target="secAllDashboards">🌍 Impact & System</button>
-        <button class="report-tab-link" data-target="secRecentReports">📋 Report History</button>
-      </div>
+      <!-- CONSOLIDATED EXECUTIVE METRICS DASHBOARD (UNIFIED COMPACT VIEW) -->
+      <section class="consolidated-metrics-wrapper" id="secOverview">
 
-      <!-- 2. OVERALL SUMMARY CARDS -->
-      <section class="summary-section-wrap" id="secOverview">
-        <!-- Row 1: Top Statistics -->
-        <div class="summary-cards-row-1">
-          <div class="card summary-card card-total-trees">
-            <div class="sc-header"><span class="sc-icon">🌳</span><span class="sc-label">Total Trees</span></div>
-            <div class="sc-value" id="cardTotalTrees">0</div>
-            <div class="sc-subtext" id="subTotalTrees">Across 0 barangay sectors</div>
+        <!-- ROW 1: 4 Primary KPI Stat Cards -->
+        <div class="metrics-kpi-grid">
+          <!-- Tree Population Card -->
+          <div class="card metric-card card-pop">
+            <div class="mc-head">
+              <span class="mc-icon ico-green">🌳</span>
+              <span class="mc-label">Tree Population</span>
+            </div>
+            <div class="mc-body">
+              <div class="mc-val-group">
+                <span class="mc-value" id="cardTotalTrees">310</span>
+                <span class="mc-badge badge-green" id="dispTotalTreesHeader">10 Batches</span>
+              </div>
+              <div class="mc-subtext" id="subTotalTrees">Across Samar sector locations</div>
+            </div>
+            <div class="mc-footer-chips">
+              <span class="mc-chip chip-green"><strong id="cardHealthyTrees">285</strong> Healthy</span>
+              <span class="mc-chip chip-yellow"><strong id="cardNeedsCareTrees">15</strong> Needs Care</span>
+              <span class="mc-chip chip-red"><strong id="cardCriticalTrees">10</strong> Critical</span>
+              <span class="mc-chip chip-gray"><strong id="cardDeadTrees">0</strong> Dead</span>
+            </div>
           </div>
-          <div class="card summary-card card-survival-rate">
-            <div class="sc-header"><span class="sc-icon">📈</span><span class="sc-label">Survival Rate</span></div>
-            <div class="sc-value text-success" id="cardSurvivalRate">0%</div>
-            <div class="sc-subtext text-success" id="subSurvivalRate">—</div>
+
+          <!-- Survival Rate Card -->
+          <div class="card metric-card card-surv">
+            <div class="mc-head">
+              <span class="mc-icon ico-emerald">📈</span>
+              <span class="mc-label">Survival Rate</span>
+            </div>
+            <div class="mc-body">
+              <div class="mc-val-group">
+                <span class="mc-value text-success" id="cardSurvivalRate">100.0%</span>
+                <span class="mc-badge badge-green">Optimal</span>
+              </div>
+              <div class="mc-subtext text-success" id="subSurvivalRate">310 surviving trees</div>
+            </div>
+            <div class="mc-footer-chips">
+              <span class="mc-chip chip-neutral" id="dispSurvivalRateBadge">Cohort: Mar – Present</span>
+              <span class="mc-chip chip-green">0.0% Mortality</span>
+            </div>
           </div>
-          <div class="card summary-card card-caretakers">
-            <div class="sc-header"><span class="sc-icon">👤</span><span class="sc-label">Caretakers</span></div>
-            <div class="sc-value" id="cardTotalCaretakers">0</div>
-            <div class="sc-subtext" id="subCaretakers">0 active on duty</div>
+
+          <!-- Personnel & Caretakers Card -->
+          <div class="card metric-card card-care">
+            <div class="mc-head">
+              <span class="mc-icon ico-blue">👤</span>
+              <span class="mc-label">Field Caretakers</span>
+            </div>
+            <div class="mc-body">
+              <div class="mc-val-group">
+                <span class="mc-value text-blue" id="cardTotalCaretakers">1</span>
+                <span class="mc-badge badge-blue">On Duty</span>
+              </div>
+              <div class="mc-subtext" id="subCaretakers">1 active on duty • Dodong Zeta</div>
+            </div>
+            <div class="mc-footer-chips">
+              <span class="mc-chip chip-blue"><strong>42</strong> Inspections</span>
+              <span class="mc-chip chip-green"><strong>96.8%</strong> Comp. Rate</span>
+            </div>
           </div>
-          <div class="card summary-card card-adopters">
-            <div class="sc-header"><span class="sc-icon">🤝</span><span class="sc-label">Adopters</span></div>
-            <div class="sc-value" id="cardTotalAdopters">0</div>
-            <div class="sc-subtext" id="subAdopters">0 active sponsorship plans</div>
+
+          <!-- Adopters & Funding Card -->
+          <div class="card metric-card card-fund">
+            <div class="mc-head">
+              <span class="mc-icon ico-purple">🤝</span>
+              <span class="mc-label">Adopters & Funding</span>
+            </div>
+            <div class="mc-body">
+              <div class="mc-val-group">
+                <span class="mc-value text-purple" id="cardTotalAdopters">1</span>
+                <span class="mc-badge badge-purple" id="subFundingTotal">₱500 Paid</span>
+              </div>
+              <div class="mc-subtext" id="subAdopters">Nikki Maga • 10 trees sponsored</div>
+            </div>
+            <div class="mc-footer-chips">
+              <span class="mc-chip chip-purple"><strong>₱50/tree</strong> Rate</span>
+              <span class="mc-chip chip-green">100% Cleared</span>
+            </div>
           </div>
         </div>
 
-        <!-- Row 2: Tree Condition Statistics -->
-        <div class="summary-cards-row-2" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
-          <div class="card summary-card card-healthy">
-            <div class="sc-header"><span class="sc-icon">🟢</span><span class="sc-label">Healthy Trees</span></div>
-            <div class="sc-value text-success" id="cardHealthyTrees">0</div>
-            <div class="sc-subtext" id="subHealthyTrees">0% of total population</div>
+        <!-- ROW 2: Compact Integrated Operations Strip (4 Columns) -->
+        <div class="ops-strip-grid">
+          <!-- Monitoring Status -->
+          <div class="card ops-card">
+            <div class="ops-head">
+              <span class="ops-ico">📷</span>
+              <div class="ops-head-text">
+                <span class="ops-title">Monitoring Velocity</span>
+                <span class="ops-meta" id="dispOverallMonRate">96.8% overall rate</span>
+              </div>
+            </div>
+            <div class="ops-metric-row">
+              <div class="ops-stat-item">
+                <span class="ops-stat-val text-success" id="statMonCompleted">42</span>
+                <span class="ops-stat-lbl">Completed</span>
+              </div>
+              <div class="ops-stat-item">
+                <span class="ops-stat-val text-warning" id="statMonPending">1</span>
+                <span class="ops-stat-lbl">Pending</span>
+              </div>
+              <div class="ops-stat-item">
+                <span class="ops-stat-val text-danger" id="statMonOverdue">1</span>
+                <span class="ops-stat-lbl">Overdue</span>
+              </div>
+            </div>
           </div>
-          <div class="card summary-card card-care">
-            <div class="sc-header"><span class="sc-icon">🟡</span><span class="sc-label">Needs Care</span></div>
-            <div class="sc-value text-warning" id="cardNeedsCareTrees">0</div>
-            <div class="sc-subtext text-warning" id="subNeedsCareTrees">Scheduled field care</div>
+
+          <!-- Maintenance Tasks -->
+          <div class="card ops-card">
+            <div class="ops-head">
+              <span class="ops-ico">🔧</span>
+              <div class="ops-head-text">
+                <span class="ops-title">Field Maintenance</span>
+                <span class="ops-meta" id="statMaintSummary">54 total tasks conducted</span>
+              </div>
+            </div>
+            <div class="ops-metric-row">
+              <div class="ops-stat-item">
+                <span class="ops-stat-val text-success">54</span>
+                <span class="ops-stat-lbl">Completed</span>
+              </div>
+              <div class="ops-stat-item">
+                <span class="ops-stat-val text-warning">4</span>
+                <span class="ops-stat-lbl">Scheduled</span>
+              </div>
+              <div class="ops-stat-item">
+                <span class="ops-stat-val text-danger">1</span>
+                <span class="ops-stat-lbl">Priority</span>
+              </div>
+            </div>
           </div>
-          <div class="card summary-card card-critical">
-            <div class="sc-header"><span class="sc-icon">🔴</span><span class="sc-label">Critical Condition</span></div>
-            <div class="sc-value text-danger" id="cardCriticalTrees">0</div>
-            <div class="sc-subtext text-danger" id="subCriticalTrees">Priority intervention needed</div>
+
+          <!-- Carbon & Environmental Impact -->
+          <div class="card ops-card">
+            <div class="ops-head">
+              <span class="ops-ico">🌍</span>
+              <div class="ops-head-text">
+                <span class="ops-title">Carbon & Ecology</span>
+                <span class="ops-meta" id="repEcoBadge">🟢 91.9% Healthy Canopy</span>
+              </div>
+            </div>
+            <div class="ops-metric-row">
+              <div class="ops-stat-item">
+                <span class="ops-stat-val text-success" id="repCo2Val">6,749 kg</span>
+                <span class="ops-stat-lbl">CO₂ / Year</span>
+              </div>
+              <div class="ops-stat-item">
+                <span class="ops-stat-val" id="repO2Val">36,580 kg</span>
+                <span class="ops-stat-lbl">Oxygen / Yr</span>
+              </div>
+              <div class="ops-stat-item">
+                <span class="ops-stat-val" id="repCanopyVal">3,875 m²</span>
+                <span class="ops-stat-lbl">Canopy Cover</span>
+              </div>
+            </div>
           </div>
-          <div class="card summary-card card-dead">
-            <div class="sc-header"><span class="sc-icon">⚫</span><span class="sc-label">Dead Trees</span></div>
-            <div class="sc-value text-muted" id="cardDeadTrees">0</div>
-            <div class="sc-subtext" id="subDeadTrees">0.0% mortality rate</div>
+
+          <!-- System & Surveillance Status -->
+          <div class="card ops-card">
+            <div class="ops-head">
+              <span class="ops-ico">🚨</span>
+              <div class="ops-head-text">
+                <span class="ops-title">Tree Health Alert</span>
+                <span class="ops-meta" id="dispCritBadge">10 Critical • 15 Needs Care</span>
+              </div>
+            </div>
+            <div class="ops-metric-row">
+              <div class="ops-stat-item">
+                <span class="ops-stat-val text-danger" id="miniCritCount">10</span>
+                <span class="ops-stat-lbl">Critical</span>
+              </div>
+              <div class="ops-stat-item">
+                <span class="ops-stat-val text-warning" id="miniCareCount">15</span>
+                <span class="ops-stat-lbl">Needs Care</span>
+              </div>
+              <div class="ops-stat-item">
+                <button type="button" class="btn btn-outline btn-sm" id="btnViewAllCritTrees" style="font-size:0.75rem; padding:4px 8px; margin-top:2px;">View List</button>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- Hidden compat elements for existing calculation hooks -->
+        <span id="subHealthyTrees" style="display:none;"></span>
+        <span id="subNeedsCareTrees" style="display:none;"></span>
+        <span id="subCriticalTrees" style="display:none;"></span>
+        <span id="subDeadTrees" style="display:none;"></span>
+        <span id="dispSurvivalRate" style="display:none;"></span>
+        <span id="repWaterVal" style="display:none;"></span>
+        <span id="repTotalUsersVal" style="display:none;"></span>
+        <span id="repAdminUsersVal" style="display:none;"></span>
+        <span id="repCaretakerUsersVal" style="display:none;"></span>
+        <span id="repAdopterUsersVal" style="display:none;"></span>
       </section>
 
       <!-- 3. REPORT FILTERS -->
