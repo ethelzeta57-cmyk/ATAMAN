@@ -630,11 +630,23 @@
         const style = document.createElement('style');
         style.id = 'atamanUniversalMobileStyles';
         style.textContent = `
-          /* Prevent horizontal scroll across all mobile & tablet devices */
+          /* Prevent horizontal scroll across all devices while keeping sticky/full-height sidebars intact */
           html, body {
             max-width: 100vw !important;
-            overflow-x: hidden !important;
+            overflow-x: clip !important;
+            min-height: 100vh !important;
             -webkit-text-size-adjust: 100%;
+          }
+
+          /* Ensure Sidebar Always Extends Full Height to the Very Bottom Across All Dashboards */
+          #sidebar,
+          aside.sidebar,
+          aside.ad-sidebar,
+          aside.ct-sidebar {
+            min-height: 100vh !important;
+            height: auto !important;
+            align-self: stretch !important;
+            box-shadow: 0 5000px 0 0 var(--sidebar-bg, var(--sb-bg, #0b331b));
           }
 
           /* Universal Hamburger Toggle Button */
