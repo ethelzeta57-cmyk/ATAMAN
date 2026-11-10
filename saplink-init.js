@@ -229,11 +229,82 @@
     }
   ];
 
-  const INIT_VERSION = 'ATAMAN_init_v5_preserve_trees';
+  const DEFAULT_ADOPTERS = (typeof window !== 'undefined' && window.ATAMAN_DEFAULT_ADOPTERS) || [
+    {
+      id: 'ADP-101',
+      name: 'John Sho',
+      fullName: 'John Sho',
+      contactPerson: 'John Sho',
+      type: 'Individual',
+      email: 'john.sho@gmail.com',
+      phone: '+63 917 123 4567',
+      address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
+      status: 'Active',
+      treesCount: 35,
+      funding: 1750,
+      fundingPaid: 1750,
+      customFunding: true,
+      joinedDate: '2026-08-28',
+      startDate: '2026-08-28',
+      expDate: 'Ongoing',
+      treesList: [
+        { id: 'TR-10001', treeCount: 10, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 },
+        { id: 'TR-10021', treeCount: 25, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 }
+      ]
+    },
+    {
+      id: 'ADP-102',
+      name: 'Century Catbalogan',
+      fullName: 'Century Catbalogan',
+      contactPerson: 'Maria Santos',
+      type: 'Corporate',
+      email: 'contact@centurycatbalogan.com',
+      phone: '+63 920 987 6543',
+      address: 'Del Rosario St., Catbalogan City, Samar',
+      status: 'Active',
+      treesCount: 17,
+      funding: 850,
+      fundingPaid: 850,
+      customFunding: true,
+      joinedDate: '2026-09-06',
+      startDate: '2026-09-06',
+      expDate: 'Ongoing',
+      treesList: [
+        { id: 'TR-10002', treeCount: 10, species: 'Molave', location: 'Brgy. Canlapwas, Catbalogan City', fundingAmount: 50 },
+        { id: 'TR-10005', treeCount: 5, species: 'Tanguile', location: 'Brgy. Mercedes, Catbalogan City', fundingAmount: 50 },
+        { id: 'TR-10007', treeCount: 2, species: 'Narra', location: 'Brgy. Silanga, Catbalogan City', fundingAmount: 50 }
+      ]
+    }
+  ];
 
-  // Only wipe non-tree caches once; preserve registered trees permanently
-  if (!localStorage.getItem(INIT_VERSION)) {
-    const adminOnly = JSON.stringify([{
+  const DEFAULT_CARETAKERS = (typeof window !== 'undefined' && window.ATAMAN_DEFAULT_CARETAKERS) || [
+    {
+      id: 'CT-101',
+      empId: 'EMP-002',
+      name: 'Pedro Reyes',
+      fullName: 'Pedro Reyes',
+      email: 'pedro.reyes@ataman.org',
+      phone: '+63 918 333 4455',
+      address: 'Brgy. Canlapwas, Catbalogan City, Samar',
+      role: 'Field Caretaker',
+      status: 'Active',
+      treesAssigned: 10,
+      assignedTreeCount: 310,
+      location: 'Catbalogan City & Jiabong, Samar',
+      municipality: 'Catbalogan City',
+      barangay: 'Canlapwas',
+      assignedTrees: ['TR-10001', 'TR-10002', 'TR-10003', 'TR-10004', 'TR-10005', 'TR-10006', 'TR-10007', 'TR-10021', 'TR-10035', 'TR-10047'],
+      assignedAdopterName: 'John Sho, Century Catbalogan',
+      joinedDate: '2026-08-01',
+      createdAt: '2026-08-01T08:00:00.000Z',
+      performanceRating: '98%',
+      inspectionsLogged: 42,
+      survivalRate: '96.8%'
+    }
+  ];
+
+  const DEFAULT_USERS = (typeof window !== 'undefined' && window.ATAMAN_DEFAULT_USERS) || [
+    {
       uid: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
       id: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
       email: 'ethelzeta57@gmail.com',
@@ -245,8 +316,59 @@
       status: 'Active',
       password: 'Password123!',
       createdAt: '2026-08-26T00:00:00.000Z'
-    }]);
+    },
+    {
+      uid: 'USR-CT-001',
+      id: 'CT-101',
+      email: 'pedro.reyes@ataman.org',
+      displayName: 'Pedro Reyes',
+      name: 'Pedro Reyes',
+      username: 'pedroreyes',
+      empId: 'EMP-002',
+      role: 'caretaker',
+      status: 'Active',
+      phone: '+63 918 333 4455',
+      address: 'Brgy. Canlapwas, Catbalogan City, Samar',
+      password: 'Password123!',
+      createdAt: '2026-08-01T08:00:00.000Z'
+    },
+    {
+      uid: 'USR-ADP-001',
+      id: 'ADP-101',
+      email: 'john.sho@gmail.com',
+      displayName: 'John Sho',
+      name: 'John Sho',
+      username: 'johnsho',
+      empId: 'ADP-101',
+      role: 'adopter',
+      status: 'Active',
+      phone: '+63 917 123 4567',
+      address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
+      password: 'Password123!',
+      createdAt: '2026-08-28T08:00:00.000Z'
+    },
+    {
+      uid: 'USR-ADP-002',
+      id: 'ADP-102',
+      email: 'contact@centurycatbalogan.com',
+      displayName: 'Century Catbalogan (Maria Santos)',
+      name: 'Century Catbalogan',
+      contactPerson: 'Maria Santos',
+      username: 'centurycatbalogan',
+      empId: 'ADP-102',
+      role: 'adopter',
+      status: 'Active',
+      phone: '+63 920 987 6543',
+      address: 'Del Rosario St., Catbalogan City, Samar',
+      password: 'Password123!',
+      createdAt: '2026-09-06T08:00:00.000Z'
+    }
+  ];
 
+  const INIT_VERSION = 'ATAMAN_init_v6_preserve_all_data';
+
+  // Seed default registered data if caches are missing or empty
+  if (!localStorage.getItem(INIT_VERSION)) {
     const existingTrees = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
@@ -257,23 +379,42 @@
       localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES));
     }
 
-    localStorage.setItem('ATAMAN_adopters_cache', '[]');
-    localStorage.setItem('ATAMAN_caretakers_cache', '[]');
-    localStorage.setItem('ATAMAN_users_cache', adminOnly);
-    localStorage.setItem('saplink_users_cache', adminOnly);
-    localStorage.setItem('ATAMAN_registered_users', adminOnly);
-    localStorage.setItem('saplink_registered_users', adminOnly);
-    localStorage.setItem('saplink_adopters_cache', '[]');
-    localStorage.setItem('saplink_caretakers_cache', '[]');
-    localStorage.setItem('ATAMAN_content_cache', '[]');
-    localStorage.setItem('ATAMAN_notifications', '[]');
-    localStorage.setItem('ATAMAN_caretaker_notifications', '[]');
-    localStorage.setItem('ATAMAN_system_logs', '[]');
-    localStorage.setItem('ATAMAN_unread_notif_count', '0');
+    const existingAdopters = (() => {
+      try {
+        const raw = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+        return Array.isArray(raw) && raw.length > 0 ? raw : null;
+      } catch (_) { return null; }
+    })();
+    if (!existingAdopters) {
+      localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
+    }
+
+    const existingCaretakers = (() => {
+      try {
+        const raw = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+        return Array.isArray(raw) && raw.length > 0 ? raw : null;
+      } catch (_) { return null; }
+    })();
+    if (!existingCaretakers) {
+      localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
+    }
+
+    const existingUsers = (() => {
+      try {
+        const raw = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
+        return Array.isArray(raw) && raw.length > 1 ? raw : null;
+      } catch (_) { return null; }
+    })();
+    const usersJson = JSON.stringify(existingUsers || DEFAULT_USERS);
+    localStorage.setItem('ATAMAN_users_cache', usersJson);
+    localStorage.setItem('saplink_users_cache', usersJson);
+    localStorage.setItem('ATAMAN_registered_users', usersJson);
+    localStorage.setItem('saplink_registered_users', usersJson);
+
     localStorage.setItem(INIT_VERSION, 'done');
   }
 
-  // Ensure trees are never missing or blanked
+  // Ensure registered datasets are never missing or blanked
   try {
     const trees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
     if (!Array.isArray(trees) || trees.length === 0) {
@@ -281,6 +422,41 @@
     }
   } catch (_) {
     try { localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES)); } catch (_) {}
+  }
+
+  try {
+    const adopters = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+    if (!Array.isArray(adopters) || adopters.length === 0) {
+      localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
+    }
+  } catch (_) {
+    try { localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS)); } catch (_) {}
+  }
+
+  try {
+    const caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+    if (!Array.isArray(caretakers) || caretakers.length === 0) {
+      localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
+    }
+  } catch (_) {
+    try { localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS)); } catch (_) {}
+  }
+
+  try {
+    const users = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
+    if (!Array.isArray(users) || users.length <= 1) {
+      const uJson = JSON.stringify(DEFAULT_USERS);
+      localStorage.setItem('ATAMAN_users_cache', uJson);
+      localStorage.setItem('saplink_users_cache', uJson);
+      localStorage.setItem('ATAMAN_registered_users', uJson);
+      localStorage.setItem('saplink_registered_users', uJson);
+    }
+  } catch (_) {
+    try {
+      const uJson = JSON.stringify(DEFAULT_USERS);
+      localStorage.setItem('ATAMAN_registered_users', uJson);
+      localStorage.setItem('ATAMAN_users_cache', uJson);
+    } catch (_) {}
   }
 
   // Admin Route Protection Guard for all Admin Portal pages

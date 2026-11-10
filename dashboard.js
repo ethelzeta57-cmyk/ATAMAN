@@ -126,56 +126,63 @@ function loadDashboardData() {
   // 2. Load Adopters (and deduplicate any split registration/adoption records for the same account)
   try {
     const cachedAdopters = localStorage.getItem('ATAMAN_adopters_cache');
+    let parsed = null;
     if (cachedAdopters) {
-      const parsed = JSON.parse(cachedAdopters);
-      if (Array.isArray(parsed)) {
-        let adsChanged = false;
-        parsed.forEach(a => {
-          if (!a) return;
-          const cnt = Number(a.treesCount ?? (Array.isArray(a.treesList) ? a.treesList.length : (a.treesAdopted || 0))) || 0;
-          if (cnt > 0 && Number(a.funding || a.fundingPaid) > 0 && a.customFunding === undefined) {
-            a.customFunding = true;
-          }
-          if (!a.customFunding && (a.funding || a.fundingPaid)) {
-            a.funding = 0;
-            a.fundingPaid = 0;
+      try { parsed = JSON.parse(cachedAdopters); } catch (_) {}
+    }
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      if (typeof window.ATAMAN_DEFAULT_ADOPTERS !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS)) {
+        parsed = [...window.ATAMAN_DEFAULT_ADOPTERS];
+        try { localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(parsed)); } catch (_) {}
+      }
+    }
+    if (Array.isArray(parsed)) {
+      let adsChanged = false;
+      parsed.forEach(a => {
+        if (!a) return;
+        const cnt = Number(a.treesCount ?? (Array.isArray(a.treesList) ? a.treesList.length : (a.treesAdopted || 0))) || 0;
+        if (cnt > 0 && Number(a.funding || a.fundingPaid) > 0 && a.customFunding === undefined) {
+          a.customFunding = true;
+        }
+        if (!a.customFunding && (a.funding || a.fundingPaid)) {
+          a.funding = 0;
+          a.fundingPaid = 0;
+          adsChanged = true;
+        }
+      });
+      for (let i = 0; i < parsed.length; i++) {
+        const a = parsed[i];
+        if (!a) continue;
+        for (let j = i + 1; j < parsed.length; j++) {
+          const b = parsed[j];
+          if (!b) continue;
+          const emailA = (a.email || '').toLowerCase().trim();
+          const emailB = (b.email || '').toLowerCase().trim();
+          const nameA = (a.name || '').toLowerCase().trim();
+          const nameB = (b.name || '').toLowerCase().trim();
+          const contactA = (a.contactPerson || a.contact || '').toLowerCase().trim();
+          const contactB = (b.contactPerson || b.contact || '').toLowerCase().trim();
+          if ((emailA && emailB && emailA === emailB) ||
+              (nameA && contactB && nameA === contactB) ||
+              (nameB && contactA && nameB === contactA) ||
+              (nameA && nameB && nameA === nameB)) {
+            const scoreA = (Number(a.treesCount) || 0) * 100 + (Array.isArray(a.treesList) ? a.treesList.length * 10 : 0);
+            const scoreB = (Number(b.treesCount) || 0) * 100 + (Array.isArray(b.treesList) ? b.treesList.length * 10 : 0);
+            const primary = scoreB > scoreA ? b : a;
+            const secondary = scoreB > scoreA ? a : b;
+            if (!primary.email && secondary.email) primary.email = secondary.email;
+            if ((!primary.contactPerson || primary.contactPerson === primary.email) && secondary.name) primary.contactPerson = secondary.name;
+            parsed[i] = primary;
+            parsed.splice(j, 1);
+            j--;
             adsChanged = true;
           }
-        });
-        for (let i = 0; i < parsed.length; i++) {
-          const a = parsed[i];
-          if (!a) continue;
-          for (let j = i + 1; j < parsed.length; j++) {
-            const b = parsed[j];
-            if (!b) continue;
-            const emailA = (a.email || '').toLowerCase().trim();
-            const emailB = (b.email || '').toLowerCase().trim();
-            const nameA = (a.name || '').toLowerCase().trim();
-            const nameB = (b.name || '').toLowerCase().trim();
-            const contactA = (a.contactPerson || a.contact || '').toLowerCase().trim();
-            const contactB = (b.contactPerson || b.contact || '').toLowerCase().trim();
-            if ((emailA && emailB && emailA === emailB) ||
-                (nameA && contactB && nameA === contactB) ||
-                (nameB && contactA && nameB === contactA) ||
-                (nameA && nameB && nameA === nameB)) {
-              const scoreA = (Number(a.treesCount) || 0) * 100 + (Array.isArray(a.treesList) ? a.treesList.length * 10 : 0);
-              const scoreB = (Number(b.treesCount) || 0) * 100 + (Array.isArray(b.treesList) ? b.treesList.length * 10 : 0);
-              const primary = scoreB > scoreA ? b : a;
-              const secondary = scoreB > scoreA ? a : b;
-              if (!primary.email && secondary.email) primary.email = secondary.email;
-              if ((!primary.contactPerson || primary.contactPerson === primary.email) && secondary.name) primary.contactPerson = secondary.name;
-              parsed[i] = primary;
-              parsed.splice(j, 1);
-              j--;
-              adsChanged = true;
-            }
-          }
         }
-        if (adsChanged) {
-          localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(parsed));
-        }
-        currentAdopters = parsed;
       }
+      if (adsChanged) {
+        localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(parsed));
+      }
+      currentAdopters = parsed;
     }
   } catch (e) {
     console.warn('Error reading ATAMAN_adopters_cache:', e);
@@ -184,10 +191,17 @@ function loadDashboardData() {
   // 3. Load Caretakers
   try {
     const cachedCaretakers = localStorage.getItem('ATAMAN_caretakers_cache');
+    let parsed = null;
     if (cachedCaretakers) {
-      const parsed = JSON.parse(cachedCaretakers);
-      if (Array.isArray(parsed)) currentCaretakers = parsed;
+      try { parsed = JSON.parse(cachedCaretakers); } catch (_) {}
     }
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      if (typeof window.ATAMAN_DEFAULT_CARETAKERS !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS)) {
+        parsed = [...window.ATAMAN_DEFAULT_CARETAKERS];
+        try { localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(parsed)); } catch (_) {}
+      }
+    }
+    if (Array.isArray(parsed)) currentCaretakers = parsed;
   } catch (e) {
     console.warn('Error reading ATAMAN_caretakers_cache:', e);
   }
@@ -195,10 +209,20 @@ function loadDashboardData() {
   // 4. Load Users
   try {
     const cachedUsers = localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache');
+    let parsed = null;
     if (cachedUsers) {
-      const parsed = JSON.parse(cachedUsers);
-      if (Array.isArray(parsed)) currentUsers = parsed;
+      try { parsed = JSON.parse(cachedUsers); } catch (_) {}
     }
+    if (!Array.isArray(parsed) || parsed.length <= 1) {
+      if (typeof window.ATAMAN_DEFAULT_USERS !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_USERS)) {
+        parsed = [...window.ATAMAN_DEFAULT_USERS];
+        try {
+          localStorage.setItem('ATAMAN_registered_users', JSON.stringify(parsed));
+          localStorage.setItem('ATAMAN_users_cache', JSON.stringify(parsed));
+        } catch (_) {}
+      }
+    }
+    if (Array.isArray(parsed)) currentUsers = parsed;
   } catch (e) {
     console.warn('Error reading ATAMAN_registered_users:', e);
   }

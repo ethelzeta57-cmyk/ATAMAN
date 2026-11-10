@@ -18,12 +18,53 @@ document.addEventListener('DOMContentLoaded', () => {
     return `data:image/svg+xml;utf8,${encoded}`;
   };
 
+  const DEFAULT_CARETAKERS = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS) && window.ATAMAN_DEFAULT_CARETAKERS.length > 0)
+    ? window.ATAMAN_DEFAULT_CARETAKERS
+    : [
+      {
+        id: 'CT-101',
+        empId: 'EMP-002',
+        name: 'Pedro Reyes',
+        fullName: 'Pedro Reyes',
+        email: 'pedro.reyes@ataman.org',
+        phone: '+63 918 333 4455',
+        address: 'Brgy. Canlapwas, Catbalogan City, Samar',
+        role: 'Field Caretaker',
+        status: 'Active',
+        treesAssigned: 10,
+        assignedTreeCount: 310,
+        location: 'Catbalogan City & Jiabong, Samar',
+        municipality: 'Catbalogan City',
+        barangay: 'Canlapwas',
+        assignedTrees: ['TR-10001', 'TR-10002', 'TR-10003', 'TR-10004', 'TR-10005', 'TR-10006', 'TR-10007', 'TR-10021', 'TR-10035', 'TR-10047'],
+        assignedAdopterName: 'John Sho, Century Catbalogan',
+        joinedDate: '2026-08-01',
+        createdAt: '2026-08-01T08:00:00.000Z',
+        performanceRating: '98%',
+        inspectionsLogged: 42,
+        survivalRate: '96.8%'
+      }
+    ];
+  window.ATAMAN_DEFAULT_CARETAKERS = DEFAULT_CARETAKERS;
+
   // Caretakers Database (loads live user-created caretakers)
   let caretakersList = [];
   try {
     const cached = localStorage.getItem('ATAMAN_caretakers_cache');
     if (cached && cached !== '[]') {
-      caretakersList = JSON.parse(cached);
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) caretakersList = parsed;
+    }
+  } catch (e) {
+    caretakersList = [];
+  }
+  if (!caretakersList || caretakersList.length === 0) {
+    caretakersList = [...DEFAULT_CARETAKERS];
+    try { localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakersList)); } catch (_) {}
+  }
+
+  try {
+    if (caretakersList.length > 0) {
       // Clean any previously generated synthetic percentages and clear schedules
       let allTrees = [];
       try { allTrees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]'); } catch (_) {}
@@ -73,10 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
           ct.schedule = [];
         }
       });
-      localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakersList));
+      try { localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakersList)); } catch (_) {}
     }
   } catch (e) {
-    caretakersList = [];
+    console.warn('Caretaker sync notice:', e);
   }
 
   // Current selected caretaker for profile & modals
@@ -2170,7 +2211,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.ATAMAN_DB.onCaretakersChange === 'function') {
       window.ATAMAN_DB.onCaretakersChange((stored) => {
         if (Array.isArray(stored)) {
-          caretakersList = stored;
+          if (stored.length > 0) {
+            caretakersList = stored;
+          } else {
+            const local = (() => {
+              try {
+                const r = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+                return Array.isArray(r) && r.length > 0 ? r : null;
+              } catch (_) { return null; }
+            })();
+            caretakersList = local || [...DEFAULT_CARETAKERS];
+          }
           updateOverviewCards();
           renderTable();
         }

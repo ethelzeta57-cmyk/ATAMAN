@@ -393,14 +393,20 @@ function getAdopterUserTrees(allTreesList = null) {
   } catch (e) {
     adopters = [];
   }
+  if ((!Array.isArray(adopters) || adopters.length === 0) && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS)) {
+    adopters = [...window.ATAMAN_DEFAULT_ADOPTERS];
+  }
 
   let treesPool = allTreesList;
-  if (!Array.isArray(treesPool)) {
+  if (!Array.isArray(treesPool) || treesPool.length === 0) {
     try {
       treesPool = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
     } catch (e) {
       treesPool = [];
     }
+  }
+  if ((!Array.isArray(treesPool) || treesPool.length === 0) && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
+    treesPool = [...window.ATAMAN_DEFAULT_TREES];
   }
 
   // Deduplicate split registration/adoption records

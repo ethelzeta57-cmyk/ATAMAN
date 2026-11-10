@@ -1135,6 +1135,9 @@ function initCaretakerSchedule() {
     } catch (e) {
       list = [];
     }
+    if ((!Array.isArray(list) || list.length === 0) && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS)) {
+      list = [...window.ATAMAN_DEFAULT_CARETAKERS];
+    }
     const currentName = (localStorage.getItem('ATAMAN_user_name') || '').toLowerCase().trim();
     let ct = list.find(c => (c.name || '').toLowerCase().trim() === currentName);
     if (!ct && list.length > 0) ct = list[0];

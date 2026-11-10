@@ -160,12 +160,18 @@ function getLoggedInAdopterData() {
   } catch (e) {
     adopters = [];
   }
+  if ((!Array.isArray(adopters) || adopters.length === 0) && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS)) {
+    adopters = [...window.ATAMAN_DEFAULT_ADOPTERS];
+  }
 
   let allTrees = [];
   try {
     allTrees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
   } catch (e) {
     allTrees = [];
+  }
+  if ((!Array.isArray(allTrees) || allTrees.length === 0) && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
+    allTrees = [...window.ATAMAN_DEFAULT_TREES];
   }
 
   // Deduplicate split registration/adoption records & preserve explicit funding

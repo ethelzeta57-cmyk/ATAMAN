@@ -4,6 +4,57 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  const DEFAULT_ADOPTERS = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS) && window.ATAMAN_DEFAULT_ADOPTERS.length > 0)
+    ? window.ATAMAN_DEFAULT_ADOPTERS
+    : [
+      {
+        id: 'ADP-101',
+        name: 'John Sho',
+        fullName: 'John Sho',
+        contactPerson: 'John Sho',
+        type: 'Individual',
+        email: 'john.sho@gmail.com',
+        phone: '+63 917 123 4567',
+        address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
+        status: 'Active',
+        treesCount: 35,
+        funding: 1750,
+        fundingPaid: 1750,
+        customFunding: true,
+        joinedDate: '2026-08-28',
+        startDate: '2026-08-28',
+        expDate: 'Ongoing',
+        treesList: [
+          { id: 'TR-10001', treeCount: 10, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 },
+          { id: 'TR-10021', treeCount: 25, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 }
+        ]
+      },
+      {
+        id: 'ADP-102',
+        name: 'Century Catbalogan',
+        fullName: 'Century Catbalogan',
+        contactPerson: 'Maria Santos',
+        type: 'Corporate',
+        email: 'contact@centurycatbalogan.com',
+        phone: '+63 920 987 6543',
+        address: 'Del Rosario St., Catbalogan City, Samar',
+        status: 'Active',
+        treesCount: 17,
+        funding: 850,
+        fundingPaid: 850,
+        customFunding: true,
+        joinedDate: '2026-09-06',
+        startDate: '2026-09-06',
+        expDate: 'Ongoing',
+        treesList: [
+          { id: 'TR-10002', treeCount: 10, species: 'Molave', location: 'Brgy. Canlapwas, Catbalogan City', fundingAmount: 50 },
+          { id: 'TR-10005', treeCount: 5, species: 'Tanguile', location: 'Brgy. Mercedes, Catbalogan City', fundingAmount: 50 },
+          { id: 'TR-10007', treeCount: 2, species: 'Narra', location: 'Brgy. Silanga, Catbalogan City', fundingAmount: 50 }
+        ]
+      }
+    ];
+  window.ATAMAN_DEFAULT_ADOPTERS = DEFAULT_ADOPTERS;
+
   // Load persisted adopters cache
   let adoptersList = [];
   try {
@@ -14,6 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch (e) {
     adoptersList = [];
+  }
+  if (!adoptersList || adoptersList.length === 0) {
+    adoptersList = [...DEFAULT_ADOPTERS];
+    try { localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(adoptersList)); } catch (_) {}
   }
 
   function harmonizeAdopterRecords(adopters) {
@@ -2159,7 +2214,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.ATAMAN_DB.onAdoptersChange === 'function') {
       window.ATAMAN_DB.onAdoptersChange(stored => {
         if (Array.isArray(stored)) {
-          adoptersList = stored;
+          if (stored.length > 0) {
+            adoptersList = stored;
+          } else {
+            const local = (() => {
+              try {
+                const r = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+                return Array.isArray(r) && r.length > 0 ? r : null;
+              } catch (_) { return null; }
+            })();
+            adoptersList = local || [...DEFAULT_ADOPTERS];
+          }
           harmonizeAdopterRecords(adoptersList);
           renderAdoptersTable();
           updateSummaryCards();

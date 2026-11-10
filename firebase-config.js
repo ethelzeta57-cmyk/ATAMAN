@@ -14,22 +14,8 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   'use strict';
 
   // Ensure one-time cache reset runs on every dashboard (even pages that don't load ATAMAN-init.js)
-  const INIT_VERSION = 'ATAMAN_init_v5_preserve_trees';
+  const INIT_VERSION = 'ATAMAN_init_v6_preserve_all_data';
   if (!localStorage.getItem(INIT_VERSION)) {
-    const adminOnly = JSON.stringify([{
-      uid: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
-      id: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
-      email: 'ethelzeta57@gmail.com',
-      displayName: 'Ethel Zeta (Admin)',
-      name: 'Ethel Zeta (Admin)',
-      username: 'ethelzeta57',
-      empId: 'EMP-001',
-      role: 'admin',
-      status: 'Active',
-      password: 'Password123!',
-      createdAt: '2026-08-26T00:00:00.000Z'
-    }]);
-
     const existingTrees = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
@@ -40,19 +26,34 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(window.ATAMAN_DEFAULT_TREES));
     }
 
-    localStorage.setItem('ATAMAN_adopters_cache', '[]');
-    localStorage.setItem('ATAMAN_caretakers_cache', '[]');
-    localStorage.setItem('ATAMAN_users_cache', adminOnly);
-    localStorage.setItem('saplink_users_cache', adminOnly);
-    localStorage.setItem('ATAMAN_registered_users', adminOnly);
-    localStorage.setItem('saplink_registered_users', adminOnly);
-    localStorage.setItem('saplink_adopters_cache', '[]');
-    localStorage.setItem('saplink_caretakers_cache', '[]');
-    localStorage.setItem('ATAMAN_content_cache', '[]');
-    localStorage.setItem('ATAMAN_notifications', '[]');
-    localStorage.setItem('ATAMAN_caretaker_notifications', '[]');
-    localStorage.setItem('ATAMAN_system_logs', '[]');
-    localStorage.setItem('ATAMAN_unread_notif_count', '0');
+    const existingAdopters = (() => {
+      try {
+        const raw = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+        return Array.isArray(raw) && raw.length > 0 ? raw : null;
+      } catch (_) { return null; }
+    })();
+    if (!existingAdopters && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS)) {
+      localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(window.ATAMAN_DEFAULT_ADOPTERS));
+    }
+
+    const existingCaretakers = (() => {
+      try {
+        const raw = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+        return Array.isArray(raw) && raw.length > 0 ? raw : null;
+      } catch (_) { return null; }
+    })();
+    if (!existingCaretakers && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS)) {
+      localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(window.ATAMAN_DEFAULT_CARETAKERS));
+    }
+
+    if (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_USERS)) {
+      const uJson = JSON.stringify(window.ATAMAN_DEFAULT_USERS);
+      localStorage.setItem('ATAMAN_users_cache', uJson);
+      localStorage.setItem('saplink_users_cache', uJson);
+      localStorage.setItem('ATAMAN_registered_users', uJson);
+      localStorage.setItem('saplink_registered_users', uJson);
+    }
+
     localStorage.setItem(INIT_VERSION, 'done');
   }
 
@@ -176,16 +177,61 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     }
   };
 
-  // Default system account (only the Admin account is seeded)
+  // Default registered system accounts
   const DEFAULT_ACCOUNTS = [
     {
       uid: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
+      id: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
       email: 'ethelzeta57@gmail.com',
       displayName: 'Ethel Zeta (Admin)',
+      name: 'Ethel Zeta (Admin)',
       role: 'admin',
       empId: 'EMP-001',
       password: 'Password123!',
       createdAt: '2026-08-26T00:00:00.000Z'
+    },
+    {
+      uid: 'USR-CT-001',
+      id: 'CT-101',
+      email: 'pedro.reyes@ataman.org',
+      displayName: 'Pedro Reyes',
+      name: 'Pedro Reyes',
+      empId: 'EMP-002',
+      role: 'caretaker',
+      status: 'Active',
+      phone: '+63 918 333 4455',
+      address: 'Brgy. Canlapwas, Catbalogan City, Samar',
+      password: 'Password123!',
+      createdAt: '2026-08-01T08:00:00.000Z'
+    },
+    {
+      uid: 'USR-ADP-001',
+      id: 'ADP-101',
+      email: 'john.sho@gmail.com',
+      displayName: 'John Sho',
+      name: 'John Sho',
+      empId: 'ADP-101',
+      role: 'adopter',
+      status: 'Active',
+      phone: '+63 917 123 4567',
+      address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
+      password: 'Password123!',
+      createdAt: '2026-08-28T08:00:00.000Z'
+    },
+    {
+      uid: 'USR-ADP-002',
+      id: 'ADP-102',
+      email: 'contact@centurycatbalogan.com',
+      displayName: 'Century Catbalogan (Maria Santos)',
+      name: 'Century Catbalogan',
+      contactPerson: 'Maria Santos',
+      empId: 'ADP-102',
+      role: 'adopter',
+      status: 'Active',
+      phone: '+63 920 987 6543',
+      address: 'Del Rosario St., Catbalogan City, Samar',
+      password: 'Password123!',
+      createdAt: '2026-09-06T08:00:00.000Z'
     }
   ];
 
@@ -973,7 +1019,12 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     getLocalAdopters() {
       try {
         const stored = localStorage.getItem('ATAMAN_adopters_cache');
-        return stored ? JSON.parse(stored) : [];
+        const parsed = stored ? JSON.parse(stored) : [];
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS) && window.ATAMAN_DEFAULT_ADOPTERS.length > 0) {
+          return window.ATAMAN_DEFAULT_ADOPTERS;
+        }
+        return [];
       } catch (e) {
         return [];
       }
@@ -991,7 +1042,12 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     getLocalCaretakers() {
       try {
         const stored = localStorage.getItem('ATAMAN_caretakers_cache');
-        return stored ? JSON.parse(stored) : [];
+        const parsed = stored ? JSON.parse(stored) : [];
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS) && window.ATAMAN_DEFAULT_CARETAKERS.length > 0) {
+          return window.ATAMAN_DEFAULT_CARETAKERS;
+        }
+        return [];
       } catch (e) {
         return [];
       }
@@ -1212,8 +1268,22 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
             unsubscribe = firestoreDb.collection('adopters').onSnapshot(snapshot => {
               const adopters = [];
               snapshot.forEach(doc => adopters.push({ id: doc.id, ...doc.data() }));
-              this.setLocalAdopters(adopters);
-              callback(adopters, 'firestore');
+              if (adopters.length > 0) {
+                this.setLocalAdopters(adopters);
+                callback(adopters, 'firestore');
+              } else {
+                const local = this.getLocalAdopters();
+                const fallback = (Array.isArray(local) && local.length > 0)
+                  ? local
+                  : (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS) ? window.ATAMAN_DEFAULT_ADOPTERS : []);
+                if (fallback.length > 0) {
+                  this.setLocalAdopters(fallback);
+                  callback(fallback, 'local-fallback');
+                } else {
+                  this.setLocalAdopters([]);
+                  callback([], 'firestore');
+                }
+              }
             }, error => {
               console.warn('Firestore onAdoptersChange error:', error);
               callback(this.getLocalAdopters(), 'local');
@@ -1324,8 +1394,22 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
             unsubscribe = firestoreDb.collection('caretakers').onSnapshot(snapshot => {
               const caretakers = [];
               snapshot.forEach(doc => caretakers.push({ id: doc.id, ...doc.data() }));
-              this.setLocalCaretakers(caretakers);
-              callback(caretakers, 'firestore');
+              if (caretakers.length > 0) {
+                this.setLocalCaretakers(caretakers);
+                callback(caretakers, 'firestore');
+              } else {
+                const local = this.getLocalCaretakers();
+                const fallback = (Array.isArray(local) && local.length > 0)
+                  ? local
+                  : (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS) ? window.ATAMAN_DEFAULT_CARETAKERS : []);
+                if (fallback.length > 0) {
+                  this.setLocalCaretakers(fallback);
+                  callback(fallback, 'local-fallback');
+                } else {
+                  this.setLocalCaretakers([]);
+                  callback([], 'firestore');
+                }
+              }
             }, error => {
               console.warn('Firestore onCaretakersChange error:', error);
               callback(this.getLocalCaretakers(), 'local');

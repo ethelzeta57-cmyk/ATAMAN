@@ -62,9 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function loadAllUsers() {
     const seen = new Map();   // normalized email → record
 
-    // Default system seed account (only the Admin account)
+    // Default system registered accounts
     const defaultSeeds = [
-      { uid: '152HcDnFRaTZtHcTN5uxUMfBY7R2', email: 'ethelzeta57@gmail.com', displayName: 'Ethel Zeta (Admin)', role: 'Administrator', empId: 'EMP-001', location: '', status: 'Active' }
+      { uid: '152HcDnFRaTZtHcTN5uxUMfBY7R2', id: '152HcDnFRaTZtHcTN5uxUMfBY7R2', email: 'ethelzeta57@gmail.com', displayName: 'Ethel Zeta (Admin)', role: 'Administrator', empId: 'EMP-001', location: 'Catbalogan City, Samar', status: 'Active' },
+      { uid: 'USR-CT-001', id: 'CT-101', email: 'pedro.reyes@ataman.org', displayName: 'Pedro Reyes', role: 'Caretaker', empId: 'EMP-002', location: 'Brgy. Canlapwas, Catbalogan City', status: 'Active', phone: '+63 918 333 4455' },
+      { uid: 'USR-ADP-001', id: 'ADP-101', email: 'john.sho@gmail.com', displayName: 'John Sho', role: 'Adopter', empId: 'ADP-101', location: 'Brgy. Guinsorongan, Catbalogan City', status: 'Active', phone: '+63 917 123 4567' },
+      { uid: 'USR-ADP-002', id: 'ADP-102', email: 'contact@centurycatbalogan.com', displayName: 'Century Catbalogan (Maria Santos)', role: 'Adopter', empId: 'ADP-102', location: 'Del Rosario St., Catbalogan City', status: 'Active', phone: '+63 920 987 6543' }
     ];
 
     defaultSeeds.forEach(seed => {
