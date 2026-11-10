@@ -1505,27 +1505,10 @@ html, body {
   }
 }
 
-/* Tablet: Compact sidebar */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .ct-sidebar {
-    width: 76px;
-  }
-  .ct-brand-name, .ct-brand-tag, .ct-nav-link span {
-    display: none;
-  }
-  .ct-brand-logo {
-    justify-content: center;
-  }
-  .ct-nav-link {
-    justify-content: center;
-    padding: 12px;
-  }
-}
-
 /* ══════════════════════════════════════════════════════════════════════════
-   MOBILE PHONES (<= 768px)
+   MOBILE & TABLET DEVICES (<= 1024px or Touch Device)
    ══════════════════════════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
+@media (max-width: 1024px), (hover: none) and (pointer: coarse), (max-height: 600px) {
   html, body {
     overflow-x: hidden;
     width: 100%;

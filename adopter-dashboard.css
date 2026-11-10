@@ -1305,44 +1305,43 @@ html, body {
   }
 }
 
-@media (max-width: 1024px) {
-  .ad-sidebar {
-    width: 72px;
-  }
-  .ad-brand-name, .ad-brand-tag, .ad-nav-link span, .ad-section-label, .ad-user-info {
-    display: none;
-  }
-  .ad-brand-logo {
-    justify-content: center;
-  }
-  .ad-nav-link {
-    justify-content: center;
-    padding: 12px;
-  }
-  .ad-sidebar-user {
-    justify-content: center;
-    padding: 10px;
-  }
-}
-
-@media (max-width: 768px) {
+@media (max-width: 1024px), (hover: none) and (pointer: coarse), (max-height: 600px) {
   body {
-    flex-direction: column;
+    flex-direction: column !important;
   }
-  .ad-sidebar {
-    width: 100%;
-    height: auto;
-    min-height: auto;
-    position: relative;
+  .ad-main-wrapper {
+    width: 100% !important;
+    min-width: 0 !important;
   }
   .ad-stats-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
   }
+  .ad-mid-grid,
   .ad-bot-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
   }
   .ad-bot-grid > :last-child {
-    grid-column: span 1;
+    grid-column: 1 / -1 !important;
+  }
+  .ad-donut-layout {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+  .ad-cta-banner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 16px !important;
+  }
+  .cta-actions {
+    flex-wrap: wrap !important;
+    width: 100% !important;
+  }
+  .btn-adopt-tree,
+  .btn-invite-others {
+    flex: 1 1 auto !important;
+    justify-content: center !important;
   }
 }
 

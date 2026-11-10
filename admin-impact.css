@@ -1167,7 +1167,7 @@ body {
 /* =========================================================
    TOP HEADER USER ACCOUNT PILL & SINGLE-ROW FIT OVERRIDES
    ========================================================= */
-@media (min-width: 993px) {
+@media (min-width: 1025px) and (hover: hover) and (pointer: fine) and (min-height: 601px) {
 header.top-navbar,
 header.topbar,
 header.dash-header {

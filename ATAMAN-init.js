@@ -580,10 +580,10 @@
   } catch (pwaErr) {
     console.warn('[ATAMAN PWA] Auto-registration notice:', pwaErr);
   }
-  // One-time Service Worker self-healer (v2.0.5) to immediately refresh latest mobile & analytics assets
+  // One-time Service Worker self-healer (v2.0.6) to immediately refresh latest mobile & analytics assets
   try {
-    if ('serviceWorker' in navigator && !localStorage.getItem('ATAMAN_sw_healed_v205')) {
-      localStorage.setItem('ATAMAN_sw_healed_v205', 'done');
+    if ('serviceWorker' in navigator && !localStorage.getItem('ATAMAN_sw_healed_v206')) {
+      localStorage.setItem('ATAMAN_sw_healed_v206', 'done');
       if ('caches' in window) {
         caches.keys().then(function(names) {
           names.forEach(function(n) { caches.delete(n); });
@@ -611,6 +611,20 @@
       }
       vp.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover';
 
+      // Detect mobile/tablet device (including Android/iOS "Desktop site" mode or landscape phone)
+      const detectMobileDevice = () => {
+        const isTouchUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent || '');
+        const isCoarse = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        const isSmallViewport = window.innerWidth <= 1024 || window.innerHeight <= 600;
+        if (isTouchUA || isCoarse || isSmallViewport) {
+          document.documentElement.classList.add('is-mobile-device');
+        } else {
+          document.documentElement.classList.remove('is-mobile-device');
+        }
+      };
+      detectMobileDevice();
+      window.addEventListener('resize', detectMobileDevice);
+
       // 2. Inject Universal Mobile & Tablet Responsive CSS
       if (!document.getElementById('atamanUniversalMobileStyles')) {
         const style = document.createElement('style');
@@ -626,7 +640,8 @@
           /* Universal Hamburger Toggle Button */
           .mobile-nav-toggle,
           #mobileMenuBtn,
-          .ct-mobile-menu-btn {
+          .ct-mobile-menu-btn,
+          #sidebarToggle {
             display: none;
             align-items: center;
             justify-content: center;
@@ -646,13 +661,15 @@
           }
           .mobile-nav-toggle:active,
           #mobileMenuBtn:active,
-          .ct-mobile-menu-btn:active {
+          .ct-mobile-menu-btn:active,
+          #sidebarToggle:active {
             transform: scale(0.95);
             background: #f1f5f9;
           }
           .mobile-nav-toggle svg,
           #mobileMenuBtn svg,
-          .ct-mobile-menu-btn svg {
+          .ct-mobile-menu-btn svg,
+          #sidebarToggle svg {
             width: 20px;
             height: 20px;
             stroke: currentColor;
@@ -697,20 +714,26 @@
             flex-shrink: 0;
           }
 
-          /* TABLET & MOBILE BREAKPOINT (<= 1024px or Touch Mobile Device) */
-          @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
-            body {
+          /* TABLET, LANDSCAPE PHONE & MOBILE BREAKPOINT (<= 1024px, <= 600px height, or Touch Device) */
+          @media (max-width: 1024px), (hover: none) and (pointer: coarse), (max-height: 600px) {
+            html, body {
               display: flex !important;
               flex-direction: column !important;
               width: 100% !important;
+              max-width: 100vw !important;
+              height: auto !important;
               min-height: 100vh !important;
               min-height: 100dvh !important;
+              max-height: none !important;
+              overflow-x: hidden !important;
+              overflow-y: auto !important;
             }
 
             /* Show Hamburger Button */
             .mobile-nav-toggle,
             #mobileMenuBtn,
-            .ct-mobile-menu-btn {
+            .ct-mobile-menu-btn,
+            #sidebarToggle {
               display: inline-flex !important;
             }
 
@@ -733,8 +756,9 @@
               transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
               display: flex !important;
               flex-direction: column !important;
-              visibility: visible !important;
+              visibility: hidden !important;
               overflow-y: auto !important;
+              margin: 0 !important;
             }
 
             #sidebar.mobile-open,
@@ -746,6 +770,7 @@
             aside.ct-sidebar.mobile-open,
             aside.ct-sidebar.open {
               transform: translateX(0) !important;
+              visibility: visible !important;
               box-shadow: 14px 0 38px rgba(0, 0, 0, 0.45) !important;
             }
 
@@ -777,17 +802,31 @@
               display: inline-flex !important;
             }
 
-            /* Full-width Main Content Wrapper */
+            /* Full-width Main Content Wrappers across Admin, Adopter, Caretaker & My Trees */
             .main-content,
             .main-wrapper,
             .ad-main,
+            .ad-main-wrapper,
             .ct-main,
+            .ct-main-wrapper,
             .ct-main-content,
+            .map-content-area,
+            .content-area,
+            .content-container,
+            .tree-map-container,
+            .page-body,
+            .dash-body,
+            .ad-body,
+            .ct-body,
             main {
               width: 100% !important;
               max-width: 100vw !important;
               min-width: 0 !important;
               margin-left: 0 !important;
+              height: auto !important;
+              max-height: none !important;
+              flex: 1 1 auto !important;
+              overflow: visible !important;
               box-sizing: border-box !important;
             }
 
@@ -799,14 +838,18 @@
             header.ad-header,
             header.ct-header,
             header.ct-navbar {
+              display: flex !important;
               flex-wrap: wrap !important;
-              padding: 12px 16px !important;
+              padding: 12px 14px !important;
               gap: 10px !important;
               height: auto !important;
+              min-height: 0 !important;
+              width: 100% !important;
+              max-width: 100vw !important;
+              box-sizing: border-box !important;
             }
 
             header .nav-title-group,
-            header .topbar-title,
             header .header-left,
             header .ad-header-left,
             header .ct-header-left,
@@ -815,7 +858,37 @@
               align-items: center !important;
               gap: 10px !important;
               flex: 1 1 auto !important;
+              width: 100% !important;
               min-width: 0 !important;
+            }
+
+            header .topbar-title {
+              display: flex !important;
+              flex-direction: column !important;
+              justify-content: center !important;
+              gap: 2px !important;
+              flex: 1 1 calc(100% - 56px) !important;
+              min-width: 0 !important;
+            }
+
+            header .page-title,
+            header .topbar-title h1,
+            header .header-left h1,
+            header .ad-page-title,
+            header .ct-page-title {
+              font-size: 18px !important;
+              line-height: 1.25 !important;
+              margin: 0 !important;
+            }
+
+            header .page-subtitle,
+            header .topbar-sub,
+            header .ad-page-sub,
+            header .ct-page-sub {
+              font-size: 11.5px !important;
+              line-height: 1.35 !important;
+              white-space: normal !important;
+              margin: 0 !important;
             }
 
             header .nav-actions-group,
@@ -823,18 +896,82 @@
             header .header-right,
             header .ad-header-right,
             header .ct-header-right,
-            header .ct-nav-actions {
+            header .ct-nav-actions,
+            header .ct-navbar-right {
               display: flex !important;
               align-items: center !important;
               flex-wrap: wrap !important;
-              gap: 8px !important;
+              gap: 6px !important;
               width: 100% !important;
               justify-content: flex-start !important;
             }
 
-            /* Stack Split Map & Content Grids Vertically */
+            header .sidebar-user-row {
+              width: 100% !important;
+              justify-content: space-between !important;
+              margin-top: 2px !important;
+            }
+
+            /* 2-Column Compact KPI & Summary Cards across all Dashboards */
+            .stats-grid,
+            .summary-cards-grid,
+            .summary-cards-row-1,
+            .summary-cards-row-2,
+            .metrics-grid,
+            .kpi-grid,
+            .impact-summary-grid,
+            .user-summary-grid,
+            .content-summary-grid,
+            .notif-summary-grid,
+            .ad-stats-grid,
+            .mytrees-stats-grid,
+            .ct-stats-grid,
+            .ov-grid,
+            .sum-grid,
+            .qa-grid,
+            .ad-impact-grid,
+            .adopter-kpi-row,
+            .community-metric-grid,
+            .maint-impact-box {
+              display: grid !important;
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              gap: 10px !important;
+              width: 100% !important;
+            }
+
+            .kpi-grid .kpi-card:last-child:nth-child(odd),
+            .impact-summary-grid > *:last-child:nth-child(odd),
+            .user-summary-grid > *:last-child:nth-child(odd),
+            .content-summary-grid > *:last-child:nth-child(odd),
+            .notif-summary-grid > *:last-child:nth-child(odd) {
+              grid-column: 1 / -1 !important;
+            }
+
+            .stat-card,
+            .summary-card,
+            .metric-card,
+            .kpi-card,
+            .ad-stat-card,
+            .ct-stat-card {
+              padding: 12px !important;
+              min-width: 0 !important;
+              max-width: 100% !important;
+              box-sizing: border-box !important;
+            }
+
+            .stat-value,
+            .sc-value,
+            .mc-value,
+            .kpi-value,
+            .ad-stat-val,
+            .ct-stat-val {
+              font-size: 18px !important;
+            }
+
+            /* Stack Split Map & Content Grids Vertically into 1 Clean Column */
             .mid-grid,
             .bot-grid,
+            .foot-grid,
             .ad-mid-grid,
             .ad-bot-grid,
             .ct-mid-grid,
@@ -845,9 +982,65 @@
             .insights-grid,
             .trees-split-container,
             .map-workspace-layout,
+            .lateral-panels-stack,
             .map-split-stage,
-            .profile-content-grid {
+            .profile-grid,
+            .profile-content-grid,
+            .homepage-manager-grid,
+            .media-grid,
+            .eco-grid,
+            .stories-grid,
+            .report-grid-2,
+            .report-grid-3,
+            .report-types-grid,
+            .settings-grid-layout,
+            .settings-toggle-grid,
+            .role-cards-grid,
+            .attention-list-grid {
+              display: grid !important;
               grid-template-columns: minmax(0, 1fr) !important;
+              gap: 14px !important;
+              width: 100% !important;
+              height: auto !important;
+              max-height: none !important;
+            }
+
+            /* Reset any multi-column spans on direct children so they never create ghost columns */
+            .mid-grid > *,
+            .bot-grid > *,
+            .foot-grid > *,
+            .ad-mid-grid > *,
+            .ad-bot-grid > *,
+            .ct-mid-grid > *,
+            .ct-bot-grid > *,
+            .two-col > *,
+            .three-col > *,
+            .survival-layout > *,
+            .insights-grid > *,
+            .trees-split-container > *,
+            .map-workspace-layout > *,
+            .map-split-stage > *,
+            .profile-grid > *,
+            .profile-content-grid > *,
+            .settings-grid-layout > * {
+              grid-column: 1 / -1 !important;
+              min-width: 0 !important;
+              max-width: 100% !important;
+            }
+
+            /* Stack Form Rows & Filter Bars cleanly on Mobile */
+            .form-row,
+            .form-grid,
+            .form-grid-2,
+            .form-grid-3,
+            .filters-row,
+            .filters-dropdown-grid,
+            .filters-bar-inline,
+            .controls-top-row {
+              grid-template-columns: 1fr !important;
+              flex-direction: column !important;
+              align-items: stretch !important;
+              gap: 10px !important;
             }
 
             /* Ensure Cards & Grid Items Never Overflow Mobile Viewport */
@@ -857,9 +1050,13 @@
             .panel-card,
             .section-card,
             .impact-card,
-            .audit-card {
+            .audit-card,
+            .tree-list-card,
+            .tree-profile-panel {
               min-width: 0 !important;
               max-width: 100% !important;
+              width: 100% !important;
+              box-sizing: border-box !important;
               overflow-x: auto !important;
               -webkit-overflow-scrolling: touch !important;
             }
@@ -891,10 +1088,12 @@
             .bulk-action-bar,
             .bulk-btns-group,
             .tabs-header,
-            .tab-meta {
+            .tab-meta,
+            .card-header,
+            .section-header-row {
               flex-wrap: wrap !important;
               max-width: 100% !important;
-              gap: 6px !important;
+              gap: 8px !important;
             }
 
             /* Keep Closed Off-Canvas Detail Drawers Off-Screen Without Expanding Viewport */
@@ -913,60 +1112,6 @@
               visibility: hidden !important;
               pointer-events: none !important;
               max-width: 100vw !important;
-            }
-          }
-
-          /* CELLPHONE BREAKPOINT (<= 768px or Touch Mobile Device) */
-          @media (max-width: 768px), (hover: none) and (pointer: coarse) {
-            /* 2-Column Compact KPI Cards on Cellphones */
-            .stats-grid,
-            .summary-cards-grid,
-            .metrics-grid,
-            .kpi-grid,
-            .ad-stats-grid,
-            .mytrees-stats-grid,
-            .ct-stats-grid,
-            .ov-grid,
-            .sum-grid,
-            .qa-grid {
-              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-              gap: 10px !important;
-            }
-
-            .kpi-grid .kpi-card:last-child:nth-child(odd) {
-              grid-column: 1 / -1 !important;
-            }
-
-            .stat-card,
-            .summary-card,
-            .metric-card,
-            .kpi-card,
-            .ad-stat-card,
-            .ct-stat-card {
-              padding: 12px !important;
-              min-width: 0 !important;
-            }
-
-            .stat-value,
-            .sc-value,
-            .mc-value,
-            .kpi-value,
-            .ad-stat-val,
-            .ct-stat-val {
-              font-size: 18px !important;
-            }
-
-            /* Stack Form Rows & Filter Bars into 1 Column on Cellphones */
-            .form-row,
-            .form-grid,
-            .form-grid-2,
-            .form-grid-3,
-            .filters-row,
-            .filters-dropdown-grid,
-            .filters-bar-inline {
-              grid-template-columns: 1fr !important;
-              flex-direction: column !important;
-              align-items: stretch !important;
             }
 
             /* Prevent iOS Auto-Zoom on Input Focus */
@@ -1016,6 +1161,7 @@
             .dash-body,
             .content-container,
             .page-content,
+            .page-body,
             .ad-body,
             .ct-body,
             .mytrees-body {
@@ -1055,6 +1201,8 @@
         const header = document.querySelector('header.dash-header, header.top-navbar, header.topbar, header.page-header, header.ad-header, header.ct-header, header.ct-navbar, header');
         if (header) {
           let toggleBtn = header.querySelector('.mobile-nav-toggle, #mobileMenuBtn, .ct-mobile-menu-btn, #sidebarToggle');
+          const leftGroup = header.querySelector('.header-left, .nav-title-group, .topbar-title, .ad-header-left, .ct-header-left, .ct-page-title-group') || header;
+
           if (!toggleBtn) {
             toggleBtn = document.createElement('button');
             toggleBtn.type = 'button';
@@ -1062,47 +1210,70 @@
             toggleBtn.id = 'mobileMenuBtn';
             toggleBtn.setAttribute('aria-label', 'Open navigation menu');
             toggleBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
-            const leftGroup = header.querySelector('.header-left, .nav-title-group, .topbar-title, .ad-header-left, .ct-header-left, .ct-page-title-group') || header;
             leftGroup.insertBefore(toggleBtn, leftGroup.firstChild);
           }
 
-          // Bind open/close handlers idempotently
+          // Group ungrouped title + subtitle siblings inside leftGroup into a vertical flex column so [Hamburger] + [Title/Sub] align cleanly
+          if (leftGroup !== header && !leftGroup.classList.contains('topbar-title') && !leftGroup.querySelector('.header-title-stack, .title-text-group')) {
+            const textNodes = Array.from(leftGroup.children).filter(el => el !== toggleBtn);
+            if (textNodes.length > 1) {
+              const stack = document.createElement('div');
+              stack.className = 'header-title-stack';
+              stack.style.cssText = 'display:flex;flex-direction:column;justify-content:center;min-width:0;flex:1;';
+              textNodes.forEach(node => stack.appendChild(node));
+              leftGroup.appendChild(stack);
+            }
+          }
+
+          // Bind open/close handlers idempotently and stop immediate propagation to prevent duplicate listener conflicts
           if (!toggleBtn.dataset.mobileBound) {
             toggleBtn.dataset.mobileBound = 'true';
-            const openSidebar = (e) => {
-              if (e) e.stopPropagation();
-              sidebar.classList.add('mobile-open', 'open');
-              backdrop.classList.add('active');
-              document.body.style.overflow = 'hidden';
-            };
             const closeSidebar = () => {
               sidebar.classList.remove('mobile-open', 'open');
               backdrop.classList.remove('active');
               document.body.style.overflow = '';
             };
+            const toggleSidebar = (e) => {
+              if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+              }
+              const isOpen = sidebar.classList.contains('mobile-open') || sidebar.classList.contains('open');
+              if (isOpen) {
+                closeSidebar();
+              } else {
+                sidebar.classList.add('mobile-open', 'open');
+                backdrop.classList.add('active');
+                document.body.style.overflow = 'hidden';
+              }
+            };
 
-            toggleBtn.addEventListener('click', openSidebar);
+            toggleBtn.addEventListener('click', toggleSidebar, true);
             backdrop.addEventListener('click', closeSidebar);
             sidebar.querySelectorAll('.sidebar-close-btn').forEach(btn => btn.addEventListener('click', closeSidebar));
             sidebar.querySelectorAll('a.nav-link, a.ad-nav-link, a.ct-nav-link').forEach(link => {
               link.addEventListener('click', () => {
-                if (window.innerWidth <= 992) closeSidebar();
+                if (window.innerWidth <= 1024 || window.innerHeight <= 600 || document.documentElement.classList.contains('is-mobile-device')) {
+                  closeSidebar();
+                }
               });
             });
             document.addEventListener('keydown', (e) => {
               if (e.key === 'Escape') closeSidebar();
             });
             window.addEventListener('resize', () => {
-              if (window.innerWidth > 992) closeSidebar();
+              if (window.innerWidth > 1024 && window.innerHeight > 600 && !document.documentElement.classList.contains('is-mobile-device')) {
+                closeSidebar();
+              }
             });
           }
         }
       }
 
+      setupMobileDrawerElements();
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', setupMobileDrawerElements);
-      } else {
-        setupMobileDrawerElements();
       }
     } catch (mobileErr) {
       console.warn('[ATAMAN Mobile Engine] Notice:', mobileErr);

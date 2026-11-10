@@ -1707,20 +1707,30 @@ html, body {
   }
 }
 
-@media (max-width: 900px) {
-  .summary-cards-grid {
-    grid-template-columns: repeat(3, 1fr);
+@media (max-width: 1024px), (hover: none) and (pointer: coarse), (max-height: 600px) {
+  .map-split-stage {
+    grid-template-columns: minmax(0, 1fr) !important;
+    min-height: 0 !important;
   }
-}
-
-@media (max-width: 768px) {
-  .ct-sidebar {
-    display: none;
-  }
-  .ct-main-content {
-    width: 100vw;
+  #caretakerMapMain {
+    min-height: 320px !important;
+    max-height: 55vh !important;
   }
   .summary-cards-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .summary-cards-grid > :last-child:nth-child(odd) {
+    grid-column: 1 / -1 !important;
+  }
+  .controls-top-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .map-search-box,
+  .map-filter-select,
+  .overdue-toggle-label {
+    width: 100% !important;
+    min-width: 0 !important;
   }
 }

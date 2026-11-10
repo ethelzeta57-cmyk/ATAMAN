@@ -561,8 +561,10 @@
           border-color: rgba(239, 68, 68, 0.45);
           color: #fca5a5;
         }
-        @media (max-width: 992px) {
-          .mobile-nav-toggle {
+        @media (max-width: 1024px), (hover: none) and (pointer: coarse), (max-height: 600px) {
+          .mobile-nav-toggle,
+          .topbar-toggle,
+          #sidebarToggle {
             display: inline-flex !important;
           }
           .sidebar-close-btn {
@@ -579,15 +581,16 @@
             height: 100vh !important;
             height: 100dvh !important;
             min-height: 100vh !important;
-            z-index: 10000 !important;
-            transform: translateX(-100%) !important;
+            z-index: 10005 !important;
+            transform: translateX(-105%) !important;
             transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s ease !important;
             visibility: hidden !important;
             box-shadow: none !important;
             display: flex !important;
             flex-direction: column !important;
           }
-          .sidebar.mobile-open {
+          .sidebar.mobile-open,
+          .sidebar.open {
             transform: translateX(0) !important;
             visibility: visible !important;
             box-shadow: 12px 0 35px rgba(0, 0, 0, 0.5) !important;
@@ -689,24 +692,26 @@
     }
 
     function openSidebar() {
-      sidebar.classList.add('mobile-open');
+      sidebar.classList.add('mobile-open', 'open');
       if (backdrop) backdrop.classList.add('active');
       document.body.classList.add('sidebar-drawer-open');
       document.body.style.overflow = 'hidden';
     }
 
     function closeSidebar() {
-      sidebar.classList.remove('mobile-open');
+      sidebar.classList.remove('mobile-open', 'open');
       if (backdrop) backdrop.classList.remove('active');
       document.body.classList.remove('sidebar-drawer-open');
       document.body.style.overflow = '';
     }
 
-    if (menuBtn) {
+    if (menuBtn && !menuBtn.dataset.mobileBound) {
+      menuBtn.dataset.mobileBound = 'true';
       menuBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (sidebar.classList.contains('mobile-open')) {
+        e.stopImmediatePropagation();
+        if (sidebar.classList.contains('mobile-open') || sidebar.classList.contains('open')) {
           closeSidebar();
         } else {
           openSidebar();
@@ -714,7 +719,8 @@
       });
     }
 
-    if (closeBtn) {
+    if (closeBtn && !closeBtn.dataset.mobileBound) {
+      closeBtn.dataset.mobileBound = 'true';
       closeBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -722,14 +728,15 @@
       });
     }
 
-    if (backdrop) {
+    if (backdrop && !backdrop.dataset.mobileBound) {
+      backdrop.dataset.mobileBound = 'true';
       backdrop.addEventListener('click', closeSidebar);
     }
 
     // Close when tapping a navigation link on mobile
     sidebar.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', () => {
-        if (window.innerWidth <= 992) {
+        if (window.innerWidth <= 1024 || window.innerHeight <= 600) {
           closeSidebar();
         }
       });
@@ -737,14 +744,14 @@
 
     // Close with Escape key
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && sidebar.classList.contains('mobile-open')) {
+      if (e.key === 'Escape' && (sidebar.classList.contains('mobile-open') || sidebar.classList.contains('open'))) {
         closeSidebar();
       }
     });
 
     // Close when resized back to desktop
     window.addEventListener('resize', () => {
-      if (window.innerWidth > 992 && sidebar.classList.contains('mobile-open')) {
+      if (window.innerWidth > 1024 && window.innerHeight > 600 && (sidebar.classList.contains('mobile-open') || sidebar.classList.contains('open'))) {
         closeSidebar();
       }
     });
