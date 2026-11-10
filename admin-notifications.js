@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const item = notifications.find(n => n.id === id);
     if (!item) return;
 
-    if (notifyStaffName) notifyStaffName.value = item.caretaker && item.caretaker !== 'Unassigned' ? item.caretaker : 'Pedro Reyes (Zone Lead)';
+    if (notifyStaffName) notifyStaffName.value = item.caretaker && item.caretaker !== 'Unassigned' ? item.caretaker : 'Dodong Zeta (Zone Lead)';
     if (notifyMessageText) {
       notifyMessageText.value = `[ATAMAN DISPATCH] Attention ${notifyStaffName.value}: Tree ${item.treeId || 'in your zone'} in ${item.location || 'Santiago'} requires inspection. Reason: ${item.issue || item.description}. Please confirm once checked.`;
     }

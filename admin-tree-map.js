@@ -1500,7 +1500,7 @@ CRITICAL HOTSPOT AREAS:
 - Payao Mangrove Sanctuary (9 Critical Cases)
 
 OPERATIONAL CARETAKERS:
-- Pedro Reyes: 485 Trees (Catbalogan Hub)
+- Dodong Zeta: 310 Trees (Catbalogan Hub)
 - Roberto Cruz: 521 Trees (North Ridge)
 - Elena Gomez: 392 Trees (East Sector)
 =====================================================

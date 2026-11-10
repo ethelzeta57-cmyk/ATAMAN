@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const triggerMockDownload = (filename) => {
     const isCsv = filename.endsWith('.csv');
     const content = isCsv
-      ? 'Tree ID,Species,Location,Health,Survival Rate,Caretaker\nTR-10021,Narra,San Isidro,Healthy,97.6%,Pedro Reyes\nTR-10047,Acacia,Santiago,Critical,94.0%,Pedro Reyes\n'
+      ? 'Tree ID,Species,Location,Health,Survival Rate,Caretaker\nTR-10021,Narra,San Isidro,Healthy,97.6%,Dodong Zeta\nTR-10047,Acacia,Santiago,Critical,94.0%,Dodong Zeta\n'
       : `ATAMAN Official Analytical Report\nGenerated: ${new Date().toLocaleString()}\nFile: ${filename}\nScope: Master System Export\n`;
 
     const blob = new Blob([content], { type: isCsv ? 'text/csv' : 'text/plain' });

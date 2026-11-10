@@ -9,47 +9,23 @@ document.addEventListener('DOMContentLoaded', () => {
     : [
       {
         id: 'ADP-101',
-        name: 'John Sho',
-        fullName: 'John Sho',
-        contactPerson: 'John Sho',
+        name: 'Nikki Maga',
+        fullName: 'Nikki Maga',
+        contactPerson: 'Nikki Maga',
         type: 'Individual',
-        email: 'john.sho@gmail.com',
+        email: 'nikkimaga24@gmail.com',
         phone: '+63 917 123 4567',
         address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
         status: 'Active',
-        treesCount: 35,
-        funding: 1750,
-        fundingPaid: 1750,
+        treesCount: 10,
+        funding: 500,
+        fundingPaid: 500,
         customFunding: true,
         joinedDate: '2026-08-28',
         startDate: '2026-08-28',
         expDate: 'Ongoing',
         treesList: [
-          { id: 'TR-10001', treeCount: 10, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 },
-          { id: 'TR-10021', treeCount: 25, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 }
-        ]
-      },
-      {
-        id: 'ADP-102',
-        name: 'Century Catbalogan',
-        fullName: 'Century Catbalogan',
-        contactPerson: 'Maria Santos',
-        type: 'Corporate',
-        email: 'contact@centurycatbalogan.com',
-        phone: '+63 920 987 6543',
-        address: 'Del Rosario St., Catbalogan City, Samar',
-        status: 'Active',
-        treesCount: 17,
-        funding: 850,
-        fundingPaid: 850,
-        customFunding: true,
-        joinedDate: '2026-09-06',
-        startDate: '2026-09-06',
-        expDate: 'Ongoing',
-        treesList: [
-          { id: 'TR-10002', treeCount: 10, species: 'Molave', location: 'Brgy. Canlapwas, Catbalogan City', fundingAmount: 50 },
-          { id: 'TR-10005', treeCount: 5, species: 'Tanguile', location: 'Brgy. Mercedes, Catbalogan City', fundingAmount: 50 },
-          { id: 'TR-10007', treeCount: 2, species: 'Narra', location: 'Brgy. Silanga, Catbalogan City', fundingAmount: 50 }
+          { id: 'TR-10001', treeCount: 10, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 }
         ]
       }
     ];
@@ -328,12 +304,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Default Samar caretaker representation
     const defaultCt = {
       id: isGuinsorongan ? 'CT-2026-001' : 'CT-101',
-      name: isGuinsorongan ? 'Amara Yes' : 'Pedro Reyes',
+      name: isGuinsorongan ? 'Amara Yes' : 'Dodong Zeta',
       empId: isGuinsorongan ? 'CT-2026-001' : 'EMP-101',
       role: 'Field Caretaker',
       primaryArea: isGuinsorongan ? 'Brgy. Guinsorongan' : 'Catbalogan City',
       phone: '+63 917 888 1234',
-      email: isGuinsorongan ? 'amara.yes@ataman.org' : 'pedro.reyes@ataman.org',
+      email: isGuinsorongan ? 'amara.yes@ataman.org' : 'zetadodong@gmail.com',
       status: 'Active',
       schedule: []
     };

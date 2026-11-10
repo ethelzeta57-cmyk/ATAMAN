@@ -18,14 +18,14 @@
       province: 'Samar',
       lat: 11.7850,
       lng: 124.8860,
-      sponsorName: 'John Sho',
-      adopter: 'John Sho',
+      sponsorName: 'Nikki Maga',
+      adopter: 'Nikki Maga',
       takenCount: 10,
       fundingAmount: 50,
       datePlanted: '2026-08-28',
       createdAt: '2026-08-28T08:00:00.000Z',
       ageOfTree: '2 months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '2.4 meters',
       trunkDiam: '4.2 cm'
     },
@@ -40,14 +40,14 @@
       province: 'Samar',
       lat: 11.7820,
       lng: 124.8870,
-      sponsorName: 'Century Catbalogan',
-      adopter: 'Century Catbalogan',
-      takenCount: 10,
+      sponsorName: '',
+      adopter: '',
+      takenCount: 0,
       fundingAmount: 50,
       datePlanted: '2026-03-06',
       createdAt: '2026-09-06T08:00:00.000Z',
       ageOfTree: '6 months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '3.1 meters',
       trunkDiam: '5.8 cm'
     },
@@ -69,7 +69,7 @@
       datePlanted: '2026-04-06',
       createdAt: '2026-09-06T09:00:00.000Z',
       ageOfTree: '5 months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '1.8 meters',
       trunkDiam: '3.5 cm'
     },
@@ -91,7 +91,7 @@
       datePlanted: '2026-03-06',
       createdAt: '2026-09-06T10:00:00.000Z',
       ageOfTree: '6 Months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '2.9 meters',
       trunkDiam: '4.8 cm'
     },
@@ -106,14 +106,14 @@
       province: 'Samar',
       lat: 11.7690,
       lng: 124.8940,
-      sponsorName: 'Century Catbalogan',
-      adopter: 'Century Catbalogan',
-      takenCount: 5,
+      sponsorName: '',
+      adopter: '',
+      takenCount: 0,
       fundingAmount: 50,
       datePlanted: '2025-09-06',
       createdAt: '2026-09-06T11:00:00.000Z',
       ageOfTree: '12 Months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '4.0 meters',
       trunkDiam: '8.2 cm'
     },
@@ -135,7 +135,7 @@
       datePlanted: '2026-03-06',
       createdAt: '2026-09-06T12:00:00.000Z',
       ageOfTree: '6 Months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '2.5 meters',
       trunkDiam: '4.0 cm'
     },
@@ -150,14 +150,14 @@
       province: 'Samar',
       lat: 11.8150,
       lng: 124.8640,
-      sponsorName: 'Century Catbalogan',
-      adopter: 'Century Catbalogan',
-      takenCount: 2,
+      sponsorName: '',
+      adopter: '',
+      takenCount: 0,
       fundingAmount: 50,
       datePlanted: '2026-04-06',
       createdAt: '2026-09-06T13:00:00.000Z',
       ageOfTree: '6 months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '2.7 meters',
       trunkDiam: '4.5 cm'
     },
@@ -172,14 +172,14 @@
       province: 'Samar',
       lat: 11.7875,
       lng: 124.8825,
-      sponsorName: 'John Sho',
-      adopter: 'John Sho',
-      takenCount: 25,
+      sponsorName: '',
+      adopter: '',
+      takenCount: 0,
       fundingAmount: 50,
       datePlanted: '2026-07-15',
       createdAt: '2026-07-15T08:00:00.000Z',
       ageOfTree: '4 months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '2.8 meters',
       trunkDiam: '4.9 cm'
     },
@@ -201,7 +201,7 @@
       datePlanted: '2026-05-10',
       createdAt: '2026-05-10T09:00:00.000Z',
       ageOfTree: '6 months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '2.2 meters',
       trunkDiam: '3.8 cm'
     },
@@ -223,7 +223,7 @@
       datePlanted: '2026-06-01',
       createdAt: '2026-06-01T10:00:00.000Z',
       ageOfTree: '5 months',
-      caretaker: 'Pedro Reyes',
+      caretaker: 'Dodong Zeta',
       height: '1.9 meters',
       trunkDiam: '3.2 cm'
     }
@@ -233,47 +233,23 @@
   const DEFAULT_ADOPTERS = [
     {
       id: 'ADP-101',
-      name: 'John Sho',
-      fullName: 'John Sho',
-      contactPerson: 'John Sho',
+      name: 'Nikki Maga',
+      fullName: 'Nikki Maga',
+      contactPerson: 'Nikki Maga',
       type: 'Individual',
-      email: 'john.sho@gmail.com',
+      email: 'nikkimaga24@gmail.com',
       phone: '+63 917 123 4567',
       address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
       status: 'Active',
-      treesCount: 35,
-      funding: 1750,
-      fundingPaid: 1750,
+      treesCount: 10,
+      funding: 500,
+      fundingPaid: 500,
       customFunding: true,
       joinedDate: '2026-08-28',
       startDate: '2026-08-28',
       expDate: 'Ongoing',
       treesList: [
-        { id: 'TR-10001', treeCount: 10, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 },
-        { id: 'TR-10021', treeCount: 25, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 }
-      ]
-    },
-    {
-      id: 'ADP-102',
-      name: 'Century Catbalogan',
-      fullName: 'Century Catbalogan',
-      contactPerson: 'Maria Santos',
-      type: 'Corporate',
-      email: 'contact@centurycatbalogan.com',
-      phone: '+63 920 987 6543',
-      address: 'Del Rosario St., Catbalogan City, Samar',
-      status: 'Active',
-      treesCount: 17,
-      funding: 850,
-      fundingPaid: 850,
-      customFunding: true,
-      joinedDate: '2026-09-06',
-      startDate: '2026-09-06',
-      expDate: 'Ongoing',
-      treesList: [
-        { id: 'TR-10002', treeCount: 10, species: 'Molave', location: 'Brgy. Canlapwas, Catbalogan City', fundingAmount: 50 },
-        { id: 'TR-10005', treeCount: 5, species: 'Tanguile', location: 'Brgy. Mercedes, Catbalogan City', fundingAmount: 50 },
-        { id: 'TR-10007', treeCount: 2, species: 'Narra', location: 'Brgy. Silanga, Catbalogan City', fundingAmount: 50 }
+        { id: 'TR-10001', treeCount: 10, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 }
       ]
     }
   ];
@@ -283,9 +259,9 @@
     {
       id: 'CT-101',
       empId: 'EMP-002',
-      name: 'Pedro Reyes',
-      fullName: 'Pedro Reyes',
-      email: 'pedro.reyes@ataman.org',
+      name: 'Dodong Zeta',
+      fullName: 'Dodong Zeta',
+      email: 'zetadodong@gmail.com',
       phone: '+63 918 333 4455',
       address: 'Brgy. Canlapwas, Catbalogan City, Samar',
       role: 'Field Caretaker',
@@ -296,7 +272,7 @@
       municipality: 'Catbalogan City',
       barangay: 'Canlapwas',
       assignedTrees: ['TR-10001', 'TR-10002', 'TR-10003', 'TR-10004', 'TR-10005', 'TR-10006', 'TR-10007', 'TR-10021', 'TR-10035', 'TR-10047'],
-      assignedAdopterName: 'John Sho, Century Catbalogan',
+      assignedAdopterName: 'Nikki Maga',
       joinedDate: '2026-08-01',
       createdAt: '2026-08-01T08:00:00.000Z',
       performanceRating: '98%',
@@ -323,10 +299,10 @@
     {
       uid: 'USR-CT-001',
       id: 'CT-101',
-      email: 'pedro.reyes@ataman.org',
-      displayName: 'Pedro Reyes',
-      name: 'Pedro Reyes',
-      username: 'pedroreyes',
+      email: 'zetadodong@gmail.com',
+      displayName: 'Dodong Zeta',
+      name: 'Dodong Zeta',
+      username: 'zetadodong',
       empId: 'EMP-002',
       role: 'caretaker',
       status: 'Active',
@@ -338,10 +314,10 @@
     {
       uid: 'USR-ADP-001',
       id: 'ADP-101',
-      email: 'john.sho@gmail.com',
-      displayName: 'John Sho',
-      name: 'John Sho',
-      username: 'johnsho',
+      email: 'nikkimaga24@gmail.com',
+      displayName: 'Nikki Maga',
+      name: 'Nikki Maga',
+      username: 'nikkimaga24',
       empId: 'ADP-101',
       role: 'adopter',
       status: 'Active',
@@ -349,67 +325,69 @@
       address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
       password: 'Password123!',
       createdAt: '2026-08-28T08:00:00.000Z'
-    },
-    {
-      uid: 'USR-ADP-002',
-      id: 'ADP-102',
-      email: 'contact@centurycatbalogan.com',
-      displayName: 'Century Catbalogan (Maria Santos)',
-      name: 'Century Catbalogan',
-      contactPerson: 'Maria Santos',
-      username: 'centurycatbalogan',
-      empId: 'ADP-102',
-      role: 'adopter',
-      status: 'Active',
-      phone: '+63 920 987 6543',
-      address: 'Del Rosario St., Catbalogan City, Samar',
-      password: 'Password123!',
-      createdAt: '2026-09-06T08:00:00.000Z'
     }
   ];
   window.ATAMAN_DEFAULT_USERS = DEFAULT_USERS;
 
-  const INIT_VERSION = 'ATAMAN_init_v6_preserve_all_data';
+  const INIT_VERSION = 'ATAMAN_init_v7_user_real_accounts';
 
-  // Seed default registered data if caches are missing or empty
+  // Seed / migrate registered data when upgrading or if caches are missing
   if (!localStorage.getItem(INIT_VERSION)) {
-    const existingTrees = (() => {
+    // 1. Trees: If missing, empty, or containing old mock caretaker/adopter, reset to DEFAULT_TREES with Dodong Zeta & Nikki Maga
+    let existingTrees = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
         return Array.isArray(raw) && raw.length > 0 ? raw : null;
       } catch (_) { return null; }
     })();
-    if (!existingTrees) {
+
+    if (!existingTrees || existingTrees.some(t => t.caretaker === 'Pedro Reyes' || t.adopter === 'John Sho' || t.adopter === 'Century Catbalogan')) {
       localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES));
     }
 
-    const existingAdopters = (() => {
+    // 2. Adopters: Replace old mock adopters (John Sho, Century Catbalogan) with real adopter Nikki Maga
+    let existingAdopters = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
         return Array.isArray(raw) && raw.length > 0 ? raw : null;
       } catch (_) { return null; }
     })();
-    if (!existingAdopters) {
+
+    if (!existingAdopters || existingAdopters.some(a => a.name === 'John Sho' || a.name === 'Century Catbalogan' || a.email === 'john.sho@gmail.com')) {
       localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
     }
 
-    const existingCaretakers = (() => {
+    // 3. Caretakers: Replace old mock caretaker (Pedro Reyes) with real caretaker Dodong Zeta
+    let existingCaretakers = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
         return Array.isArray(raw) && raw.length > 0 ? raw : null;
       } catch (_) { return null; }
     })();
-    if (!existingCaretakers) {
+
+    if (!existingCaretakers || existingCaretakers.some(c => c.name === 'Pedro Reyes' || c.email === 'pedro.reyes@ataman.org')) {
       localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
     }
 
-    const existingUsers = (() => {
+    // 4. Users: Filter out pedro.reyes, john.sho, and centurycatbalogan, ensuring real accounts: ethelzeta57@gmail.com, zetadodong@gmail.com, nikkimaga24@gmail.com
+    let existingUsers = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
-        return Array.isArray(raw) && raw.length > 1 ? raw : null;
+        return Array.isArray(raw) && raw.length > 0 ? raw : null;
       } catch (_) { return null; }
     })();
-    const usersJson = JSON.stringify(existingUsers || DEFAULT_USERS);
+
+    let cleanedUsers = DEFAULT_USERS.slice();
+    if (existingUsers) {
+      existingUsers.forEach(u => {
+        const email = (u.email || '').toLowerCase().trim();
+        if (email && email !== 'pedro.reyes@ataman.org' && email !== 'john.sho@gmail.com' && email !== 'contact@centurycatbalogan.com' && !cleanedUsers.some(cu => cu.email.toLowerCase() === email)) {
+          cleanedUsers.push(u);
+        }
+      });
+    }
+
+    const usersJson = JSON.stringify(cleanedUsers);
     localStorage.setItem('ATAMAN_users_cache', usersJson);
     localStorage.setItem('saplink_users_cache', usersJson);
     localStorage.setItem('ATAMAN_registered_users', usersJson);
@@ -418,19 +396,36 @@
     localStorage.setItem(INIT_VERSION, 'done');
   }
 
-  // Ensure registered datasets are never missing or blanked
+  // Ensure registered datasets are never missing, blanked, or containing deprecated sample data
   try {
-    const trees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
+    let trees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
     if (!Array.isArray(trees) || trees.length === 0) {
       localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES));
+    } else if (trees.some(t => t.caretaker === 'Pedro Reyes' || t.adopter === 'John Sho' || t.adopter === 'Century Catbalogan')) {
+      trees = trees.map(t => {
+        let updated = Object.assign({}, t);
+        if (updated.caretaker === 'Pedro Reyes') updated.caretaker = 'Dodong Zeta';
+        if (updated.adopter === 'John Sho' || updated.adopter === 'Century Catbalogan') {
+          if (updated.id === 'TR-10001') {
+            updated.adopter = 'Nikki Maga';
+            updated.sponsorName = 'Nikki Maga';
+          } else {
+            updated.adopter = '';
+            updated.sponsorName = '';
+            updated.takenCount = 0;
+          }
+        }
+        return updated;
+      });
+      localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(trees));
     }
   } catch (_) {
     try { localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES)); } catch (_) {}
   }
 
   try {
-    const adopters = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
-    if (!Array.isArray(adopters) || adopters.length === 0) {
+    let adopters = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+    if (!Array.isArray(adopters) || adopters.length === 0 || adopters.some(a => a.name === 'John Sho' || a.name === 'Century Catbalogan')) {
       localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
     }
   } catch (_) {
@@ -438,8 +433,8 @@
   }
 
   try {
-    const caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-    if (!Array.isArray(caretakers) || caretakers.length === 0) {
+    let caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+    if (!Array.isArray(caretakers) || caretakers.length === 0 || caretakers.some(c => c.name === 'Pedro Reyes' || c.email === 'pedro.reyes@ataman.org')) {
       localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
     }
   } catch (_) {
@@ -447,9 +442,18 @@
   }
 
   try {
-    const users = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
-    if (!Array.isArray(users) || users.length <= 1) {
-      const uJson = JSON.stringify(DEFAULT_USERS);
+    let users = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
+    if (!Array.isArray(users) || users.length <= 1 || users.some(u => u.email === 'pedro.reyes@ataman.org' || u.email === 'john.sho@gmail.com')) {
+      let filtered = (Array.isArray(users) ? users : []).filter(u => {
+        const em = (u.email || '').toLowerCase().trim();
+        return em !== 'pedro.reyes@ataman.org' && em !== 'john.sho@gmail.com' && em !== 'contact@centurycatbalogan.com';
+      });
+      DEFAULT_USERS.forEach(defU => {
+        if (!filtered.some(u => (u.email || '').toLowerCase() === defU.email.toLowerCase())) {
+          filtered.push(defU);
+        }
+      });
+      const uJson = JSON.stringify(filtered);
       localStorage.setItem('ATAMAN_users_cache', uJson);
       localStorage.setItem('saplink_users_cache', uJson);
       localStorage.setItem('ATAMAN_registered_users', uJson);

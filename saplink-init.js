@@ -365,47 +365,65 @@
     }
   ];
 
-  const INIT_VERSION = 'ATAMAN_init_v6_preserve_all_data';
+  const INIT_VERSION = 'ATAMAN_init_v7_user_real_accounts';
 
-  // Seed default registered data if caches are missing or empty
+  // Seed / migrate registered data when upgrading or if caches are missing
   if (!localStorage.getItem(INIT_VERSION)) {
-    const existingTrees = (() => {
+    // 1. Trees: If missing, empty, or containing old mock caretaker/adopter, reset to DEFAULT_TREES with Dodong Zeta & Nikki Maga
+    let existingTrees = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
         return Array.isArray(raw) && raw.length > 0 ? raw : null;
       } catch (_) { return null; }
     })();
-    if (!existingTrees) {
+
+    if (!existingTrees || existingTrees.some(t => t.caretaker === 'Pedro Reyes' || t.adopter === 'John Sho' || t.adopter === 'Century Catbalogan')) {
       localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES));
     }
 
-    const existingAdopters = (() => {
+    // 2. Adopters: Replace old mock adopters (John Sho, Century Catbalogan) with real adopter Nikki Maga
+    let existingAdopters = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
         return Array.isArray(raw) && raw.length > 0 ? raw : null;
       } catch (_) { return null; }
     })();
-    if (!existingAdopters) {
+
+    if (!existingAdopters || existingAdopters.some(a => a.name === 'John Sho' || a.name === 'Century Catbalogan' || a.email === 'john.sho@gmail.com')) {
       localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
     }
 
-    const existingCaretakers = (() => {
+    // 3. Caretakers: Replace old mock caretaker (Pedro Reyes) with real caretaker Dodong Zeta
+    let existingCaretakers = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
         return Array.isArray(raw) && raw.length > 0 ? raw : null;
       } catch (_) { return null; }
     })();
-    if (!existingCaretakers) {
+
+    if (!existingCaretakers || existingCaretakers.some(c => c.name === 'Pedro Reyes' || c.email === 'pedro.reyes@ataman.org')) {
       localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
     }
 
-    const existingUsers = (() => {
+    // 4. Users: Filter out pedro.reyes, john.sho, and centurycatbalogan, ensuring real accounts: ethelzeta57@gmail.com, zetadodong@gmail.com, nikkimaga24@gmail.com
+    let existingUsers = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
-        return Array.isArray(raw) && raw.length > 1 ? raw : null;
+        return Array.isArray(raw) && raw.length > 0 ? raw : null;
       } catch (_) { return null; }
     })();
-    const usersJson = JSON.stringify(existingUsers || DEFAULT_USERS);
+
+    let cleanedUsers = DEFAULT_USERS.slice();
+    if (existingUsers) {
+      existingUsers.forEach(u => {
+        const email = (u.email || '').toLowerCase().trim();
+        if (email && email !== 'pedro.reyes@ataman.org' && email !== 'john.sho@gmail.com' && email !== 'contact@centurycatbalogan.com' && !cleanedUsers.some(cu => cu.email.toLowerCase() === email)) {
+          cleanedUsers.push(u);
+        }
+      });
+    }
+
+    const usersJson = JSON.stringify(cleanedUsers);
     localStorage.setItem('ATAMAN_users_cache', usersJson);
     localStorage.setItem('saplink_users_cache', usersJson);
     localStorage.setItem('ATAMAN_registered_users', usersJson);
@@ -414,19 +432,36 @@
     localStorage.setItem(INIT_VERSION, 'done');
   }
 
-  // Ensure registered datasets are never missing or blanked
+  // Ensure registered datasets are never missing, blanked, or containing deprecated sample data
   try {
-    const trees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
+    let trees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
     if (!Array.isArray(trees) || trees.length === 0) {
       localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES));
+    } else if (trees.some(t => t.caretaker === 'Pedro Reyes' || t.adopter === 'John Sho' || t.adopter === 'Century Catbalogan')) {
+      trees = trees.map(t => {
+        let updated = Object.assign({}, t);
+        if (updated.caretaker === 'Pedro Reyes') updated.caretaker = 'Dodong Zeta';
+        if (updated.adopter === 'John Sho' || updated.adopter === 'Century Catbalogan') {
+          if (updated.id === 'TR-10001') {
+            updated.adopter = 'Nikki Maga';
+            updated.sponsorName = 'Nikki Maga';
+          } else {
+            updated.adopter = '';
+            updated.sponsorName = '';
+            updated.takenCount = 0;
+          }
+        }
+        return updated;
+      });
+      localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(trees));
     }
   } catch (_) {
     try { localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES)); } catch (_) {}
   }
 
   try {
-    const adopters = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
-    if (!Array.isArray(adopters) || adopters.length === 0) {
+    let adopters = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+    if (!Array.isArray(adopters) || adopters.length === 0 || adopters.some(a => a.name === 'John Sho' || a.name === 'Century Catbalogan')) {
       localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
     }
   } catch (_) {
@@ -434,8 +469,8 @@
   }
 
   try {
-    const caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-    if (!Array.isArray(caretakers) || caretakers.length === 0) {
+    let caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+    if (!Array.isArray(caretakers) || caretakers.length === 0 || caretakers.some(c => c.name === 'Pedro Reyes' || c.email === 'pedro.reyes@ataman.org')) {
       localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
     }
   } catch (_) {
@@ -443,9 +478,18 @@
   }
 
   try {
-    const users = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
-    if (!Array.isArray(users) || users.length <= 1) {
-      const uJson = JSON.stringify(DEFAULT_USERS);
+    let users = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
+    if (!Array.isArray(users) || users.length <= 1 || users.some(u => u.email === 'pedro.reyes@ataman.org' || u.email === 'john.sho@gmail.com')) {
+      let filtered = (Array.isArray(users) ? users : []).filter(u => {
+        const em = (u.email || '').toLowerCase().trim();
+        return em !== 'pedro.reyes@ataman.org' && em !== 'john.sho@gmail.com' && em !== 'contact@centurycatbalogan.com';
+      });
+      DEFAULT_USERS.forEach(defU => {
+        if (!filtered.some(u => (u.email || '').toLowerCase() === defU.email.toLowerCase())) {
+          filtered.push(defU);
+        }
+      });
+      const uJson = JSON.stringify(filtered);
       localStorage.setItem('ATAMAN_users_cache', uJson);
       localStorage.setItem('saplink_users_cache', uJson);
       localStorage.setItem('ATAMAN_registered_users', uJson);

@@ -14,7 +14,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   'use strict';
 
   // Ensure one-time cache reset runs on every dashboard (even pages that don't load ATAMAN-init.js)
-  const INIT_VERSION = 'ATAMAN_init_v6_preserve_all_data';
+  const INIT_VERSION = 'ATAMAN_init_v7_user_real_accounts';
   if (!localStorage.getItem(INIT_VERSION)) {
     const existingTrees = (() => {
       try {
@@ -166,13 +166,13 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       role: 'admin'
     },
     caretaker: {
-      email: 'pedro.reyes@ATAMAN.org',
-      displayName: 'Pedro Reyes',
+      email: 'zetadodong@gmail.com',
+      displayName: 'Dodong Zeta',
       role: 'caretaker'
     },
     adopter: {
-      email: 'juan.delacruz@ATAMAN.org',
-      displayName: 'Juan Dela Cruz',
+      email: 'nikkimaga24@gmail.com',
+      displayName: 'Nikki Maga',
       role: 'adopter'
     }
   };
@@ -193,9 +193,9 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     {
       uid: 'USR-CT-001',
       id: 'CT-101',
-      email: 'pedro.reyes@ataman.org',
-      displayName: 'Pedro Reyes',
-      name: 'Pedro Reyes',
+      email: 'zetadodong@gmail.com',
+      displayName: 'Dodong Zeta',
+      name: 'Dodong Zeta',
       empId: 'EMP-002',
       role: 'caretaker',
       status: 'Active',
@@ -207,9 +207,9 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     {
       uid: 'USR-ADP-001',
       id: 'ADP-101',
-      email: 'john.sho@gmail.com',
-      displayName: 'John Sho',
-      name: 'John Sho',
+      email: 'nikkimaga24@gmail.com',
+      displayName: 'Nikki Maga',
+      name: 'Nikki Maga',
       empId: 'ADP-101',
       role: 'adopter',
       status: 'Active',
@@ -217,21 +217,6 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
       password: 'Password123!',
       createdAt: '2026-08-28T08:00:00.000Z'
-    },
-    {
-      uid: 'USR-ADP-002',
-      id: 'ADP-102',
-      email: 'contact@centurycatbalogan.com',
-      displayName: 'Century Catbalogan (Maria Santos)',
-      name: 'Century Catbalogan',
-      contactPerson: 'Maria Santos',
-      empId: 'ADP-102',
-      role: 'adopter',
-      status: 'Active',
-      phone: '+63 920 987 6543',
-      address: 'Del Rosario St., Catbalogan City, Samar',
-      password: 'Password123!',
-      createdAt: '2026-09-06T08:00:00.000Z'
     }
   ];
 
