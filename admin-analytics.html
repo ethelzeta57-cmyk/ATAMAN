@@ -428,10 +428,11 @@
       <section class="section" id="secHealth">
         <div class="section-hd">
           <h2 class="section-title">🌳 Tree Health Analytics</h2>
-          <select class="mini-select">
-            <option>Last 6 months</option>
-            <option>Last 3 months</option>
-            <option>This year</option>
+          <select class="mini-select" id="healthPeriodSelect">
+            <option value="present" selected>Present (Live)</option>
+            <option value="last6">Last 6 months</option>
+            <option value="last3">Last 3 months</option>
+            <option value="year">This year</option>
           </select>
         </div>
         <div class="two-col">
@@ -1078,10 +1079,10 @@
   <!-- Toast -->
   <div class="toast hidden" id="toastMsg"></div>
 
-  <script src="ATAMAN-init.js?v=20261110_v9"></script>
+  <script src="ATAMAN-init.js?v=20261110_v10"></script>
   <!-- Real-Time Sync Engine -->
-  <script src="realtime-admin.js?v=20261110_v9"></script>
-  <script src="admin-analytics.js?v=20261110_v9"></script>
+  <script src="realtime-admin.js?v=20261110_v10"></script>
+  <script src="admin-analytics.js?v=20261110_v10"></script>
 </body>
 
 </html>

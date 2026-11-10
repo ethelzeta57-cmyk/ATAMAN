@@ -248,19 +248,42 @@ function drawDonut(h = 0, nc = 0, cr = 0, d = 0) {
    SECTION 2 RIGHT: HEALTH TREND SVG
 ══════════════════════════════════ */
 function computeMonthlyCohorts(trees) {
-  const monthBuckets = [
-    { key: '2026-03', label: 'Mar', fullLabel: 'March 2026' },
-    { key: '2026-04', label: 'Apr', fullLabel: 'April 2026' },
-    { key: '2026-05', label: 'May', fullLabel: 'May 2026' },
-    { key: '2026-06', label: 'Jun', fullLabel: 'June 2026' },
-    { key: '2026-07', label: 'Jul', fullLabel: 'July 2026' },
-    { key: '2026-08', label: 'Aug', fullLabel: 'August 2026' }
-  ];
+  const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  return monthBuckets.map((m, idx) => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonthIdx = now.getMonth(); // e.g., 10 for November
+  const currentKey = `${currentYear}-${String(currentMonthIdx + 1).padStart(2, '0')}`;
+
+  // Build timeline from March 2026 through the live Present month
+  const monthBuckets = [];
+  let y = 2026;
+  let m = 2; // March (0-indexed = 2)
+  const endY = Math.max(2026, currentYear);
+  const endM = (endY === 2026) ? Math.max(7, currentMonthIdx) : currentMonthIdx;
+
+  while (y < endY || (y === endY && m <= endM)) {
+    const key = `${y}-${String(m + 1).padStart(2, '0')}`;
+    const isPresent = (y === endY && m === endM);
+    monthBuckets.push({
+      key,
+      label: isPresent ? `${shortMonths[m]} (Present)` : shortMonths[m],
+      shortLabel: shortMonths[m],
+      fullLabel: isPresent ? `${fullMonths[m]} ${y} (Present)` : `${fullMonths[m]} ${y}`,
+      isPresent
+    });
+    m++;
+    if (m > 11) {
+      m = 0;
+      y++;
+    }
+  }
+
+  return monthBuckets.map((mb, idx) => {
     const cumulative = trees.filter(t => {
       const dp = String(t.datePlanted || t.createdAt || '2026-03-01').slice(0, 7);
-      return dp <= m.key;
+      return dp <= mb.key;
     });
 
     const sourceList = cumulative.length > 0 ? cumulative : trees;
@@ -272,15 +295,16 @@ function computeMonthlyCohorts(trees) {
 
     const addedInMonth = trees.filter(t => {
       const dp = String(t.datePlanted || t.createdAt || '').slice(0, 7);
-      if (idx === 0) return dp <= m.key;
-      return dp === m.key;
+      if (idx === 0) return dp <= mb.key;
+      return dp === mb.key;
     }).reduce((s, t) => s + getTreeCount(t), 0);
 
     const healthyPct = tot > 0 ? Number(((hlth / tot) * 100).toFixed(1)) : 0;
     const survivalPct = tot > 0 ? Number((((tot - dead) / tot) * 100).toFixed(1)) : 0;
 
     return {
-      ...m,
+      ...mb,
+      currentKey,
       totalTrees: tot,
       addedTrees: addedInMonth,
       healthy: hlth,
@@ -295,19 +319,42 @@ function computeMonthlyCohorts(trees) {
 
 function renderHealthTrendChart(cohorts) {
   const svg = document.querySelector('#secHealth .line-svg');
-  if (!svg) return;
+  if (!svg || cohorts.length === 0) return;
 
-  const periodTxt = healthPeriodSelect ? healthPeriodSelect.value.toLowerCase() : 'last 6 months';
+  const periodTxt = healthPeriodSelect ? healthPeriodSelect.value.toLowerCase() : 'present';
   let displayCohorts = cohorts.slice();
-  if (periodTxt.includes('3')) {
+
+  if (periodTxt === 'present' || periodTxt.includes('present')) {
+    // Show key milestones + recent months up to Present (6 points ending at Present)
+    if (cohorts.length > 6) {
+      displayCohorts = [cohorts[0], ...cohorts.slice(-5)];
+    }
+  } else if (periodTxt.includes('6')) {
+    displayCohorts = cohorts.slice(-6);
+  } else if (periodTxt.includes('3')) {
     displayCohorts = cohorts.slice(-3);
+  } else {
+    // This year: show all cohorts from Mar to Present
+    displayCohorts = cohorts.slice();
   }
 
-  const xs = displayCohorts.length === 3
-    ? [90, 260, 430]
-    : [60, 140, 220, 300, 380, 460];
+  // Update card title to reflect Present monitoring
+  const trendTitle = document.querySelector('#secHealth .card:nth-child(2) .card-title');
+  const latest = cohorts[cohorts.length - 1];
+  if (trendTitle && latest) {
+    if (periodTxt.includes('present')) {
+      trendTitle.innerHTML = `Health Trend — % Healthy Over Time <span style="display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:2px 8px;border-radius:999px;background:#dcfce7;color:#166534;font-size:.72rem;font-weight:700;">● Present: ${latest.healthyPct}% Healthy</span>`;
+    } else {
+      trendTitle.textContent = 'Health Trend — % Healthy Over Time';
+    }
+  }
 
-  // Map 70%..100% to y=160..40 (or if below 70%, clamp to 175)
+  const count = displayCohorts.length;
+  const minX = 54;
+  const maxX = 446;
+  const stepX = count > 1 ? (maxX - minX) / (count - 1) : 0;
+
+  // Map 70%..100% to y=160..40
   const pctToY = (pct) => {
     if (pct <= 0) return 180;
     const clamped = Math.max(65, Math.min(100, pct));
@@ -315,11 +362,14 @@ function renderHealthTrendChart(cohorts) {
   };
 
   const points = displayCohorts.map((c, i) => ({
-    x: xs[i] || 60 + i * 80,
+    x: Math.round(minX + i * stepX),
     y: pctToY(c.healthyPct),
     pct: c.healthyPct,
-    label: c.label,
-    total: c.totalTrees
+    label: c.isPresent ? `${c.shortLabel} (Now)` : c.shortLabel,
+    fullLabel: c.fullLabel,
+    isPresent: c.isPresent,
+    total: c.totalTrees,
+    healthy: c.healthy
   }));
 
   const polyPoints = points.map(p => `${p.x},${p.y}`).join(' ');
@@ -346,11 +396,12 @@ function renderHealthTrendChart(cohorts) {
     <polyline points="${polyPoints}" fill="none" stroke="#16a34a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
     ${points.map(p => `
       <g>
-        <circle cx="${p.x}" cy="${p.y}" r="5" fill="#ffffff" stroke="#16a34a" stroke-width="2.5">
-          <title>${p.label}: ${p.pct}% Healthy (${p.total} trees)</title>
+        ${p.isPresent ? `<circle cx="${p.x}" cy="${p.y}" r="10" fill="#22c55e" fill-opacity="0.22" />` : ''}
+        <circle cx="${p.x}" cy="${p.y}" r="${p.isPresent ? '6' : '5'}" fill="${p.isPresent ? '#16a34a' : '#ffffff'}" stroke="#16a34a" stroke-width="2.5">
+          <title>${p.fullLabel}: ${p.pct}% Healthy (${p.healthy} / ${p.total} trees)</title>
         </circle>
-        <text x="${p.x}" y="${Math.max(16, p.y - 10)}" text-anchor="middle" fill="#15803d" font-size="10" font-weight="800">${p.pct}%</text>
-        <text x="${p.x}" y="196" text-anchor="middle" fill="#64748b" font-size="10.5" font-weight="700">${p.label}</text>
+        <text x="${p.x}" y="${Math.max(16, p.y - 10)}" text-anchor="middle" fill="${p.isPresent ? '#166534' : '#15803d'}" font-size="10" font-weight="800">${p.pct}%</text>
+        <text x="${p.x}" y="196" text-anchor="middle" fill="${p.isPresent ? '#166534' : '#64748b'}" font-size="${count > 7 ? '9.5' : '10.5'}" font-weight="${p.isPresent ? '800' : '700'}">${p.label}</text>
       </g>
     `).join('')}
   `;
@@ -776,18 +827,18 @@ function renderMonitoringSection(trees, caretakers) {
     `;
   }
 
-  // Monthly Monitoring Volume pillars (Jan - Aug)
+  // Monthly Monitoring Volume pillars (Apr - Nov Present)
   const pillarWrap = document.querySelector('#secMonitoring .pillar-wrap');
   if (pillarWrap) {
     const monthlyVolumes = [
-      { lbl: 'Jan', val: 2 },
-      { lbl: 'Feb', val: 3 },
-      { lbl: 'Mar', val: 8 },
-      { lbl: 'Apr', val: 6 },
-      { lbl: 'May', val: 5 },
-      { lbl: 'Jun', val: 6 },
+      { lbl: 'Apr', val: 5 },
+      { lbl: 'May', val: 4 },
+      { lbl: 'Jun', val: 5 },
       { lbl: 'Jul', val: 5 },
-      { lbl: 'Aug', val: 7, active: true }
+      { lbl: 'Aug', val: 6 },
+      { lbl: 'Sep', val: 5 },
+      { lbl: 'Oct', val: 6 },
+      { lbl: 'Nov (Now)', val: 6, active: true }
     ];
     const maxVal = Math.max(...monthlyVolumes.map(m => m.val), 1);
     pillarWrap.innerHTML = monthlyVolumes.map(m => {
@@ -1049,17 +1100,20 @@ function renderGrowthSection(trees, adopters, caretakers, cohorts, maintStats) {
     const yTopVal = Math.ceil(maxTrees / 50) * 50; // e.g., 350
     const yStep = Math.round(yTopVal / 4);
 
-    const xs = [60, 140, 220, 300, 380, 460];
+    const growthCohorts = cohorts.length > 6 ? [cohorts[0], ...cohorts.slice(-5)] : cohorts;
+    const minX = 54, maxX = 446;
+    const stepX = growthCohorts.length > 1 ? (maxX - minX) / (growthCohorts.length - 1) : 0;
     const valToY = (v) => {
       const ratio = Math.max(0, Math.min(1, v / yTopVal));
       return Math.round(175 - ratio * 135);
     };
 
-    const pts = cohorts.map((c, i) => ({
-      x: xs[i] || 60 + i * 80,
+    const pts = growthCohorts.map((c, i) => ({
+      x: Math.round(minX + i * stepX),
       y: valToY(c.totalTrees),
       val: c.totalTrees,
-      label: c.label
+      label: c.isPresent ? `${c.shortLabel} (Now)` : c.shortLabel,
+      isPresent: c.isPresent
     }));
 
     const polyPoints = pts.map(p => `${p.x},${p.y}`).join(' ');
