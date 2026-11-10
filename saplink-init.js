@@ -539,6 +539,20 @@
   } catch (guardErr) {
     console.warn('[ATAMAN RBAC] Admin guard error:', guardErr);
   }
+  // One-time Service Worker self-healer (v2.0.2) to immediately restore external map & chart CDNs
+  try {
+    if ('serviceWorker' in navigator && !localStorage.getItem('ATAMAN_sw_healed_v202')) {
+      localStorage.setItem('ATAMAN_sw_healed_v202', 'done');
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        if (regs && regs.length > 0) {
+          Promise.all(regs.map(function(r) { return r.unregister(); })).then(function() {
+            window.location.reload();
+          });
+        }
+      }).catch(function() {});
+    }
+  } catch (_) {}
+
   // UNIVERSAL MOBILE & CROSS-DEVICE RESPONSIVE UI ENGINE
   function initUniversalMobileResponsiveEngine() {
     try {
@@ -794,8 +808,7 @@
             .adopters-table-wrap,
             .caretakers-table-wrap,
             .users-table-wrap,
-            .logs-table-wrap,
-            .card table {
+            .logs-table-wrap {
               display: block !important;
               width: 100% !important;
               overflow-x: auto !important;

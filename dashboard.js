@@ -335,7 +335,20 @@ function updateTopKpis() {
 /* ─── 2.2 Tree Health Donut Chart ─── */
 function initDonutChart(counts) {
   const ctx = document.getElementById('healthChart');
-  if (!ctx || typeof Chart === 'undefined') return;
+  if (!ctx) return;
+  if (typeof Chart === 'undefined') {
+    if (!document.getElementById('chartCorsJs')) {
+      const script = document.createElement('script');
+      script.id = 'chartCorsJs';
+      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+      script.crossOrigin = 'anonymous';
+      script.onload = () => {
+        updateHealthDonut();
+      };
+      document.head.appendChild(script);
+    }
+    return;
+  }
 
   const dataCounts = counts || [0, 0, 0, 0];
   const total = dataCounts.reduce((a, b) => a + b, 0);
@@ -432,7 +445,34 @@ function updateHealthDonut() {
 /* ─── 2.3 Interactive Leaflet Map ─── */
 function initLeafletMap() {
   const mapElement = document.getElementById('leafletMap');
-  if (!mapElement || typeof L === 'undefined') return;
+  if (!mapElement) return;
+  if (typeof L === 'undefined') {
+    // Self-heal: dynamically load Leaflet with CORS if blocked or delayed
+    if (!document.getElementById('leafletCorsCss')) {
+      const link = document.createElement('link');
+      link.id = 'leafletCorsCss';
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    }
+    if (!document.getElementById('leafletCorsJs')) {
+      const script = document.createElement('script');
+      script.id = 'leafletCorsJs';
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.crossOrigin = 'anonymous';
+      script.onload = () => {
+        initLeafletMap();
+        updateMapMarkers();
+      };
+      document.head.appendChild(script);
+    }
+    return;
+  }
+  if (leafletMap) {
+    setTimeout(() => { try { leafletMap.invalidateSize(); } catch (_) {} }, 150);
+    return;
+  }
 
   try {
     leafletMap = L.map('leafletMap', {
@@ -443,6 +483,16 @@ function initLeafletMap() {
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 17
     }).addTo(leafletMap);
+
+    setTimeout(() => {
+      try {
+        leafletMap.invalidateSize();
+        updateMapMarkers();
+      } catch (_) {}
+    }, 200);
+    window.addEventListener('resize', () => {
+      try { if (leafletMap) leafletMap.invalidateSize(); } catch (_) {}
+    });
   } catch (err) {
     console.warn('Leaflet initialization note:', err);
   }
