@@ -580,10 +580,10 @@
   } catch (pwaErr) {
     console.warn('[ATAMAN PWA] Auto-registration notice:', pwaErr);
   }
-  // One-time Service Worker self-healer (v2.0.6) to immediately refresh latest mobile & analytics assets
+  // One-time Service Worker self-healer (v2.0.7) to immediately refresh latest mobile & analytics assets
   try {
-    if ('serviceWorker' in navigator && !localStorage.getItem('ATAMAN_sw_healed_v206')) {
-      localStorage.setItem('ATAMAN_sw_healed_v206', 'done');
+    if ('serviceWorker' in navigator && !localStorage.getItem('ATAMAN_sw_healed_v207')) {
+      localStorage.setItem('ATAMAN_sw_healed_v207', 'done');
       if ('caches' in window) {
         caches.keys().then(function(names) {
           names.forEach(function(n) { caches.delete(n); });
