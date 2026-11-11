@@ -453,7 +453,8 @@
     <div class="modal-card modal-xl">
       <div class="profile-header-banner">
         <div class="profile-title-group">
-          <span class="profile-emoji">🤝</span>
+          <span class="profile-emoji" id="profEmojiIcon">🤝</span>
+          <img id="profPhotoImg" src="" alt="Adopter Photo" style="display: none; width: 56px; height: 56px; border-radius: 12px; object-fit: cover; border: 2.5px solid #86efac; box-shadow: 0 4px 10px rgba(0,0,0,0.12); flex-shrink: 0;" />
           <div>
             <h2 class="profile-name" id="profName">ABC FOUNDATION</h2>
             <div class="profile-badges-row">
@@ -544,6 +545,14 @@
                     id="profProjectDetail">Community Reforestation 2026</span></div>
                 <div class="info-item"><span class="info-label">Assigned Caretaker</span><span class="info-val"
                     id="profCaretakerDetail">👤 Amara Yes (Brgy. Guinsorongan)</span></div>
+              </div>
+            </div>
+
+            <!-- Adopter / Tree Photo Evidence Card -->
+            <div class="card p-card" id="profPhotoCard" style="display: none;">
+              <h3 class="p-card-title">📸 Adoption Photo</h3>
+              <div style="border-radius: 10px; overflow: hidden; border: 1.5px solid #86efac; max-height: 220px; background: #0f172a; display: flex; align-items: center; justify-content: center; position: relative;">
+                <img id="profCardPhotoImg" src="" alt="Adoption Photo" style="width: 100%; max-height: 220px; object-fit: cover; display: block;" />
               </div>
             </div>
 
@@ -854,6 +863,43 @@
                 <input type="date" id="newStartDate" value="2026-08-28" />
               </div>
 
+              <!-- Upload Photo for Tree Adopter -->
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                  <label for="newAdopterPhotoInput" style="font-weight: 700; color: #1e293b; font-size: 12px; display: flex; align-items: center; gap: 5px;">
+                    📸 Tree / Adopter Photo
+                  </label>
+                  <span style="font-size: 11px; color: #64748b; font-weight: 500;">Optional</span>
+                </div>
+
+                <input type="file" id="newAdopterPhotoInput" accept="image/*" style="display: none;" />
+
+                <div id="adopterPhotoUploadZone"
+                  style="border: 2px dashed #86efac; border-radius: 10px; background: #f0fdf4; padding: 12px 14px; text-align: center; cursor: pointer; transition: all 0.2s ease;">
+                  
+                  <div id="adopterPhotoPrompt" style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                      🌲
+                    </div>
+                    <strong style="font-size: 12px; color: #166534;">Click to Upload Tree / Adopter Photo</strong>
+                    <span style="font-size: 10.5px; color: #64748b;">Supports PNG, JPG, WebP (or Drag &amp; Drop)</span>
+                  </div>
+
+                  <div id="adopterPhotoPreviewWrap" style="display: none; flex-direction: column; align-items: center; gap: 6px;">
+                    <div style="position: relative; width: 100%; height: 105px; border-radius: 8px; overflow: hidden; border: 1.5px solid #86efac; box-shadow: 0 1px 4px rgba(0,0,0,0.06); background: #f8fafc;">
+                      <img id="adopterPhotoPreviewImg" src="" alt="Tree Adopter Photo" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+                      <button type="button" id="btnRemoveAdopterPhoto" title="Remove photo"
+                        style="position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; line-height: 1; transition: background 0.15s;">✕</button>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; font-size: 11px;">
+                      <span id="adopterPhotoFileName" style="color: #15803d; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;"></span>
+                      <span id="adopterPhotoFileSize" style="color: #64748b; font-size: 10.5px;"></span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
               <!-- Live Funding Summary Card -->
               <div id="fundingSummaryCard"
                 style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1.5px solid #86efac; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
@@ -926,6 +972,13 @@
             </div>
             <div class="src-row"><span class="src-label">Total Funding:</span><strong class="text-success"
                 id="confirmFunding">₱0</strong></div>
+            <div class="src-row" id="confirmPhotoRow">
+              <span class="src-label">Tree / Adopter Photo:</span>
+              <div id="confirmPhotoVal" style="display: flex; align-items: center; gap: 8px;">
+                <img id="confirmPhotoThumb" src="" alt="Thumbnail" style="width: 34px; height: 34px; object-fit: cover; border-radius: 6px; border: 1.5px solid #86efac; display: none;" />
+                <span id="confirmPhotoText" style="color: #64748b; font-size: 12.5px;">None attached</span>
+              </div>
+            </div>
           </div>
         </div>
 

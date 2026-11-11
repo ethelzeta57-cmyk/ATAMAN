@@ -187,6 +187,92 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentWizardStep = 1;
   let currentProfileTrees = [];
   let currentSelectedAdopter = null;
+  let currentAdopterPhotoData = '';
+
+  function processAdopterPhotoFile(file) {
+    if (!file) return;
+    if (!file.type || !file.type.startsWith('image/')) {
+      alert('⚠️ Please select a valid image file (PNG, JPG, WebP, GIF).');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('⚠️ The selected image exceeds 10MB. Please choose a smaller image.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const maxDim = 1200;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+        currentAdopterPhotoData = compressedDataUrl;
+
+        const previewImg = document.getElementById('adopterPhotoPreviewImg');
+        const previewWrap = document.getElementById('adopterPhotoPreviewWrap');
+        const promptWrap = document.getElementById('adopterPhotoPrompt');
+        const fileNameEl = document.getElementById('adopterPhotoFileName');
+        const fileSizeEl = document.getElementById('adopterPhotoFileSize');
+
+        if (previewImg) previewImg.src = compressedDataUrl;
+        if (fileNameEl) fileNameEl.textContent = file.name;
+        if (fileSizeEl) fileSizeEl.textContent = (file.size / 1024 > 1024) ? (file.size / (1024 * 1024)).toFixed(1) + ' MB' : Math.round(file.size / 1024) + ' KB';
+        if (previewWrap) previewWrap.style.display = 'flex';
+        if (promptWrap) promptWrap.style.display = 'none';
+
+        // Update Step 3 confirmation row if already generated
+        const thumbEl = document.getElementById('confirmPhotoThumb');
+        const textEl = document.getElementById('confirmPhotoText');
+        if (thumbEl && textEl) {
+          thumbEl.src = compressedDataUrl;
+          thumbEl.style.display = 'block';
+          textEl.textContent = file.name || 'Photo Attached';
+          textEl.style.color = '#15803d';
+          textEl.style.fontWeight = '600';
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function resetAdopterPhotoUpload() {
+    currentAdopterPhotoData = '';
+    const input = document.getElementById('newAdopterPhotoInput');
+    if (input) input.value = '';
+    const previewImg = document.getElementById('adopterPhotoPreviewImg');
+    const previewWrap = document.getElementById('adopterPhotoPreviewWrap');
+    const promptWrap = document.getElementById('adopterPhotoPrompt');
+    if (previewImg) previewImg.src = '';
+    if (previewWrap) previewWrap.style.display = 'none';
+    if (promptWrap) promptWrap.style.display = 'flex';
+
+    const thumbEl = document.getElementById('confirmPhotoThumb');
+    const textEl = document.getElementById('confirmPhotoText');
+    if (thumbEl && textEl) {
+      thumbEl.style.display = 'none';
+      textEl.textContent = 'None attached';
+      textEl.style.color = '#64748b';
+      textEl.style.fontWeight = 'normal';
+    }
+  }
 
   function safeEscape(str) {
     if (!str) return '';
@@ -709,11 +795,21 @@ document.addEventListener('DOMContentLoaded', () => {
       const displayContact = ad.contactPerson || ad.contact || ad.email || '—';
       const displayType = ad.type || 'Individual';
 
+      const adopterThumb = ad.photo || ad.treePhoto || '';
       tr.innerHTML = `
         <td>
-          <div class="adopter-name-cell">
-            <span class="adopter-title">${displayName}</span>
-            <span class="adopter-contact">👤 ${displayContact}</span>
+          <div class="adopter-name-cell" style="display: flex; align-items: center; gap: 10px;">
+            ${adopterThumb ? `
+              <img src="${adopterThumb}" alt="${displayName}" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover; border: 1.5px solid #86efac; flex-shrink: 0;" />
+            ` : `
+              <div style="width: 36px; height: 36px; border-radius: 8px; background: #dcfce7; color: #166534; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0;">
+                ${displayName.slice(0, 2).toUpperCase()}
+              </div>
+            `}
+            <div>
+              <span class="adopter-title">${displayName}</span>
+              <span class="adopter-contact">👤 ${displayContact}</span>
+            </div>
           </div>
         </td>
         <td><span class="badge badge-subtle">${displayType}</span></td>
@@ -827,6 +923,29 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     document.getElementById('profPlanBadge').textContent = adopter.plan || 'Standard';
+
+    // Adopter Photo Header & Card
+    const profEmojiIcon = document.getElementById('profEmojiIcon');
+    const profPhotoImg = document.getElementById('profPhotoImg');
+    const profPhotoCard = document.getElementById('profPhotoCard');
+    const profCardPhotoImg = document.getElementById('profCardPhotoImg');
+    const adopterPhoto = adopter.photo || adopter.treePhoto || '';
+
+    if (adopterPhoto) {
+      if (profPhotoImg) {
+        profPhotoImg.src = adopterPhoto;
+        profPhotoImg.style.display = 'block';
+      }
+      if (profEmojiIcon) profEmojiIcon.style.display = 'none';
+      if (profPhotoCard && profCardPhotoImg) {
+        profCardPhotoImg.src = adopterPhoto;
+        profPhotoCard.style.display = 'block';
+      }
+    } else {
+      if (profPhotoImg) profPhotoImg.style.display = 'none';
+      if (profEmojiIcon) profEmojiIcon.style.display = 'inline-block';
+      if (profPhotoCard) profPhotoCard.style.display = 'none';
+    }
 
     // Renewal Warning Banner toggle
     const renewalBanner = document.getElementById('profRenewalBanner');
@@ -1377,6 +1496,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('confirmProjectArea').textContent = document.getElementById('newProject')?.value.trim() || 'Community Reforestation 2026';
     document.getElementById('confirmPeriod').textContent = document.getElementById('newStartDate')?.value || 'Aug 28, 2026';
     document.getElementById('confirmFunding').textContent = '₱' + totalFunding.toLocaleString();
+
+    const thumbEl = document.getElementById('confirmPhotoThumb');
+    const textEl = document.getElementById('confirmPhotoText');
+    if (thumbEl && textEl) {
+      if (currentAdopterPhotoData) {
+        thumbEl.src = currentAdopterPhotoData;
+        thumbEl.style.display = 'block';
+        textEl.textContent = 'Photo attached ✓';
+        textEl.style.color = '#15803d';
+        textEl.style.fontWeight = '600';
+      } else {
+        thumbEl.style.display = 'none';
+        textEl.textContent = 'None attached';
+        textEl.style.color = '#64748b';
+        textEl.style.fontWeight = 'normal';
+      }
+    }
   }
 
   function renderTreeCheckboxes() {
@@ -1820,6 +1956,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (searchInp) searchInp.value = '';
 
       loadSyncedTrees();
+      resetAdopterPhotoUpload();
       populateAdopterDropdown();
       renderWizardStep(1);
       addAdopterModal.classList.remove('hidden');
@@ -1964,6 +2101,8 @@ document.addEventListener('DOMContentLoaded', () => {
       treesCondition: { healthy: totalCount, care: 0, critical: 0, dead: 0 },
       fundingPaid: totalFunding,
       paymentStatus: totalFunding > 0 ? 'Fully Paid' : 'No Funding Entered',
+      photo: currentAdopterPhotoData || '',
+      treePhoto: currentAdopterPhotoData || '',
       payments: totalFunding > 0 ? [
         { date: formatDateDisplay(new Date().toISOString()), ref: 'INV-' + Math.floor(10000 + Math.random() * 90000), amount: totalFunding, status: 'Paid' }
       ] : [],
@@ -1997,6 +2136,8 @@ document.addEventListener('DOMContentLoaded', () => {
           ...tObj,
           sponsorName: adopterName,
           adopter: adopterName,
+          adopterPhoto: currentAdopterPhotoData || tObj.adopterPhoto || '',
+          photo: tObj.photo || currentAdopterPhotoData || '',
           takenCount: newTaken,
           customFunding: totalFunding > 0,
           fundingAmount: perTreeRate,
@@ -2061,6 +2202,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badgeReset) badgeReset.style.display = 'none';
     const searchInpReset = document.getElementById('adopterSearchInput');
     if (searchInpReset) searchInpReset.value = '';
+    resetAdopterPhotoUpload();
     selectedTreeIds = [];
     treeQuantities = {};
     updateLiveSummary();
@@ -2088,6 +2230,51 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Hook both direct button click and form submit
+  // Wire up Step 2 Tree / Adopter Photo Upload Listeners
+  const newAdopterPhotoInput = document.getElementById('newAdopterPhotoInput');
+  const adopterPhotoUploadZone = document.getElementById('adopterPhotoUploadZone');
+  const btnRemoveAdopterPhoto = document.getElementById('btnRemoveAdopterPhoto');
+
+  if (adopterPhotoUploadZone && newAdopterPhotoInput) {
+    adopterPhotoUploadZone.addEventListener('click', (e) => {
+      if (e.target.closest('#btnRemoveAdopterPhoto')) return;
+      newAdopterPhotoInput.click();
+    });
+
+    newAdopterPhotoInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) processAdopterPhotoFile(file);
+    });
+
+    adopterPhotoUploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      adopterPhotoUploadZone.style.borderColor = '#166534';
+      adopterPhotoUploadZone.style.background = '#dcfce7';
+    });
+
+    adopterPhotoUploadZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      adopterPhotoUploadZone.style.borderColor = '#86efac';
+      adopterPhotoUploadZone.style.background = '#f0fdf4';
+    });
+
+    adopterPhotoUploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      adopterPhotoUploadZone.style.borderColor = '#86efac';
+      adopterPhotoUploadZone.style.background = '#f0fdf4';
+      const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) processAdopterPhotoFile(file);
+    });
+  }
+
+  if (btnRemoveAdopterPhoto) {
+    btnRemoveAdopterPhoto.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      resetAdopterPhotoUpload();
+    });
+  }
+
   if (submitAddAdopterBtn) {
     submitAddAdopterBtn.addEventListener('click', (e) => {
       e.preventDefault();
