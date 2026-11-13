@@ -148,11 +148,15 @@ function generateAssignedTrees() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        const userEmail = (localStorage.getItem('ATAMAN_user_email') || '').toLowerCase().trim();
+        const userName = (localStorage.getItem('ATAMAN_user_name') || 'Dodong Zeta').toLowerCase().trim();
         const assignedOnly = parsed.filter(t => {
           if (!t) return false;
-          const hasAdopter = Boolean((t.adopter && t.adopter !== 'None' && t.adopter !== 'Not yet adopted' && t.adopter !== 'Available for Adoption') || (t.sponsorName && t.sponsorName !== 'None' && t.sponsorName !== 'Available for Adoption') || (parseInt(t.takenCount) || 0) > 0);
-          const hasCaretaker = Boolean(t.caretaker && t.caretaker !== 'Unassigned' && t.caretaker !== 'None');
-          return hasAdopter || hasCaretaker;
+          const ctName = (t.caretaker || '').toLowerCase().trim();
+          const ctEmail = (t.caretakerEmail || '').toLowerCase().trim();
+          return (ctName && (ctName.includes(userName) || userName.includes(ctName))) ||
+                 (userEmail && ctEmail === userEmail) ||
+                 (t.caretakerId === 'CT-101');
         });
         return assignedOnly.map((t, idx) => mapRawTreeToCaretakerTreeMap(t, idx));
       }

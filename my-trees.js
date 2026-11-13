@@ -411,9 +411,7 @@ function getAdopterUserTrees(allTreesList = null) {
       treesPool = [];
     }
   }
-  if ((!Array.isArray(treesPool) || treesPool.length === 0) && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
-    treesPool = [...window.ATAMAN_DEFAULT_TREES];
-  }
+  // Zero Ghost Data: treesPool remains empty array if no trees exist
 
   // Deduplicate split registration/adoption records
   if (Array.isArray(adopters) && adopters.length > 0) {

@@ -99,11 +99,8 @@ function loadDashboardData() {
     if (cachedTrees) {
       try { parsed = JSON.parse(cachedTrees); } catch (_) {}
     }
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      if (typeof window.ATAMAN_DEFAULT_TREES !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
-        parsed = [...window.ATAMAN_DEFAULT_TREES];
-        try { localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(parsed)); } catch (_) {}
-      }
+    if (!Array.isArray(parsed)) {
+      parsed = [];
     }
     if (Array.isArray(parsed)) {
       let treesChanged = false;
@@ -946,8 +943,6 @@ function initRealtimeSync() {
         if (trees && Array.isArray(trees)) {
           if (trees.length > 0) {
             currentTrees = trees;
-          } else if (currentTrees.length === 0 && typeof window.ATAMAN_DEFAULT_TREES !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
-            currentTrees = [...window.ATAMAN_DEFAULT_TREES];
           }
           renderAllDashboardMetrics();
         }

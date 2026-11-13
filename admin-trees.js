@@ -1,3 +1,80 @@
+
+function syncLinkedAdopterAndCaretaker(allTrees) {
+  try {
+    const list = Array.isArray(allTrees) ? allTrees : [];
+
+    // 1. Sync Adopters
+    let adopters = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+    if (Array.isArray(adopters)) {
+      adopters = adopters.map(ad => {
+        const adName = (ad.name || '').toLowerCase().trim();
+        const myTrees = list.filter(t => {
+          const sp = (t.sponsorName || '').toLowerCase().trim();
+          const adp = (t.adopter || '').toLowerCase().trim();
+          return (sp && (sp === adName || sp.includes(adName))) || (adp && (adp === adName || adp.includes(adName)));
+        });
+        const treesCount = myTrees.reduce((sum, t) => sum + (parseInt(t.takenCount || t.treeCount) || 1), 0);
+        const treesList = myTrees.map(t => ({
+          id: t.id,
+          treeCount: parseInt(t.takenCount || t.treeCount) || 1,
+          species: t.species?.common || 'Tree',
+          location: [t.barangay, t.municipality].filter(Boolean).join(', ') || 'Samar',
+          fundingAmount: parseInt(t.fundingAmount) || 50
+        }));
+        const funding = treesList.reduce((sum, it) => sum + ((it.treeCount || 1) * (it.fundingAmount || 50)), 0);
+        return {
+          ...ad,
+          treesCount: treesCount,
+          treesAdopted: treesCount,
+          funding: funding,
+          fundingPaid: funding,
+          treesList: treesList
+        };
+      });
+      localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(adopters));
+      localStorage.setItem('saplink_adopters_cache', JSON.stringify(adopters));
+      window.dispatchEvent(new CustomEvent('ATAMAN:adopters-updated', { detail: adopters }));
+      if (window.ATAMAN_DB && window.ATAMAN_DB.isFirestore && window.ATAMAN_FIRESTORE) {
+        adopters.forEach(ad => {
+          window.ATAMAN_FIRESTORE.collection('adopters').doc(ad.id).set(ad, { merge: true }).catch(() => {});
+        });
+      }
+    }
+
+    // 2. Sync Caretakers
+    let caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+    if (Array.isArray(caretakers)) {
+      caretakers = caretakers.map(ct => {
+        const ctName = (ct.name || '').toLowerCase().trim();
+        const myTrees = list.filter(t => {
+          const c = (t.caretaker || '').toLowerCase().trim();
+          return c && (c === ctName || c.includes(ctName) || ctName.includes(c));
+        });
+        const treesAssigned = myTrees.reduce((sum, t) => sum + (parseInt(t.treeCount) || 1), 0);
+        const assignedTrees = myTrees.map(t => t.id);
+        return {
+          ...ct,
+          treesAssigned: myTrees.length,
+          assignedTreeCount: treesAssigned,
+          assignedTrees: assignedTrees,
+          treesList: myTrees
+        };
+      });
+      localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakers));
+      localStorage.setItem('saplink_caretakers_cache', JSON.stringify(caretakers));
+      window.dispatchEvent(new CustomEvent('ATAMAN:caretakers-updated', { detail: caretakers }));
+      if (window.ATAMAN_DB && window.ATAMAN_DB.isFirestore && window.ATAMAN_FIRESTORE) {
+        caretakers.forEach(ct => {
+          window.ATAMAN_FIRESTORE.collection('caretakers').doc(ct.id).set(ct, { merge: true }).catch(() => {});
+        });
+      }
+    }
+  } catch (err) {
+    console.warn('syncLinkedAdopterAndCaretaker error:', err);
+  }
+}
+window.syncLinkedAdopterAndCaretaker = syncLinkedAdopterAndCaretaker;
+
 /* ============================================================
    ATAMAN Admin Trees — admin-trees.js
    Full tree database management: table, filters, profile drawer,
@@ -38,275 +115,18 @@ const NEXT_MONITOR_DATES = [];
 const PLANTING_DATES = [];
 
 // Default registered Samar reforestation tree registry
-const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0)
-  ? window.ATAMAN_DEFAULT_TREES
-  : [
-    {
-      id: 'TR-10001',
-      species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
-      treeCount: 10,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Guinsorongan',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7850,
-      lng: 124.8860,
-      sponsorName: 'Nikki Maga',
-      adopter: 'Nikki Maga',
-      takenCount: 10,
-      fundingAmount: 50,
-      datePlanted: '2026-08-28',
-      createdAt: '2026-08-28T08:00:00.000Z',
-      ageOfTree: '2 months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.4 meters',
-      trunkDiam: '4.2 cm'
-    },
-    {
-      id: 'TR-10002',
-      species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Endemic' },
-      treeCount: 50,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Canlapwas',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7820,
-      lng: 124.8870,
-      sponsorName: '',
-      adopter: '',
-      takenCount: 0,
-      fundingAmount: 50,
-      datePlanted: '2026-03-06',
-      createdAt: '2026-09-06T08:00:00.000Z',
-      ageOfTree: '6 months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '3.1 meters',
-      trunkDiam: '5.8 cm'
-    },
-    {
-      id: 'TR-10003',
-      species: { common: 'Supa', scientific: 'Sindora supa', type: 'Endemic' },
-      treeCount: 10,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Bunuanan',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7910,
-      lng: 124.8790,
-      sponsorName: '',
-      adopter: '',
-      takenCount: 0,
-      fundingAmount: 50,
-      datePlanted: '2026-04-06',
-      createdAt: '2026-09-06T09:00:00.000Z',
-      ageOfTree: '5 months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '1.8 meters',
-      trunkDiam: '3.5 cm'
-    },
-    {
-      id: 'TR-10004',
-      species: { common: 'Yakal', scientific: 'Shorea astylosa', type: 'Native' },
-      treeCount: 100,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Iguid',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.8020,
-      lng: 124.8810,
-      sponsorName: '',
-      adopter: '',
-      takenCount: 0,
-      fundingAmount: 50,
-      datePlanted: '2026-03-06',
-      createdAt: '2026-09-06T10:00:00.000Z',
-      ageOfTree: '6 Months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.9 meters',
-      trunkDiam: '4.8 cm'
-    },
-    {
-      id: 'TR-10005',
-      species: { common: 'Tanguile', scientific: 'Shorea polysperma', type: 'Native' },
-      treeCount: 20,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Mercedes',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7690,
-      lng: 124.8940,
-      sponsorName: '',
-      adopter: '',
-      takenCount: 0,
-      fundingAmount: 50,
-      datePlanted: '2025-09-06',
-      createdAt: '2026-09-06T11:00:00.000Z',
-      ageOfTree: '12 Months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '4.0 meters',
-      trunkDiam: '8.2 cm'
-    },
-    {
-      id: 'TR-10006',
-      species: { common: 'White Lauan', scientific: 'Shorea contorta', type: 'Native' },
-      treeCount: 20,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Maulong',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7710,
-      lng: 124.8690,
-      sponsorName: '',
-      adopter: '',
-      takenCount: 0,
-      fundingAmount: 50,
-      datePlanted: '2026-03-06',
-      createdAt: '2026-09-06T12:00:00.000Z',
-      ageOfTree: '6 Months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.5 meters',
-      trunkDiam: '4.0 cm'
-    },
-    {
-      id: 'TR-10007',
-      species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
-      treeCount: 50,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Silanga',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.8150,
-      lng: 124.8640,
-      sponsorName: '',
-      adopter: '',
-      takenCount: 0,
-      fundingAmount: 50,
-      datePlanted: '2026-04-06',
-      createdAt: '2026-09-06T13:00:00.000Z',
-      ageOfTree: '6 months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.7 meters',
-      trunkDiam: '4.5 cm'
-    },
-    {
-      id: 'TR-10021',
-      species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
-      treeCount: 25,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Guinsorongan',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7875,
-      lng: 124.8825,
-      sponsorName: '',
-      adopter: '',
-      takenCount: 0,
-      fundingAmount: 50,
-      datePlanted: '2026-07-15',
-      createdAt: '2026-07-15T08:00:00.000Z',
-      ageOfTree: '4 months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.8 meters',
-      trunkDiam: '4.9 cm'
-    },
-    {
-      id: 'TR-10035',
-      species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Endemic' },
-      treeCount: 15,
-      status: 'needs-care',
-      health: 'Needs Care',
-      barangay: 'Canlapwas',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7810,
-      lng: 124.8890,
-      sponsorName: '',
-      adopter: '',
-      takenCount: 0,
-      fundingAmount: 50,
-      datePlanted: '2026-05-10',
-      createdAt: '2026-05-10T09:00:00.000Z',
-      ageOfTree: '6 months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.2 meters',
-      trunkDiam: '3.8 cm'
-    },
-    {
-      id: 'TR-10047',
-      species: { common: 'Acacia', scientific: 'Samanea saman', type: 'Native' },
-      treeCount: 10,
-      status: 'critical',
-      health: 'Critical',
-      barangay: 'Canlapwas',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7795,
-      lng: 124.8910,
-      sponsorName: '',
-      adopter: '',
-      takenCount: 0,
-      fundingAmount: 50,
-      datePlanted: '2026-06-01',
-      createdAt: '2026-06-01T10:00:00.000Z',
-      ageOfTree: '5 months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '1.9 meters',
-      trunkDiam: '3.2 cm'
-    }
-  ];
+// Zero Ghost Data: default tree registry starts completely empty until inputted by Admin
+const DEFAULT_TREES = [];
 window.ATAMAN_DEFAULT_TREES = DEFAULT_TREES;
 
 // Load persisted data from localStorage (fallback when Firestore is not available)
 const _cachedTrees = (() => {
   try {
     const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
-    return Array.isArray(raw) && raw.length > 0 ? raw : null;
-  } catch (_) { return null; }
+    return Array.isArray(raw) ? raw : [];
+  } catch (_) { return []; }
 })();
-let ALL_TREES = _cachedTrees || [...DEFAULT_TREES];
-if (!_cachedTrees) {
-  try {
-    localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(ALL_TREES));
-  } catch (_) {}
-}
+let ALL_TREES = _cachedTrees || [];
 
 let filteredTrees = [...ALL_TREES];
 
@@ -549,7 +369,7 @@ async function initDatabaseSync() {
 
   if (window.ATAMAN_DB) {
     // Seed initial dataset to Firestore if first time
-    window.ATAMAN_DB.seedInitialTrees(ALL_TREES);
+    // Zero Ghost Data: seedInitialTrees disabled
 
     // Listen for live Firestore / local updates
     window.ATAMAN_DB.onTreesChange((trees, source) => {
@@ -562,7 +382,7 @@ async function initDatabaseSync() {
             return Array.isArray(raw) && raw.length > 0 ? raw : null;
           } catch (_) { return null; }
         })();
-        ALL_TREES = local || [...DEFAULT_TREES];
+        ALL_TREES = local || [];
       }
       harmonizeAdopterTreeLocations(ALL_TREES);
       filteredTrees = [...ALL_TREES];

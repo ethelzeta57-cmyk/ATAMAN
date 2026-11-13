@@ -170,9 +170,7 @@ function getLoggedInAdopterData() {
   } catch (e) {
     allTrees = [];
   }
-  if ((!Array.isArray(allTrees) || allTrees.length === 0) && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
-    allTrees = [...window.ATAMAN_DEFAULT_TREES];
-  }
+  // Zero Ghost Data: allTrees remains empty array if no trees exist
 
   // Deduplicate split registration/adoption records & preserve explicit funding
   if (Array.isArray(adopters) && adopters.length > 0) {

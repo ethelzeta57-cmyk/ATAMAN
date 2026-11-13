@@ -72,7 +72,7 @@ function getLiveDatasets() {
   try { caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]'); } catch (e) {}
 
   if (!Array.isArray(trees) || trees.length === 0) {
-    trees = Array.isArray(window.ATAMAN_DEFAULT_TREES) ? window.ATAMAN_DEFAULT_TREES.slice() : [];
+    trees = [];
   }
   if (!Array.isArray(adopters) || adopters.length === 0) {
     adopters = Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS) ? window.ATAMAN_DEFAULT_ADOPTERS.slice() : [];

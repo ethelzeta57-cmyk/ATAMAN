@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try { trees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]'); } catch (_) {}
     if (!Array.isArray(trees) || trees.length === 0) {
-      trees = Array.isArray(window.ATAMAN_DEFAULT_TREES) ? [...window.ATAMAN_DEFAULT_TREES] : [];
+      trees = [];
     }
 
     try { adopters = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]'); } catch (_) {}

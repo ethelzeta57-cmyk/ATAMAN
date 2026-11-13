@@ -14,45 +14,51 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   'use strict';
 
   // Ensure one-time cache reset runs on every dashboard (even pages that don't load ATAMAN-init.js)
-  const INIT_VERSION = 'ATAMAN_init_v8_cross_device_sync';
+  const INIT_VERSION = 'ATAMAN_clean_reset_v10_zero_ghost_trees';
   if (!localStorage.getItem(INIT_VERSION)) {
-    const existingTrees = (() => {
-      try {
-        const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
-        return Array.isArray(raw) && raw.length > 0 ? raw : null;
-      } catch (_) { return null; }
-    })();
-    if (!existingTrees && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
-      localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(window.ATAMAN_DEFAULT_TREES));
-    }
+    localStorage.setItem('ATAMAN_trees_cache', '[]');
+    localStorage.setItem('saplink_trees_cache', '[]');
+    localStorage.setItem('ATAMAN_tree_logs_cache', '[]');
+    localStorage.setItem('ATAMAN_monitoring_logs', '[]');
+    localStorage.setItem('ATAMAN_tree_transactions', '[]');
+    localStorage.setItem('ATAMAN_tree_activities', '[]');
 
-    const existingAdopters = (() => {
-      try {
-        const raw = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
-        return Array.isArray(raw) && raw.length > 0 ? raw : null;
-      } catch (_) { return null; }
-    })();
-    if (!existingAdopters && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS)) {
-      localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(window.ATAMAN_DEFAULT_ADOPTERS));
-    }
+    try {
+      let ads = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+      if (Array.isArray(ads)) {
+        ads = ads.map(a => ({
+          ...a,
+          treesCount: 0,
+          treesAdopted: 0,
+          funding: 0,
+          fundingPaid: 0,
+          customFunding: false,
+          treesList: [],
+          transactions: [],
+          donations: []
+        }));
+        localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(ads));
+        localStorage.setItem('saplink_adopters_cache', JSON.stringify(ads));
+      }
+    } catch (_) {}
 
-    const existingCaretakers = (() => {
-      try {
-        const raw = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-        return Array.isArray(raw) && raw.length > 0 ? raw : null;
-      } catch (_) { return null; }
-    })();
-    if (!existingCaretakers && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS)) {
-      localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(window.ATAMAN_DEFAULT_CARETAKERS));
-    }
-
-    if (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_USERS)) {
-      const uJson = JSON.stringify(window.ATAMAN_DEFAULT_USERS);
-      localStorage.setItem('ATAMAN_users_cache', uJson);
-      localStorage.setItem('saplink_users_cache', uJson);
-      localStorage.setItem('ATAMAN_registered_users', uJson);
-      localStorage.setItem('saplink_registered_users', uJson);
-    }
+    try {
+      let cts = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+      if (Array.isArray(cts)) {
+        cts = cts.map(c => ({
+          ...c,
+          treesAssigned: 0,
+          assignedTreeCount: 0,
+          inspectionsLogged: 0,
+          pendingMonitoring: 0,
+          completedMonitoring: 0,
+          assignedTrees: [],
+          treesList: []
+        }));
+        localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(cts));
+        localStorage.setItem('saplink_caretakers_cache', JSON.stringify(cts));
+      }
+    } catch (_) {}
 
     localStorage.setItem(INIT_VERSION, 'done');
   }
@@ -1049,13 +1055,10 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       try {
         const stored = localStorage.getItem('ATAMAN_trees_cache');
         const parsed = stored ? JSON.parse(stored) : null;
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        if (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0) {
-          return window.ATAMAN_DEFAULT_TREES;
-        }
-        return null;
+        if (Array.isArray(parsed)) return parsed;
+        return [];
       } catch (e) {
-        return null;
+        return [];
       }
     },
 
@@ -1164,12 +1167,8 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
             this.setLocalTrees(trees);
             return { data: trees, source: 'firestore' };
           } else {
-            const fallback = this.getLocalTrees() || [];
-            if (fallback.length > 0) {
-              this.seedInitialTrees(fallback);
-              this.setLocalTrees(fallback);
-            }
-            return { data: fallback, source: 'local-seeded' };
+            this.setLocalTrees([]);
+            return { data: [], source: 'firestore-empty' };
           }
         } catch (error) {
           console.warn("Firestore fetch error, reading local cache:", error);
@@ -1317,24 +1316,8 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
 
     // Seed initial registered trees if collection is currently empty
     async seedInitialTrees(treesArray) {
-      if (!this.isFirestore || !Array.isArray(treesArray) || treesArray.length === 0) return;
-      try {
-        await firestoreCleanPromise;
-        const snap = await firestoreDb.collection('trees').limit(1).get();
-        if (snap.empty) {
-          const batch = firestoreDb.batch();
-          treesArray.forEach(t => {
-            if (t && t.id) {
-              const docRef = firestoreDb.collection('trees').doc(t.id);
-              batch.set(docRef, t);
-            }
-          });
-          await batch.commit();
-          console.log(`[ATAMAN DB] Seeded ${treesArray.length} registered trees to Firestore.`);
-        }
-      } catch (err) {
-        console.warn('[ATAMAN DB] Error seeding trees to Firestore:', err);
-      }
+      // Disabled by Zero Ghost Data Policy. No placeholder or mock trees will ever be seeded.
+      return;
     },
 
     /* ── ADOPTERS CRUD & REAL-TIME ── */

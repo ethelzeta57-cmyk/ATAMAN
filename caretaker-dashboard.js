@@ -48,12 +48,16 @@ function syncCaretakerStats(treesList = null) {
     }
   }
 
-  // Only include trees that have an assigned caretaker or an active adopter sponsorship
+  const userEmail = (localStorage.getItem('ATAMAN_user_email') || '').toLowerCase().trim();
+  const userName = (localStorage.getItem('ATAMAN_user_name') || 'Dodong Zeta').toLowerCase().trim();
+  // Strictly filter for trees assigned to this specific caretaker in real time
   trees = (Array.isArray(trees) ? trees : []).filter(t => {
     if (!t) return false;
-    const hasAdopter = Boolean((t.adopter && t.adopter !== 'None' && t.adopter !== 'Not yet adopted' && t.adopter !== 'Available for Adoption') || (t.sponsorName && t.sponsorName !== 'None' && t.sponsorName !== 'Available for Adoption') || (parseInt(t.takenCount) || 0) > 0);
-    const hasCaretaker = Boolean(t.caretaker && t.caretaker !== 'Unassigned' && t.caretaker !== 'None');
-    return hasAdopter || hasCaretaker;
+    const ctName = (t.caretaker || '').toLowerCase().trim();
+    const ctEmail = (t.caretakerEmail || '').toLowerCase().trim();
+    return (ctName && (ctName.includes(userName) || userName.includes(ctName))) ||
+           (userEmail && ctEmail === userEmail) ||
+           (t.caretakerId === 'CT-101');
   });
 
   const getCnt = (t) => Math.max(1, parseInt(t.treeCount || t.count) || 1);
