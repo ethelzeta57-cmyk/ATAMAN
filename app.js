@@ -201,10 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!email && !password && currentMode === 'signin') {
         setButtonLoading(true, `Signing in as ${roleData[currentRole].name}...`);
         const user = authAPI ? authAPI.loginAsRole(currentRole) : null;
-        showToast(`Signed in as ${roleData[currentRole].name}! Redirecting...`, '🚀');
         setTimeout(() => {
           window.location.href = getDashboardUrl(currentRole);
-        }, 700);
+        }, 500);
         return;
       }
 
@@ -292,11 +291,9 @@ document.addEventListener('DOMContentLoaded', () => {
             roleName = (roleData[normRole] && roleData[normRole].name) || (normRole.charAt(0).toUpperCase() + normRole.slice(1));
           }
 
-          showToast(`Welcome! Opening ${roleName} dashboard...`, '🌳');
-
           setTimeout(() => {
             window.location.href = targetUrl;
-          }, 700);
+          }, 500);
 
         } catch (error) {
           console.error('Sign In Error:', error);
