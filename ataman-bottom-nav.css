@@ -48,6 +48,93 @@
   .page-body {
     margin-bottom: calc(64px + env(safe-area-inset-bottom, 10px)) !important;
   }
+
+  /* ══════════════════════════════════════════════════════════════
+     MOBILE HEADER & SYNC BUTTON ADJUSTMENTS (ALWAYS 100% VISIBLE)
+     ══════════════════════════════════════════════════════════════ */
+  header.dash-header,
+  header.top-navbar,
+  header.topbar,
+  header.page-header {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    overflow: hidden !important;
+  }
+
+  header .nav-actions-group,
+  header .topbar-actions,
+  header .header-right {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  header .nav-actions-group::-webkit-scrollbar,
+  header .topbar-actions::-webkit-scrollbar,
+  header .header-right::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Sync All Data button pinned and fully visible */
+  .hdr-sync-btn,
+  header .hdr-sync-btn,
+  header .header-right .hdr-sync-btn,
+  .hdr-btn.hdr-sync-btn,
+  #btnSyncAllDash {
+    width: auto !important;
+    min-width: max-content !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 13px !important;
+    height: 36px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    background: #15803d !important;
+    color: #ffffff !important;
+    border: 1px solid #166534 !important;
+    border-radius: 9px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  header .header-right .notif-btn,
+  header .notif-btn {
+    flex-shrink: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+
+  .date-range-btn,
+  header .header-right .date-range-btn,
+  #adminLiveDatePill,
+  header #adminLiveDatePill {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .date-range-btn span,
+  header .header-right .date-range-btn span,
+  #adminLiveDatePill span,
+  header #adminLiveDatePill span {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
 }
 
 /* Individual Navigation Tab Button */
@@ -179,3 +266,4 @@
     transform: scale(1.12);
   }
 }
+

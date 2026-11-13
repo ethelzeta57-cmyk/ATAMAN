@@ -305,3 +305,4 @@
   // Export helper
   window.ATAMAN_BOTTOM_NAV = { init: initBottomNav };
 })();
+

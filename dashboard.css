@@ -2354,6 +2354,20 @@ body {
     flex-shrink: 0 !important;
   }
 
+  .hdr-btn.hdr-sync-btn,
+  .hdr-sync-btn,
+  #btnSyncAllDash {
+    width: auto !important;
+    min-width: max-content !important;
+    padding: 0 14px !important;
+    height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
   .dash-body {
     padding: 12px 12px 40px 12px !important;
     gap: 14px !important;
