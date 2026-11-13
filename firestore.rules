@@ -1,7 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
+    match /trees/{treeId} {
+      allow read, delete: if true;
+      allow create, update: if request.resource.data.savedTimestamp is number;
+    }
+    match /users/{docId} {
+      allow read, write: if true;
+    }
+    match /adopters/{docId} {
+      allow read, write: if true;
+    }
+    match /caretakers/{docId} {
+      allow read, write: if true;
+    }
+    match /notifications/{docId} {
+      allow read, write: if true;
+    }
+    match /systemLogs/{docId} {
+      allow read, write: if true;
+    }
+    match /inspectionLogs/{docId} {
+      allow read, write: if true;
+    }
+    match /maintenanceLogs/{docId} {
       allow read, write: if true;
     }
   }

@@ -1250,6 +1250,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       const treeRecord = {
         ...treeData,
         id: docId,
+        savedTimestamp: treeData.savedTimestamp || Date.now(),
         updatedAt: new Date().toISOString(),
         createdAt: treeData.createdAt || new Date().toISOString()
       };
@@ -1284,6 +1285,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         try {
           await firestoreDb.collection('trees').doc(treeId).set({
             ...updates,
+            savedTimestamp: updates.savedTimestamp || Date.now(),
             updatedAt: new Date().toISOString()
           }, { merge: true });
           return { success: true, source: 'firestore' };
