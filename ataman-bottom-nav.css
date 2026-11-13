@@ -1,0 +1,181 @@
+/* ==========================================================================
+   ATAMAN MOBILE BOTTOM NAVIGATION BAR
+   Modern, responsive, thumb-friendly navigation bar for mobile viewports
+   ========================================================================== */
+
+.ataman-bottom-nav {
+  display: none; /* Hidden on desktop and tablet (> 1024px) */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 62px;
+  background: rgba(9, 46, 24, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(74, 222, 128, 0.25);
+  box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.42);
+  z-index: 9990;
+  padding: 0 6px env(safe-area-inset-bottom, 6px) 6px;
+  box-sizing: content-box;
+  align-items: center;
+  justify-content: space-around;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Visibility: Activated strictly on mobile viewports */
+@media (max-width: 1024px) {
+  .ataman-bottom-nav {
+    display: flex !important;
+  }
+
+  /* Safe padding so bottom navigation bar does not overlap any content or action buttons */
+  body {
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 12px)) !important;
+  }
+
+  /* Extra clearance for fixed or scrollable main content areas */
+  main,
+  .dash-body,
+  .content-container,
+  .main-content,
+  .ct-body,
+  .ad-body,
+  .tree-map-container,
+  .map-content-area,
+  .content-area,
+  .page-body {
+    margin-bottom: calc(64px + env(safe-area-inset-bottom, 10px)) !important;
+  }
+}
+
+/* Individual Navigation Tab Button */
+.ataman-bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.68);
+  text-decoration: none;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+  padding: 6px 2px 4px 2px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  box-sizing: border-box;
+}
+
+/* Icon Container */
+.ataman-bottom-nav-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-bottom: 2px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ataman-bottom-nav-item svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.1;
+  stroke: currentColor;
+  fill: none;
+  transition: stroke 0.2s ease, transform 0.2s ease;
+}
+
+/* Text Label */
+.ataman-bottom-nav-label {
+  font-size: 10.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+/* Hover / Touch State */
+.ataman-bottom-nav-item:hover,
+.ataman-bottom-nav-item:focus-visible {
+  color: #ffffff;
+}
+
+.ataman-bottom-nav-item:active .ataman-bottom-nav-icon-wrap {
+  transform: scale(0.90);
+}
+
+/* Active State */
+.ataman-bottom-nav-item.active {
+  color: #4ade80 !important;
+  font-weight: 700;
+}
+
+.ataman-bottom-nav-item.active .ataman-bottom-nav-icon-wrap {
+  transform: translateY(-2px);
+}
+
+.ataman-bottom-nav-item.active svg {
+  stroke: #4ade80 !important;
+  filter: drop-shadow(0 2px 8px rgba(74, 222, 128, 0.55));
+}
+
+.ataman-bottom-nav-item.active .ataman-bottom-nav-label {
+  color: #4ade80 !important;
+  font-weight: 700;
+}
+
+/* Top Accent Glow Indicator Bar for Active Tab */
+.ataman-bottom-nav-item.active::after {
+  content: '';
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: #4ade80;
+  border-radius: 9999px;
+  box-shadow: 0 2px 10px rgba(74, 222, 128, 0.7);
+}
+
+/* Notification & Alert Badges */
+.ataman-bottom-nav-badge {
+  position: absolute;
+  top: -3px;
+  right: -5px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 9.5px;
+  font-weight: 800;
+  line-height: 16px;
+  text-align: center;
+  color: #ffffff;
+  background: #ef4444;
+  border: 1.5px solid #092e18;
+  border-radius: 9999px;
+  box-sizing: border-box;
+  animation: pulseBadge 2.4s infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
