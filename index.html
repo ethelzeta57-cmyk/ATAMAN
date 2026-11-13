@@ -329,12 +329,14 @@
       }
     }
 
-    /* ── Mobile (≤ 600px wide) ── */
-    @media (max-width: 600px) {
+    /* ── Mobile (≤ 640px wide or portrait mobile) ── */
+    @media (max-width: 640px) and (orientation: portrait), (max-width: 600px) {
       #splashView {
         flex-direction: column;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
+        height: 100%;
+        height: 100dvh;
       }
 
       .splash-bg {
@@ -349,67 +351,98 @@
 
       .splash-brand {
         width: 100%;
-        max-width: 360px;
+        max-width: 420px;
+        height: 100%;
+        height: 100dvh;
         margin: 0 auto;
         background: transparent;
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
         border: none;
         box-shadow: none;
-        padding: 16px;
+        padding: calc(env(safe-area-inset-top, 20px) + 24px) 20px calc(env(safe-area-inset-bottom, 24px) + 36px) 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
       }
 
       .splash-content-lockup {
         width: 100%;
-        gap: 14px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0;
+      }
+
+      .splash-logo-card {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 6vh;
       }
 
       .splash-logo {
-        width: clamp(230px, 78vw, 320px);
+        width: clamp(250px, 80vw, 340px);
+      }
+
+      .cta-section {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: auto;
+        padding-bottom: 8px;
+        flex-shrink: 0;
       }
 
       .btn-get-started {
-        width: clamp(220px, 68vw, 270px);
-        height: 46px;
-        font-size: 15.5px;
+        width: clamp(250px, 82vw, 310px);
+        height: 52px;
+        font-size: 16.5px;
+        box-shadow: 0 10px 28px rgba(1, 40, 16, 0.55), 0 3px 10px rgba(0, 0, 0, 0.4);
       }
     }
 
     /* ── Small / Compact Phones (≤ 600px wide AND height ≤ 700px) ── */
-    @media (max-width: 600px) and (max-height: 700px) {
+    @media (max-width: 600px) and (max-height: 700px) and (orientation: portrait) {
       .splash-brand {
-        padding: 12px;
+        padding: calc(env(safe-area-inset-top, 10px) + 14px) 16px calc(env(safe-area-inset-bottom, 16px) + 24px) 16px;
       }
 
-      .splash-content-lockup {
-        gap: 10px;
+      .splash-logo-card {
+        padding-top: 2vh;
       }
 
       .splash-logo {
-        width: clamp(190px, 66vw, 240px);
+        width: clamp(200px, 68vw, 260px);
       }
 
       .btn-get-started {
-        height: 42px;
-        font-size: 14.5px;
-        max-width: 240px;
+        height: 48px;
+        font-size: 15px;
+        max-width: 270px;
       }
     }
 
     /* ── Extra Narrow Phones (≤ 360px wide) ── */
-    @media (max-width: 360px) {
+    @media (max-width: 360px) and (orientation: portrait) {
       .splash-brand {
-        padding: 10px;
+        padding: calc(env(safe-area-inset-top, 8px) + 10px) 12px calc(env(safe-area-inset-bottom, 12px) + 20px) 12px;
       }
 
       .splash-logo {
-        width: clamp(180px, 82vw, 230px);
+        width: clamp(190px, 82vw, 240px);
       }
 
       .btn-get-started {
-        height: 42px;
-        font-size: 14px;
-        max-width: 230px;
+        height: 46px;
+        font-size: 14.5px;
+        max-width: 250px;
       }
     }
 
