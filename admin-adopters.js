@@ -17,16 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
         phone: '+63 917 123 4567',
         address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
         status: 'Active',
-        treesCount: 10,
-        funding: 500,
-        fundingPaid: 500,
-        customFunding: true,
+        treesCount: 0,
+        funding: 0,
+        fundingPaid: 0,
+        customFunding: false,
         joinedDate: '2026-08-28',
         startDate: '2026-08-28',
         expDate: 'Ongoing',
-        treesList: [
-          { id: 'TR-10001', treeCount: 10, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 }
-        ]
+        treesList: []
       }
     ];
   window.ATAMAN_DEFAULT_ADOPTERS = DEFAULT_ADOPTERS;

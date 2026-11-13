@@ -31,17 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
         address: 'Brgy. Canlapwas, Catbalogan City, Samar',
         role: 'Field Caretaker',
         status: 'Active',
-        treesAssigned: 10,
-        assignedTreeCount: 310,
+        treesAssigned: 0,
+        assignedTreeCount: 0,
         location: 'Catbalogan City & Jiabong, Samar',
         municipality: 'Catbalogan City',
         barangay: 'Canlapwas',
-        assignedTrees: ['TR-10001', 'TR-10002', 'TR-10003', 'TR-10004', 'TR-10005', 'TR-10006', 'TR-10007', 'TR-10021', 'TR-10035', 'TR-10047'],
+        assignedTrees: [],
         assignedAdopterName: 'Nikki Maga',
         joinedDate: '2026-08-01',
         createdAt: '2026-08-01T08:00:00.000Z',
         performanceRating: '98%',
-        inspectionsLogged: 42,
+        inspectionsLogged: 0,
         survivalRate: '96.8%'
       }
     ];
