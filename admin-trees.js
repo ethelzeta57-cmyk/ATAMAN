@@ -1009,6 +1009,7 @@ function clearBulkSelection() {
 }
 
 function initBulkActions() {
+  updateBulkBar(); // Initial state sync
   document.getElementById('btnBulkAssign').addEventListener('click', () => {
     document.getElementById('bulkAssignDesc').innerHTML =
       `Assign a new caretaker to <strong>${selectedIds.size} selected trees</strong>.`;

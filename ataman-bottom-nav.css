@@ -289,3 +289,13 @@
   visibility: visible !important;
   pointer-events: auto !important;
 }
+
+
+/* Ensure floating bulk actions bar never leaks onto viewport when 0 items are selected */
+.bulk-actions-floating-bar:not(.show),
+#bulkActionsBar:not(.show) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
