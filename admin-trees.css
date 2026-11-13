@@ -418,21 +418,23 @@ body {
 
 /* ─── 1. PAGE HEADER BANNER ─── */
 .trees-header-banner {
-  background: #fbfdfc;
-  border: 1px solid var(--border-color);
+  background: #092e18;
+  background: linear-gradient(135deg, #092e18 0%, #14532d 100%);
+  border: 1px solid rgba(74, 222, 128, 0.2);
   border-radius: var(--card-radius);
   padding: 22px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 4px 18px rgba(9, 46, 24, 0.25);
   gap: 20px;
+  color: #ffffff;
 }
 
 .banner-title-wrap h1 {
   font-size: 24px;
   font-weight: 800;
-  color: var(--text-dark);
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -440,7 +442,7 @@ body {
 
 .banner-title-wrap p {
   font-size: 14px;
-  color: #86efac;
+  color: #bbf7d0;
   margin-top: 4px;
   font-weight: 500;
 }
