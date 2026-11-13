@@ -2801,3 +2801,166 @@ aside.tree-drawer-panel.open,
     height: 11px !important;
   }
 }
+
+
+/* ==========================================================================
+   MOBILE TOP NAVBAR (COMPACT 2-ROW SPACE-SAVER)
+   Row 1: [Menu Hamburger] [Icon + Admin Tree Map] ... [Date/Time Pill]
+   Row 2: [Sync All Sensors] [Tree QR Codes] [Export GIS Data] (3 equal columns)
+   ========================================================================== */
+@media (max-width: 900px) {
+  header.top-navbar {
+    height: auto !important;
+    min-height: unset !important;
+    padding: 10px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  header.top-navbar .nav-title-group {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  header.top-navbar .nav-title-group .mobile-nav-toggle {
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  header.top-navbar .nav-title-group .title-text-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    flex-shrink: 1 !important;
+  }
+
+  header.top-navbar .nav-title-group .nav-page-icon {
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0 !important;
+  }
+
+  header.top-navbar .nav-title-group .nav-page-title {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin: 0 !important;
+  }
+
+  header.top-navbar #adminLiveDatePill,
+  header.top-navbar .admin-live-date-pill {
+    margin-left: auto !important;
+    height: 32px !important;
+    padding: 0 8px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  header.top-navbar .nav-actions-group {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 6px !important;
+    align-items: stretch !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  header.top-navbar .nav-actions-group .btn-nav-action,
+  header.top-navbar .nav-actions-group #btnRecalibrateAll,
+  header.top-navbar .nav-actions-group #universalQrTrackHeaderBtn,
+  header.top-navbar .nav-actions-group #btnExportData {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 34px !important;
+    padding: 0 4px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    gap: 4px !important;
+    box-sizing: border-box !important;
+  }
+
+  header.top-navbar .nav-actions-group .btn-nav-action svg,
+  header.top-navbar .nav-actions-group #btnRecalibrateAll svg,
+  header.top-navbar .nav-actions-group #universalQrTrackHeaderBtn svg,
+  header.top-navbar .nav-actions-group #btnExportData svg {
+    width: 13px !important;
+    height: 13px !important;
+    flex-shrink: 0 !important;
+  }
+
+  header.top-navbar .nav-actions-group .btn-nav-action span,
+  header.top-navbar .nav-actions-group #btnRecalibrateAll span,
+  header.top-navbar .nav-actions-group #universalQrTrackHeaderBtn span,
+  header.top-navbar .nav-actions-group #btnExportData span {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  header.top-navbar {
+    padding: 8px 10px !important;
+    gap: 6px !important;
+  }
+
+  header.top-navbar .nav-title-group .nav-page-title {
+    font-size: 14.5px !important;
+  }
+
+  header.top-navbar #adminLiveDatePill,
+  header.top-navbar .admin-live-date-pill {
+    font-size: 10px !important;
+    padding: 0 6px !important;
+    height: 28px !important;
+  }
+
+  header.top-navbar .nav-actions-group {
+    gap: 4px !important;
+  }
+
+  header.top-navbar .nav-actions-group .btn-nav-action,
+  header.top-navbar .nav-actions-group #btnRecalibrateAll,
+  header.top-navbar .nav-actions-group #universalQrTrackHeaderBtn,
+  header.top-navbar .nav-actions-group #btnExportData {
+    height: 32px !important;
+    font-size: 10px !important;
+    padding: 0 3px !important;
+  }
+
+  header.top-navbar .nav-actions-group .btn-nav-action span,
+  header.top-navbar .nav-actions-group #btnRecalibrateAll span,
+  header.top-navbar .nav-actions-group #universalQrTrackHeaderBtn span,
+  header.top-navbar .nav-actions-group #btnExportData span {
+    font-size: 10px !important;
+  }
+}
