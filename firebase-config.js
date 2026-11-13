@@ -210,6 +210,16 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
           });
         }
 
+        // 3. Selective Reset: Purge all placeholder/seed trees from Cloud Firestore
+        const treesSnap = await firestoreDb.collection('trees').get();
+        treesSnap.forEach(doc => {
+          const d = doc.data() || {};
+          if (doc.id.startsWith('TR-100') || !d.savedTimestamp) {
+            batch.delete(doc.ref);
+            hasBatchOps = true;
+          }
+        });
+
         if (hasBatchOps) {
           await batch.commit();
         }
@@ -1196,18 +1206,8 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
                 this.setLocalTrees(trees);
                 callback(trees, 'firestore');
               } else {
-                const local = this.getLocalTrees();
-                const fallback = (Array.isArray(local) && local.length > 0)
-                  ? local
-                  : (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) ? window.ATAMAN_DEFAULT_TREES : []);
-                if (fallback.length > 0) {
-                  this.seedInitialTrees(fallback);
-                  this.setLocalTrees(fallback);
-                  callback(fallback, 'local-fallback');
-                } else {
-                  this.setLocalTrees([]);
-                  callback([], 'firestore');
-                }
+                this.setLocalTrees([]);
+                callback([], 'firestore');
               }
             }, error => {
               console.warn('Firestore onSnapshot error:', error);
@@ -1406,7 +1406,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     async addAdopter(adopterData) {
       const docId = adopterData.id || ('ADP-' + Math.floor(1000 + Math.random() * 9000));
       const record = { ...adopterData, id: docId, createdAt: adopterData.createdAt || new Date().toISOString() };
-      
+
       const list = this.getLocalAdopters();
       const updated = [record, ...list.filter(a => a.id !== docId)];
       this.setLocalAdopters(updated);
