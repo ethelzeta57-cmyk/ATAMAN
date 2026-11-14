@@ -790,23 +790,40 @@ document.addEventListener('DOMContentLoaded', () => {
       const treesCount = Number(ad.treesCount != null ? ad.treesCount : (Array.isArray(ad.treesList) ? ad.treesList.length : 0)) || 0;
       const funding = Number(ad.funding != null ? ad.funding : 0) || 0;
       const displayName = ad.name || ad.fullName || 'Unnamed Adopter';
-      const displayContact = ad.contactPerson || ad.contact || ad.email || '—';
-      const displayType = ad.type || 'Individual';
 
+      // Clean secondary line: show email, phone, handle, or contact person (without duplicate name)
+      let displayContact = '';
+      if (ad.contactPerson && ad.contactPerson.toLowerCase().trim() !== displayName.toLowerCase().trim()) {
+        displayContact = `👤 Rep: ${ad.contactPerson}`;
+      } else if (ad.email && !ad.email.includes('@ataman.local')) {
+        displayContact = `✉️ ${ad.email}`;
+      } else if (ad.username) {
+        displayContact = `@${ad.username}`;
+      } else if (ad.phone) {
+        displayContact = `📞 ${ad.phone}`;
+      } else if (ad.email) {
+        displayContact = `✉️ ${ad.email}`;
+      } else if (ad.address) {
+        displayContact = `📍 ${ad.address}`;
+      } else {
+        displayContact = '—';
+      }
+
+      const displayType = ad.type || 'Individual';
       const adopterThumb = ad.photo || ad.treePhoto || '';
       tr.innerHTML = `
         <td>
-          <div class="adopter-name-cell" style="display: flex; align-items: center; gap: 10px;">
+          <div class="adopter-name-cell" style="display: flex; flex-direction: row; align-items: center; gap: 12px;">
             ${adopterThumb ? `
-              <img src="${adopterThumb}" alt="${displayName}" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover; border: 1.5px solid #86efac; flex-shrink: 0;" />
+              <img src="${adopterThumb}" alt="${displayName}" style="width: 38px; height: 38px; border-radius: 8px; object-fit: cover; border: 1.5px solid #86efac; flex-shrink: 0;" />
             ` : `
-              <div style="width: 36px; height: 36px; border-radius: 8px; background: #dcfce7; color: #166534; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0;">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: #dcfce7; color: #166534; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0;">
                 ${displayName.slice(0, 2).toUpperCase()}
               </div>
             `}
-            <div>
+            <div class="adopter-info-col" style="display: flex; flex-direction: column; gap: 2px;">
               <span class="adopter-title">${displayName}</span>
-              <span class="adopter-contact">👤 ${displayContact}</span>
+              <span class="adopter-contact">${displayContact}</span>
             </div>
           </div>
         </td>
