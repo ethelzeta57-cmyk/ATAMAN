@@ -372,8 +372,6 @@
             <option value="Adopter">🟣 Tree Adopter</option>
             <option value="Caretaker">🟢 Caretaker</option>
             <option value="Administrator">🔴 Administrator</option>
-            <option value="Staff">🔵 Staff</option>
-            <option value="Farmer">🟡 Farmer / Landowner</option>
           </select>
 
           <select class="filter-select" id="statusFilter">
@@ -599,8 +597,6 @@
           <select class="form-control" id="permRoleSelect">
             <option value="Administrator">🔴 Administrator (Full System Control)</option>
             <option value="Caretaker" selected>🟢 Caretaker (Field Monitoring &amp; Worklogs)</option>
-            <option value="Staff">🔵 Staff (Operations &amp; Reporting)</option>
-            <option value="Farmer">🟡 Farmer / Landowner (Site Verification)</option>
             <option value="Adopter">🟣 Adopter (Sponsorship Portal)</option>
           </select>
         </div>
@@ -620,7 +616,6 @@
           <label class="perm-item"><input type="checkbox" checked> View Assigned Reports</label>
           <label class="perm-item"><input type="checkbox"> Manage Caretakers</label>
           <label class="perm-item"><input type="checkbox"> Manage Adopters</label>
-          <label class="perm-item"><input type="checkbox"> Manage Farmers / Landowners</label>
           <label class="perm-item"><input type="checkbox"> Manage System User Accounts</label>
           <label class="perm-item"><input type="checkbox"> Modify Global System Settings</label>
         </div>
@@ -767,18 +762,6 @@
               <span class="rsc-icon">🔴</span>
               <strong>Administrator</strong>
               <small>Full administrative control across all trees, users, and reports</small>
-            </label>
-            <label class="role-select-card">
-              <input type="radio" name="addRole" value="Staff">
-              <span class="rsc-icon">🔵</span>
-              <strong>Staff</strong>
-              <small>Logistics coordination, reporting access, and operational dispatch</small>
-            </label>
-            <label class="role-select-card">
-              <input type="radio" name="addRole" value="Farmer">
-              <span class="rsc-icon">🟡</span>
-              <strong>Farmer / Landowner</strong>
-              <small>Land parcel management and stewardship verification</small>
             </label>
             <label class="role-select-card">
               <input type="radio" name="addRole" value="Adopter">

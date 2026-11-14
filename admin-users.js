@@ -22,8 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let roleDisplay;
     if (roleRaw === 'admin' || roleRaw.includes('admin'))       roleDisplay = 'Administrator';
     else if (roleRaw === 'caretaker' || roleRaw.includes('caretaker') || roleRaw.includes('care')) roleDisplay = 'Caretaker';
-    else if (roleRaw === 'staff')                                      roleDisplay = 'Staff';
-    else if (roleRaw === 'farmer' || roleRaw.includes('farm'))         roleDisplay = 'Farmer';
     else                                                               roleDisplay = 'Adopter';
 
     const rawEmail = (raw.email || '').toLowerCase().trim();
@@ -244,13 +242,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getRoleClass(role) {
-    switch (role.toLowerCase()) {
-      case 'administrator': return 'admin';
+    switch ((role || '').toLowerCase()) {
+      case 'administrator':
+      case 'admin': return 'admin';
       case 'caretaker': return 'caretaker';
-      case 'staff': return 'staff';
-      case 'farmer': return 'farmer';
       case 'adopter': return 'adopter';
-      default: return 'staff';
+      default: return 'adopter';
     }
   }
 
@@ -296,8 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (roleCls === 'adopter')       roleIconText = '🤝 Adopter';
       else if (roleCls === 'caretaker')roleIconText = '👨‍🌾 Caretaker';
       else if (roleCls === 'admin')    roleIconText = '🔐 Administrator';
-      else if (roleCls === 'farmer')   roleIconText = '🌱 Farmer';
-      else                             roleIconText = '👤 Staff';
+      else                             roleIconText = '🤝 Adopter';
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
