@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.1.8-auto-consecutive-ref-id';
+const CACHE_NAME = 'ataman-pwa-v2.1.9-remove-redundant-passwords';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
