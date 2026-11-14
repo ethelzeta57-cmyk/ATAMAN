@@ -210,15 +210,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
           });
         }
 
-        // 3. Selective Reset: Purge all placeholder/seed trees from Cloud Firestore
-        const treesSnap = await firestoreDb.collection('trees').get();
-        treesSnap.forEach(doc => {
-          const d = doc.data() || {};
-          if (doc.id.startsWith('TR-100') || !d.savedTimestamp) {
-            batch.delete(doc.ref);
-            hasBatchOps = true;
-          }
-        });
+        // Selective Reset completed: user-inputted trees are always preserved
 
         if (hasBatchOps) {
           await batch.commit();
@@ -1153,6 +1145,13 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
             this.setLocalTrees(trees);
             return { data: trees, source: 'firestore' };
           } else {
+            const local = this.getLocalTrees();
+            if (Array.isArray(local) && local.length > 0) {
+              local.forEach(t => {
+                if (t.id) firestoreDb.collection('trees').doc(t.id).set(t, { merge: true }).catch(() => {});
+              });
+              return { data: local, source: 'local-restored' };
+            }
             this.setLocalTrees([]);
             return { data: [], source: 'firestore-empty' };
           }
@@ -1182,8 +1181,16 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
                 this.setLocalTrees(trees);
                 callback(trees, 'firestore');
               } else {
-                this.setLocalTrees([]);
-                callback([], 'firestore');
+                const local = this.getLocalTrees();
+                if (Array.isArray(local) && local.length > 0) {
+                  local.forEach(t => {
+                    if (t.id) firestoreDb.collection('trees').doc(t.id).set(t, { merge: true }).catch(() => {});
+                  });
+                  callback(local, 'local-restored');
+                } else {
+                  this.setLocalTrees([]);
+                  callback([], 'firestore');
+                }
               }
             }, error => {
               console.warn('Firestore onSnapshot error:', error);

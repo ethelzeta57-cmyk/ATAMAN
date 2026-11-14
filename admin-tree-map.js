@@ -239,13 +239,21 @@ function initAdminTreeMap() {
 
   if (window.ATAMAN_DB && typeof window.ATAMAN_DB.onTreesChange === 'function') {
     window.ATAMAN_DB.onTreesChange((trees) => {
-      if (Array.isArray(trees)) {
+      if (Array.isArray(trees) && trees.length > 0) {
         ALL_TREES = trees;
-        CURRENT_FILTERED_TREES = [...ALL_TREES];
-        renderTreeMarkers(CURRENT_FILTERED_TREES);
-        renderAttentionPanel();
-        renderGeographicSummary();
+      } else {
+        const local = (() => {
+          try {
+            const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
+            return Array.isArray(raw) && raw.length > 0 ? raw : null;
+          } catch (_) { return null; }
+        })();
+        ALL_TREES = local || trees || [];
       }
+      CURRENT_FILTERED_TREES = [...ALL_TREES];
+      renderTreeMarkers(CURRENT_FILTERED_TREES);
+      renderAttentionPanel();
+      renderGeographicSummary();
     });
   }
 }

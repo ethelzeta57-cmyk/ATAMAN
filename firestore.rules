@@ -2,8 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /trees/{treeId} {
-      allow read, delete: if true;
-      allow create, update: if request.resource.data.savedTimestamp is number;
+      allow read, write: if true;
     }
     match /users/{docId} {
       allow read, write: if true;
