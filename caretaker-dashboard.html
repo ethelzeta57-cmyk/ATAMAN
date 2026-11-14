@@ -176,90 +176,9 @@
       </ul>
     </nav>
 
-  </aside>
-
-  <!-- Mobile Drawer Backdrop Overlay -->
-  <div class="ct-sidebar-overlay" id="sidebarOverlay"></div>
-
-  <!-- ════════════════════════════════ MAIN CONTENT WRAPPER ════════════════════════════════ -->
-  <div class="ct-main-wrapper">
-
-    <!-- ── TOP HEADER ── -->
-    <header class="ct-header">
-      <div class="ct-header-left">
-        <button class="ct-mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open navigation menu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-            stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
-        <div class="ct-header-titles">
-          <h1 class="ct-dash-title" id="ctDashTitle">Good morning, Caretaker! <span class="seedling-icon">🌱</span></h1>
-          <p class="ct-dash-subtitle">Here's your tree monitoring activity.</p>
-        </div>
-      </div>
-
-      <div class="ct-header-right">
-        <!-- Real-Time Notification Dropdown Container -->
-        <div class="ct-notif-dropdown-wrapper" id="ctNotifWrapper">
-          <button class="ct-hdr-btn" type="button" id="ctNotifBtn" aria-label="Notifications"
-            title="Live Real-time Notifications">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
-            <span class="ct-badge-red" id="ctNotifBadge">0</span>
-          </button>
-
-          <!-- Dropdown Popover -->
-          <div class="ct-notif-dropdown hide" id="ctNotifDropdown">
-            <div class="notif-dd-header">
-              <div class="notif-dd-title-row">
-                <span class="notif-dd-title">Notifications</span>
-                <span class="notif-badge-pill" id="notifUnreadPill">0 Unread</span>
-              </div>
-              <button type="button" class="notif-mark-btn" id="notifMarkAllReadBtn">Mark all read</button>
-            </div>
-
-            <div class="notif-dd-body" id="ctNotifDropdownList">
-              <!-- Dynamically populated in real-time -->
-            </div>
-
-            <div class="notif-dd-footer">
-              <span class="notif-status-indicator">
-                <span class="pulse-green-dot"></span> Live Real-time Sync
-              </span>
-              <button type="button" class="notif-clear-btn" id="notifClearBtn">Clear All</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Location Badge -->
-        <div class="ct-location-pill">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          <span>Catbalogan, Samar</span>
-        </div>
-
-        <!-- Live Real-Time Date & Clock Pill -->
-        <div class="ct-location-pill" id="ctLiveDatePill" title="Live Real-Time Date & Clock">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-            <line x1="16" x2="16" y1="2" y2="6" />
-            <line x1="8" x2="8" y1="2" y2="6" />
-            <line x1="3" x2="21" y1="10" y2="10" />
-          </svg>
-          <span id="ctLiveDateText">Live Date</span>
-        </div>
-
-        <!-- Caretaker User Profile Dropdown Wrapper -->
+    <!-- Caretaker User Profile in Sidebar Bottom -->
+    <div class="ct-sidebar-footer">
+      <!-- Caretaker User Profile Dropdown Wrapper -->
         <div class="ct-user-dropdown-wrapper" id="ctUserDropdownWrapper">
           <div class="ct-user-pill" id="ctUserDropdown" role="button" tabindex="0" aria-haspopup="true"
             aria-expanded="false" aria-label="Open profile menu">
@@ -351,6 +270,91 @@
             </div>
           </div>
         </div>
+    </div>
+
+  </aside>
+
+  <!-- Mobile Drawer Backdrop Overlay -->
+  <div class="ct-sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════ MAIN CONTENT WRAPPER ════════════════════════════════ -->
+  <div class="ct-main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="ct-header">
+      <div class="ct-header-left">
+        <button class="ct-mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open navigation menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="ct-header-titles">
+          <h1 class="ct-dash-title" id="ctDashTitle">Good morning, Caretaker! <span class="seedling-icon">🌱</span></h1>
+          <p class="ct-dash-subtitle">Here's your tree monitoring activity.</p>
+        </div>
+      </div>
+
+      <div class="ct-header-right">
+        <!-- Real-Time Notification Dropdown Container -->
+        <div class="ct-notif-dropdown-wrapper" id="ctNotifWrapper">
+          <button class="ct-hdr-btn" type="button" id="ctNotifBtn" aria-label="Notifications"
+            title="Live Real-time Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span class="ct-badge-red" id="ctNotifBadge">0</span>
+          </button>
+
+          <!-- Dropdown Popover -->
+          <div class="ct-notif-dropdown hide" id="ctNotifDropdown">
+            <div class="notif-dd-header">
+              <div class="notif-dd-title-row">
+                <span class="notif-dd-title">Notifications</span>
+                <span class="notif-badge-pill" id="notifUnreadPill">0 Unread</span>
+              </div>
+              <button type="button" class="notif-mark-btn" id="notifMarkAllReadBtn">Mark all read</button>
+            </div>
+
+            <div class="notif-dd-body" id="ctNotifDropdownList">
+              <!-- Dynamically populated in real-time -->
+            </div>
+
+            <div class="notif-dd-footer">
+              <span class="notif-status-indicator">
+                <span class="pulse-green-dot"></span> Live Real-time Sync
+              </span>
+              <button type="button" class="notif-clear-btn" id="notifClearBtn">Clear All</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location Badge -->
+        <div class="ct-location-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          <span>Catbalogan, Samar</span>
+        </div>
+
+        <!-- Live Real-Time Date & Clock Pill -->
+        <div class="ct-location-pill" id="ctLiveDatePill" title="Live Real-Time Date & Clock">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+            <line x1="16" x2="16" y1="2" y2="6" />
+            <line x1="8" x2="8" y1="2" y2="6" />
+            <line x1="3" x2="21" y1="10" y2="10" />
+          </svg>
+          <span id="ctLiveDateText">Live Date</span>
+        </div>
+
       </div>
     </header>
 

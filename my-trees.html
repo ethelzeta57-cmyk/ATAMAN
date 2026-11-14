@@ -174,59 +174,10 @@
 
       </ul>
     </nav>
-  </aside>
 
-  <!-- ════════════════════════════════ MAIN CONTENT WRAPPER ════════════════════════════════ -->
-  <div class="ct-main-wrapper">
-
-    <!-- ── TOP HEADER ── -->
-    <header class="ct-header">
-      <div class="ct-header-left">
-        <div class="title-with-icon">
-          <span class="tree-icon-badge">🌳</span>
-          <div>
-            <h1 class="ct-dash-title">My Trees</h1>
-            <p class="ct-dash-subtitle">View and manage the trees assigned to you.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="ct-header-right">
-        <!-- Top + Record Monitoring Button -->
-        <button class="btn-top-record" type="button" id="btnTopRecordMon">
-          <span>+ Record Monitoring</span>
-        </button>
-
-        <!-- Notification Icon with Badge -->
-        <button class="ct-hdr-btn" type="button" id="ctNotifBtn" aria-label="Notifications">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-          </svg>
-          <span class="ct-badge-red" style="display:none;">0</span>
-        </button>
-
-        <!-- Location Badge -->
-        <div class="ct-location-pill">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          <span>Catbalogan, Samar</span>
-        </div>
-
-        <!-- Live Real-Time Date & Clock Pill -->
-        <div class="ct-location-pill" id="ctLiveDatePill" title="Live Real-Time Date & Clock">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-            <line x1="16" x2="16" y1="2" y2="6" />
-            <line x1="8" x2="8" y1="2" y2="6" />
-            <line x1="3" x2="21" y1="10" y2="10" />
-          </svg>
-          <span id="ctLiveDateText">Live Date</span>
-        </div>
-
-        <!-- Caretaker / Adopter User Profile Dropdown Wrapper -->
+    <!-- Caretaker / Adopter User Profile in Sidebar Bottom -->
+    <div class="ct-sidebar-footer">
+      <!-- Caretaker / Adopter User Profile Dropdown Wrapper -->
         <div class="ct-user-dropdown-wrapper" id="ctUserDropdownWrapper">
           <div class="ct-user-pill" id="ctUserDropdown" role="button" tabindex="0" aria-haspopup="true"
             aria-expanded="false" aria-label="Open profile menu">
@@ -335,6 +286,59 @@
             } catch (e) { }
           })();
         </script>
+    </div>
+  </aside>
+
+  <!-- ════════════════════════════════ MAIN CONTENT WRAPPER ════════════════════════════════ -->
+  <div class="ct-main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="ct-header">
+      <div class="ct-header-left">
+        <div class="title-with-icon">
+          <span class="tree-icon-badge">🌳</span>
+          <div>
+            <h1 class="ct-dash-title">My Trees</h1>
+            <p class="ct-dash-subtitle">View and manage the trees assigned to you.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ct-header-right">
+        <!-- Top + Record Monitoring Button -->
+        <button class="btn-top-record" type="button" id="btnTopRecordMon">
+          <span>+ Record Monitoring</span>
+        </button>
+
+        <!-- Notification Icon with Badge -->
+        <button class="ct-hdr-btn" type="button" id="ctNotifBtn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="ct-badge-red" style="display:none;">0</span>
+        </button>
+
+        <!-- Location Badge -->
+        <div class="ct-location-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          <span>Catbalogan, Samar</span>
+        </div>
+
+        <!-- Live Real-Time Date & Clock Pill -->
+        <div class="ct-location-pill" id="ctLiveDatePill" title="Live Real-Time Date & Clock">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+            <line x1="16" x2="16" y1="2" y2="6" />
+            <line x1="8" x2="8" y1="2" y2="6" />
+            <line x1="3" x2="21" y1="10" y2="10" />
+          </svg>
+          <span id="ctLiveDateText">Live Date</span>
+        </div>
+
       </div>
     </header>
 

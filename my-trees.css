@@ -1700,3 +1700,70 @@ html, body {
     width: 100% !important;
   }
 }
+
+
+/* Sidebar Footer Caretaker Profile Pill & Upward Dropdown */
+.ct-sidebar-footer {
+  padding: 14px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.16);
+  margin-top: auto;
+}
+
+.ct-sidebar-footer .ct-user-dropdown-wrapper {
+  display: block;
+  width: 100%;
+  position: relative;
+}
+
+.ct-sidebar-footer .ct-user-pill {
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+}
+
+.ct-sidebar-footer .ct-user-pill:hover,
+.ct-sidebar-footer .ct-user-pill.active {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(74, 222, 128, 0.45);
+}
+
+.ct-sidebar-footer .ct-user-details {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ct-sidebar-footer .ct-user-name {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ct-sidebar-footer .ct-user-role {
+  color: var(--sidebar-muted, #86efac);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ct-sidebar-footer .ct-chevron {
+  color: rgba(255, 255, 255, 0.75);
+  flex-shrink: 0;
+}
+
+.ct-sidebar-footer .ct-profile-dropdown {
+  top: auto;
+  bottom: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-width: 220px;
+}
