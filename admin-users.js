@@ -590,10 +590,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (currentWizardStep === 5) {
       nextWizardBtn.classList.add('hidden');
-      submitCreateUserBtn.classList.remove('hidden');
     } else {
       nextWizardBtn.classList.remove('hidden');
-      submitCreateUserBtn.classList.add('hidden');
     }
   }
 
@@ -628,45 +626,238 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Submit Wizard and create user
+  // Password visibility toggle helpers
+  const toggleAddPasswordBtn = document.getElementById('toggleAddPassword');
+  const addPasswordInput = document.getElementById('addPassword');
+  if (toggleAddPasswordBtn && addPasswordInput) {
+    toggleAddPasswordBtn.addEventListener('click', () => {
+      const isPass = addPasswordInput.type === 'password';
+      addPasswordInput.type = isPass ? 'text' : 'password';
+      toggleAddPasswordBtn.textContent = isPass ? '🙈' : '👁️';
+    });
+  }
+
+  const toggleAddConfirmPasswordBtn = document.getElementById('toggleAddConfirmPassword');
+  const addConfirmPasswordInput = document.getElementById('addConfirmPassword');
+  if (toggleAddConfirmPasswordBtn && addConfirmPasswordInput) {
+    toggleAddConfirmPasswordBtn.addEventListener('click', () => {
+      const isPass = addConfirmPasswordInput.type === 'password';
+      addConfirmPasswordInput.type = isPass ? 'text' : 'password';
+      toggleAddConfirmPasswordBtn.textContent = isPass ? '🙈' : '👁️';
+    });
+  }
+
+  // Allow clicking stepper steps directly
+  stepperItems.forEach((item, idx) => {
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', () => {
+      currentWizardStep = idx + 1;
+      updateWizardUI();
+    });
+  });
+
+  // Submit Wizard and create user with credentials
   if (submitCreateUserBtn) {
-    submitCreateUserBtn.addEventListener('click', () => {
-      const fullName = document.getElementById('addFullName').value.trim() || 'New User';
-      const username = document.getElementById('addUsername').value.trim() || fullName.toLowerCase().replace(/\s+/g, '.');
-      const email    = document.getElementById('addEmail').value.trim() || `${username}@ATAMAN.org`;
-      const phone    = document.getElementById('addPhone').value.trim() || '+63 917 000 0000';
+    submitCreateUserBtn.addEventListener('click', async () => {
+      const fullName = document.getElementById('addFullName').value.trim();
+      const username = document.getElementById('addUsername').value.trim() || (fullName ? fullName.toLowerCase().replace(/\s+/g, '.') : '');
+      const email    = document.getElementById('addEmail').value.trim();
+      const phone    = document.getElementById('addPhone').value.trim();
       const empId    = document.getElementById('addEmpId').value.trim() || `EMP-2026-${Math.floor(100 + Math.random() * 900)}`;
       const role     = document.querySelector('input[name="addRole"]:checked')?.value || 'Caretaker';
       const location = document.getElementById('addLocation').value || '';
+      const password = document.getElementById('addPassword')?.value || '';
+      const confirmPass = document.getElementById('addConfirmPassword')?.value || '';
+
+      if (!fullName) {
+        showToast('⚠️ Please enter the user\'s Full Name.');
+        currentWizardStep = 1; updateWizardUI();
+        document.getElementById('addFullName')?.focus();
+        return;
+      }
+      if (!email) {
+        showToast('⚠️ Please enter a valid Email Address.');
+        currentWizardStep = 1; updateWizardUI();
+        document.getElementById('addEmail')?.focus();
+        return;
+      }
+      if (!password) {
+        showToast('⚠️ Please create a password for this user (minimum 6 characters).');
+        currentWizardStep = 1; updateWizardUI();
+        document.getElementById('addPassword')?.focus();
+        return;
+      }
+      if (password.length < 6) {
+        showToast('⚠️ Password must be at least 6 characters.');
+        currentWizardStep = 1; updateWizardUI();
+        document.getElementById('addPassword')?.focus();
+        return;
+      }
+      if (confirmPass && password !== confirmPass) {
+        showToast('⚠️ Passwords do not match. Please re-enter.');
+        currentWizardStep = 1; updateWizardUI();
+        document.getElementById('addConfirmPassword')?.focus();
+        return;
+      }
+
+      submitCreateUserBtn.disabled = true;
+      submitCreateUserBtn.textContent = '⏳ Creating account...';
+
+      let createdFirebaseUser = null;
+
+      // 1. Create in Firebase Authentication without logging out the current Admin
+      if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+        try {
+          let secondaryApp;
+          try {
+            secondaryApp = firebase.app('AdminUserCreator');
+          } catch (_) {
+            secondaryApp = firebase.initializeApp(firebase.app().options, 'AdminUserCreator');
+          }
+          const secondaryAuth = secondaryApp.auth();
+          const cred = await secondaryAuth.createUserWithEmailAndPassword(email.toLowerCase(), password);
+          createdFirebaseUser = cred.user;
+          if (createdFirebaseUser && createdFirebaseUser.updateProfile) {
+            await createdFirebaseUser.updateProfile({ displayName: fullName });
+          }
+          await secondaryAuth.signOut();
+        } catch (err) {
+          console.warn('Firebase Auth user creation info:', err);
+          if (err.code === 'auth/weak-password') {
+            showToast('⚠️ Password is too weak (minimum 6 characters required).');
+            submitCreateUserBtn.disabled = false;
+            submitCreateUserBtn.textContent = '⚡ Create User Account';
+            return;
+          }
+        }
+      }
+
+      const uid = createdFirebaseUser?.uid || (`USR-${Date.now().toString().slice(-6)}`);
+      const normRole = role.toLowerCase().includes('adopter') ? 'adopter' : (role.toLowerCase().includes('caretaker') ? 'caretaker' : (role.toLowerCase().includes('admin') ? 'admin' : role.toLowerCase()));
 
       const newUser = {
-        id: `USR-${Date.now().toString().slice(-4)}`,
+        id: uid,
+        uid: uid,
         name: fullName,
         username: username,
-        email: email,
+        email: email.toLowerCase(),
         phone: phone,
         empId: empId,
         role: role,
         location: location,
         lastLogin: 'Never logged in',
-        createdDate: 'Aug 29, 2026',
+        createdDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         status: 'Active',
-        tfa: true,
-        treesAssigned: role === 'Caretaker' ? 150 : 0,
-        areas: [location],
+        tfa: false,
+        treesAssigned: 0,
+        areas: [location].filter(Boolean),
         completionRate: '0%'
       };
 
+      // 2. Persist to Cloud Firestore database
+      const db = window.ATAMAN_FIRESTORE || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+      if (db) {
+        try {
+          const userDoc = {
+            id: uid,
+            uid: uid,
+            name: fullName,
+            displayName: fullName,
+            email: email.toLowerCase(),
+            phone: phone,
+            empId: empId,
+            role: normRole,
+            location: location,
+            address: location,
+            status: 'Active',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          await db.collection('users').doc(uid).set(userDoc, { merge: true });
+          await db.collection('users').doc(email.toLowerCase()).set(userDoc, { merge: true });
+
+          // Role-specific Cloud Firestore collections
+          if (normRole === 'adopter') {
+            const adopterDoc = {
+              id: uid,
+              name: fullName,
+              fullName: fullName,
+              contactPerson: fullName,
+              email: email.toLowerCase(),
+              phone: phone,
+              address: location || 'Samar',
+              type: 'Individual',
+              status: 'Active',
+              treesCount: 0,
+              treesAdopted: 0,
+              funding: 0,
+              fundingPaid: 0,
+              customFunding: false,
+              treesList: [],
+              joinedDate: new Date().toISOString().slice(0, 10),
+              startDate: new Date().toISOString().slice(0, 10),
+              expDate: 'Ongoing'
+            };
+            await db.collection('adopters').doc(uid).set(adopterDoc, { merge: true });
+            let adList = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+            adList = [adopterDoc, ...adList.filter(a => a.id !== uid && a.email !== email.toLowerCase())];
+            localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(adList));
+            localStorage.setItem('saplink_adopters_cache', JSON.stringify(adList));
+            window.dispatchEvent(new CustomEvent('ATAMAN:adopters-updated', { detail: adList }));
+          } else if (normRole === 'caretaker') {
+            const caretakerDoc = {
+              id: uid,
+              empId: empId,
+              name: fullName,
+              fullName: fullName,
+              email: email.toLowerCase(),
+              phone: phone,
+              address: location || 'Catbalogan City, Samar',
+              location: location || 'Catbalogan City & Jiabong, Samar',
+              municipality: location.includes('Catbalogan') ? 'Catbalogan City' : (location || 'Catbalogan City'),
+              barangay: location || 'Canlapwas',
+              role: 'Field Caretaker',
+              status: 'Active',
+              treesAssigned: 0,
+              assignedTreeCount: 0,
+              inspectionsLogged: 0,
+              assignedTrees: [],
+              treesList: [],
+              assignedAdopterName: '',
+              performanceRating: '100%',
+              survivalRate: '100%',
+              joinedDate: new Date().toISOString().slice(0, 10),
+              createdAt: new Date().toISOString()
+            };
+            await db.collection('caretakers').doc(uid).set(caretakerDoc, { merge: true });
+            let ctList = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+            ctList = [caretakerDoc, ...ctList.filter(c => c.id !== uid && c.email !== email.toLowerCase())];
+            localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(ctList));
+            localStorage.setItem('saplink_caretakers_cache', JSON.stringify(ctList));
+            window.dispatchEvent(new CustomEvent('ATAMAN:caretakers-updated', { detail: ctList }));
+          }
+        } catch (dbErr) {
+          console.warn('Firestore user save warning:', dbErr);
+        }
+      }
+
+      // 3. Save into local persistent caches
       usersData.unshift(newUser);
       try {
         localStorage.setItem('ATAMAN_users_cache', JSON.stringify(usersData));
         if (window.ATAMAN_SYNC && typeof window.ATAMAN_SYNC.notifyUsers === 'function') {
           window.ATAMAN_SYNC.notifyUsers(usersData);
         }
+        let regUsers = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || '[]');
+        regUsers = [{ uid, email: email.toLowerCase(), displayName: fullName, role: normRole, password }, ...regUsers.filter(u => u.email !== email.toLowerCase())];
+        localStorage.setItem('ATAMAN_registered_users', JSON.stringify(regUsers));
       } catch (e) {}
+
+      submitCreateUserBtn.disabled = false;
+      submitCreateUserBtn.textContent = '⚡ Create User Account';
       closeAddUserModal();
       applyFilters();
-      showToast(`🎉 User account created for ${fullName} (${role}) & setup invitation sent.`);
+      showToast(`🎉 User account created for ${fullName} (${role})! They can now log in with their email and password.`);
     });
   }
 

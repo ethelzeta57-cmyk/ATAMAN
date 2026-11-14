@@ -734,6 +734,22 @@
             <label>Employee / Partner Reference ID</label>
             <input type="text" class="form-control" id="addEmpId" placeholder="e.g. EMP-2026-088" />
           </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Create Password *</label>
+              <div style="position:relative; display:flex; align-items:center;">
+                <input type="password" class="form-control" id="addPassword" placeholder="Minimum 6 characters" required style="padding-right:38px;" autocomplete="new-password" />
+                <button type="button" id="toggleAddPassword" style="position:absolute; right:10px; background:none; border:none; cursor:pointer; font-size:15px; color:#64748b; padding:0;" aria-label="Toggle password">👁️</button>
+              </div>
+            </div>
+            <div class="form-group flex-1">
+              <label>Confirm Password *</label>
+              <div style="position:relative; display:flex; align-items:center;">
+                <input type="password" class="form-control" id="addConfirmPassword" placeholder="Re-enter password" required style="padding-right:38px;" autocomplete="new-password" />
+                <button type="button" id="toggleAddConfirmPassword" style="position:absolute; right:10px; background:none; border:none; cursor:pointer; font-size:15px; color:#64748b; padding:0;" aria-label="Toggle confirm password">👁️</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Step 2: Role Selection -->
@@ -881,8 +897,10 @@
 
       <div class="modal-ft">
         <button class="btn btn-secondary" id="prevWizardBtn" disabled>&larr; Back</button>
-        <button class="btn btn-primary" id="nextWizardBtn">Next Step &rarr;</button>
-        <button class="btn btn-primary hidden" id="submitCreateUserBtn">⚡ Create User Account</button>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-secondary" id="nextWizardBtn">Next Step &rarr;</button>
+          <button class="btn btn-primary" id="submitCreateUserBtn" style="background:#092e18; border-color:#092e18; display:inline-flex; align-items:center; gap:6px;">⚡ Create User Account</button>
+        </div>
       </div>
     </div>
   </div>

@@ -2111,6 +2111,48 @@ document.addEventListener('DOMContentLoaded', () => {
         window.ATAMAN_DB.addCaretaker(newCt);
       }
     } catch(e) {}
+    // Register login credentials in Firebase Auth & users collection if password was provided
+    const ctPass = document.getElementById('addCaretakerPassword')?.value?.trim();
+    if (ctPass && ctPass.length >= 6 && email) {
+      if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+        try {
+          let secondaryApp;
+          try {
+            secondaryApp = firebase.app('AdminUserCreator');
+          } catch (_) {
+            secondaryApp = firebase.initializeApp(firebase.app().options, 'AdminUserCreator');
+          }
+          const secondaryAuth = secondaryApp.auth();
+          secondaryAuth.createUserWithEmailAndPassword(email.toLowerCase(), ctPass).then((cred) => {
+            if (cred && cred.user && cred.user.updateProfile) {
+              cred.user.updateProfile({ displayName: fullName }).catch(() => {});
+            }
+            secondaryAuth.signOut().catch(() => {});
+          }).catch(err => console.warn('Caretaker Firebase Auth creation:', err));
+        } catch (e) {
+          console.warn('Caretaker Firebase auth setup info:', e);
+        }
+      }
+      const db = window.ATAMAN_FIRESTORE || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+      if (db) {
+        db.collection('users').doc(email.toLowerCase()).set({
+          id: newCt.id,
+          uid: newCt.id,
+          name: fullName,
+          displayName: fullName,
+          email: email.toLowerCase(),
+          role: 'caretaker',
+          status: 'Active',
+          createdAt: new Date().toISOString()
+        }, { merge: true }).catch(() => {});
+      }
+      try {
+        let regUsers = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || '[]');
+        regUsers = [{ uid: newCt.id, email: email.toLowerCase(), displayName: fullName, role: 'caretaker', password: ctPass }, ...regUsers.filter(u => u.email !== email.toLowerCase())];
+        localStorage.setItem('ATAMAN_registered_users', JSON.stringify(regUsers));
+      } catch (e) {}
+    }
+
     closeAddModal();
     updateOverviewCards();
     renderTable();

@@ -2207,6 +2207,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     alert(`🎉 New adopter "${newObj.name}" added successfully! ${selectedTrees.length} tree record(s) (${totalCount.toLocaleString()} trees · ₱${totalFunding.toLocaleString()}) marked as adopted.`);
 
+    // Register login credentials in Firebase Auth & users collection if password was provided
+    const newPass = document.getElementById('newPassword')?.value?.trim();
+    if (newPass && newPass.length >= 6 && emailVal) {
+      if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+        try {
+          let secondaryApp;
+          try {
+            secondaryApp = firebase.app('AdminUserCreator');
+          } catch (_) {
+            secondaryApp = firebase.initializeApp(firebase.app().options, 'AdminUserCreator');
+          }
+          const secondaryAuth = secondaryApp.auth();
+          secondaryAuth.createUserWithEmailAndPassword(emailVal.toLowerCase(), newPass).then((cred) => {
+            if (cred && cred.user && cred.user.updateProfile) {
+              cred.user.updateProfile({ displayName: adopterName }).catch(() => {});
+            }
+            secondaryAuth.signOut().catch(() => {});
+          }).catch(err => console.warn('Adopter Firebase Auth creation:', err));
+        } catch (e) {
+          console.warn('Adopter Firebase auth setup info:', e);
+        }
+      }
+      const db = window.ATAMAN_FIRESTORE || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+      if (db) {
+        db.collection('users').doc(emailVal.toLowerCase()).set({
+          id: newObj.id,
+          uid: newObj.id,
+          name: adopterName,
+          displayName: adopterName,
+          email: emailVal.toLowerCase(),
+          role: 'adopter',
+          status: 'Active',
+          createdAt: new Date().toISOString()
+        }, { merge: true }).catch(() => {});
+      }
+      try {
+        let regUsers = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || '[]');
+        regUsers = [{ uid: newObj.id, email: emailVal.toLowerCase(), displayName: adopterName, role: 'adopter', password: newPass }, ...regUsers.filter(u => u.email !== emailVal.toLowerCase())];
+        localStorage.setItem('ATAMAN_registered_users', JSON.stringify(regUsers));
+      } catch (e) {}
+    }
+
     // 4. Background DB sync (non-blocking, seamlessly queues offline)
     if (window.ATAMAN_DB) {
       if (typeof window.ATAMAN_DB.addAdopter === 'function') {
