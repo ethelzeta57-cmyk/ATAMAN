@@ -3,6 +3,20 @@
 
 <head>
   <script>
+    // Only Administrator can access account registration
+    (function() {
+      try {
+        var sess = JSON.parse(localStorage.getItem('ATAMAN_current_user') || localStorage.getItem('saplink_user') || 'null');
+        if (!sess || (sess.role !== 'admin' && sess.role !== 'Administrator')) {
+          window.location.replace('login.html');
+        }
+      } catch (e) {
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
+
+  <script>
     function solveSimpleChallenge() { return true; }
     var solveSimpleChallenge = solveSimpleChallenge;
     window.solveSimpleChallenge = solveSimpleChallenge;
