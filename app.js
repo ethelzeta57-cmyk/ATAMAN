@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Common Validation
       if (!email) {
         if (emailInput) emailInput.focus();
-        showToast('Please enter your email address', '⚠️');
+        showToast('Please enter your email or username', '⚠️');
         return;
       }
 
@@ -371,18 +371,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const email = emailInput ? emailInput.value.trim() : '';
+      let email = emailInput ? emailInput.value.trim() : '';
 
       if (!email) {
         if (emailInput) emailInput.focus();
-        showToast('Enter your email address above first, then click Forgot Password', 'ℹ️');
+        showToast('Enter your email or username above first, then click Forgot Password', 'ℹ️');
         return;
+      }
+
+      if (!email.includes('@') && window.ATAMAN_AUTH && typeof window.ATAMAN_AUTH.resolveEmailByIdentifier === 'function') {
+        const resolved = window.ATAMAN_AUTH.resolveEmailByIdentifier(email);
+        if (resolved) email = resolved;
       }
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         if (emailInput) emailInput.focus();
-        showToast('Please enter a valid email address.', '⚠️');
+        showToast('Please enter a valid email address or registered username.', '⚠️');
         return;
       }
 

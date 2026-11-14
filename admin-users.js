@@ -671,10 +671,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('addFullName')?.focus();
         return;
       }
-      if (!email) {
-        showToast('⚠️ Please enter a valid Email Address.');
+      if (!username && !email) {
+        showToast('⚠️ Please enter a Username or Email Address.');
         currentWizardStep = 1; updateWizardUI();
-        document.getElementById('addEmail')?.focus();
+        document.getElementById('addUsername')?.focus();
         return;
       }
       if (!password) {
@@ -699,6 +699,9 @@ document.addEventListener('DOMContentLoaded', () => {
       submitCreateUserBtn.disabled = true;
       submitCreateUserBtn.textContent = '⏳ Creating account...';
 
+      const cleanUsername = (username || (email ? email.split('@')[0] : 'user')).toLowerCase().replace(/[^a-z0-9._-]/g, '');
+      const authEmail = email ? email.toLowerCase() : `${cleanUsername}@ataman.local`;
+
       let createdFirebaseUser = null;
 
       // 1. Create in Firebase Authentication without logging out the current Admin
@@ -711,7 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
             secondaryApp = firebase.initializeApp(firebase.app().options, 'AdminUserCreator');
           }
           const secondaryAuth = secondaryApp.auth();
-          const cred = await secondaryAuth.createUserWithEmailAndPassword(email.toLowerCase(), password);
+          const cred = await secondaryAuth.createUserWithEmailAndPassword(authEmail, password);
           createdFirebaseUser = cred.user;
           if (createdFirebaseUser && createdFirebaseUser.updateProfile) {
             await createdFirebaseUser.updateProfile({ displayName: fullName });
@@ -735,12 +738,14 @@ document.addEventListener('DOMContentLoaded', () => {
         id: uid,
         uid: uid,
         name: fullName,
-        username: username,
-        email: email.toLowerCase(),
+        username: cleanUsername,
+        email: email ? email.toLowerCase() : authEmail,
+        hasRealEmail: !!email,
         phone: phone,
         empId: empId,
         role: role,
         location: location,
+        password: password,
         lastLogin: 'Never logged in',
         createdDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         status: 'Active',
@@ -759,7 +764,9 @@ document.addEventListener('DOMContentLoaded', () => {
             uid: uid,
             name: fullName,
             displayName: fullName,
-            email: email.toLowerCase(),
+            username: cleanUsername,
+            email: authEmail,
+            displayEmail: email || '',
             phone: phone,
             empId: empId,
             role: normRole,
@@ -770,7 +777,12 @@ document.addEventListener('DOMContentLoaded', () => {
             updatedAt: new Date().toISOString()
           };
           await db.collection('users').doc(uid).set(userDoc, { merge: true });
-          await db.collection('users').doc(email.toLowerCase()).set(userDoc, { merge: true });
+          if (cleanUsername) {
+            await db.collection('users').doc(cleanUsername).set(userDoc, { merge: true });
+          }
+          if (email) {
+            await db.collection('users').doc(email.toLowerCase()).set(userDoc, { merge: true });
+          }
 
           // Role-specific Cloud Firestore collections
           if (normRole === 'adopter') {
@@ -779,7 +791,9 @@ document.addEventListener('DOMContentLoaded', () => {
               name: fullName,
               fullName: fullName,
               contactPerson: fullName,
-              email: email.toLowerCase(),
+              username: cleanUsername,
+              email: authEmail,
+              displayEmail: email || '',
               phone: phone,
               address: location || 'Samar',
               type: 'Individual',
@@ -796,7 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             await db.collection('adopters').doc(uid).set(adopterDoc, { merge: true });
             let adList = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
-            adList = [adopterDoc, ...adList.filter(a => a.id !== uid && a.email !== email.toLowerCase())];
+            adList = [adopterDoc, ...adList.filter(a => a.id !== uid && a.email !== authEmail && (!email || a.email !== email.toLowerCase()))];
             localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(adList));
             localStorage.setItem('saplink_adopters_cache', JSON.stringify(adList));
             window.dispatchEvent(new CustomEvent('ATAMAN:adopters-updated', { detail: adList }));
@@ -806,7 +820,9 @@ document.addEventListener('DOMContentLoaded', () => {
               empId: empId,
               name: fullName,
               fullName: fullName,
-              email: email.toLowerCase(),
+              username: cleanUsername,
+              email: authEmail,
+              displayEmail: email || '',
               phone: phone,
               address: location || 'Catbalogan City, Samar',
               location: location || 'Catbalogan City & Jiabong, Samar',
@@ -827,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             await db.collection('caretakers').doc(uid).set(caretakerDoc, { merge: true });
             let ctList = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-            ctList = [caretakerDoc, ...ctList.filter(c => c.id !== uid && c.email !== email.toLowerCase())];
+            ctList = [caretakerDoc, ...ctList.filter(c => c.id !== uid && c.email !== authEmail && (!email || c.email !== email.toLowerCase()))];
             localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(ctList));
             localStorage.setItem('saplink_caretakers_cache', JSON.stringify(ctList));
             window.dispatchEvent(new CustomEvent('ATAMAN:caretakers-updated', { detail: ctList }));

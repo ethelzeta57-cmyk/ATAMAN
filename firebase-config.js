@@ -531,27 +531,109 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       return 'adopter-dashboard.html';
     },
 
-    // Sign In (Email & Password) — looks up role from database
-    async signIn(email, password, fallbackRole) {
-      const normEmail = (email || '').toLowerCase().trim();
-      if (!normEmail) {
-        throw { code: 'auth/invalid-email', message: 'Please enter your email address.' };
+    // Helper to resolve email from username or email identifier
+    resolveEmailByIdentifier(identifier) {
+      if (!identifier) return '';
+      const raw = identifier.trim().toLowerCase();
+      if (raw.includes('@')) return raw;
+      const reg = getRegisteredUsersList();
+      const match = reg.find(u => {
+        const uEmail = (u.email || '').toLowerCase().trim();
+        const uUser = (u.username || '').toLowerCase().trim();
+        const uEmp = (u.empId || '').toLowerCase().trim();
+        return uUser === raw || uEmail.split('@')[0] === raw || uEmp === raw;
+      });
+      if (match && match.email) return match.email;
+      return `${raw}@ataman.local`;
+    },
+
+    // Sign In (Email or Username & Password) — looks up role from database
+    async signIn(loginIdentifier, password, fallbackRole) {
+      const rawInput = (loginIdentifier || '').trim();
+      if (!rawInput) {
+        throw { code: 'auth/invalid-email', message: 'Please enter your email address or username.' };
       }
       if (!password) {
         throw { code: 'auth/missing-password', message: 'Please enter your password.' };
       }
+
+      const inputLower = rawInput.toLowerCase();
+      const isEmail = inputLower.includes('@');
 
       let authenticatedUser = null;
       let detectedRole = null;
       let displayName = '';
       let isFirebaseAuth = false;
 
+      // ── Step 0: Search user across local stores by email, username, or empId ──
       const regUsers = getRegisteredUsersList();
-      const localMatch = regUsers.find(u => u.email && u.email.toLowerCase() === normEmail);
+      let localMatch = regUsers.find(u => {
+        const uEmail = (u.email || '').toLowerCase().trim();
+        const uUser = (u.username || '').toLowerCase().trim();
+        const uEmp = (u.empId || '').toLowerCase().trim();
+        if (isEmail) return uEmail === inputLower;
+        return uUser === inputLower || uEmail.split('@')[0] === inputLower || uEmp === inputLower;
+      });
+
+      // Check caretakers cache if no match yet
+      if (!localMatch) {
+        try {
+          const cts = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+          localMatch = cts.find(c => {
+            const cEmail = (c.email || '').toLowerCase().trim();
+            const cUser = (c.username || '').toLowerCase().trim();
+            if (isEmail) return cEmail === inputLower;
+            return cUser === inputLower || cEmail.split('@')[0] === inputLower;
+          });
+          if (localMatch && !localMatch.role) localMatch.role = 'caretaker';
+        } catch (_) {}
+      }
+
+      // Check adopters cache if no match yet
+      if (!localMatch) {
+        try {
+          const ads = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+          localMatch = ads.find(a => {
+            const aEmail = (a.email || '').toLowerCase().trim();
+            const aUser = (a.username || '').toLowerCase().trim();
+            if (isEmail) return aEmail === inputLower;
+            return aUser === inputLower || aEmail.split('@')[0] === inputLower;
+          });
+          if (localMatch && !localMatch.role) localMatch.role = 'adopter';
+        } catch (_) {}
+      }
+
+      // Check demo accounts if no match yet
+      if (!localMatch) {
+        const demoEntry = Object.values(DEMO_USERS).find(d => {
+          const dEmail = (d.email || '').toLowerCase().trim();
+          if (isEmail) return dEmail === inputLower;
+          return dEmail.split('@')[0] === inputLower || (d.role && d.role.toLowerCase() === inputLower);
+        });
+        if (demoEntry) localMatch = demoEntry;
+      }
+
+      // Check Firestore by username if not found yet
+      if (!localMatch && !isEmail && this.isFirestore && firestoreDb) {
+        try {
+          const snap = await firestoreDb.collection('users').where('username', '==', inputLower).get();
+          if (!snap.empty) {
+            const doc = snap.docs[0];
+            localMatch = { uid: doc.id, id: doc.id, ...doc.data() };
+          }
+        } catch (_) {}
+      }
+
+      // Determine authoritative auth email for Firebase Auth
+      let normEmail = isEmail ? inputLower : '';
+      if (localMatch && localMatch.email) {
+        normEmail = localMatch.email.toLowerCase().trim();
+      } else if (!isEmail) {
+        normEmail = `${inputLower}@ataman.local`;
+      }
 
       // ── Step 1: Try Firebase Auth FIRST when online ───────────────────────
-      // If the user changed/reset their password in Firebase, Firebase Auth is authoritative.
-      if (this.isFirebase && firebaseAuth) {
+      if (this.isFirebase && firebaseAuth && normEmail) {
         try {
           const userCredential = await firebaseAuth.signInWithEmailAndPassword(normEmail, password);
           const fbUser = userCredential.user;
@@ -559,30 +641,49 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
           authenticatedUser = {
             uid: fbUser.uid,
             email: normEmail,
-            displayName: fbUser.displayName || (localMatch ? localMatch.displayName : '')
+            username: (localMatch && localMatch.username) ? localMatch.username : (!isEmail ? inputLower : normEmail.split('@')[0]),
+            displayName: fbUser.displayName || (localMatch ? (localMatch.displayName || localMatch.name) : '')
           };
           if (localMatch && localMatch.role) {
             detectedRole = localMatch.role;
           }
         } catch (fbErr) {
-          // If Firebase rejected the credentials, check if we have a matching local account (e.g. offline/demo)
-          if (fbErr.code === 'auth/wrong-password' || fbErr.code === 'auth/invalid-credential') {
-            if (localMatch && localMatch.password === password) {
-              authenticatedUser = localMatch;
-              detectedRole = localMatch.role;
-              displayName = localMatch.displayName || '';
+          // If username wasn't found as @ataman.local, try @ataman.org
+          if (!isEmail && fbErr.code === 'auth/user-not-found' && normEmail.endsWith('@ataman.local')) {
+            try {
+              const altEmail = `${inputLower}@ataman.org`;
+              const altCred = await firebaseAuth.signInWithEmailAndPassword(altEmail, password);
+              const fbUser = altCred.user;
+              isFirebaseAuth = true;
+              normEmail = altEmail;
+              authenticatedUser = {
+                uid: fbUser.uid,
+                email: altEmail,
+                username: inputLower,
+                displayName: fbUser.displayName || (localMatch ? (localMatch.displayName || localMatch.name) : '')
+              };
+              if (localMatch && localMatch.role) detectedRole = localMatch.role;
+            } catch (_) {}
+          }
+
+          if (!authenticatedUser) {
+            if (fbErr.code === 'auth/wrong-password' || fbErr.code === 'auth/invalid-credential') {
+              if (localMatch && localMatch.password === password) {
+                authenticatedUser = localMatch;
+                detectedRole = localMatch.role;
+                displayName = localMatch.displayName || localMatch.name || '';
+              } else {
+                throw { code: 'auth/wrong-password', message: 'Incorrect password. Please try again.' };
+              }
+            } else if (fbErr.code === 'auth/user-not-found') {
+              if (localMatch && (!localMatch.password || localMatch.password === password)) {
+                authenticatedUser = localMatch;
+                detectedRole = localMatch.role;
+                displayName = localMatch.displayName || localMatch.name || '';
+              }
             } else {
-              throw { code: 'auth/wrong-password', message: 'Incorrect password. Please try again.' };
+              console.warn('[ATAMAN] Firebase Auth signIn notice:', fbErr.code);
             }
-          } else if (fbErr.code === 'auth/user-not-found') {
-            // Check local accounts
-            if (localMatch && (!localMatch.password || localMatch.password === password)) {
-              authenticatedUser = localMatch;
-              detectedRole = localMatch.role;
-              displayName = localMatch.displayName || '';
-            }
-          } else {
-            console.warn('[ATAMAN] Firebase Auth signIn notice:', fbErr.code);
           }
         }
       }
@@ -594,48 +695,12 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         }
         authenticatedUser = localMatch;
         detectedRole = localMatch.role;
-        displayName = localMatch.displayName || '';
+        displayName = localMatch.displayName || localMatch.name || '';
       }
 
       // ── Step 3: Check secondary caches if still no match ─────────────────
       if (!authenticatedUser) {
-        // Check caretakers cache
-        try {
-          const cts = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-          const ctMatch = cts.find(c => c.email && c.email.toLowerCase() === normEmail);
-          if (ctMatch) {
-            authenticatedUser = { uid: ctMatch.id || ('CT-' + Date.now()), email: normEmail, displayName: ctMatch.name, role: 'caretaker' };
-            detectedRole = 'caretaker';
-            displayName = ctMatch.name || '';
-          }
-        } catch (e) {}
-
-        // Check adopters cache
-        if (!authenticatedUser) {
-          try {
-            const ads = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
-            const adMatch = ads.find(a => a.email && a.email.toLowerCase() === normEmail);
-            if (adMatch) {
-              authenticatedUser = { uid: adMatch.id || ('ADP-' + Date.now()), email: normEmail, displayName: adMatch.name, role: 'adopter' };
-              detectedRole = 'adopter';
-              displayName = adMatch.name || '';
-            }
-          } catch (e) {}
-        }
-
-        // Check demo accounts
-        if (!authenticatedUser) {
-          const demoEntry = Object.values(DEMO_USERS).find(d => d.email.toLowerCase() === normEmail);
-          if (demoEntry) {
-            authenticatedUser = demoEntry;
-            detectedRole = demoEntry.role;
-            displayName = demoEntry.displayName;
-          }
-        }
-
-        if (!authenticatedUser) {
-          throw { code: 'auth/user-not-found', message: 'No account found with this email. Please create an account first.' };
-        }
+        throw { code: 'auth/user-not-found', message: `No account found with username or email "${rawInput}". Please check your credentials.` };
       }
 
       // 3. Resolve saved role from Cloud Firestore / database
