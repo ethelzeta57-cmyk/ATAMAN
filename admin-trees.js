@@ -339,8 +339,11 @@ function harmonizeAdopterTreeLocations(trees) {
       if (t.lat == null && defT.lat != null) { t.lat = defT.lat; changed = true; }
       if (t.lng == null && defT.lng != null) { t.lng = defT.lng; changed = true; }
     }
-    if (!t.caretaker || t.caretaker === 'Unassigned' || t.caretaker === 'Pedro Reyes') {
-      t.caretaker = 'Dodong Zeta';
+    if (!t.caretaker || t.caretaker === 'Pedro Reyes') {
+      t.caretaker = 'Unassigned';
+      changed = true;
+    } else if (t.caretaker === 'Dodong Zeta' && (parseInt(t.takenCount, 10) || 0) === 0 && !t.adopter && !t.sponsorName && !t.customAssignedCaretaker) {
+      t.caretaker = 'Unassigned';
       changed = true;
     }
     t.customCaretaker = true;

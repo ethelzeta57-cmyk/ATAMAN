@@ -625,35 +625,30 @@ function updateRecentAdoptions() {
   const listEl = document.getElementById('dashAdoptionList');
   if (!listEl) return;
 
-  if (currentAdopters.length === 0) {
+  const activeAdoptions = currentAdopters.filter(ad => {
+    const count = parseInt(ad.treesCount, 10) || (Array.isArray(ad.treesList) ? ad.treesList.length : (parseInt(ad.treesAdopted, 10) || 0));
+    return count > 0;
+  });
+
+  if (activeAdoptions.length === 0) {
     listEl.innerHTML = `
       <div style="padding:32px 16px; text-align:center; color:#94a3b8; font-weight:600; font-size:13px;">
         🌱 No tree adoptions recorded yet.<br>New adoptions will automatically appear here.
-        <div style="margin-top:12px;">
-          <a href="admin-adopters.html" style="display:inline-block; font-size:12px; background:#166534; color:#fff; padding:6px 14px; border-radius:8px; text-decoration:none; font-weight:600;">
-            + Register First Adopter
-          </a>
-        </div>
       </div>
     `;
     return;
   }
 
   const avatarClasses = ['av-green', 'av-blue', 'av-emerald', 'av-purple', 'av-teal'];
-  const sorted = [...currentAdopters].slice(0, 5);
+  const sorted = [...activeAdoptions].slice(0, 5);
 
   let html = '';
   sorted.forEach((ad, idx) => {
     const name = ad.name || ad.adopterName || ad.displayName || 'Tree Adopter';
     const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'AD';
     const avClass = avatarClasses[idx % avatarClasses.length];
-
-    let treeDetail = 'Adopted trees';
-    if (ad.treesCount) {
-      treeDetail = `${ad.treesCount} Tree${ad.treesCount === 1 ? '' : 's'} Adopted`;
-    } else if (ad.treesList && ad.treesList.length > 0) {
-      treeDetail = `${ad.treesList.length} Tree${ad.treesList.length === 1 ? '' : 's'} Adopted`;
-    }
+    const count = parseInt(ad.treesCount, 10) || (Array.isArray(ad.treesList) ? ad.treesList.length : (parseInt(ad.treesAdopted, 10) || 0));
+    const treeDetail = `${count} Tree${count === 1 ? '' : 's'} Adopted`;
 
     const st = (ad.status || 'Active').toLowerCase();
     const isDone = st === 'active' || st === 'completed';
@@ -693,35 +688,59 @@ function updateRecentActivities() {
 
   const activities = [];
 
-  // Generate activities from recent trees
-  currentTrees.slice(0, 4).forEach((t, i) => {
+  // 1. Explicit transaction / activity logs
+  try {
+    const loggedActs = JSON.parse(localStorage.getItem('ATAMAN_tree_activities') || '[]');
+    if (Array.isArray(loggedActs)) {
+      loggedActs.slice(0, 5).forEach((act, idx) => {
+        if (!act || !act.desc) return;
+        activities.push({
+          iconClass: act.iconClass || 'ai-green',
+          iconSvg: act.iconSvg || '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+          desc: act.desc,
+          actor: act.actor || 'ATAMAN Portal',
+          time: act.time || 'Recent',
+          ts: act.timestamp || (Date.now() - idx * 60000)
+        });
+      });
+    }
+  } catch (_) {}
+
+  // 2. Real adoption transactions (only where adopted tree count > 0)
+  currentAdopters.forEach((ad, i) => {
+    const count = parseInt(ad.treesCount, 10) || (Array.isArray(ad.treesList) ? ad.treesList.length : (parseInt(ad.treesAdopted, 10) || 0));
+    if (count <= 0) return;
+
+    const name = ad.name || ad.fullName || 'Adopter';
+    activities.push({
+      iconClass: 'ai-blue',
+      iconSvg: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+      desc: `<strong>${name}</strong> adopted <strong>${count} tree${count === 1 ? '' : 's'}</strong>`,
+      actor: 'Tree Adoption Portal',
+      time: ad.adoptedAt ? new Date(ad.adoptedAt).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' }) : 'Today',
+      ts: ad.adoptedAt ? new Date(ad.adoptedAt).getTime() : (Date.now() - (i * 86400000))
+    });
+  });
+
+  // 3. Real tree transactions (only trees that have been adopted or have verified monitoring logs)
+  currentTrees.forEach((t, i) => {
+    const taken = parseInt(t.takenCount, 10) || 0;
+    const hasAdopter = Boolean((t.adopter && t.adopter !== 'None' && t.adopter !== 'Not yet adopted' && t.adopter !== 'Available for Adoption') || (t.sponsorName && t.sponsorName !== 'None' && t.sponsorName !== 'Available for Adoption'));
+    const hasMonitoring = Array.isArray(t.monitoringHistory) && t.monitoringHistory.length > 0;
+    if (taken <= 0 && !hasAdopter && !hasMonitoring) return;
+
     const sp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || 'Narra';
-    const count = Math.max(1, parseInt(t.treeCount) || 1);
-    const loc = t.barangay || 'Samar';
-    const timeLabels = ['Just now', '15m ago', '2h ago', '1d ago'];
+    const count = taken > 0 ? taken : Math.max(1, parseInt(t.treeCount, 10) || 1);
+    const loc = t.barangay || t.municipality || 'Samar';
+    const caretakerName = (t.caretaker && t.caretaker !== 'Unassigned' && t.caretaker !== 'None') ? t.caretaker : '';
 
     activities.push({
       iconClass: 'ai-green',
       iconSvg: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
-      desc: `Registered <strong>${count}x ${sp}</strong> in ${loc}`,
-      actor: t.caretaker ? `By Caretaker ${t.caretaker}` : 'By Field Caretaker',
-      time: timeLabels[i % timeLabels.length],
-      ts: Date.now() - (i * 3600000)
-    });
-  });
-
-  // Generate activities from recent adoptions
-  currentAdopters.slice(0, 3).forEach((ad, i) => {
-    const name = ad.name || 'Adopter';
-    const count = ad.treesCount || (ad.treesList ? ad.treesList.length : 1);
-
-    activities.push({
-      iconClass: 'ai-blue',
-      iconSvg: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-      desc: `<strong>${name}</strong> adopted <strong>${count} trees</strong>`,
-      actor: 'Tree Adoption Portal',
-      time: i === 0 ? 'Today' : `${i + 1}d ago`,
-      ts: Date.now() - (i * 86400000)
+      desc: hasMonitoring ? `Inspected <strong>${count}x ${sp}</strong> in ${loc}` : `Allocated <strong>${count}x ${sp}</strong> in ${loc}`,
+      actor: caretakerName ? `By Caretaker ${caretakerName}` : (t.adopter || t.sponsorName ? `Sponsored by ${t.adopter || t.sponsorName}` : 'ATAMAN Registry'),
+      time: t.dateAdded || 'Recent',
+      ts: t.savedTimestamp || (Date.now() - (i * 3600000))
     });
   });
 

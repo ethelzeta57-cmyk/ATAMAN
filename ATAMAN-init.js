@@ -207,6 +207,18 @@
     let trees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
     if (!Array.isArray(trees)) {
       localStorage.setItem('ATAMAN_trees_cache', '[]');
+    } else {
+      let modified = false;
+      trees.forEach(t => {
+        if (t && t.caretaker === 'Dodong Zeta' && (parseInt(t.takenCount, 10) || 0) === 0 && !t.adopter && !t.sponsorName && !t.customAssignedCaretaker) {
+          t.caretaker = 'Unassigned';
+          modified = true;
+        }
+      });
+      if (modified) {
+        localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(trees));
+        localStorage.setItem('saplink_trees_cache', JSON.stringify(trees));
+      }
     }
   } catch (_) {
     try { localStorage.setItem('ATAMAN_trees_cache', '[]'); } catch (_) {}
