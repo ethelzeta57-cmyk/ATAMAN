@@ -58,10 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         a.treesCount = Number(a.treesCount);
       }
-      if (a.treesCount > 0 && Number(a.funding || a.fundingPaid) > 0 && a.customFunding === undefined) {
-        a.customFunding = true;
-      }
-      if (!a.customFunding) {
+      if (a.treesCount > 0) {
+        const autoFund = a.treesCount * 50;
+        if (!a.funding || Number(a.funding) === 0) {
+          a.funding = autoFund;
+          a.fundingPaid = autoFund;
+          a.customFunding = true;
+          changed = true;
+        } else {
+          a.funding = Number(a.funding || a.fundingPaid) || autoFund;
+          a.customFunding = true;
+        }
+      } else if (!a.customFunding) {
         if (a.funding || a.fundingPaid) {
           a.funding = 0;
           a.fundingPaid = 0;
@@ -1486,6 +1494,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return sel.value.trim();
   }
 
+  const FUNDING_PER_TREE = 50;
+
   function calcTotalsFromSelection() {
     const selectedTrees = allTreesList.filter(t => selectedTreeIds.includes(t.id) || selectedTreeIds.includes(String(t.id)));
     // Sum using per-tree overrides if set, else use the tree's registered treeCount
@@ -1493,8 +1503,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const override = treeQuantities[t.id];
       return sum + (override !== undefined ? override : (parseInt(t.treeCount) || 1));
     }, 0);
-    const rawFundInput = document.getElementById('newFundingInput')?.value;
-    const totalFunding = rawFundInput !== undefined && rawFundInput !== '' ? Math.max(0, parseFloat(rawFundInput) || 0) : 0;
+    // Automatic rate: 1 tree = ₱50
+    const totalFunding = totalCount * FUNDING_PER_TREE;
     return { selectedTrees, totalCount, totalFunding };
   }
 
@@ -1705,6 +1715,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateLiveSummary() {
     const { totalCount, totalFunding } = calcTotalsFromSelection();
+
+    // Automatically set Funding Amount (₱) input to totalCount * 50
+    const rawFundInput = document.getElementById('newFundingInput');
+    if (rawFundInput) rawFundInput.value = totalFunding;
 
     // Update hidden inputs for submission
     const countInput = document.getElementById('newTreesCount');
