@@ -35,13 +35,9 @@
       fundingPaid: 0,
       customFunding: false,
       treesList: [],
-      customFunding: true,
       joinedDate: '2026-08-28',
       startDate: '2026-08-28',
-      expDate: 'Ongoing',
-      treesList: [
-        { id: 'TR-10001', treeCount: 10, species: 'Narra', location: 'Brgy. Guinsorongan, Catbalogan City', fundingAmount: 50 }
-      ]
+      expDate: 'Ongoing'
     }
   ];
   window.ATAMAN_DEFAULT_ADOPTERS = DEFAULT_ADOPTERS;
@@ -62,12 +58,11 @@
       inspectionsLogged: 0,
       assignedTrees: [],
       treesList: [],
-      assignedAdopterName: 'Nikki Maga',
+      assignedAdopterName: '',
       joinedDate: '2026-08-01',
       createdAt: '2026-08-01T08:00:00.000Z',
-      performanceRating: '98%',
-      inspectionsLogged: 42,
-      survivalRate: '96.8%'
+      performanceRating: '100%',
+      survivalRate: '100%'
     }
   ];
   window.ATAMAN_DEFAULT_CARETAKERS = DEFAULT_CARETAKERS;
@@ -119,7 +114,7 @@
   ];
   window.ATAMAN_DEFAULT_USERS = DEFAULT_USERS;
 
-  const INIT_VERSION = 'ATAMAN_clean_reset_v10_zero_ghost_trees';
+  const INIT_VERSION = 'ATAMAN_clean_reset_v12_zero_mock_trees_adopters';
 
   // Seed / migrate registered data when upgrading or if caches are missing
   if (!localStorage.getItem(INIT_VERSION)) {

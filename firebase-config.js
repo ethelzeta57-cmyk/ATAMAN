@@ -1150,30 +1150,6 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
             trees.push({ id: doc.id, ...doc.data() });
           });
           if (trees.length > 0) {
-            const defTrees = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES)) ? window.ATAMAN_DEFAULT_TREES : [];
-            trees = trees.map(t => {
-              const defT = defTrees.find(d => d.id === t.id);
-              const copy = { ...t };
-              if (defT) {
-                if (!copy.barangay) copy.barangay = defT.barangay;
-                if (!copy.municipality) copy.municipality = defT.municipality;
-                if (!copy.province) copy.province = defT.province;
-                if (copy.lat == null) copy.lat = defT.lat;
-                if (copy.lng == null) copy.lng = defT.lng;
-              }
-              if (copy.caretaker === 'Pedro Reyes' || copy.caretaker === 'Unassigned' || !copy.caretaker) {
-                copy.caretaker = 'Dodong Zeta';
-              }
-              if (copy.adopter === 'John Sho' || copy.adopter === 'Century Catbalogan') {
-                copy.adopter = copy.id === 'TR-10001' ? 'Nikki Maga' : '';
-                copy.sponsorName = copy.adopter;
-                if (!copy.adopter) copy.takenCount = 0;
-              }
-              copy.customCaretaker = true;
-              copy.customGps = true;
-              copy.customLocation = true;
-              return copy;
-            });
             this.setLocalTrees(trees);
             return { data: trees, source: 'firestore' };
           } else {
