@@ -1171,13 +1171,125 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       }
     },
 
+    _dedupeCaretakersList(rawList, cleanCloudDuplicates = false) {
+      if (!Array.isArray(rawList)) return [];
+      const merged = [];
+      const duplicateDocIdsToRemove = [];
+      const updatedPrimaryDocs = [];
+
+      rawList.forEach(item => {
+        if (!item || item.name === 'Pedro Reyes') return;
+        const c = { ...item };
+        c.name = c.name || c.fullName || c.displayName || 'Field Caretaker';
+        c.empId = c.empId || c.employeeId || 'EMP-001';
+        c.email = (c.email || c.userEmail || '').toLowerCase().trim();
+        c.phone = c.phone || c.contact || c.contactNumber || '—';
+        const rawArea = (c.primaryArea && String(c.primaryArea) !== 'undefined') ? c.primaryArea : '';
+        c.primaryArea = rawArea || c.barangay || c.location || c.address || 'Catbalogan City';
+        c.barangay = c.barangay || c.primaryArea || 'Canlapwas';
+        c.assignedTreeType = (c.assignedTreeType && String(c.assignedTreeType) !== 'undefined') ? c.assignedTreeType : 'Native Hardwood';
+        c.status = c.status || 'Active';
+        c.assignedTrees = typeof c.assignedTrees === 'number' ? c.assignedTrees : (parseInt(c.assignedTreeCount || c.treesAssigned) || 0);
+
+        const normEmp = (c.empId || '').toLowerCase().trim();
+        const normEmail = (c.email || '').toLowerCase().trim();
+        const normName = (c.name || '').toLowerCase().trim();
+        const normUid = (c.userId || c.uid || '').toLowerCase().trim();
+
+        const existingIdx = merged.findIndex(ex => {
+          const exEmp = (ex.empId || '').toLowerCase().trim();
+          const exEmail = (ex.email || '').toLowerCase().trim();
+          const exName = (ex.name || '').toLowerCase().trim();
+          const exUid = (ex.userId || ex.uid || '').toLowerCase().trim();
+          return (c.id && ex.id === c.id) ||
+                 (normEmp && exEmp && normEmp === exEmp) ||
+                 (normEmail && exEmail && normEmail === exEmail) ||
+                 (normUid && exUid && normUid === exUid) ||
+                 (normName && exName && normName === exName);
+        });
+
+        if (existingIdx === -1) {
+          merged.push(c);
+        } else {
+          const ex = merged[existingIdx];
+          const scoreEx = (Number(ex.assignedTrees) || 0) * 100 + (Array.isArray(ex.assignedTreeIds) ? ex.assignedTreeIds.length * 10 : 0) + (ex.assignedTreeType && ex.assignedTreeType !== 'Native Hardwood' ? 5 : 0);
+          const scoreC = (Number(c.assignedTrees) || 0) * 100 + (Array.isArray(c.assignedTreeIds) ? c.assignedTreeIds.length * 10 : 0) + (c.assignedTreeType && c.assignedTreeType !== 'Native Hardwood' ? 5 : 0);
+
+          const primary = scoreC > scoreEx ? c : ex;
+          const secondary = scoreC > scoreEx ? ex : c;
+
+          // Keep canonical ID (prefer first existing doc ID or EMP/CT ID) and record secondary doc ID for cleanup
+          const canonicalId = ex.id || c.id;
+          const otherId = (canonicalId === ex.id) ? c.id : ex.id;
+          if (otherId && otherId !== canonicalId) {
+            duplicateDocIdsToRemove.push(otherId);
+          }
+
+          // Prefer EMP-* employee ID over auto-generated CT-* if one exists
+          const bestEmpId = (String(ex.empId || '').toUpperCase().startsWith('EMP-') ? ex.empId : (String(c.empId || '').toUpperCase().startsWith('EMP-') ? c.empId : (primary.empId || secondary.empId)));
+
+          // Combine assignedTreeType species
+          const typesSet = new Set();
+          [primary.assignedTreeType, secondary.assignedTreeType].forEach(tt => {
+            if (tt && tt !== 'undefined' && tt !== 'Native Hardwood') {
+              tt.split(',').map(s => s.trim()).filter(Boolean).forEach(s => typesSet.add(s));
+            }
+          });
+          const combinedTreeType = typesSet.size > 0 ? Array.from(typesSet).join(', ') : (primary.assignedTreeType || secondary.assignedTreeType || 'Native Hardwood');
+
+          // Combine arrays
+          const combinedTreeIds = Array.from(new Set([...(primary.assignedTreeIds || []), ...(secondary.assignedTreeIds || [])].map(String)));
+          const combinedBrgys = Array.from(new Set([...(primary.assignedBarangays || []), ...(secondary.assignedBarangays || []), primary.primaryArea, secondary.primaryArea].filter(b => b && b !== 'undefined' && b !== 'None')));
+          const combinedProjects = Array.from(new Set([...(primary.assignedProjects || []), ...(secondary.assignedProjects || [])].filter(p => p && p !== 'undefined' && p !== 'None')));
+
+          // Prefer specific barangay for primaryArea
+          const isGenericArea = (a) => !a || a === 'undefined' || a === 'Catbalogan City' || a.includes('&');
+          const bestPrimaryArea = !isGenericArea(primary.primaryArea) ? primary.primaryArea : (!isGenericArea(secondary.primaryArea) ? secondary.primaryArea : (primary.primaryArea || secondary.primaryArea || 'Catbalogan City'));
+
+          const unified = {
+            ...secondary,
+            ...primary,
+            id: canonicalId,
+            empId: bestEmpId,
+            userId: primary.userId || secondary.userId || secondary.id || primary.id,
+            email: primary.email || secondary.email,
+            phone: (primary.phone && primary.phone !== '—') ? primary.phone : (secondary.phone || '—'),
+            address: primary.address || secondary.address || bestPrimaryArea,
+            primaryArea: bestPrimaryArea,
+            barangay: bestPrimaryArea,
+            assignedTreeType: combinedTreeType,
+            assignedTreeIds: combinedTreeIds,
+            assignedBarangays: combinedBrgys.length > 0 ? combinedBrgys : [bestPrimaryArea],
+            assignedProjects: combinedProjects.length > 0 ? combinedProjects : ['General Reforestation'],
+            assignedTrees: Math.max(Number(primary.assignedTrees) || 0, Number(secondary.assignedTrees) || 0)
+          };
+
+          merged[existingIdx] = unified;
+          updatedPrimaryDocs.push(unified);
+        }
+      });
+
+      if (cleanCloudDuplicates && this.isFirestore && firestoreDb) {
+        duplicateDocIdsToRemove.forEach(dupId => {
+          firestoreDb.collection('caretakers').doc(dupId).delete().catch(() => {});
+        });
+        updatedPrimaryDocs.forEach(docObj => {
+          if (docObj && docObj.id) {
+            firestoreDb.collection('caretakers').doc(docObj.id).set(docObj, { merge: true }).catch(() => {});
+          }
+        });
+      }
+
+      return merged;
+    },
+
     getLocalCaretakers() {
       try {
         const stored = localStorage.getItem('ATAMAN_caretakers_cache');
         const parsed = stored ? JSON.parse(stored) : [];
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return this._dedupeCaretakersList(parsed, false);
         if (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS) && window.ATAMAN_DEFAULT_CARETAKERS.length > 0) {
-          return window.ATAMAN_DEFAULT_CARETAKERS;
+          return this._dedupeCaretakersList(window.ATAMAN_DEFAULT_CARETAKERS, false);
         }
         return [];
       } catch (e) {
@@ -1187,8 +1299,9 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
 
     setLocalCaretakers(caretakers) {
       try {
-        localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakers));
-        this._notify('caretakers', caretakers);
+        const deduped = this._dedupeCaretakersList(caretakers, false);
+        localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(deduped));
+        this._notify('caretakers', deduped);
       } catch (e) {
         console.warn("Local caretakers cache write failed:", e);
       }
@@ -1454,11 +1567,22 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     },
 
     async addAdopter(adopterData) {
-      const docId = adopterData.id || ('ADP-' + Math.floor(1000 + Math.random() * 9000));
-      const record = { ...adopterData, id: docId, createdAt: adopterData.createdAt || new Date().toISOString() };
-
       const list = this.getLocalAdopters();
-      const updated = [record, ...list.filter(a => a.id !== docId)];
+      const normEmail = (adopterData.email || '').toLowerCase().trim();
+      const normName = (adopterData.name || '').toLowerCase().trim();
+      const existingAd = list.find(a =>
+        (adopterData.id && a.id === adopterData.id) ||
+        (normEmail && (a.email || '').toLowerCase().trim() === normEmail) ||
+        (normName && (a.name || '').toLowerCase().trim() === normName)
+      );
+      const docId = (existingAd && existingAd.id) || adopterData.id || ('ADP-' + Math.floor(1000 + Math.random() * 9000));
+      const record = { ...(existingAd || {}), ...adopterData, id: docId, createdAt: adopterData.createdAt || existingAd?.createdAt || new Date().toISOString() };
+
+      const updated = [record, ...list.filter(a =>
+        a.id !== docId &&
+        (!normEmail || (a.email || '').toLowerCase().trim() !== normEmail) &&
+        (!normName || (a.name || '').toLowerCase().trim() !== normName)
+      )];
       this.setLocalAdopters(updated);
 
       if (this.isFirestore) {
@@ -1514,12 +1638,13 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
           snapshot.forEach(doc => {
             const d = doc.data() || {};
             if (d.name !== 'Pedro Reyes') {
-              list.push({ id: doc.id, ...d });
+              list.push({ ...d, id: doc.id });
             }
           });
           if (list.length > 0) {
-            this.setLocalCaretakers(list);
-            return list;
+            const deduped = this._dedupeCaretakersList(list, true);
+            this.setLocalCaretakers(deduped);
+            return deduped;
           }
           return this.getLocalCaretakers();
         } catch (err) {
@@ -1536,9 +1661,10 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
           let unsubscribe = () => {};
           firestoreCleanPromise.then(() => {
             unsubscribe = firestoreDb.collection('caretakers').onSnapshot(snapshot => {
-              const caretakers = [];
-              snapshot.forEach(doc => caretakers.push({ id: doc.id, ...doc.data() }));
-              if (caretakers.length > 0) {
+              const rawCaretakers = [];
+              snapshot.forEach(doc => rawCaretakers.push({ ...doc.data(), id: doc.id }));
+              if (rawCaretakers.length > 0) {
+                const caretakers = this._dedupeCaretakersList(rawCaretakers, true);
                 this.setLocalCaretakers(caretakers);
                 callback(caretakers, 'firestore');
               } else {
@@ -1562,7 +1688,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
 
           const localHandler = (e) => {
             if (e.detail && Array.isArray(e.detail)) {
-              callback(e.detail, 'local-event');
+              callback(this._dedupeCaretakersList(e.detail, false), 'local-event');
             }
           };
           window.addEventListener('ATAMAN:caretakers-updated', localHandler);
@@ -1580,7 +1706,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       callback(cached, 'local');
       const localHandler = (e) => {
         if (e.detail && Array.isArray(e.detail)) {
-          callback(e.detail, 'local-event');
+          callback(this._dedupeCaretakersList(e.detail, false), 'local-event');
         }
       };
       window.addEventListener('ATAMAN:caretakers-updated', localHandler);
@@ -1588,16 +1714,47 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     },
 
     async addCaretaker(caretakerData) {
-      const docId = caretakerData.id || caretakerData.empId || ('CT-' + Math.floor(1000 + Math.random() * 9000));
-      const record = { ...caretakerData, id: docId, createdAt: new Date().toISOString() };
-
       const list = this.getLocalCaretakers();
-      const updated = [record, ...list.filter(c => c.id !== docId && c.empId !== record.empId)];
+      const normEmp = (caretakerData.empId || '').toLowerCase().trim();
+      const normEmail = (caretakerData.email || '').toLowerCase().trim();
+      const normName = (caretakerData.name || '').toLowerCase().trim();
+      const normUid = (caretakerData.userId || caretakerData.uid || '').toLowerCase().trim();
+
+      const existingCt = list.find(c =>
+        (caretakerData.id && c.id === caretakerData.id) ||
+        (normEmp && (c.empId || '').toLowerCase().trim() === normEmp) ||
+        (normEmail && (c.email || '').toLowerCase().trim() === normEmail) ||
+        (normUid && (c.userId || c.uid || '').toLowerCase().trim() === normUid) ||
+        (normName && (c.name || '').toLowerCase().trim() === normName)
+      );
+
+      const docId = (existingCt && existingCt.id) || caretakerData.id || caretakerData.empId || ('CT-' + Math.floor(1000 + Math.random() * 9000));
+      const bestEmpId = (existingCt && String(existingCt.empId || '').toUpperCase().startsWith('EMP-'))
+        ? existingCt.empId
+        : (caretakerData.empId || existingCt?.empId || docId);
+
+      const record = {
+        ...(existingCt || {}),
+        ...caretakerData,
+        id: docId,
+        empId: bestEmpId,
+        createdAt: existingCt?.createdAt || caretakerData.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      const updated = this._dedupeCaretakersList([record, ...list], false);
       this.setLocalCaretakers(updated);
 
       if (this.isFirestore) {
         try {
           await firestoreDb.collection('caretakers').doc(docId).set(record, { merge: true });
+          // If caretakerData had a different temporary ID in Firestore, clean it up so no duplicate row remains
+          if (caretakerData.id && caretakerData.id !== docId) {
+            firestoreDb.collection('caretakers').doc(caretakerData.id).delete().catch(() => {});
+          }
+          if (caretakerData.userId && caretakerData.userId !== docId) {
+            firestoreDb.collection('caretakers').doc(caretakerData.userId).delete().catch(() => {});
+          }
         } catch (e) {
           console.warn("Firestore addCaretaker error:", e);
         }

@@ -63,57 +63,175 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakersList)); } catch (_) {}
   }
 
-  try {
-    if (caretakersList.length > 0) {
-      // Clean any previously generated synthetic percentages and clear schedules
-      let allTrees = [];
-      try { allTrees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]'); } catch (_) {}
-      let sysTotal = 0, sysH = 0, sysNC = 0, sysCR = 0, sysD = 0;
-      if (Array.isArray(allTrees)) {
-        allTrees.forEach(t => {
-          const cnt = Math.max(1, parseInt(t.treeCount) || 1);
-          sysTotal += cnt;
-          const st = (t.status || 'healthy').toLowerCase();
-          if (st === 'healthy') sysH += cnt;
-          else if (st === 'needs-care' || st === 'needs') sysNC += cnt;
-          else if (st === 'critical') sysCR += cnt;
-          else if (st === 'dead') sysD += cnt;
-          else sysH += cnt;
-        });
-      }
+  function harmonizeCaretakerRecords(caretakers) {
+    if (!Array.isArray(caretakers)) return false;
+    let changed = false;
 
-      caretakersList.forEach(ct => {
-        if (!ct.treesCondition) ct.treesCondition = { healthy: 0, care: 0, critical: 0, dead: 0 };
-        const ctName = (ct.name || '').toLowerCase().trim();
-        const ctAdopter = (ct.assignedAdopterName || '').toLowerCase().trim();
-        // Sync assigned tree counts & health breakdown strictly from trees assigned to this caretaker or their assigned adopter
-        const ctTrees = Array.isArray(allTrees) ? allTrees.filter(t => {
-          const treeCt = (t.caretaker || '').toLowerCase().trim();
-          const treeAd = (t.adopter || t.sponsorName || '').toLowerCase().trim();
-          return (ctName && treeCt === ctName) || (ctAdopter && treeAd && treeAd === ctAdopter);
-        }) : [];
-        let cTotal = 0, cH = 0, cNC = 0, cCR = 0, cD = 0;
-        ctTrees.forEach(t => {
-          const cnt = Math.max(1, parseInt(t.caretakerAssignedCount) || parseInt(t.treeCount) || 1);
-          cTotal += cnt;
-          const st = (t.status || 'healthy').toLowerCase();
-          if (st === 'healthy') cH += cnt;
-          else if (st === 'needs-care' || st === 'needs') cNC += cnt;
-          else if (st === 'critical') cCR += cnt;
-          else if (st === 'dead') cD += cnt;
-          else cH += cnt;
-        });
+    let allTrees = [];
+    try { allTrees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]'); } catch (_) {}
+    if ((!allTrees || allTrees.length === 0) && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
+      allTrees = [...window.ATAMAN_DEFAULT_TREES];
+    }
+
+    // 1. Normalize fields on every record so 'undefined' never appears
+    caretakers.forEach(ct => {
+      if (!ct) return;
+      ct.name = ct.name || ct.fullName || ct.displayName || 'Field Caretaker';
+      ct.empId = ct.empId || ct.employeeId || 'EMP-001';
+      ct.email = (ct.email || ct.userEmail || '').toLowerCase().trim();
+      ct.phone = ct.phone || ct.contact || ct.contactNumber || '—';
+      const rawArea = (ct.primaryArea && String(ct.primaryArea) !== 'undefined') ? ct.primaryArea : '';
+      ct.primaryArea = rawArea || ct.barangay || ct.location || ct.address || 'Catbalogan City';
+      ct.barangay = ct.barangay || ct.primaryArea || 'Canlapwas';
+      if (!ct.assignedTreeType || String(ct.assignedTreeType) === 'undefined') {
+        ct.assignedTreeType = 'Native Hardwood';
+      }
+      if (!ct.status) ct.status = 'Active';
+      if (!ct.dateJoined) ct.dateJoined = ct.joinedDate || 'Aug 01, 2026';
+      if (!Array.isArray(ct.assignedBarangays) || ct.assignedBarangays.length === 0) {
+        ct.assignedBarangays = [ct.primaryArea];
+      }
+      if (!Array.isArray(ct.assignedProjects) || ct.assignedProjects.length === 0) {
+        ct.assignedProjects = ['General Reforestation'];
+      }
+    });
+
+    // 2. Deduplicate & merge split records belonging to the same user account / caretaker ID
+    for (let i = 0; i < caretakers.length; i++) {
+      const a = caretakers[i];
+      if (!a) continue;
+      for (let j = i + 1; j < caretakers.length; j++) {
+        const b = caretakers[j];
+        if (!b) continue;
+
+        const idMatch = a.id && b.id && String(a.id) === String(b.id);
+        const empA = (a.empId || '').toLowerCase().trim();
+        const empB = (b.empId || '').toLowerCase().trim();
+        const empMatch = empA && empB && empA === empB;
+        const emailA = (a.email || '').toLowerCase().trim();
+        const emailB = (b.email || '').toLowerCase().trim();
+        const emailMatch = emailA && emailB && emailA === emailB;
+        const uidA = (a.userId || a.uid || '').toLowerCase().trim();
+        const uidB = (b.userId || b.uid || '').toLowerCase().trim();
+        const uidMatch = uidA && uidB && uidA === uidB;
+        const nameA = (a.name || '').toLowerCase().trim();
+        const nameB = (b.name || '').toLowerCase().trim();
+        const nameMatch = nameA && nameB && nameA === nameB;
+
+        if (idMatch || empMatch || emailMatch || uidMatch || nameMatch) {
+          const scoreA = (Number(a.assignedTrees) || 0) * 100 + (Array.isArray(a.assignedTreeIds) ? a.assignedTreeIds.length * 10 : 0) + (a.assignedTreeType && a.assignedTreeType !== 'Native Hardwood' ? 5 : 0);
+          const scoreB = (Number(b.assignedTrees) || 0) * 100 + (Array.isArray(b.assignedTreeIds) ? b.assignedTreeIds.length * 10 : 0) + (b.assignedTreeType && b.assignedTreeType !== 'Native Hardwood' ? 5 : 0);
+
+          const primary = scoreB > scoreA ? b : a;
+          const secondary = scoreB > scoreA ? a : b;
+
+          const canonicalId = a.id || b.id;
+          const dupId = (canonicalId === a.id) ? b.id : a.id;
+          const bestEmpId = String(a.empId || '').toUpperCase().startsWith('EMP-') ? a.empId : (String(b.empId || '').toUpperCase().startsWith('EMP-') ? b.empId : (primary.empId || secondary.empId));
+
+          const typesSet = new Set();
+          [primary.assignedTreeType, secondary.assignedTreeType].forEach(tt => {
+            if (tt && tt !== 'undefined' && tt !== 'Native Hardwood') {
+              tt.split(',').map(s => s.trim()).filter(Boolean).forEach(s => typesSet.add(s));
+            }
+          });
+          const combinedTreeType = typesSet.size > 0 ? Array.from(typesSet).join(', ') : (primary.assignedTreeType || secondary.assignedTreeType || 'Native Hardwood');
+
+          const isGenericArea = (ar) => !ar || ar === 'undefined' || ar === 'Catbalogan City' || ar.includes('&');
+          const bestPrimaryArea = !isGenericArea(primary.primaryArea) ? primary.primaryArea : (!isGenericArea(secondary.primaryArea) ? secondary.primaryArea : (primary.primaryArea || secondary.primaryArea || 'Catbalogan City'));
+
+          const combinedTreeIds = Array.from(new Set([...(primary.assignedTreeIds || []), ...(secondary.assignedTreeIds || [])].map(String)));
+          const combinedBrgys = Array.from(new Set([...(primary.assignedBarangays || []), ...(secondary.assignedBarangays || []), bestPrimaryArea].filter(x => x && x !== 'undefined' && x !== 'None')));
+          const combinedProjects = Array.from(new Set([...(primary.assignedProjects || []), ...(secondary.assignedProjects || [])].filter(x => x && x !== 'undefined' && x !== 'None')));
+
+          const mergedObj = {
+            ...secondary,
+            ...primary,
+            id: canonicalId,
+            empId: bestEmpId,
+            userId: primary.userId || secondary.userId || secondary.id || primary.id,
+            email: primary.email || secondary.email,
+            phone: (primary.phone && primary.phone !== '—') ? primary.phone : (secondary.phone || '—'),
+            address: primary.address || secondary.address || bestPrimaryArea,
+            primaryArea: bestPrimaryArea,
+            barangay: bestPrimaryArea,
+            assignedTreeType: combinedTreeType,
+            assignedTreeIds: combinedTreeIds,
+            assignedBarangays: combinedBrgys.length > 0 ? combinedBrgys : [bestPrimaryArea],
+            assignedProjects: combinedProjects.length > 0 ? combinedProjects : ['General Reforestation'],
+            assignedTrees: Math.max(Number(primary.assignedTrees) || 0, Number(secondary.assignedTrees) || 0)
+          };
+
+          caretakers[i] = mergedObj;
+          caretakers.splice(j, 1);
+          j--;
+          changed = true;
+
+          // Delete the duplicate document from Firestore if it had a different doc ID
+          if (dupId && dupId !== canonicalId) {
+            const db = window.ATAMAN_FIRESTORE || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+            if (db) {
+              db.collection('caretakers').doc(dupId).delete().catch(() => {});
+              db.collection('caretakers').doc(canonicalId).set(mergedObj, { merge: true }).catch(() => {});
+            }
+          }
+        }
+      }
+    }
+
+    // 3. Recalculate assigned tree counts, health breakdown, and species from ATAMAN_trees_cache
+    caretakers.forEach(ct => {
+      if (!ct) return;
+      if (!ct.treesCondition) ct.treesCondition = { healthy: 0, care: 0, critical: 0, dead: 0 };
+      const ctName = (ct.name || '').toLowerCase().trim();
+      const ctAdopter = (ct.assignedAdopterName || '').toLowerCase().trim();
+      const ctTrees = Array.isArray(allTrees) ? allTrees.filter(t => {
+        const treeCt = (t.caretaker || '').toLowerCase().trim();
+        const treeAd = (t.adopter || t.sponsorName || '').toLowerCase().trim();
+        const inIdList = Array.isArray(ct.assignedTreeIds) && ct.assignedTreeIds.map(String).includes(String(t.id));
+        return (ctName && treeCt === ctName) || (ctAdopter && treeAd && treeAd === ctAdopter) || inIdList;
+      }) : [];
+
+      let cTotal = 0, cH = 0, cNC = 0, cCR = 0, cD = 0;
+      const speciesSet = new Set();
+      ctTrees.forEach(t => {
+        const cnt = Math.max(1, parseInt(t.caretakerAssignedCount) || parseInt(t.treeCount) || 1);
+        cTotal += cnt;
+        const st = (t.status || 'healthy').toLowerCase();
+        if (st === 'healthy') cH += cnt;
+        else if (st === 'needs-care' || st === 'needs') cNC += cnt;
+        else if (st === 'critical') cCR += cnt;
+        else if (st === 'dead') cD += cnt;
+        else cH += cnt;
+        const sp = t.species?.common || (typeof t.species === 'string' ? t.species : '');
+        if (sp) speciesSet.add(sp);
+      });
+
+      if (ctTrees.length > 0) {
         ct.assignedTrees = cTotal;
         ct.treesCondition = { healthy: cH, care: cNC, critical: cCR, dead: cD };
-        // Clear all mock schedules so caretaker can put updated schedule monitor
-        if (!ct._schedulesClearedV2) {
-          ct.schedule = [];
-          ct._schedulesClearedV2 = true;
+        if (speciesSet.size > 0 && (!ct.assignedTreeType || ct.assignedTreeType === 'Native Hardwood')) {
+          ct.assignedTreeType = Array.from(speciesSet).join(', ');
         }
-        if (!Array.isArray(ct.schedule)) {
-          ct.schedule = [];
-        }
-      });
+      } else if (typeof ct.assignedTrees !== 'number') {
+        ct.assignedTrees = 0;
+      }
+
+      if (!ct._schedulesClearedV2) {
+        ct.schedule = [];
+        ct._schedulesClearedV2 = true;
+      }
+      if (!Array.isArray(ct.schedule)) {
+        ct.schedule = [];
+      }
+    });
+
+    return changed;
+  }
+
+  try {
+    if (caretakersList.length > 0) {
+      harmonizeCaretakerRecords(caretakersList);
       try { localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakersList)); } catch (_) {}
     }
   } catch (e) {
@@ -307,11 +425,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     caretakersTbody.innerHTML = filtered.map(ct => {
-      const initials = ct.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+      const initials = (ct.name || 'CT').split(' ').map(n => n[0]).join('').substring(0, 2);
       const isInactive = ct.status === 'Inactive';
       const healthy = ct.treesCondition?.healthy || 0;
       const critical = ct.treesCondition?.critical || 0;
       const pending = ct.pendingMonitoring || 0;
+      const areaDisplay = (ct.primaryArea && String(ct.primaryArea) !== 'undefined') ? ct.primaryArea : (ct.barangay || ct.location || ct.address || 'Catbalogan City');
+      const phoneDisplay = (ct.phone && String(ct.phone) !== 'undefined') ? ct.phone : '—';
 
       return `
         <tr>
@@ -320,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="ct-avatar ${isInactive ? 'inactive' : ''}">${initials}</div>
               <div class="ct-info-meta">
                 <button class="ct-name-btn" data-id="${ct.id}">${ct.name}</button>
-                <span class="ct-sub-loc">${ct.primaryArea} • ${ct.assignedTreeType || 'Native Hardwood'} • ${ct.phone}</span>
+                <span class="ct-sub-loc">${areaDisplay} • ${ct.assignedTreeType || 'Native Hardwood'} • ${phoneDisplay}</span>
               </div>
             </div>
           </td>
@@ -1901,6 +2021,29 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Check if this caretaker already exists in caretakersList so we keep their exact ID, empId, and existing assignments tied together
+      const existingCt = caretakersList.find(c => {
+        if (!c) return false;
+        const cEmp = (c.empId || '').toLowerCase().trim();
+        const cEmail = (c.email || '').toLowerCase().trim();
+        const cName = (c.name || '').toLowerCase().trim();
+        const chEmp = (chosen.empId || '').toLowerCase().trim();
+        const chEmail = (chosen.email || '').toLowerCase().trim();
+        const chName = (chosen.name || '').toLowerCase().trim();
+        return (chosen.id && c.id === chosen.id) ||
+               (chEmp && cEmp && chEmp === cEmp) ||
+               (chEmail && cEmail && chEmail === cEmail) ||
+               (chName && cName && chName === cName);
+      });
+
+      if (existingCt) {
+        chosen.id = existingCt.id || chosen.id;
+        chosen.empId = existingCt.empId || chosen.empId;
+        chosen.barangay = existingCt.primaryArea || existingCt.barangay || chosen.barangay;
+        chosen.phone = (existingCt.phone && existingCt.phone !== '—') ? existingCt.phone : chosen.phone;
+        chosen.address = existingCt.address || chosen.address;
+      }
+
       window._selectedCaretakerUser = chosen;
 
       // 1. Full Name
@@ -1910,10 +2053,10 @@ document.addEventListener('DOMContentLoaded', () => {
         nameInp.dispatchEvent(new Event('input', { bubbles: true }));
       }
 
-      // 2. Employee ID (use registered if present, else keep auto-generated)
+      // 2. Employee ID (always keep existing caretaker's Employee ID so they are never split)
       const empInp = document.getElementById('addEmpId');
-      if (empInp && chosen.empId) {
-        empInp.value = chosen.empId;
+      if (empInp && (existingCt?.empId || chosen.empId)) {
+        empInp.value = existingCt?.empId || chosen.empId;
         empInp.dispatchEvent(new Event('input', { bubbles: true }));
       }
 
@@ -1959,12 +2102,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // 8. Visual Confirmation & Account Link Badge
+      // 8. Pre-check any trees already assigned to this caretaker so all their trees stay tied together
+      const allTrees = getRegisteredTreesForCaretaker();
+      const chNameLower = (chosen.name || '').toLowerCase().trim();
+      const existingIdsSet = new Set(Array.isArray(existingCt?.assignedTreeIds) ? existingCt.assignedTreeIds.map(String) : []);
+      allTrees.forEach(t => {
+        const tid = String(t.id);
+        const tCt = (t.caretaker || '').toLowerCase().trim();
+        if ((chNameLower && tCt === chNameLower) || existingIdsSet.has(tid)) {
+          if (!selectedCtTreeIds.includes(tid)) {
+            selectedCtTreeIds.push(tid);
+          }
+          if (ctTreeQuantities[tid] === undefined) {
+            ctTreeQuantities[tid] = Math.max(1, parseInt(t.caretakerAssignedCount) || parseInt(t.treeCount) || 1);
+          }
+        }
+      });
+      renderCaretakerTreesCheckboxes();
+
+      // 9. Visual Confirmation & Account Link Badge
       if (feedback) {
         feedback.style.display = 'flex';
         const feedbackText = document.getElementById('caretakerSelectFeedbackText');
         if (feedbackText) {
-          feedbackText.textContent = `✓ Auto-filled and linked to registered account: ${chosen.name} (${chosen.email || chosen.empId || 'Verified'})`;
+          feedbackText.textContent = `✓ Auto-filled and linked to registered account: ${chosen.name} (${chosen.empId || chosen.email || 'Verified'})`;
         }
       }
       if (badge) {
@@ -2359,62 +2520,93 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e) {}
 
-    const newCt = {
-      id: (selectedCaretaker && selectedCaretaker.id && String(selectedCaretaker.id).startsWith('ct-')) ? selectedCaretaker.id : (selectedCaretaker?.id || `ct-custom-${Date.now()}`),
-      userId: selectedCaretaker?.id || '',
-      userEmail: email,
-      accountLinked: true,
-      registeredCaretaker: true,
-      name: fullName,
-      empId: empId,
-      email: email,
-      phone: phone,
-      address: address,
-      status: 'Active',
-      primaryArea: barangay,
-      assignedTreeType: treeType,
-      assignedTreeIds: [...selectedCtTreeIds],
-      assignedTreesList: assignedTreesList,
-      assignedAdopter: assignedAdopter,
-      assignedAdopterName: assignedAdopterName,
-      dateJoined: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-      assignedTrees: initTrees,
-      treesCondition: { healthy: cH, care: cNC, critical: cCR, dead: cD },
-      pendingMonitoring: 0,
-      overdueMonitoring: 0,
-      completedMonitoring: 0,
-      completionRate: 0,
-      onTimeRate: 100,
-      avgWeeklyMonitored: 0,
-      monitoredThisMonth: 0,
-      photosUploaded: 0,
-      maintenanceRecords: 0,
-      assignedBarangays: [barangay],
-      assignedProjects: [project],
-      assignedFarms: [],
-      areaBreakdown: initTrees > 0 ? [{ area: barangay, count: initTrees, percent: 100 }] : [],
-      monthlyTrend: { july: 0, august: 0, septProj: 0 },
-      schedule: [],
-      recentActivity: [],
-      criticalTrees: [],
-      maintenance: { watering: 0, fert: 0, pest: 0, weed: 0, prune: 0, recentLog: null },
-      photos: []
-    };
-
-    // Check if caretaker already exists in list (by empId, email, or id)
+    // Check if caretaker already exists in list (by id, empId, email, userId, or name) so we NEVER split into two rows
     const existingIdx = caretakersList.findIndex(c => {
       if (!c) return false;
       const em = (c.email || '').toLowerCase().trim();
-      const idMatch = c.empId && c.empId.toLowerCase().trim() === empId.toLowerCase().trim();
+      const nm = (c.name || '').toLowerCase().trim();
+      const cEmp = (c.empId || '').toLowerCase().trim();
+      const cUid = (c.userId || c.uid || '').toLowerCase().trim();
+      const selId = (selectedCaretaker?.id || '').toLowerCase().trim();
+      const idMatch = (selId && (String(c.id).toLowerCase().trim() === selId || cUid === selId)) || (cEmp && empId && cEmp === empId.toLowerCase().trim());
       const emailMatch = em && email && em === email.toLowerCase().trim();
-      return idMatch || emailMatch;
+      const nameMatch = nm && fullName && nm === fullName.toLowerCase().trim();
+      return idMatch || emailMatch || nameMatch;
     });
 
+    const existingCt = existingIdx >= 0 ? caretakersList[existingIdx] : null;
+    const canonicalId = (existingCt && existingCt.id)
+      ? existingCt.id
+      : ((selectedCaretaker && selectedCaretaker.id && String(selectedCaretaker.id).startsWith('ct-')) ? selectedCaretaker.id : (selectedCaretaker?.id || `ct-custom-${Date.now()}`));
+    const canonicalEmpId = (existingCt && String(existingCt.empId || '').toUpperCase().startsWith('EMP-'))
+      ? existingCt.empId
+      : (empId || existingCt?.empId || 'EMP-001');
+
+    const mergedTreeIds = Array.from(new Set([...(existingCt?.assignedTreeIds || []), ...selectedCtTreeIds].map(String)));
+    const mergedBrgys = Array.from(new Set([...(existingCt?.assignedBarangays || []), barangay].filter(b => b && b !== 'undefined' && b !== 'None')));
+    const mergedProjects = Array.from(new Set([...(existingCt?.assignedProjects || []), project].filter(p => p && p !== 'undefined' && p !== 'None')));
+    const finalPrimaryArea = (barangay && barangay !== 'undefined') ? barangay : (existingCt?.primaryArea || existingCt?.barangay || 'Canlapwas');
+
+    // Combine species labels from existing and newly selected trees
+    const typesSet = new Set();
+    [existingCt?.assignedTreeType, treeType].forEach(tt => {
+      if (tt && tt !== 'undefined' && tt !== 'Native Hardwood') {
+        tt.split(',').map(s => s.trim()).filter(Boolean).forEach(s => typesSet.add(s));
+      }
+    });
+    const combinedTreeType = typesSet.size > 0 ? Array.from(typesSet).join(', ') : (treeType || existingCt?.assignedTreeType || 'Native Hardwood');
+
+    const newCt = {
+      ...(existingCt || {}),
+      id: canonicalId,
+      userId: selectedCaretaker?.id || existingCt?.userId || canonicalId,
+      userEmail: email || existingCt?.email || '',
+      accountLinked: true,
+      registeredCaretaker: true,
+      name: fullName,
+      empId: canonicalEmpId,
+      email: email || existingCt?.email || '',
+      phone: phone || existingCt?.phone || '—',
+      address: address || existingCt?.address || finalPrimaryArea,
+      status: existingCt?.status || 'Active',
+      primaryArea: finalPrimaryArea,
+      barangay: finalPrimaryArea,
+      assignedTreeType: combinedTreeType,
+      assignedTreeIds: mergedTreeIds,
+      assignedTreesList: assignedTreesList,
+      assignedAdopter: assignedAdopter || existingCt?.assignedAdopter || '',
+      assignedAdopterName: assignedAdopterName || existingCt?.assignedAdopterName || '',
+      dateJoined: existingCt?.dateJoined || new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+      assignedTrees: initTrees,
+      treesCondition: { healthy: cH, care: cNC, critical: cCR, dead: cD },
+      pendingMonitoring: existingCt?.pendingMonitoring || 0,
+      overdueMonitoring: existingCt?.overdueMonitoring || 0,
+      completedMonitoring: existingCt?.completedMonitoring || 0,
+      completionRate: existingCt?.completionRate || 0,
+      onTimeRate: existingCt?.onTimeRate || 100,
+      avgWeeklyMonitored: existingCt?.avgWeeklyMonitored || 0,
+      monitoredThisMonth: existingCt?.monitoredThisMonth || 0,
+      photosUploaded: existingCt?.photosUploaded || 0,
+      maintenanceRecords: existingCt?.maintenanceRecords || 0,
+      assignedBarangays: mergedBrgys.length > 0 ? mergedBrgys : [finalPrimaryArea],
+      assignedProjects: mergedProjects.length > 0 ? mergedProjects : [project],
+      assignedFarms: existingCt?.assignedFarms || [],
+      areaBreakdown: initTrees > 0 ? [{ area: finalPrimaryArea, count: initTrees, percent: 100 }] : (existingCt?.areaBreakdown || []),
+      monthlyTrend: existingCt?.monthlyTrend || { july: 0, august: 0, septProj: 0 },
+      schedule: existingCt?.schedule || [],
+      recentActivity: existingCt?.recentActivity || [],
+      criticalTrees: existingCt?.criticalTrees || [],
+      maintenance: existingCt?.maintenance || { watering: 0, fert: 0, pest: 0, weed: 0, prune: 0, recentLog: null },
+      photos: existingCt?.photos || []
+    };
+
     if (existingIdx >= 0) {
-      caretakersList[existingIdx] = { ...caretakersList[existingIdx], ...newCt };
+      caretakersList[existingIdx] = newCt;
     } else {
       caretakersList.unshift(newCt);
     }
+
+    harmonizeCaretakerRecords(caretakersList);
 
     try {
       localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakersList));
@@ -2558,6 +2750,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('ATAMAN:caretakers-updated', (e) => {
     if (e.detail && Array.isArray(e.detail)) {
       caretakersList = e.detail;
+      harmonizeCaretakerRecords(caretakersList);
       updateOverviewCards();
       renderTable();
     }
@@ -2578,6 +2771,8 @@ document.addEventListener('DOMContentLoaded', () => {
             })();
             caretakersList = local || [...DEFAULT_CARETAKERS];
           }
+          harmonizeCaretakerRecords(caretakersList);
+          try { localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakersList)); } catch (_) {}
           updateOverviewCards();
           renderTable();
         }
@@ -2586,6 +2781,8 @@ document.addEventListener('DOMContentLoaded', () => {
       window.ATAMAN_DB.getCaretakers().then(stored => {
         if (Array.isArray(stored) && stored.length > 0) {
           caretakersList = stored;
+          harmonizeCaretakerRecords(caretakersList);
+          try { localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakersList)); } catch (_) {}
           updateOverviewCards();
           renderTable();
         }

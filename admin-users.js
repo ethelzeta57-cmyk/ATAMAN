@@ -913,35 +913,55 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('saplink_adopters_cache', JSON.stringify(adList));
             window.dispatchEvent(new CustomEvent('ATAMAN:adopters-updated', { detail: adList }));
           } else if (normRole === 'caretaker') {
+            let ctList = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+            const existingCt = Array.isArray(ctList) ? ctList.find(c =>
+              c && (
+                (empId && c.empId && c.empId.toLowerCase().trim() === empId.toLowerCase().trim()) ||
+                (authEmail && c.email && c.email.toLowerCase().trim() === authEmail.toLowerCase().trim()) ||
+                (fullName && c.name && c.name.toLowerCase().trim() === fullName.toLowerCase().trim())
+              )
+            ) : null;
+            const ctDocId = (existingCt && existingCt.id) || uid;
+            const areaVal = location || existingCt?.primaryArea || existingCt?.barangay || 'Canlapwas';
             const caretakerDoc = {
-              id: uid,
-              empId: empId,
+              ...(existingCt || {}),
+              id: ctDocId,
+              userId: uid,
+              empId: empId || existingCt?.empId || 'EMP-001',
               name: fullName,
               fullName: fullName,
               username: cleanUsername,
               email: authEmail,
               displayEmail: email || '',
-              phone: phone,
-              address: location || 'Catbalogan City, Samar',
-              location: location || 'Catbalogan City & Jiabong, Samar',
-              municipality: location.includes('Catbalogan') ? 'Catbalogan City' : (location || 'Catbalogan City'),
-              barangay: location || 'Canlapwas',
+              phone: phone || existingCt?.phone || '—',
+              address: location || existingCt?.address || 'Catbalogan City, Samar',
+              location: location || existingCt?.location || 'Catbalogan City & Jiabong, Samar',
+              municipality: location.includes('Catbalogan') ? 'Catbalogan City' : (location || existingCt?.municipality || 'Catbalogan City'),
+              barangay: areaVal,
+              primaryArea: areaVal,
+              assignedBarangays: existingCt?.assignedBarangays || [areaVal],
+              assignedTreeType: existingCt?.assignedTreeType || 'Native Hardwood',
               role: 'Field Caretaker',
               status: 'Active',
-              treesAssigned: 0,
-              assignedTreeCount: 0,
-              inspectionsLogged: 0,
-              assignedTrees: [],
-              treesList: [],
-              assignedAdopterName: '',
-              performanceRating: '100%',
-              survivalRate: '100%',
-              joinedDate: new Date().toISOString().slice(0, 10),
-              createdAt: new Date().toISOString()
+              treesAssigned: existingCt?.treesAssigned || 0,
+              assignedTreeCount: existingCt?.assignedTreeCount || 0,
+              inspectionsLogged: existingCt?.inspectionsLogged || 0,
+              assignedTrees: existingCt?.assignedTrees || 0,
+              treesList: existingCt?.treesList || [],
+              assignedAdopterName: existingCt?.assignedAdopterName || '',
+              performanceRating: existingCt?.performanceRating || '100%',
+              survivalRate: existingCt?.survivalRate || '100%',
+              joinedDate: existingCt?.joinedDate || new Date().toISOString().slice(0, 10),
+              createdAt: existingCt?.createdAt || new Date().toISOString()
             };
-            await db.collection('caretakers').doc(uid).set(caretakerDoc, { merge: true });
-            let ctList = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-            ctList = [caretakerDoc, ...ctList.filter(c => c.id !== uid && c.email !== authEmail && (!email || c.email !== email.toLowerCase()))];
+            await db.collection('caretakers').doc(ctDocId).set(caretakerDoc, { merge: true });
+            ctList = [caretakerDoc, ...(Array.isArray(ctList) ? ctList.filter(c =>
+              c.id !== ctDocId &&
+              c.id !== uid &&
+              (!empId || (c.empId || '').toLowerCase().trim() !== empId.toLowerCase().trim()) &&
+              c.email !== authEmail &&
+              (!email || c.email !== email.toLowerCase())
+            ) : [])];
             localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(ctList));
             localStorage.setItem('saplink_caretakers_cache', JSON.stringify(ctList));
             window.dispatchEvent(new CustomEvent('ATAMAN:caretakers-updated', { detail: ctList }));

@@ -2531,9 +2531,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (existingAdIdx >= 0) {
-      const prevId = adoptersList[existingAdIdx].id;
+      const existingAd = adoptersList[existingAdIdx];
+      const prevId = existingAd.id;
       newObj.id = prevId || newObj.id;
-      adoptersList[existingAdIdx] = { ...adoptersList[existingAdIdx], ...newObj };
+
+      // Merge previously adopted trees with newly adopted trees so they remain tied together under the same adopter account
+      const mergedTreesMap = new Map();
+      (Array.isArray(existingAd.treesList) ? existingAd.treesList : []).forEach(t => {
+        if (t && t.id) mergedTreesMap.set(String(t.id), { ...t });
+      });
+      (Array.isArray(newObj.treesList) ? newObj.treesList : []).forEach(t => {
+        if (t && t.id) {
+          const tid = String(t.id);
+          if (mergedTreesMap.has(tid)) {
+            const prev = mergedTreesMap.get(tid);
+            mergedTreesMap.set(tid, {
+              ...prev,
+              ...t,
+              treeCount: (parseInt(prev.treeCount) || 0) + (parseInt(t.treeCount) || 0),
+              photo: t.photo || prev.photo || ''
+            });
+          } else {
+            mergedTreesMap.set(tid, { ...t });
+          }
+        }
+      });
+
+      const mergedTreesList = Array.from(mergedTreesMap.values());
+      const mergedTotalTrees = mergedTreesList.reduce((sum, item) => sum + (Math.max(1, parseInt(item.treeCount) || 1)), 0);
+      const mergedTotalFunding = mergedTotalTrees * 50;
+
+      newObj.treesList = mergedTreesList;
+      newObj.treesCount = mergedTotalTrees;
+      newObj.funding = mergedTotalFunding;
+      newObj.fundingPaid = mergedTotalFunding;
+      newObj.customFunding = mergedTotalFunding > 0;
+      newObj.treePhotos = { ...(existingAd.treePhotos || {}), ...(newObj.treePhotos || {}) };
+      newObj.payments = [...(newObj.payments || []), ...(existingAd.payments || [])];
+      adoptersList[existingAdIdx] = { ...existingAd, ...newObj };
     } else {
       adoptersList.unshift(newObj);
     }
