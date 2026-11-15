@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.0-auto-funding-50-per-tree';
+const CACHE_NAME = 'ataman-pwa-v2.2.1-remove-top-save-caretaker';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [

@@ -212,10 +212,10 @@
 
       </ul>
     </nav>
-      <!-- User Account Profile in Sidebar Bottom -->
+    <!-- User Account Profile in Sidebar Bottom -->
     <div class="sidebar-user-row">
-      <a href="admin-settings.html" class="sidebar-user" id="sidebarUserProfile"
-        title="Open Admin Account & Settings" style="text-decoration:none; flex:1;">
+      <a href="admin-settings.html" class="sidebar-user" id="sidebarUserProfile" title="Open Admin Account & Settings"
+        style="text-decoration:none; flex:1;">
         <div class="sb-user-avatar">EZ</div>
         <div class="sb-user-info">
           <span class="sb-user-name">Ethel Zeta (Admin)</span>
@@ -248,9 +248,8 @@
     <!-- 1. PAGE HEADER -->
     <header class="top-navbar">
       <div class="nav-title-group">
-        <span class="nav-icon-emoji">👥</span>
         <div>
-          <h1 class="nav-page-title">Caretakers</h1>
+          <h1 class="nav-page-title"><span class="nav-icon-emoji">👥</span>Caretakers</h1>
           <p class="nav-page-subtitle">Manage caretakers, assigned trees, monitoring activities, and field performance.
           </p>
         </div>
@@ -260,7 +259,7 @@
         <button class="btn btn-outline" id="exportCaretakersBtn" type="button">📤 Export</button>
         <button class="btn btn-primary" id="openAddCaretakerModalBtn" type="button">+ Add Caretaker</button>
 
-        
+
       </div>
     </header>
 
@@ -749,13 +748,7 @@
     <div class="modal-card" style="max-width: 680px;">
       <div class="modal-header">
         <h2 class="modal-title"><span>➕</span> Add New Caretaker</h2>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <button class="btn btn-primary btn-sm" type="submit" form="addCaretakerForm" id="headerSaveCaretakerBtn"
-            style="display:inline-flex; align-items:center; gap:6px; font-weight:700; padding:6px 14px; font-size:13px;">
-            <span>💾</span> Save Caretaker
-          </button>
-          <button class="modal-close-btn" id="closeAddModalBtn" type="button">✕</button>
-        </div>
+        <button class="modal-close-btn" id="closeAddModalBtn" type="button">✕</button>
       </div>
       <form id="addCaretakerForm">
         <div class="modal-body">
@@ -767,7 +760,9 @@
             <div class="form-group" style="margin-bottom: 14px;">
               <label for="selectCaretakerUser" style="display:flex; align-items:center; justify-content:space-between;">
                 <span>Caretaker <span style="color:#ef4444;">*</span></span>
-                <span id="caretakerLinkedBadge" style="display:none; font-size:11px; font-weight:700; color:#15803d; background:#dcfce7; padding:2px 8px; border-radius:12px;">✓ Account Linked</span>
+                <span id="caretakerLinkedBadge"
+                  style="display:none; font-size:11px; font-weight:700; color:#15803d; background:#dcfce7; padding:2px 8px; border-radius:12px;">✓
+                  Account Linked</span>
               </label>
               <input type="text" id="caretakerSearchInput" placeholder="🔍 Type to filter registered caretakers..."
                 style="display:none; margin-bottom:6px; width:100%; padding:7px 10px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:12.5px; box-sizing:border-box;" />
@@ -1018,8 +1013,8 @@
       <div class="modal-body" style="align-items: center; gap: 14px;">
         <div
           style="width: 100%; height: 260px; border-radius: 10px; overflow: hidden; background: #0f172a; display: flex; align-items: center; justify-content: center;">
-          <img id="pvImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Tree Field Photo"
-            style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+          <img id="pvImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            alt="Tree Field Photo" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
         </div>
         <div class="card"
           style="width: 100%; padding: 14px; font-size: 0.82rem; background: #f8fafc; border-color: #e2e8f0; display: flex; flex-direction: column; gap: 6px;">
