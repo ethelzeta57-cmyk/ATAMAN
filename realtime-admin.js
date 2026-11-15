@@ -1054,7 +1054,7 @@
                 t.caretaker = ct.name;
                 treesModified = true;
               }
-              const cnt = Math.max(1, parseInt(t.treeCount) || 1);
+              const cnt = Math.max(1, parseInt(t.caretakerAssignedCount) || parseInt(t.treeCount) || 1);
               cTotal += cnt;
               const st = (t.status || 'healthy').toLowerCase();
               if (st === 'healthy') cH += cnt;

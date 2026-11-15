@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }) : [];
         let cTotal = 0, cH = 0, cNC = 0, cCR = 0, cD = 0;
         ctTrees.forEach(t => {
-          const cnt = Math.max(1, parseInt(t.treeCount) || 1);
+          const cnt = Math.max(1, parseInt(t.caretakerAssignedCount) || parseInt(t.treeCount) || 1);
           cTotal += cnt;
           const st = (t.status || 'healthy').toLowerCase();
           if (st === 'healthy') cH += cnt;
@@ -1985,11 +1985,262 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // ── Registered Trees Multi-Select Dropdown with Checkboxes for Caretaker Assignment ──
+  let selectedCtTreeIds = [];
+  let ctTreeQuantities = {};
+
+  function getRegisteredTreesForCaretaker() {
+    let trees = [];
+    try {
+      const raw = localStorage.getItem('ATAMAN_trees_cache');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) trees = parsed;
+      }
+    } catch (e) {}
+    if ((!trees || trees.length === 0) && Array.isArray(window.ATAMAN_DEFAULT_TREES)) {
+      trees = [...window.ATAMAN_DEFAULT_TREES];
+    }
+    return Array.isArray(trees) ? trees : [];
+  }
+
+  function updateCaretakerSelectedTreesSummary() {
+    const allTrees = getRegisteredTreesForCaretaker();
+    const selectedObjs = allTrees.filter(t => selectedCtTreeIds.includes(String(t.id)));
+    let totalCount = 0;
+    const speciesLabels = [];
+
+    selectedObjs.forEach(t => {
+      const tid = String(t.id);
+      const regCount = Math.max(1, parseInt(t.treeCount) || 1);
+      const qty = ctTreeQuantities[tid] !== undefined ? Math.min(regCount, Math.max(1, parseInt(ctTreeQuantities[tid]) || regCount)) : regCount;
+      totalCount += qty;
+      const common = t.species?.common || (typeof t.species === 'string' ? t.species : 'Native Tree');
+      if (!speciesLabels.includes(common)) speciesLabels.push(common);
+    });
+
+    const addTreeTypeEl = document.getElementById('addTreeType');
+    const addInitialTreesEl = document.getElementById('addInitialTrees');
+    const dropdownLabelEl = document.getElementById('caretakerTreeDropdownLabel');
+    const badgeEl = document.getElementById('ctSelectedTreesBadge');
+    const selectAllCb = document.getElementById('ctSelectAllTreesCb');
+
+    const summaryStr = speciesLabels.length > 0
+      ? speciesLabels.join(', ')
+      : '';
+
+    if (addTreeTypeEl) addTreeTypeEl.value = summaryStr;
+    if (addInitialTreesEl) addInitialTreesEl.value = totalCount;
+
+    if (badgeEl) {
+      badgeEl.textContent = selectedObjs.length > 0
+        ? `${selectedObjs.length} record${selectedObjs.length === 1 ? '' : 's'} · ${totalCount.toLocaleString()} trees`
+        : '0 selected';
+    }
+
+    if (dropdownLabelEl) {
+      if (selectedObjs.length === 0) {
+        dropdownLabelEl.textContent = '— Select registered tree(s) to assign —';
+        dropdownLabelEl.style.color = '#64748b';
+      } else {
+        const preview = selectedObjs.map(t => {
+          const common = t.species?.common || (typeof t.species === 'string' ? t.species : 'Native Tree');
+          return `${t.id} (${common})`;
+        }).join(', ');
+        dropdownLabelEl.textContent = `✓ ${ preview }`;
+        dropdownLabelEl.style.color = '#166534';
+      }
+    }
+
+    if (selectAllCb) {
+      selectAllCb.checked = allTrees.length > 0 && selectedCtTreeIds.length === allTrees.length;
+      selectAllCb.indeterminate = selectedCtTreeIds.length > 0 && selectedCtTreeIds.length < allTrees.length;
+    }
+  }
+
+  function renderCaretakerTreesCheckboxes() {
+    const listEl = document.getElementById('caretakerTreeCheckboxList');
+    if (!listEl) return;
+
+    const allTrees = getRegisteredTreesForCaretaker();
+    const query = (document.getElementById('ctTreeSearchInput')?.value || '').toLowerCase().trim();
+
+    if (allTrees.length === 0) {
+      listEl.innerHTML = `
+        <div style="text-align:center; padding:18px 12px; color:#64748b; font-size:12.5px;">
+          🌱 No trees registered yet in the Trees Table.
+        </div>
+      `;
+      updateCaretakerSelectedTreesSummary();
+      return;
+    }
+
+    const filtered = allTrees.filter(t => {
+      const id = String(t.id || '').toLowerCase();
+      const common = (t.species?.common || (typeof t.species === 'string' ? t.species : '')).toLowerCase();
+      const sci = (t.species?.scientific || '').toLowerCase();
+      const type = (t.treeType || t.species?.type || '').toLowerCase();
+      const brgy = (t.barangay || t.location || '').toLowerCase();
+      return !query || id.includes(query) || common.includes(query) || sci.includes(query) || type.includes(query) || brgy.includes(query);
+    });
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div style="text-align:center; padding:16px 12px; color:#64748b; font-size:12.5px;">
+          🔍 No trees match "${query}"
+        </div>
+      `;
+      updateCaretakerSelectedTreesSummary();
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(t => {
+      const tid = String(t.id);
+      const isChecked = selectedCtTreeIds.includes(tid);
+      const common = t.species?.common || (typeof t.species === 'string' ? t.species : 'Native Tree');
+      const sci = t.species?.scientific || '';
+      const treeType = t.treeType || t.species?.type || 'Native';
+      const regCount = Math.max(1, parseInt(t.treeCount) || 1);
+      const qty = ctTreeQuantities[tid] !== undefined ? Math.min(regCount, Math.max(1, parseInt(ctTreeQuantities[tid]) || regCount)) : regCount;
+      const loc = t.barangay ? `Brgy. ${t.barangay}` : (t.location || 'Catbalogan City');
+      const curCt = (t.caretaker && t.caretaker !== 'Unassigned' && t.caretaker !== 'Pedro Reyes') ? t.caretaker : '';
+
+      return `
+        <div class="ct-tree-cb-row" data-tree-id="${tid}"
+          style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 10px; border-radius:8px; border:1.5px solid ${isChecked ? '#86efac' : '#e2e8f0'}; background:${isChecked ? '#f0fdf4' : '#ffffff'}; transition:all 0.15s ease;">
+          <label style="display:flex; align-items:flex-start; gap:8px; flex:1; min-width:0; cursor:pointer; margin:0;">
+            <input type="checkbox" class="ct-tree-cb" value="${tid}" ${isChecked ? 'checked' : ''}
+              style="width:16px; height:16px; accent-color:#16a34a; cursor:pointer; margin-top:2px; flex-shrink:0;" />
+            <div style="min-width:0; flex:1;">
+              <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                <strong style="font-size:12.5px; color:#0f172a;">${tid}</strong>
+                <span style="font-size:12.5px; font-weight:700; color:#166534;">— ${common}</span>
+                ${sci ? `<span style="font-size:11px; color:#64748b; font-style:italic;">(${sci})</span>` : ''}
+                <span style="font-size:10.5px; font-weight:700; color:#065f46; background:#ecfdf5; border:1px solid #a7f3d0; padding:1px 5px; border-radius:4px;">${treeType}</span>
+              </div>
+              <div style="font-size:11px; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <span>🌳 ${regCount} registered</span>
+                <span>• 📍 ${loc}</span>
+                ${curCt ? `<span style="color:#1d4ed8; font-weight:600;">• 👤 ${curCt}</span>` : ''}
+              </div>
+            </div>
+          </label>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:2px; flex-shrink:0;">
+            <span style="font-size:9.5px; font-weight:700; color:#64748b;">Trees (max ${regCount})</span>
+            <input type="number" class="ct-tree-qty-input" data-tree-id="${tid}" data-max="${regCount}"
+              min="1" max="${regCount}" value="${qty}" ${isChecked ? '' : 'disabled'}
+              style="width:62px; padding:3px 5px; border-radius:5px; border:1.5px solid ${isChecked ? '#86efac' : '#cbd5e1'}; background:${isChecked ? '#ffffff' : '#f1f5f9'}; color:${isChecked ? '#166534' : '#94a3b8'}; font-size:12px; font-weight:700; text-align:center;" />
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    listEl.querySelectorAll('.ct-tree-cb').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const tid = cb.value;
+        const row = cb.closest('.ct-tree-cb-row');
+        const qtyInp = row?.querySelector('.ct-tree-qty-input');
+        const treeObj = allTrees.find(x => String(x.id) === String(tid));
+        const maxCount = Math.max(1, parseInt(treeObj?.treeCount) || 1);
+
+        if (cb.checked) {
+          if (!selectedCtTreeIds.includes(tid)) selectedCtTreeIds.push(tid);
+          if (ctTreeQuantities[tid] === undefined) ctTreeQuantities[tid] = maxCount;
+          if (qtyInp) {
+            qtyInp.disabled = false;
+            qtyInp.value = ctTreeQuantities[tid];
+            qtyInp.style.borderColor = '#86efac';
+            qtyInp.style.background = '#ffffff';
+            qtyInp.style.color = '#166534';
+          }
+          if (row) {
+            row.style.borderColor = '#86efac';
+            row.style.background = '#f0fdf4';
+          }
+        } else {
+          selectedCtTreeIds = selectedCtTreeIds.filter(id => id !== tid);
+          if (qtyInp) {
+            qtyInp.disabled = true;
+            qtyInp.style.borderColor = '#cbd5e1';
+            qtyInp.style.background = '#f1f5f9';
+            qtyInp.style.color = '#94a3b8';
+          }
+          if (row) {
+            row.style.borderColor = '#e2e8f0';
+            row.style.background = '#ffffff';
+          }
+        }
+        updateCaretakerSelectedTreesSummary();
+      });
+    });
+
+    listEl.querySelectorAll('.ct-tree-qty-input').forEach(inp => {
+      const onQty = () => {
+        const tid = inp.getAttribute('data-tree-id');
+        const maxVal = parseInt(inp.getAttribute('data-max')) || 9999;
+        const val = Math.min(maxVal, Math.max(1, parseInt(inp.value) || 1));
+        ctTreeQuantities[tid] = val;
+        inp.value = val;
+        updateCaretakerSelectedTreesSummary();
+      };
+      inp.addEventListener('input', onQty);
+      inp.addEventListener('change', onQty);
+    });
+
+    updateCaretakerSelectedTreesSummary();
+  }
+
+  const caretakerTreeDropdownBtn = document.getElementById('caretakerTreeDropdownBtn');
+  const caretakerTreeDropdownMenu = document.getElementById('caretakerTreeDropdownMenu');
+  const ctSelectAllTreesCb = document.getElementById('ctSelectAllTreesCb');
+  const ctTreeSearchInput = document.getElementById('ctTreeSearchInput');
+
+  if (caretakerTreeDropdownBtn && caretakerTreeDropdownMenu) {
+    caretakerTreeDropdownBtn.addEventListener('click', () => {
+      const isHidden = caretakerTreeDropdownMenu.style.display === 'none';
+      caretakerTreeDropdownMenu.style.display = isHidden ? 'flex' : 'none';
+      const arrow = document.getElementById('caretakerTreeDropdownArrow');
+      if (arrow) arrow.textContent = isHidden ? '▴' : '▾';
+    });
+  }
+
+  if (ctSelectAllTreesCb) {
+    ctSelectAllTreesCb.addEventListener('change', () => {
+      const allTrees = getRegisteredTreesForCaretaker();
+      if (ctSelectAllTreesCb.checked) {
+        selectedCtTreeIds = allTrees.map(t => String(t.id));
+        allTrees.forEach(t => {
+          const tid = String(t.id);
+          if (ctTreeQuantities[tid] === undefined) {
+            ctTreeQuantities[tid] = Math.max(1, parseInt(t.treeCount) || 1);
+          }
+        });
+      } else {
+        selectedCtTreeIds = [];
+      }
+      renderCaretakerTreesCheckboxes();
+    });
+  }
+
+  if (ctTreeSearchInput) {
+    ctTreeSearchInput.addEventListener('input', renderCaretakerTreesCheckboxes);
+  }
+
+  window.addEventListener('ATAMAN:trees-updated', () => {
+    if (!addCaretakerModal.classList.contains('hidden')) {
+      renderCaretakerTreesCheckboxes();
+    }
+  });
+
   openAddCaretakerModalBtn.addEventListener('click', () => {
     updateCaretakerBarangays();
     populateRealtimeAdopters();
     addCaretakerForm.reset();
     window._selectedCaretakerUser = null;
+    selectedCtTreeIds = [];
+    ctTreeQuantities = {};
+    if (ctTreeSearchInput) ctTreeSearchInput.value = '';
+    if (caretakerTreeDropdownMenu) caretakerTreeDropdownMenu.style.display = 'flex';
     const feedback = document.getElementById('caretakerSelectFeedback');
     if (feedback) feedback.style.display = 'none';
     const badge = document.getElementById('caretakerLinkedBadge');
@@ -2001,12 +2252,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextIdNum = caretakersList.length + 1;
     document.getElementById('addEmpId').value = `CT-${String(nextIdNum).padStart(3, '0')}`;
     populateCaretakersDropdown();
+    renderCaretakerTreesCheckboxes();
     addCaretakerModal.classList.remove('hidden');
   });
 
   const closeAddModal = () => {
     addCaretakerModal.classList.add('hidden');
     window._selectedCaretakerUser = null;
+    selectedCtTreeIds = [];
+    ctTreeQuantities = {};
     const feedback = document.getElementById('caretakerSelectFeedback');
     if (feedback) feedback.style.display = 'none';
     const badge = document.getElementById('caretakerLinkedBadge');
@@ -2025,6 +2279,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!selUserEl?.value || !selectedCaretaker) {
       alert('⚠️ Please select a registered Caretaker from the dropdown.');
       selUserEl?.focus();
+      return;
+    }
+
+    if (selectedCtTreeIds.length === 0) {
+      alert('⚠️ Please check at least one tree under "Assigned Tree Type / Species" for this caretaker.');
+      document.getElementById('caretakerTreeDropdownBtn')?.focus();
       return;
     }
 
@@ -2047,6 +2307,58 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Update selected trees in ATAMAN_trees_cache & Firestore so they are assigned to this caretaker
+    const allTrees = getRegisteredTreesForCaretaker();
+    let cH = 0, cNC = 0, cCR = 0, cD = 0;
+    const assignedTreesList = [];
+
+    selectedCtTreeIds.forEach(tid => {
+      const idx = allTrees.findIndex(t => String(t.id) === String(tid));
+      if (idx >= 0) {
+        const tObj = allTrees[idx];
+        const regCount = Math.max(1, parseInt(tObj.treeCount) || 1);
+        const assignedQty = ctTreeQuantities[tid] !== undefined ? Math.min(regCount, Math.max(1, parseInt(ctTreeQuantities[tid]) || regCount)) : regCount;
+        const st = (tObj.status || 'healthy').toLowerCase();
+        if (st === 'healthy') cH += assignedQty;
+        else if (st === 'needs-care' || st === 'needs') cNC += assignedQty;
+        else if (st === 'critical') cCR += assignedQty;
+        else if (st === 'dead') cD += assignedQty;
+        else cH += assignedQty;
+
+        const common = tObj.species?.common || (typeof tObj.species === 'string' ? tObj.species : 'Native Tree');
+        assignedTreesList.push({
+          id: tObj.id,
+          species: common,
+          treeCount: assignedQty,
+          treeType: tObj.treeType || tObj.species?.type || 'Native'
+        });
+
+        allTrees[idx] = {
+          ...tObj,
+          caretaker: fullName,
+          caretakerAssignedCount: assignedQty,
+          customAssignedCaretaker: true,
+          customCaretaker: true
+        };
+
+        if (window.ATAMAN_DB && typeof window.ATAMAN_DB.updateTree === 'function') {
+          window.ATAMAN_DB.updateTree(tid, {
+            caretaker: fullName,
+            caretakerAssignedCount: assignedQty,
+            customAssignedCaretaker: true,
+            customCaretaker: true
+          }).catch(() => {});
+        }
+      }
+    });
+
+    try {
+      localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
+      if (window.ATAMAN_SYNC && typeof window.ATAMAN_SYNC.notifyTrees === 'function') {
+        window.ATAMAN_SYNC.notifyTrees(allTrees);
+      }
+    } catch (e) {}
+
     const newCt = {
       id: (selectedCaretaker && selectedCaretaker.id && String(selectedCaretaker.id).startsWith('ct-')) ? selectedCaretaker.id : (selectedCaretaker?.id || `ct-custom-${Date.now()}`),
       userId: selectedCaretaker?.id || '',
@@ -2061,11 +2373,13 @@ document.addEventListener('DOMContentLoaded', () => {
       status: 'Active',
       primaryArea: barangay,
       assignedTreeType: treeType,
+      assignedTreeIds: [...selectedCtTreeIds],
+      assignedTreesList: assignedTreesList,
       assignedAdopter: assignedAdopter,
       assignedAdopterName: assignedAdopterName,
       dateJoined: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
       assignedTrees: initTrees,
-      treesCondition: { healthy: 0, care: 0, critical: 0, dead: 0 },
+      treesCondition: { healthy: cH, care: cNC, critical: cCR, dead: cD },
       pendingMonitoring: 0,
       overdueMonitoring: 0,
       completedMonitoring: 0,
