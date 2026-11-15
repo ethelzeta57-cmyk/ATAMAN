@@ -194,6 +194,223 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentProfileTrees = [];
   let currentSelectedAdopter = null;
   let currentAdopterPhotoData = '';
+  // Map of treeId -> { dataUrl, fileName, fileSize, treeId, species, source }
+  let treePhotosMap = {};
+  let activePhotoTreeId = '';
+
+  function getExistingTreePhoto(t) {
+    if (!t) return '';
+    return t.photo || t.adopterPhoto || (t.photos && t.photos.treePhoto) || '';
+  }
+
+  function getTreeSpeciesLabel(t) {
+    if (!t) return 'Native Tree';
+    return t.species?.common || (typeof t.species === 'string' ? t.species : 'Native Tree');
+  }
+
+  function ensureTreePhotoInitialized(treeId) {
+    if (!treeId || treePhotosMap[treeId]) return;
+    const t = allTreesList.find(x => String(x.id) === String(treeId));
+    const existingUrl = getExistingTreePhoto(t);
+    if (existingUrl) {
+      const sp = getTreeSpeciesLabel(t);
+      treePhotosMap[treeId] = {
+        dataUrl: existingUrl,
+        fileName: `${t.id} (${sp}) — Linked Tree Photo`,
+        fileSize: 'Matched from Tree Record',
+        treeId: String(t.id),
+        species: sp,
+        source: 'tree-record'
+      };
+    }
+  }
+
+  function getPrimaryAdopterPhoto() {
+    for (const tid of selectedTreeIds) {
+      if (treePhotosMap[tid]?.dataUrl) return treePhotosMap[tid].dataUrl;
+    }
+    const keys = Object.keys(treePhotosMap);
+    if (keys.length > 0 && treePhotosMap[keys[0]]?.dataUrl) {
+      return treePhotosMap[keys[0]].dataUrl;
+    }
+    return currentAdopterPhotoData || '';
+  }
+
+  function syncPhotoTargetUI() {
+    const targetSelect = document.getElementById('photoTargetTreeSelect');
+    const linkedBadge = document.getElementById('photoLinkedTreeBadge');
+    const previewImg = document.getElementById('adopterPhotoPreviewImg');
+    const previewWrap = document.getElementById('adopterPhotoPreviewWrap');
+    const promptWrap = document.getElementById('adopterPhotoPrompt');
+    const promptTitle = document.getElementById('adopterPhotoPromptTitle');
+    const promptSub = document.getElementById('adopterPhotoPromptSub');
+    const treeTag = document.getElementById('adopterPhotoTreeTag');
+    const fileNameEl = document.getElementById('adopterPhotoFileName');
+    const fileSizeEl = document.getElementById('adopterPhotoFileSize');
+    const linkedListEl = document.getElementById('linkedTreePhotosList');
+
+    // Keep activePhotoTreeId synced with selectedTreeIds
+    if (selectedTreeIds.length > 0) {
+      selectedTreeIds.forEach(tid => ensureTreePhotoInitialized(tid));
+      if (!activePhotoTreeId || !selectedTreeIds.includes(activePhotoTreeId)) {
+        activePhotoTreeId = selectedTreeIds[0];
+      }
+    } else {
+      activePhotoTreeId = '';
+    }
+
+    // Populate Target Tree Dropdown
+    if (targetSelect) {
+      const opts = [];
+      if (selectedTreeIds.length === 0) {
+        opts.push('<option value="">— Select a tree on the right to link photo —</option>');
+      } else {
+        opts.push('<optgroup label="✓ Selected Adopted Trees">');
+        selectedTreeIds.forEach(tid => {
+          const t = allTreesList.find(x => String(x.id) === String(tid));
+          const sp = getTreeSpeciesLabel(t);
+          const qty = treeQuantities[tid] !== undefined ? treeQuantities[tid] : (parseInt(t?.treeCount) || 1);
+          const hasPhoto = !!(treePhotosMap[tid]?.dataUrl);
+          const sel = String(tid) === String(activePhotoTreeId) ? 'selected' : '';
+          opts.push(`<option value="${tid}" ${sel}>${hasPhoto ? '📸 ' : '🌳 '}${tid} — ${sp} (${qty} tree${qty === 1 ? '' : 's'})</option>`);
+        });
+        opts.push('</optgroup>');
+      }
+
+      const unselected = allTreesList.filter(t => !selectedTreeIds.includes(t.id));
+      if (unselected.length > 0) {
+        opts.push('<optgroup label="Other Registered Trees (Selecting will check tree)">');
+        unselected.forEach(t => {
+          const sp = getTreeSpeciesLabel(t);
+          opts.push(`<option value="${t.id}">➕ ${t.id} — ${sp}</option>`);
+        });
+        opts.push('</optgroup>');
+      }
+      targetSelect.innerHTML = opts.join('');
+      if (activePhotoTreeId) targetSelect.value = activePhotoTreeId;
+    }
+
+    const activeTree = activePhotoTreeId ? allTreesList.find(x => String(x.id) === String(activePhotoTreeId)) : null;
+    const activeSpecies = getTreeSpeciesLabel(activeTree);
+
+    if (linkedBadge) {
+      if (activePhotoTreeId) {
+        linkedBadge.textContent = `🔗 Linked: ${activePhotoTreeId} (${activeSpecies})`;
+        linkedBadge.style.background = '#dcfce7';
+        linkedBadge.style.color = '#15803d';
+        linkedBadge.style.borderColor = '#86efac';
+      } else {
+        linkedBadge.textContent = 'Select a tree →';
+        linkedBadge.style.background = '#f1f5f9';
+        linkedBadge.style.color = '#64748b';
+        linkedBadge.style.borderColor = '#cbd5e1';
+      }
+    }
+
+    const currentEntry = activePhotoTreeId ? treePhotosMap[activePhotoTreeId] : null;
+    currentAdopterPhotoData = getPrimaryAdopterPhoto();
+
+    if (currentEntry && currentEntry.dataUrl) {
+      if (previewImg) previewImg.src = currentEntry.dataUrl;
+      if (treeTag) treeTag.textContent = `🌳 ${currentEntry.treeId} — ${currentEntry.species}`;
+      if (fileNameEl) fileNameEl.textContent = currentEntry.fileName || `${currentEntry.treeId} Photo`;
+      if (fileSizeEl) fileSizeEl.textContent = currentEntry.fileSize || '';
+      if (previewWrap) previewWrap.style.display = 'flex';
+      if (promptWrap) promptWrap.style.display = 'none';
+    } else {
+      if (previewImg) previewImg.src = '';
+      if (previewWrap) previewWrap.style.display = 'none';
+      if (promptWrap) promptWrap.style.display = 'flex';
+      if (promptTitle) {
+        promptTitle.textContent = activePhotoTreeId
+          ? `Click to Upload Photo for ${activePhotoTreeId} (${activeSpecies})`
+          : 'Select a Tree & Upload Linked Tree Photo';
+      }
+      if (promptSub) {
+        promptSub.textContent = activePhotoTreeId
+          ? `Photo will be directly matched & saved to tree ${activePhotoTreeId}`
+          : 'Directly linked & matched to the specific tree ID adopted';
+      }
+    }
+
+    // Render per-tree linked photos tracker list
+    if (linkedListEl) {
+      if (selectedTreeIds.length === 0) {
+        linkedListEl.style.display = 'none';
+        linkedListEl.innerHTML = '';
+      } else {
+        linkedListEl.style.display = 'flex';
+        linkedListEl.innerHTML = selectedTreeIds.map(tid => {
+          const t = allTreesList.find(x => String(x.id) === String(tid));
+          const sp = getTreeSpeciesLabel(t);
+          const entry = treePhotosMap[tid];
+          const isTarget = String(tid) === String(activePhotoTreeId);
+          return `
+            <div class="linked-tree-photo-chip" data-tree-id="${tid}"
+              style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 8px; border-radius:7px; border:1px solid ${isTarget ? '#16a34a' : '#bbf7d0'}; background:${isTarget ? '#dcfce7' : '#ffffff'}; font-size:11.5px; cursor:pointer;">
+              <div style="display:flex; align-items:center; gap:7px; min-width:0;">
+                ${entry?.dataUrl
+                  ? `<img src="${entry.dataUrl}" alt="${tid}" style="width:24px; height:24px; border-radius:5px; object-fit:cover; border:1px solid #86efac; flex-shrink:0;" />`
+                  : `<span style="width:24px; height:24px; border-radius:5px; background:#f0fdf4; border:1px dashed #86efac; display:inline-flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;">🌱</span>`
+                }
+                <span style="color:#0f172a; font-weight:700; white-space:nowrap;">${tid}</span>
+                <span style="color:#475569; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${sp}</span>
+              </div>
+              <button type="button" class="btn-chip-upload-tree-photo" data-tree-id="${tid}"
+                style="border:none; background:${entry?.dataUrl ? '#166534' : '#e2e8f0'}; color:${entry?.dataUrl ? '#fff' : '#334155'}; padding:2px 7px; border-radius:5px; font-size:10.5px; font-weight:700; cursor:pointer; flex-shrink:0;">
+                ${entry?.dataUrl ? '✓ Linked · Change' : '📷 Upload'}
+              </button>
+            </div>
+          `;
+        }).join('');
+
+        linkedListEl.querySelectorAll('.linked-tree-photo-chip').forEach(chip => {
+          chip.addEventListener('click', (ev) => {
+            const tid = chip.getAttribute('data-tree-id');
+            if (!tid) return;
+            activePhotoTreeId = tid;
+            syncPhotoTargetUI();
+            if (ev.target.closest('.btn-chip-upload-tree-photo')) {
+              document.getElementById('newAdopterPhotoInput')?.click();
+            }
+          });
+        });
+      }
+    }
+
+    // Update Step 3 confirmation row if present
+    updateConfirmationPhotoRow();
+  }
+
+  function updateConfirmationPhotoRow() {
+    const thumbEl = document.getElementById('confirmPhotoThumb');
+    const textEl = document.getElementById('confirmPhotoText');
+    if (!thumbEl || !textEl) return;
+
+    const linkedEntries = selectedTreeIds
+      .map(tid => treePhotosMap[tid])
+      .filter(Boolean);
+
+    if (linkedEntries.length > 0) {
+      thumbEl.src = linkedEntries[0].dataUrl;
+      thumbEl.style.display = 'block';
+      const labels = linkedEntries.map(e => `${e.treeId} (${e.species})`).join(', ');
+      textEl.textContent = `Linked to ${labels} ✓`;
+      textEl.style.color = '#15803d';
+      textEl.style.fontWeight = '600';
+    } else if (currentAdopterPhotoData) {
+      thumbEl.src = currentAdopterPhotoData;
+      thumbEl.style.display = 'block';
+      textEl.textContent = 'Photo attached ✓';
+      textEl.style.color = '#15803d';
+      textEl.style.fontWeight = '600';
+    } else {
+      thumbEl.style.display = 'none';
+      textEl.textContent = 'None attached';
+      textEl.style.color = '#64748b';
+      textEl.style.fontWeight = 'normal';
+    }
+  }
 
   function processAdopterPhotoFile(file) {
     if (!file) return;
@@ -205,6 +422,25 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('⚠️ The selected image exceeds 10MB. Please choose a smaller image.');
       return;
     }
+
+    // Ensure a specific tree is selected & linked for this photo
+    if (!activePhotoTreeId) {
+      if (selectedTreeIds.length > 0) {
+        activePhotoTreeId = selectedTreeIds[0];
+      } else if (allTreesList.length > 0) {
+        const firstTree = allTreesList[0];
+        activePhotoTreeId = String(firstTree.id);
+        selectedTreeIds.push(activePhotoTreeId);
+        const regCount = parseInt(firstTree.treeCount) || 1;
+        const tkCount = parseInt(firstTree.takenCount) || 0;
+        const remaining = Math.max(1, regCount - tkCount);
+        treeQuantities[activePhotoTreeId] = Math.min(remaining, 10);
+      }
+    }
+
+    const targetTreeId = activePhotoTreeId;
+    const targetTreeObj = allTreesList.find(t => String(t.id) === String(targetTreeId));
+    const speciesName = getTreeSpeciesLabel(targetTreeObj);
 
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -228,56 +464,44 @@ document.addEventListener('DOMContentLoaded', () => {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        const sizeLabel = (file.size / 1024 > 1024)
+          ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
+          : Math.round(file.size / 1024) + ' KB';
 
+        if (targetTreeId) {
+          treePhotosMap[targetTreeId] = {
+            dataUrl: compressedDataUrl,
+            fileName: `${targetTreeId} (${speciesName}) · ${file.name}`,
+            fileSize: sizeLabel,
+            treeId: targetTreeId,
+            species: speciesName,
+            source: 'uploaded',
+            linkedAt: new Date().toISOString()
+          };
+        }
         currentAdopterPhotoData = compressedDataUrl;
 
-        const previewImg = document.getElementById('adopterPhotoPreviewImg');
-        const previewWrap = document.getElementById('adopterPhotoPreviewWrap');
-        const promptWrap = document.getElementById('adopterPhotoPrompt');
-        const fileNameEl = document.getElementById('adopterPhotoFileName');
-        const fileSizeEl = document.getElementById('adopterPhotoFileSize');
-
-        if (previewImg) previewImg.src = compressedDataUrl;
-        if (fileNameEl) fileNameEl.textContent = file.name;
-        if (fileSizeEl) fileSizeEl.textContent = (file.size / 1024 > 1024) ? (file.size / (1024 * 1024)).toFixed(1) + ' MB' : Math.round(file.size / 1024) + ' KB';
-        if (previewWrap) previewWrap.style.display = 'flex';
-        if (promptWrap) promptWrap.style.display = 'none';
-
-        // Update Step 3 confirmation row if already generated
-        const thumbEl = document.getElementById('confirmPhotoThumb');
-        const textEl = document.getElementById('confirmPhotoText');
-        if (thumbEl && textEl) {
-          thumbEl.src = compressedDataUrl;
-          thumbEl.style.display = 'block';
-          textEl.textContent = file.name || 'Photo Attached';
-          textEl.style.color = '#15803d';
-          textEl.style.fontWeight = '600';
-        }
+        renderTreeCheckboxes();
+        syncPhotoTargetUI();
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
 
-  function resetAdopterPhotoUpload() {
-    currentAdopterPhotoData = '';
+  function resetAdopterPhotoUpload(onlyActiveTree) {
     const input = document.getElementById('newAdopterPhotoInput');
     if (input) input.value = '';
-    const previewImg = document.getElementById('adopterPhotoPreviewImg');
-    const previewWrap = document.getElementById('adopterPhotoPreviewWrap');
-    const promptWrap = document.getElementById('adopterPhotoPrompt');
-    if (previewImg) previewImg.src = '';
-    if (previewWrap) previewWrap.style.display = 'none';
-    if (promptWrap) promptWrap.style.display = 'flex';
 
-    const thumbEl = document.getElementById('confirmPhotoThumb');
-    const textEl = document.getElementById('confirmPhotoText');
-    if (thumbEl && textEl) {
-      thumbEl.style.display = 'none';
-      textEl.textContent = 'None attached';
-      textEl.style.color = '#64748b';
-      textEl.style.fontWeight = 'normal';
+    if (onlyActiveTree && activePhotoTreeId) {
+      delete treePhotosMap[activePhotoTreeId];
+    } else {
+      treePhotosMap = {};
+      activePhotoTreeId = '';
+      currentAdopterPhotoData = '';
     }
+    renderTreeCheckboxes();
+    syncPhotoTargetUI();
   }
 
   function safeEscape(str) {
@@ -1073,18 +1297,43 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Synchronize locations of profile trees from live trees dataset
+    // Synchronize locations and linked photos of profile trees from live trees dataset
     treesForProfile = treesForProfile.map(item => {
       const liveTree = allTreesList.find(t => String(t.id) === String(item.id));
+      const matchedPhoto = item.photo || (adopter.treePhotos && adopter.treePhotos[item.id]?.dataUrl) || getExistingTreePhoto(liveTree) || adopter.photo || adopter.treePhoto || '';
       if (liveTree) {
         const brgy = liveTree.barangay ? (liveTree.barangay.startsWith('Brgy.') ? liveTree.barangay : `Brgy. ${liveTree.barangay}`) : (livesInGuinsorongan ? 'Brgy. Guinsorongan' : 'Catbalogan City');
         const loc = `${brgy}, ${liveTree.municipality || 'Catbalogan City'}`;
-        return { ...item, location: loc };
+        return { ...item, location: loc, photo: matchedPhoto };
       } else if (livesInGuinsorongan) {
-        return { ...item, location: 'Brgy. Guinsorongan, Catbalogan City' };
+        return { ...item, location: 'Brgy. Guinsorongan, Catbalogan City', photo: matchedPhoto };
       }
-      return item;
+      return { ...item, photo: matchedPhoto };
     });
+
+    // Update Profile Photo Card with first linked tree badge
+    const profCardPhotoTreeBadge = document.getElementById('profCardPhotoTreeBadge');
+    const firstTreeWithPhoto = treesForProfile.find(t => t.photo) || treesForProfile[0];
+    const displayPhotoUrl = firstTreeWithPhoto?.photo || adopterPhoto || '';
+    if (displayPhotoUrl) {
+      if (profPhotoImg) {
+        profPhotoImg.src = displayPhotoUrl;
+        profPhotoImg.style.display = 'block';
+      }
+      if (profEmojiIcon) profEmojiIcon.style.display = 'none';
+      if (profPhotoCard && profCardPhotoImg) {
+        profCardPhotoImg.src = displayPhotoUrl;
+        profPhotoCard.style.display = 'block';
+      }
+      if (profCardPhotoTreeBadge) {
+        if (firstTreeWithPhoto && firstTreeWithPhoto.id) {
+          profCardPhotoTreeBadge.textContent = `🔗 ${firstTreeWithPhoto.id} — ${firstTreeWithPhoto.species || 'Native Tree'} (${firstTreeWithPhoto.treeCount || 1} trees)`;
+          profCardPhotoTreeBadge.style.display = 'inline-block';
+        } else {
+          profCardPhotoTreeBadge.style.display = 'none';
+        }
+      }
+    }
 
     currentProfileTrees = treesForProfile;
     document.getElementById('profTreeTitleCount').textContent = currentProfileTrees.length;
@@ -1120,9 +1369,21 @@ document.addEventListener('DOMContentLoaded', () => {
     tbody.innerHTML = trees.map(t => {
       const badgeClass = t.health === 'Healthy' ? 'badge-active' : (t.health === 'Needs Care' ? 'badge-pending' : 'badge-expired');
       const countTag = t.treeCount ? `<span style="font-weight: 700; color: #166534; font-size: 11.5px; margin-left: 4px;">(🌳 ${t.treeCount})</span>` : '';
+      const treePhoto = t.photo || '';
       return `
-        <tr>
-          <td><strong>${t.id}</strong></td>
+        <tr class="prof-tree-row" data-tree-id="${t.id}" style="cursor: ${treePhoto ? 'pointer' : 'default'};" title="${treePhoto ? 'Click to preview linked tree photo' : ''}">
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${treePhoto
+                ? `<img src="${treePhoto}" alt="${t.id}" style="width:30px; height:30px; border-radius:6px; object-fit:cover; border:1.5px solid #86efac; flex-shrink:0;" />`
+                : `<span style="width:30px; height:30px; border-radius:6px; background:#f0fdf4; border:1px dashed #86efac; display:inline-flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0;">🌳</span>`
+              }
+              <div>
+                <strong>${t.id}</strong>
+                ${treePhoto ? `<div style="font-size:10px; color:#15803d; font-weight:700;">📸 Photo Linked</div>` : ''}
+              </div>
+            </div>
+          </td>
           <td>
             <div style="font-weight: 600;">${t.species} ${countTag}</div>
             ${t.scientific ? `<div style="font-size: 11px; font-style: italic; color: #64748b;">${t.scientific}</div>` : ''}
@@ -1133,6 +1394,26 @@ document.addEventListener('DOMContentLoaded', () => {
         </tr>
       `;
     }).join('');
+
+    tbody.querySelectorAll('.prof-tree-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const tid = row.getAttribute('data-tree-id');
+        const trObj = trees.find(x => String(x.id) === String(tid));
+        if (trObj && trObj.photo) {
+          const profPhotoCard = document.getElementById('profPhotoCard');
+          const profCardPhotoImg = document.getElementById('profCardPhotoImg');
+          const profCardPhotoTreeBadge = document.getElementById('profCardPhotoTreeBadge');
+          if (profPhotoCard && profCardPhotoImg) {
+            profCardPhotoImg.src = trObj.photo;
+            profPhotoCard.style.display = 'block';
+          }
+          if (profCardPhotoTreeBadge) {
+            profCardPhotoTreeBadge.textContent = `🔗 ${trObj.id} — ${trObj.species || 'Native Tree'} (${trObj.treeCount || 1} trees)`;
+            profCardPhotoTreeBadge.style.display = 'inline-block';
+          }
+        }
+      });
+    });
   }
 
   // Tree Health Pill Filter inside Profile Modal
@@ -1522,22 +1803,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('confirmPeriod').textContent = document.getElementById('newStartDate')?.value || 'Aug 28, 2026';
     document.getElementById('confirmFunding').textContent = '₱' + totalFunding.toLocaleString();
 
-    const thumbEl = document.getElementById('confirmPhotoThumb');
-    const textEl = document.getElementById('confirmPhotoText');
-    if (thumbEl && textEl) {
-      if (currentAdopterPhotoData) {
-        thumbEl.src = currentAdopterPhotoData;
-        thumbEl.style.display = 'block';
-        textEl.textContent = 'Photo attached ✓';
-        textEl.style.color = '#15803d';
-        textEl.style.fontWeight = '600';
-      } else {
-        thumbEl.style.display = 'none';
-        textEl.textContent = 'None attached';
-        textEl.style.color = '#64748b';
-        textEl.style.fontWeight = 'normal';
-      }
-    }
+    updateConfirmationPhotoRow();
   }
 
   function renderTreeCheckboxes() {
@@ -1571,6 +1837,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
       if (step3SelectedBadge) step3SelectedBadge.textContent = 'Selected: 0 trees';
+      syncPhotoTargetUI();
       return;
     }
 
@@ -1580,6 +1847,7 @@ document.addEventListener('DOMContentLoaded', () => {
           🔍 No trees match "<strong>${treeSearchInput?.value || ''}</strong>"
         </div>
       `;
+      syncPhotoTargetUI();
       return;
     }
 
@@ -1598,6 +1866,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const loc = t.barangay ? `Brgy. ${t.barangay}` : (t.location || 'Central Hub');
       const adopterName = t.sponsorName || t.adopter;
       const isAdopted = !!adopterName;
+      const linkedPhotoUrl = treePhotosMap[t.id]?.dataUrl || getExistingTreePhoto(t);
+      const hasLinkedPhoto = !!linkedPhotoUrl;
+      const isPhotoActive = String(activePhotoTreeId) === String(t.id);
 
       return `
         <div class="tree-cb-item" data-tree-id="${t.id}" style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 9px; border: 1.5px solid ${isChecked ? '#86efac' : '#f1f5f9'}; background: ${isChecked ? '#f0fdf4' : '#fff'}; margin-bottom: 5px; transition: all 0.15s ease;">
@@ -1615,10 +1886,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 : ''
               }
             </div>
-            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: #64748b;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: #64748b; margin-bottom: 5px;">
               <span style="color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1px 6px; border-radius: 4px; font-weight: 600;">${treeType}</span>
               ${t.age ? `<span>• Age: ${t.age}</span>` : ''}
               <span>• ${loc}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              ${hasLinkedPhoto
+                ? `<img src="${linkedPhotoUrl}" alt="${t.id}" style="width: 24px; height: 24px; border-radius: 5px; object-fit: cover; border: 1.5px solid #16a34a; flex-shrink: 0;" />`
+                : ''
+              }
+              <button type="button" class="btn-link-tree-photo" data-tree-id="${t.id}"
+                style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid ${hasLinkedPhoto ? '#16a34a' : (isPhotoActive ? '#86efac' : '#cbd5e1')}; background: ${hasLinkedPhoto ? '#dcfce7' : (isPhotoActive ? '#f0fdf4' : '#f8fafc')}; color: ${hasLinkedPhoto ? '#166534' : '#334155'};">
+                ${hasLinkedPhoto ? `📸 Photo Linked to ${t.id} · Change` : `📷 Upload / Link Photo for ${t.id}`}
+              </button>
             </div>
           </div>
           <!-- Qty input: only active when checked -->
@@ -1656,6 +1937,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const remaining = Math.max(1, regCount - tkCount);
             treeQuantities[val] = Math.min(remaining, 10);
           }
+          ensureTreePhotoInitialized(val);
+          activePhotoTreeId = val;
           if (qtyInput) {
             qtyInput.disabled = false;
             qtyInput.value = treeQuantities[val];
@@ -1666,6 +1949,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (row) { row.style.borderColor = '#86efac'; row.style.background = '#f0fdf4'; }
         } else {
           selectedTreeIds = selectedTreeIds.filter(id => id !== val);
+          if (activePhotoTreeId === val) {
+            activePhotoTreeId = selectedTreeIds[0] || '';
+          }
           if (qtyInput) {
             qtyInput.disabled = true;
             qtyInput.style.borderColor = '#e2e8f0';
@@ -1675,6 +1961,31 @@ document.addEventListener('DOMContentLoaded', () => {
           if (row) { row.style.borderColor = '#f1f5f9'; row.style.background = '#fff'; }
         }
         updateLiveSummary();
+        syncPhotoTargetUI();
+      });
+    });
+
+    // Attach per-tree "Upload / Link Photo" button listeners
+    document.querySelectorAll('.btn-link-tree-photo').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tid = btn.getAttribute('data-tree-id');
+        if (!tid) return;
+        if (!selectedTreeIds.includes(tid)) {
+          selectedTreeIds.push(tid);
+          const tree = allTreesList.find(t => String(t.id) === String(tid));
+          if (treeQuantities[tid] === undefined) {
+            const regCount = parseInt(tree?.treeCount) || 1;
+            const tkCount = parseInt(tree?.takenCount) || 0;
+            const remaining = Math.max(1, regCount - tkCount);
+            treeQuantities[tid] = Math.min(remaining, 10);
+          }
+          ensureTreePhotoInitialized(tid);
+        }
+        activePhotoTreeId = tid;
+        renderTreeCheckboxes();
+        syncPhotoTargetUI();
+        document.getElementById('newAdopterPhotoInput')?.click();
       });
     });
 
@@ -1687,12 +1998,14 @@ document.addEventListener('DOMContentLoaded', () => {
         treeQuantities[treeId] = val;
         inp.value = val;
         updateLiveSummary();
+        syncPhotoTargetUI();
       };
       inp.addEventListener('input', updateQty);
       inp.addEventListener('change', updateQty);
     });
 
     updateLiveSummary();
+    syncPhotoTargetUI();
   }
 
   function syncTreeQuantitiesFromDOM() {
@@ -2084,6 +2397,7 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (t.status === 'critical') health = 'Critical';
       else if (t.status === 'dead') health = 'Dead';
       const qty = treeQuantities[t.id] !== undefined ? treeQuantities[t.id] : (parseInt(t.treeCount) || 1);
+      const specificPhoto = treePhotosMap[t.id]?.dataUrl || getExistingTreePhoto(t) || currentAdopterPhotoData || '';
 
       return {
         id: t.id,
@@ -2093,7 +2407,10 @@ document.addEventListener('DOMContentLoaded', () => {
         health: health,
         lastMon: t.dateAdded || formatDateDisplay(new Date().toISOString()),
         treeCount: qty,
-        treeType: t.treeType || t.species?.type || 'Native'
+        treeType: t.treeType || t.species?.type || 'Native',
+        photo: specificPhoto,
+        photoLinkedTreeId: t.id,
+        photoFileName: treePhotosMap[t.id]?.fileName || ''
       };
     });
 
@@ -2102,6 +2419,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const adopterLocation = isGuinsoronganAdopter ? 'Brgy. Guinsorongan' : (selectedTrees[0]?.barangay ? `Brgy. ${selectedTrees[0].barangay}` : 'Catbalogan City');
     const selectedAdopter = window._selectedAdopterUser;
+    const primaryPhotoData = getPrimaryAdopterPhoto();
 
     const newObj = {
       id: (selectedAdopter && selectedAdopter.id && String(selectedAdopter.id).startsWith('ad-')) ? selectedAdopter.id : ('ad-' + Date.now()),
@@ -2130,8 +2448,9 @@ document.addEventListener('DOMContentLoaded', () => {
       treesCondition: { healthy: totalCount, care: 0, critical: 0, dead: 0 },
       fundingPaid: totalFunding,
       paymentStatus: totalFunding > 0 ? 'Fully Paid' : 'No Funding Entered',
-      photo: currentAdopterPhotoData || '',
-      treePhoto: currentAdopterPhotoData || '',
+      photo: primaryPhotoData || '',
+      treePhoto: primaryPhotoData || '',
+      treePhotos: { ...treePhotosMap },
       payments: totalFunding > 0 ? [
         { date: formatDateDisplay(new Date().toISOString()), ref: 'INV-' + Math.floor(10000 + Math.random() * 90000), amount: totalFunding, status: 'Paid' }
       ] : [],
@@ -2139,8 +2458,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 1. UPDATE SELECTED TREES IN LOCAL CACHE & SYNC
-    const perTreeRate = totalCount > 0 && totalFunding > 0 ? (totalFunding / totalCount) : 0;
-    for (const treeId of selectedTreeIds) {
+    const savedTreeIds = [...selectedTreeIds];
+    const perTreeRate = totalCount > 0 && totalFunding > 0 ? (totalFunding / totalCount) : 50;
+    for (const treeId of savedTreeIds) {
       const idx = allTreesList.findIndex(t => String(t.id) === String(treeId));
       if (idx >= 0) {
         const tObj = allTreesList[idx];
@@ -2160,13 +2480,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const newTaken = Math.min(totalRegistered, otherTaken + requestedQty);
+        const treeSpecificPhoto = treePhotosMap[treeId]?.dataUrl || tObj.photo || tObj.adopterPhoto || primaryPhotoData || '';
 
         allTreesList[idx] = {
           ...tObj,
           sponsorName: adopterName,
           adopter: adopterName,
-          adopterPhoto: currentAdopterPhotoData || tObj.adopterPhoto || '',
-          photo: tObj.photo || currentAdopterPhotoData || '',
+          adopterPhoto: treeSpecificPhoto,
+          photo: treeSpecificPhoto,
+          photos: {
+            ...(tObj.photos || {}),
+            ...(treeSpecificPhoto ? { treePhoto: treeSpecificPhoto } : {})
+          },
           takenCount: newTaken,
           customFunding: totalFunding > 0,
           fundingAmount: perTreeRate,
@@ -2231,9 +2556,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badgeReset) badgeReset.style.display = 'none';
     const searchInpReset = document.getElementById('adopterSearchInput');
     if (searchInpReset) searchInpReset.value = '';
-    resetAdopterPhotoUpload();
     selectedTreeIds = [];
     treeQuantities = {};
+    resetAdopterPhotoUpload(false);
     updateLiveSummary();
 
     alert(`🎉 New adopter "${newObj.name}" added successfully! ${selectedTrees.length} tree record(s) (${totalCount.toLocaleString()} trees · ₱${totalFunding.toLocaleString()}) marked as adopted.`);
@@ -2285,13 +2610,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof window.ATAMAN_DB.addAdopter === 'function') {
         window.ATAMAN_DB.addAdopter(newObj).catch(() => {});
       }
-      for (const treeId of selectedTreeIds) {
+      for (const treeId of savedTreeIds) {
         const tObj = allTreesList.find(t => String(t.id) === String(treeId));
         if (tObj && typeof window.ATAMAN_DB.updateTree === 'function') {
           window.ATAMAN_DB.updateTree(treeId, {
             sponsorName: adopterName,
             adopter: adopterName,
             takenCount: tObj.takenCount,
+            photo: tObj.photo || '',
+            adopterPhoto: tObj.adopterPhoto || '',
+            photos: tObj.photos || {},
             project: projectVal,
             adoptedAt: tObj.adoptedAt
           }).catch(() => {});
@@ -2305,6 +2633,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const newAdopterPhotoInput = document.getElementById('newAdopterPhotoInput');
   const adopterPhotoUploadZone = document.getElementById('adopterPhotoUploadZone');
   const btnRemoveAdopterPhoto = document.getElementById('btnRemoveAdopterPhoto');
+  const photoTargetTreeSelect = document.getElementById('photoTargetTreeSelect');
+
+  if (photoTargetTreeSelect) {
+    photoTargetTreeSelect.addEventListener('change', () => {
+      const chosenId = photoTargetTreeSelect.value;
+      if (!chosenId) {
+        activePhotoTreeId = '';
+        syncPhotoTargetUI();
+        return;
+      }
+      if (!selectedTreeIds.includes(chosenId)) {
+        selectedTreeIds.push(chosenId);
+        const tree = allTreesList.find(t => String(t.id) === String(chosenId));
+        if (treeQuantities[chosenId] === undefined) {
+          const regCount = parseInt(tree?.treeCount) || 1;
+          const tkCount = parseInt(tree?.takenCount) || 0;
+          const remaining = Math.max(1, regCount - tkCount);
+          treeQuantities[chosenId] = Math.min(remaining, 10);
+        }
+        ensureTreePhotoInitialized(chosenId);
+      }
+      activePhotoTreeId = chosenId;
+      renderTreeCheckboxes();
+      syncPhotoTargetUI();
+    });
+  }
 
   if (adopterPhotoUploadZone && newAdopterPhotoInput) {
     adopterPhotoUploadZone.addEventListener('click', (e) => {
@@ -2342,7 +2696,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRemoveAdopterPhoto.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      resetAdopterPhotoUpload();
+      resetAdopterPhotoUpload(true);
     });
   }
 

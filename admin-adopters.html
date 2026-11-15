@@ -553,7 +553,11 @@
 
             <!-- Adopter / Tree Photo Evidence Card -->
             <div class="card p-card" id="profPhotoCard" style="display: none;">
-              <h3 class="p-card-title">📸 Adoption Photo</h3>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <h3 class="p-card-title" style="margin: 0;">📸 Adopted Tree Photo</h3>
+                <span id="profCardPhotoTreeBadge"
+                  style="font-size: 11px; font-weight: 700; color: #166534; background: #dcfce7; border: 1px solid #86efac; padding: 2px 8px; border-radius: 10px;"></span>
+              </div>
               <div
                 style="border-radius: 10px; overflow: hidden; border: 1.5px solid #86efac; max-height: 220px; background: #0f172a; display: flex; align-items: center; justify-content: center; position: relative;">
                 <img id="profCardPhotoImg" src="" alt="Adoption Photo"
@@ -870,14 +874,23 @@
                 <input type="date" id="newStartDate" value="2026-08-28" />
               </div>
 
-              <!-- Upload Photo for Tree Adopter -->
+              <!-- Upload Photo Linked to Specific Adopted Tree -->
               <div class="form-group">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                   <label for="newAdopterPhotoInput"
                     style="font-weight: 700; color: #1e293b; font-size: 12px; display: flex; align-items: center; gap: 5px;">
-                    📸 Tree / Adopter Photo
+                    📸 Adopted Tree Photo
                   </label>
-                  <span style="font-size: 11px; color: #64748b; font-weight: 500;">Optional</span>
+                  <span id="photoLinkedTreeBadge"
+                    style="font-size: 10.5px; color: #15803d; background: #dcfce7; border: 1px solid #86efac; padding: 1px 7px; border-radius: 10px; font-weight: 700;">Select a tree →</span>
+                </div>
+
+                <!-- Target Tree Selector (links upload directly to the specific tree adopted) -->
+                <div style="margin-bottom: 6px;">
+                  <select id="photoTargetTreeSelect"
+                    style="width: 100%; padding: 6px 9px; border: 1.5px solid #bbf7d0; border-radius: 7px; font-size: 12px; font-weight: 600; color: #166534; background: #ffffff; cursor: pointer;">
+                    <option value="">— Select a tree on the right to link photo —</option>
+                  </select>
                 </div>
 
                 <input type="file" id="newAdopterPhotoInput" accept="image/*" style="display: none;" />
@@ -891,17 +904,19 @@
                       style="width: 32px; height: 32px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                       🌲
                     </div>
-                    <strong style="font-size: 12px; color: #166534;">Click to Upload Tree / Adopter Photo</strong>
-                    <span style="font-size: 10.5px; color: #64748b;">Supports PNG, JPG, WebP (or Drag &amp; Drop)</span>
+                    <strong id="adopterPhotoPromptTitle" style="font-size: 12px; color: #166534;">Click to Upload Photo for Selected Tree</strong>
+                    <span id="adopterPhotoPromptSub" style="font-size: 10.5px; color: #64748b;">Directly linked &amp; matched to the specific tree ID adopted</span>
                   </div>
 
                   <div id="adopterPhotoPreviewWrap"
                     style="display: none; flex-direction: column; align-items: center; gap: 6px;">
                     <div
-                      style="position: relative; width: 100%; height: 105px; border-radius: 8px; overflow: hidden; border: 1.5px solid #86efac; box-shadow: 0 1px 4px rgba(0,0,0,0.06); background: #f8fafc;">
+                      style="position: relative; width: 100%; height: 110px; border-radius: 8px; overflow: hidden; border: 1.5px solid #86efac; box-shadow: 0 1px 4px rgba(0,0,0,0.06); background: #f8fafc;">
                       <img id="adopterPhotoPreviewImg" src="" alt="Tree Adopter Photo"
                         style="width: 100%; height: 100%; object-fit: cover; display: block;" />
-                      <button type="button" id="btnRemoveAdopterPhoto" title="Remove photo"
+                      <span id="adopterPhotoTreeTag"
+                        style="position: absolute; bottom: 5px; left: 5px; background: rgba(22, 101, 52, 0.92); color: #fff; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; backdrop-filter: blur(2px);"></span>
+                      <button type="button" id="btnRemoveAdopterPhoto" title="Remove photo for this tree"
                         style="position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; line-height: 1; transition: background 0.15s;">✕</button>
                     </div>
                     <div
@@ -913,6 +928,9 @@
                   </div>
 
                 </div>
+
+                <!-- Per-Tree Linked Photos Tracker List -->
+                <div id="linkedTreePhotosList" style="display: none; flex-direction: column; gap: 4px; margin-top: 6px;"></div>
               </div>
 
               <!-- Live Funding Summary Card -->
