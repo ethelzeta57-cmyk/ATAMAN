@@ -1711,8 +1711,10 @@
         : `ATAMAN-CERT-CT-${caretakerData.caretakerId}-${new Date().getFullYear()}`;
       const issueDate = new Date().toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' });
 
-      const subtitleLine1 = isAdopter ? 'ENVIRONMENTAL SPONSORSHIP &' : 'FOREST STEWARDSHIP &';
-      const subtitleLine2 = isAdopter ? 'TREE ADOPTION EXCELLENCE' : 'TREE NURTURING DEDICATION';
+      const headerTopLine1 = 'TANOM.ATAMAN.PADAYUN';
+      const headerTopLine2 = 'SAMAR REFORESTRATION INITIATIVE';
+      const subtitleLine1 = isAdopter ? '“ENVIRONMENTAL SPONSORSHIP & TREE”' : '“FOREST STEWARDSHIP & TREE”';
+      const subtitleLine2 = isAdopter ? 'ADOPTION EXCELLENCE' : 'NURTURING DEDICATION';
 
       const card1Label = isAdopter ? 'TREES FUNDED' : 'TREES NURTURED';
       const card1Value = isAdopter ? `${adopterData.fundedTreePoolTotal} Trees` : `${caretakerData.survivingTreesCount} Trees`;
@@ -1808,11 +1810,15 @@
           <!-- Printable Ornate Certificate Frame -->
           <div id="atamanPrintableCertificate" style="width:100%;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.18);background:#faf6e8;">
             <svg id="atamanCertSvg" viewBox="0 0 1024 682" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
-              <image href="assets/certificate-template-bg.jpg?v=20261117_v2" x="0" y="0" width="1024" height="682" preserveAspectRatio="none"/>
+              <image href="assets/certificate-template-bg.jpg?v=20261117_v3" x="0" y="0" width="1024" height="682" preserveAspectRatio="none"/>
 
-              <!-- Top-Right Subtitle -->
-              <text x="786" y="97" text-anchor="middle" fill="#0c3b1c" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="14.5">${escapeCertXml(subtitleLine1)}</text>
-              <text x="786" y="115" text-anchor="middle" fill="#0c3b1c" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="14.5">${escapeCertXml(subtitleLine2)}</text>
+              <!-- Top-Right Header & Subtitle (matching second image) -->
+              <text x="760" y="52" text-anchor="middle" fill="#091e12" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="800" font-size="16" letter-spacing="0.5">${escapeCertXml(headerTopLine1)}</text>
+              <text x="760" y="73" text-anchor="middle" fill="#091e12" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="800" font-size="15" letter-spacing="0.4">${escapeCertXml(headerTopLine2)}</text>
+              <text x="761" y="98" text-anchor="middle" fill="#cbd5e1" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="14" letter-spacing="0.3">${escapeCertXml(subtitleLine1)}</text>
+              <text x="760" y="97" text-anchor="middle" fill="#091e12" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="14" letter-spacing="0.3">${escapeCertXml(subtitleLine1)}</text>
+              <text x="761" y="118" text-anchor="middle" fill="#cbd5e1" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="14.5" letter-spacing="0.5">${escapeCertXml(subtitleLine2)}</text>
+              <text x="760" y="117" text-anchor="middle" fill="#091e12" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="14.5" letter-spacing="0.5">${escapeCertXml(subtitleLine2)}</text>
 
               <!-- Recipient Name -->
               <text x="504" y="282" text-anchor="middle" fill="#083b1c" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-style="italic" font-size="${nameFontSize}">${escapeCertXml(recipientName)}</text>
@@ -1859,9 +1865,9 @@
       });
 
       modal.querySelector('#certPrintBtn')?.addEventListener('click', () => {
-        const absBgUrl = new URL('assets/certificate-template-bg.jpg?v=20261117_v2', window.location.href).href;
+        const absBgUrl = new URL('assets/certificate-template-bg.jpg?v=20261117_v3', window.location.href).href;
         const rawSvg = (document.getElementById('atamanPrintableCertificate')?.innerHTML || '')
-          .replace('assets/certificate-template-bg.jpg?v=20261117_v2', absBgUrl);
+          .replace('assets/certificate-template-bg.jpg?v=20261117_v3', absBgUrl);
         const win = window.open('', '_blank', 'width=1080,height=740');
         if (win) {
           win.document.write(`<!DOCTYPE html><html><head><title>${certSerial}</title><style>@page{size:landscape;margin:8mm;}body{font-family:Georgia,serif;padding:0;margin:0;background:#fff;display:flex;align-items:center;justify-content:center;}</style></head><body><div style="width:100%;max-width:1024px;">${rawSvg}</div><script>window.onload=function(){setTimeout(function(){window.print();},400);};<\/script></body></html>`);
@@ -1884,12 +1890,17 @@
           // 1. Draw the ornate certificate background template
           ctx.drawImage(bgImg, 0, 0, 1024, 682);
 
-          // 2. Top-Right Subtitle
+          // 2. Top-Right Header & Subtitle
           ctx.textAlign = 'center';
-          ctx.fillStyle = '#0c3b1c';
-          ctx.font = 'italic 14.5px Georgia, "Times New Roman", serif';
-          ctx.fillText(subtitleLine1, 786, 97);
-          ctx.fillText(subtitleLine2, 786, 115);
+          ctx.fillStyle = '#091e12';
+          ctx.font = 'bold 16px "Plus Jakarta Sans", Arial, sans-serif';
+          ctx.fillText(headerTopLine1, 760, 52);
+          ctx.font = 'bold 15px "Plus Jakarta Sans", Arial, sans-serif';
+          ctx.fillText(headerTopLine2, 760, 73);
+          ctx.font = 'bold 14px Georgia, "Times New Roman", serif';
+          ctx.fillText(subtitleLine1, 760, 97);
+          ctx.font = 'bold 14.5px Georgia, "Times New Roman", serif';
+          ctx.fillText(subtitleLine2, 760, 117);
 
           // 3. Recipient Name
           ctx.fillStyle = '#083b1c';
@@ -1979,7 +1990,7 @@
           link.href = canvas.toDataURL('image/png');
           link.click();
         };
-        bgImg.src = 'assets/certificate-template-bg.jpg?v=20261117_v2';
+        bgImg.src = 'assets/certificate-template-bg.jpg?v=20261117_v3';
       });
     }
 

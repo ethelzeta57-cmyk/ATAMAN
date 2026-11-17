@@ -212,10 +212,10 @@
 
       </ul>
     </nav>
-      <!-- User Account Profile in Sidebar Bottom -->
+    <!-- User Account Profile in Sidebar Bottom -->
     <div class="sidebar-user-row">
-      <a href="admin-settings.html" class="sidebar-user" id="sidebarUserProfile"
-        title="Open Admin Account & Settings" style="text-decoration:none; flex:1;">
+      <a href="admin-settings.html" class="sidebar-user" id="sidebarUserProfile" title="Open Admin Account & Settings"
+        style="text-decoration:none; flex:1;">
         <div class="sb-user-avatar">EZ</div>
         <div class="sb-user-info">
           <span class="sb-user-name">Ethel Zeta (Admin)</span>
@@ -284,10 +284,10 @@
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          + Add User
+          Add User
         </button>
 
-        
+
       </div>
     </header>
 
@@ -717,8 +717,10 @@
           </div>
           <div class="form-row">
             <div class="form-group flex-1">
-              <label>Email Address <span style="font-weight:normal; color:#64748b; font-size:0.78rem;">(Optional if user has no email)</span></label>
-              <input type="email" class="form-control" id="addEmail" placeholder="e.g. juanita@example.com (optional)" />
+              <label>Email Address <span style="font-weight:normal; color:#64748b; font-size:0.78rem;">(Optional if user
+                  has no email)</span></label>
+              <input type="email" class="form-control" id="addEmail"
+                placeholder="e.g. juanita@example.com (optional)" />
             </div>
             <div class="form-group flex-1">
               <label>Phone Number</label>
@@ -726,22 +728,30 @@
             </div>
           </div>
           <div class="form-group">
-            <label>Employee / Partner Reference ID <span style="font-weight:normal; color:#16a34a; font-size:0.78rem;">(Auto-generated consecutive ID)</span></label>
+            <label>Employee / Partner Reference ID <span
+                style="font-weight:normal; color:#16a34a; font-size:0.78rem;">(Auto-generated consecutive
+                ID)</span></label>
             <input type="text" class="form-control" id="addEmpId" placeholder="Auto-generated (e.g. EMP-003)" />
           </div>
           <div class="form-row">
             <div class="form-group flex-1">
               <label>Create Password *</label>
               <div style="position:relative; display:flex; align-items:center;">
-                <input type="password" class="form-control" id="addPassword" placeholder="Minimum 6 characters" required style="padding-right:38px;" autocomplete="new-password" />
-                <button type="button" id="toggleAddPassword" style="position:absolute; right:10px; background:none; border:none; cursor:pointer; font-size:15px; color:#64748b; padding:0;" aria-label="Toggle password">👁️</button>
+                <input type="password" class="form-control" id="addPassword" placeholder="Minimum 6 characters" required
+                  style="padding-right:38px;" autocomplete="new-password" />
+                <button type="button" id="toggleAddPassword"
+                  style="position:absolute; right:10px; background:none; border:none; cursor:pointer; font-size:15px; color:#64748b; padding:0;"
+                  aria-label="Toggle password">👁️</button>
               </div>
             </div>
             <div class="form-group flex-1">
               <label>Confirm Password *</label>
               <div style="position:relative; display:flex; align-items:center;">
-                <input type="password" class="form-control" id="addConfirmPassword" placeholder="Re-enter password" required style="padding-right:38px;" autocomplete="new-password" />
-                <button type="button" id="toggleAddConfirmPassword" style="position:absolute; right:10px; background:none; border:none; cursor:pointer; font-size:15px; color:#64748b; padding:0;" aria-label="Toggle confirm password">👁️</button>
+                <input type="password" class="form-control" id="addConfirmPassword" placeholder="Re-enter password"
+                  required style="padding-right:38px;" autocomplete="new-password" />
+                <button type="button" id="toggleAddConfirmPassword"
+                  style="position:absolute; right:10px; background:none; border:none; cursor:pointer; font-size:15px; color:#64748b; padding:0;"
+                  aria-label="Toggle confirm password">👁️</button>
               </div>
             </div>
           </div>
@@ -882,7 +892,9 @@
         <button class="btn btn-secondary" id="prevWizardBtn" disabled>&larr; Back</button>
         <div style="display:flex; gap:10px; align-items:center;">
           <button class="btn btn-secondary" id="nextWizardBtn">Next Step &rarr;</button>
-          <button class="btn btn-primary" id="submitCreateUserBtn" style="background:#092e18; border-color:#092e18; display:inline-flex; align-items:center; gap:6px;">⚡ Create User Account</button>
+          <button class="btn btn-primary" id="submitCreateUserBtn"
+            style="background:#092e18; border-color:#092e18; display:inline-flex; align-items:center; gap:6px;">⚡ Create
+            User Account</button>
         </div>
       </div>
     </div>
@@ -918,7 +930,7 @@
   <!-- Toast Notification -->
   <div class="toast hidden" id="toastMsg"></div>
 
-  <script src="ATAMAN-init.js?v=20261110_v14"></script>
+  <script src="ATAMAN-init.js?v=20261117_v3"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>

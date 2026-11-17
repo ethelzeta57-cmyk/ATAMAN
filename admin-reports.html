@@ -212,10 +212,10 @@
 
       </ul>
     </nav>
-      <!-- User Account Profile in Sidebar Bottom -->
+    <!-- User Account Profile in Sidebar Bottom -->
     <div class="sidebar-user-row">
-      <a href="admin-settings.html" class="sidebar-user" id="sidebarUserProfile"
-        title="Open Admin Account & Settings" style="text-decoration:none; flex:1;">
+      <a href="admin-settings.html" class="sidebar-user" id="sidebarUserProfile" title="Open Admin Account & Settings"
+        style="text-decoration:none; flex:1;">
         <div class="sb-user-avatar">EZ</div>
         <div class="sb-user-info">
           <span class="sb-user-name">Ethel Zeta (Admin)</span>
@@ -248,9 +248,8 @@
     <!-- 1. PAGE HEADER -->
     <header class="top-navbar">
       <div class="nav-title-group">
-        <span class="nav-icon-emoji">📊</span>
         <div>
-          <h1 class="nav-page-title">Reports & Analytics</h1>
+          <h1 class="nav-page-title">📊Reports & Analytics</h1>
           <p class="nav-page-subtitle">View system-wide tree monitoring, survival, maintenance, caretaker, and adoption
             performance.</p>
         </div>
@@ -260,7 +259,7 @@
         <button class="btn btn-outline" id="printReportBtn" type="button">🖨️ Print</button>
         <button class="btn btn-primary" id="openReportGenModalBtn" type="button">⚡ Generate Report</button>
 
-        
+
       </div>
     </header>
 
@@ -446,7 +445,8 @@
                 <span class="ops-stat-lbl">Needs Care</span>
               </div>
               <div class="ops-stat-item">
-                <button type="button" class="btn btn-outline btn-sm" id="btnViewAllCritTrees" style="font-size:0.75rem; padding:4px 8px; margin-top:2px;">View List</button>
+                <button type="button" class="btn btn-outline btn-sm" id="btnViewAllCritTrees"
+                  style="font-size:0.75rem; padding:4px 8px; margin-top:2px;">View List</button>
               </div>
             </div>
           </div>
@@ -914,7 +914,8 @@
           </div>
           <div style="display:flex; flex-direction:column; gap:10px; font-size:0.84rem;">
             <div style="display:flex; justify-content:space-between;"><span>Total Registered Adopters:</span>
-              <strong>0</strong></div>
+              <strong>0</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Active Adopters:</span> <strong
                 class="text-success">0</strong></div>
             <div style="display:flex; justify-content:space-between;"><span>Trees Adopted:</span> <strong>0</strong>
@@ -939,7 +940,8 @@
           </div>
           <div style="display:flex; flex-direction:column; gap:10px; font-size:0.84rem;">
             <div style="display:flex; justify-content:space-between;"><span>Total Contributions:</span>
-              <strong>₱0</strong></div>
+              <strong>₱0</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Received & Cleared:</span> <strong
                 class="text-success">₱0</strong></div>
             <div style="display:flex; justify-content:space-between;"><span>Pending Invoice Balance:</span> <strong
@@ -977,13 +979,17 @@
           </div>
           <div id="repImpactContainer" style="display:flex; flex-direction:column; gap:10px; font-size:0.84rem;">
             <div style="display:flex; justify-content:space-between;"><span>CO₂ Sequestered (Annual):</span>
-              <strong class="text-success" id="repCo2Val">0 kg/yr</strong></div>
+              <strong class="text-success" id="repCo2Val">0 kg/yr</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Oxygen Produced:</span>
-              <strong id="repO2Val">0 kg/yr</strong></div>
+              <strong id="repO2Val">0 kg/yr</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Stormwater Intercepted:</span>
-              <strong id="repWaterVal">0 L/yr</strong></div>
+              <strong id="repWaterVal">0 L/yr</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Restored Canopy Area:</span>
-              <strong id="repCanopyVal">0 m²</strong></div>
+              <strong id="repCanopyVal">0 m²</strong>
+            </div>
             <hr style="border:none; border-top:1px solid var(--border-subtle);" />
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span>Ecological Health Index:</span>
@@ -1000,13 +1006,17 @@
           </div>
           <div id="repUsersContainer" style="display:flex; flex-direction:column; gap:10px; font-size:0.84rem;">
             <div style="display:flex; justify-content:space-between;"><span>Total Verified Accounts:</span>
-              <strong id="repTotalUsersVal">3</strong></div>
+              <strong id="repTotalUsersVal">3</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Super Administrators:</span>
-              <strong id="repAdminUsersVal">1 (Ethel Zeta)</strong></div>
+              <strong id="repAdminUsersVal">1 (Ethel Zeta)</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Field Caretakers:</span>
-              <strong class="text-success" id="repCaretakerUsersVal">1 (Dodong Zeta)</strong></div>
+              <strong class="text-success" id="repCaretakerUsersVal">1 (Dodong Zeta)</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Tree Adopters:</span>
-              <strong class="text-success" id="repAdopterUsersVal">1 (Nikki Maga)</strong></div>
+              <strong class="text-success" id="repAdopterUsersVal">1 (Nikki Maga)</strong>
+            </div>
             <hr style="border:none; border-top:1px solid var(--border-subtle);" />
             <div style="font-size:0.75rem; color:var(--text-muted);" id="repUsersSub">
               All accounts active & synced with Firestore / Local Registry
@@ -1022,13 +1032,17 @@
           </div>
           <div id="repSystemContainer" style="display:flex; flex-direction:column; gap:10px; font-size:0.84rem;">
             <div style="display:flex; justify-content:space-between;"><span>GIS Map Markers Active:</span>
-              <strong class="text-success" id="repGisBatchesVal">10 Batches (310 Trees)</strong></div>
+              <strong class="text-success" id="repGisBatchesVal">10 Batches (310 Trees)</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Active System Alerts:</span>
-              <strong class="text-warning" id="repNotifAlertsVal">2 Field Alerts</strong></div>
+              <strong class="text-warning" id="repNotifAlertsVal">2 Field Alerts</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>Audit Log Events:</span>
-              <strong id="repAuditCountVal">18 Logged Actions</strong></div>
+              <strong id="repAuditCountVal">18 Logged Actions</strong>
+            </div>
             <div style="display:flex; justify-content:space-between;"><span>CMS Public Stories:</span>
-              <strong id="repContentCountVal">Active & Published</strong></div>
+              <strong id="repContentCountVal">Active & Published</strong>
+            </div>
             <hr style="border:none; border-top:1px solid var(--border-subtle);" />
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span>Cross-Dashboard Sync:</span>
@@ -1043,7 +1057,8 @@
         <div class="table-header-row">
           <div>
             <h3 class="section-title">📋 Recent Generated Reports Archive</h3>
-            <span style="font-size:0.75rem; color:var(--text-muted);">Live compiled reports across all ATAMAN dashboards (View, Print, or Download PDF/Excel/CSV)</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Live compiled reports across all ATAMAN dashboards
+              (View, Print, or Download PDF/Excel/CSV)</span>
           </div>
           <button class="btn btn-primary btn-sm" id="btnGenNewTop" type="button">+ Compile New Report</button>
         </div>
@@ -1061,7 +1076,8 @@
             </thead>
             <tbody id="tbodyArchive">
               <tr>
-                <td colspan="5" style="text-align:center; padding:32px; color:#94a3b8; font-weight:600;">📄 Loading compiled reports...</td>
+                <td colspan="5" style="text-align:center; padding:32px; color:#94a3b8; font-weight:600;">📄 Loading
+                  compiled reports...</td>
               </tr>
             </tbody>
           </table>
@@ -1245,7 +1261,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- JavaScript -->
-  <script src="ATAMAN-init.js?v=20261110_v14"></script>
+  <script src="ATAMAN-init.js?v=20261117_v3"></script>
   <!-- Real-Time Sync Engine -->
   <script src="realtime-admin.js?v=20261110_v14"></script>
   <script src="admin-reports.js?v=20261110_v14"></script>

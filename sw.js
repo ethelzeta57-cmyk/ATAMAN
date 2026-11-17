@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.7-certificate-official-logos';
+const CACHE_NAME = 'ataman-pwa-v2.2.8-second-image-logos-and-header';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
@@ -210,7 +210,7 @@ self.addEventListener('fetch', (event) => {
           const networkResponse = await fetch(req);
           if (networkResponse && networkResponse.ok) {
             const clone = networkResponse.clone();
-            safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => {});
+            safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => { });
           }
           return networkResponse;
         } catch (fetchErr) {
@@ -247,10 +247,10 @@ self.addEventListener('fetch', (event) => {
           const networkResponse = await fetch(req);
           if (networkResponse && networkResponse.ok) {
             const clone = networkResponse.clone();
-            safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => {});
+            safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => { });
             return networkResponse;
           }
-        } catch (_) {}
+        } catch (_) { }
         const cachedResponse = await safeMatch(req);
         if (cachedResponse) return cachedResponse;
         return new Response('Code asset unavailable offline', { status: 503, statusText: 'Service Unavailable' });
@@ -268,7 +268,7 @@ self.addEventListener('fetch', (event) => {
             const networkResponse = await fetch(req);
             if (networkResponse && networkResponse.ok) {
               const clone = networkResponse.clone();
-              safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => {});
+              safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => { });
             }
             return networkResponse;
           } catch (_) {
@@ -291,7 +291,7 @@ self.addEventListener('fetch', (event) => {
         const networkResponse = await fetch(req);
         if (networkResponse && networkResponse.ok) {
           const clone = networkResponse.clone();
-          safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => {});
+          safeOpenCache(CACHE_NAME).then((cache) => safePut(cache, req, clone)).catch(() => { });
         }
         return networkResponse;
       } catch (err) {
