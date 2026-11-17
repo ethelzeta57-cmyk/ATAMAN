@@ -1808,7 +1808,7 @@
           <!-- Printable Ornate Certificate Frame -->
           <div id="atamanPrintableCertificate" style="width:100%;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.18);background:#faf6e8;">
             <svg id="atamanCertSvg" viewBox="0 0 1024 682" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
-              <image href="assets/certificate-template-bg.jpg" x="0" y="0" width="1024" height="682" preserveAspectRatio="none"/>
+              <image href="assets/certificate-template-bg.jpg?v=20261117_v2" x="0" y="0" width="1024" height="682" preserveAspectRatio="none"/>
 
               <!-- Top-Right Subtitle -->
               <text x="786" y="97" text-anchor="middle" fill="#0c3b1c" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="14.5">${escapeCertXml(subtitleLine1)}</text>
@@ -1859,9 +1859,9 @@
       });
 
       modal.querySelector('#certPrintBtn')?.addEventListener('click', () => {
-        const absBgUrl = new URL('assets/certificate-template-bg.jpg', window.location.href).href;
+        const absBgUrl = new URL('assets/certificate-template-bg.jpg?v=20261117_v2', window.location.href).href;
         const rawSvg = (document.getElementById('atamanPrintableCertificate')?.innerHTML || '')
-          .replace('assets/certificate-template-bg.jpg', absBgUrl);
+          .replace('assets/certificate-template-bg.jpg?v=20261117_v2', absBgUrl);
         const win = window.open('', '_blank', 'width=1080,height=740');
         if (win) {
           win.document.write(`<!DOCTYPE html><html><head><title>${certSerial}</title><style>@page{size:landscape;margin:8mm;}body{font-family:Georgia,serif;padding:0;margin:0;background:#fff;display:flex;align-items:center;justify-content:center;}</style></head><body><div style="width:100%;max-width:1024px;">${rawSvg}</div><script>window.onload=function(){setTimeout(function(){window.print();},400);};<\/script></body></html>`);
@@ -1979,7 +1979,7 @@
           link.href = canvas.toDataURL('image/png');
           link.click();
         };
-        bgImg.src = 'assets/certificate-template-bg.jpg';
+        bgImg.src = 'assets/certificate-template-bg.jpg?v=20261117_v2';
       });
     }
 
