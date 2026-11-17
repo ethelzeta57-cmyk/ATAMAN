@@ -1810,7 +1810,7 @@
           <!-- Printable Ornate Certificate Frame -->
           <div id="atamanPrintableCertificate" style="width:100%;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.18);background:#faf6e8;">
             <svg id="atamanCertSvg" viewBox="0 0 1024 682" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
-              <image href="assets/certificate-template-bg.jpg?v=20261117_v5" x="0" y="0" width="1024" height="682" preserveAspectRatio="none"/>
+              <image href="assets/certificate-template-bg.jpg?v=20261117_v6" x="0" y="0" width="1024" height="682" preserveAspectRatio="none"/>
 
               <!-- Centered Header & Subtitle Underneath the Top Logos -->
               <text x="512" y="86" text-anchor="middle" fill="#091e12" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="800" font-size="12.5" letter-spacing="0.6">${escapeCertXml(headerTopLine1)}</text>
@@ -1863,9 +1863,9 @@
       });
 
       modal.querySelector('#certPrintBtn')?.addEventListener('click', () => {
-        const absBgUrl = new URL('assets/certificate-template-bg.jpg?v=20261117_v5', window.location.href).href;
+        const absBgUrl = new URL('assets/certificate-template-bg.jpg?v=20261117_v6', window.location.href).href;
         const rawSvg = (document.getElementById('atamanPrintableCertificate')?.innerHTML || '')
-          .replace('assets/certificate-template-bg.jpg?v=20261117_v5', absBgUrl);
+          .replace('assets/certificate-template-bg.jpg?v=20261117_v6', absBgUrl);
         const win = window.open('', '_blank', 'width=1080,height=740');
         if (win) {
           win.document.write(`<!DOCTYPE html><html><head><title>${certSerial}</title><style>@page{size:landscape;margin:8mm;}body{font-family:Georgia,serif;padding:0;margin:0;background:#fff;display:flex;align-items:center;justify-content:center;}</style></head><body><div style="width:100%;max-width:1024px;">${rawSvg}</div><script>window.onload=function(){setTimeout(function(){window.print();},400);};<\/script></body></html>`);
@@ -1989,7 +1989,7 @@
           link.href = canvas.toDataURL('image/png');
           link.click();
         };
-        bgImg.src = 'assets/certificate-template-bg.jpg?v=20261117_v5';
+        bgImg.src = 'assets/certificate-template-bg.jpg?v=20261117_v6';
       });
     }
 
