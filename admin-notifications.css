@@ -284,8 +284,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  max-width: 1440px;
   width: 100%;
+  max-width: none;
+  box-sizing: border-box;
 }
 
 /* ══════════════════════════════════
@@ -1775,6 +1776,7 @@ body {
 .dash-body {
   flex: 1 !important;
   width: 100% !important;
+  max-width: none !important;
   box-sizing: border-box !important;
 }
 

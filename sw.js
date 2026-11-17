@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.10-clean-pristine-certificate-template';
+const CACHE_NAME = 'ataman-pwa-v2.2.11-notifications-full-width';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
