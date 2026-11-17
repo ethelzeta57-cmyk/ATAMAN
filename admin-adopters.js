@@ -1569,7 +1569,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Action Button Alerts for Profile Buttons
   document.getElementById('profEditBtn')?.addEventListener('click', () => alert('✏️ Edit Adopter Modal triggered.'));
   document.getElementById('profManageTreesBtn')?.addEventListener('click', () => alert('🌳 Manage Trees feature triggered.'));
-  document.getElementById('profCertBtn')?.addEventListener('click', () => alert('📜 Adoption Certificate preview triggered.'));
+  const openSelectedAdopterCert = () => {
+    if (window.ATAMAN_INCENTIVES && typeof window.ATAMAN_INCENTIVES.openCertificateModal === 'function') {
+      window.ATAMAN_INCENTIVES.openCertificateModal({ role: 'adopter', personName: currentSelectedAdopter?.name });
+    }
+  };
+  document.getElementById('profCertBtn')?.addEventListener('click', openSelectedAdopterCert);
   document.getElementById('profReportBtn')?.addEventListener('click', handleGenerateReport);
   document.getElementById('profMessageBtn')?.addEventListener('click', handleSendMessage);
   document.getElementById('profRenewBtn')?.addEventListener('click', handleRenewAdoption);
@@ -1577,9 +1582,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('bannerRenewBtn')?.addEventListener('click', handleRenewAdoption);
   document.getElementById('bannerReminderBtn')?.addEventListener('click', () => alert('✉️ Renewal reminder email sent to adopter!'));
   document.getElementById('bannerAgreementBtn')?.addEventListener('click', () => alert('📄 Adoption agreement document opened.'));
-  document.getElementById('viewCertBtn')?.addEventListener('click', () => alert('📜 Full resolution Certificate opened.'));
-  document.getElementById('downloadPdfBtn')?.addEventListener('click', () => alert('📥 Certificate PDF download started.'));
-  document.getElementById('printCertBtn')?.addEventListener('click', () => alert('🖨️ Print dialog opened.'));
+  document.getElementById('viewCertBtn')?.addEventListener('click', openSelectedAdopterCert);
+  document.getElementById('downloadPdfBtn')?.addEventListener('click', openSelectedAdopterCert);
+  document.getElementById('printCertBtn')?.addEventListener('click', openSelectedAdopterCert);
   document.getElementById('viewTreeSingleBtn')?.addEventListener('click', () => alert('🌳 Opening tree detailed view...'));
   document.getElementById('viewAllTreesBtn')?.addEventListener('click', () => alert('🌳 Navigating to full tree list...'));
 

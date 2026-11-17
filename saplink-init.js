@@ -1663,6 +1663,41 @@
     }
 
     /* ── 6. Certificate of Recognition Modal & Downloadable PNG / Print Generator ── */
+    function escapeCertXml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getAllRegisteredRecipients(isAdopterRole) {
+      const names = [];
+      const addName = (n) => {
+        const clean = String(n || '').trim();
+        if (clean && clean !== '—' && clean !== 'undefined' && !names.some(x => x.toLowerCase() === clean.toLowerCase())) {
+          names.push(clean);
+        }
+      };
+      if (isAdopterRole) {
+        getAdoptersCache().forEach(a => addName(a?.name || a?.fullName));
+      } else {
+        getCaretakersCache().forEach(c => addName(c?.name || c?.fullName));
+      }
+      try {
+        const reg = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || '[]');
+        if (Array.isArray(reg)) {
+          reg.forEach(u => {
+            const r = String(u?.role || '').toLowerCase();
+            if (isAdopterRole && r.includes('adopter')) addName(u.displayName || u.name);
+            if (!isAdopterRole && (r.includes('care') || r.includes('farm'))) addName(u.displayName || u.name);
+          });
+        }
+      } catch (_) {}
+      return names;
+    }
+
     function openCertificateModal(options = {}) {
       const role = String(options.role || (window.location.pathname.includes('adopter') ? 'adopter' : 'caretaker')).toLowerCase();
       const isAdopter = role === 'adopter';
@@ -1676,47 +1711,73 @@
         : `ATAMAN-CERT-CT-${caretakerData.caretakerId}-${new Date().getFullYear()}`;
       const issueDate = new Date().toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' });
 
-      const subtitleRole = isAdopter
-        ? 'ENVIRONMENTAL SPONSORSHIP & TREE ADOPTION EXCELLENCE'
-        : 'FOREST STEWARDSHIP & TREE NURTURING DEDICATION';
+      const subtitleLine1 = isAdopter ? 'ENVIRONMENTAL SPONSORSHIP &' : 'FOREST STEWARDSHIP &';
+      const subtitleLine2 = isAdopter ? 'TREE ADOPTION EXCELLENCE' : 'TREE NURTURING DEDICATION';
 
-      const bodyCitation = isAdopter
-        ? `In grateful recognition of their outstanding environmental contribution and financial sponsorship of <strong>${adopterData.fundedTreePoolTotal} Native &amp; Endemic Trees</strong> (<strong>₱${adopterData.totalFundingPhp.toLocaleString()} PHP</strong> funded at ₱50.00/tree) planted in <strong>Catbalogan City, Samar</strong>, sequestering approximately <strong>${(adopterData.fundedTreePoolTotal * 22)} kg CO₂/year</strong> and restoring local watershed biodiversity.`
-        : `In grateful recognition of their exemplary field dedication, monthly health monitoring compliance (<strong>${caretakerData.compliancePct}% Verified Monthly Logs</strong>), and active stewardship in nurturing <strong>${caretakerData.survivingTreesCount} of ${caretakerData.totalAssignedTrees} Assigned Trees</strong> (<strong>${caretakerData.survivalRatePct}% Survival Rate</strong> • <strong>₱${caretakerData.netReceivableIncentivePhp.toLocaleString()} PHP</strong> Net Earned Incentive) across <strong>Catbalogan City, Samar</strong>.`;
+      const card1Label = isAdopter ? 'TREES FUNDED' : 'TREES NURTURED';
+      const card1Value = isAdopter ? `${adopterData.fundedTreePoolTotal} Trees` : `${caretakerData.survivingTreesCount} Trees`;
 
-      const metricsPillsHtml = isAdopter
+      const card2Label = isAdopter ? 'TOTAL CONTRIBUTION (₱50/TREE)' : 'HEALTHY SURVIVAL RATE';
+      const card2Value = isAdopter ? `₱${adopterData.totalFundingPhp.toLocaleString()} PHP` : `${caretakerData.survivalRatePct}%`;
+
+      const card3Label = isAdopter ? 'CARETAKER ASSIGNED' : 'NET EARNED INCENTIVE';
+      const card3Value = isAdopter
+        ? (adopterData.caretakersAssigned.join(', ') || 'Dodong Zeta')
+        : `₱${caretakerData.netReceivableIncentivePhp.toLocaleString()} PHP`;
+
+      const citationSvgLines = isAdopter
         ? `
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 14px;text-align:center;">
-            <div style="font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;">Trees Funded</div>
-            <div style="font-size:16px;font-weight:800;color:#14532d;">${adopterData.fundedTreePoolTotal} Trees</div>
-          </div>
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 14px;text-align:center;">
-            <div style="font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;">Total Contribution (₱50/Tree)</div>
-            <div style="font-size:16px;font-weight:800;color:#14532d;">₱${adopterData.totalFundingPhp.toLocaleString()} PHP</div>
-          </div>
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 14px;text-align:center;">
-            <div style="font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;">Caretaker Assigned</div>
-            <div style="font-size:16px;font-weight:800;color:#14532d;">${adopterData.caretakersAssigned.join(', ')}</div>
-          </div>
+          <text x="502" y="331" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-size="16.6">
+            In grateful recognition of their outstanding environmental contribution and financial sponsorship of
+          </text>
+          <text x="502" y="354" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-size="16.6">
+            <tspan font-weight="bold">${adopterData.fundedTreePoolTotal} Native &amp; Endemic Trees</tspan> (₱${adopterData.totalFundingPhp.toLocaleString()} PHP funded at ₱50.00/tree) planted in <tspan font-weight="bold">Catbalogan City,</tspan>
+          </text>
+          <text x="502" y="377" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-size="16.6">
+            <tspan font-weight="bold">Samar,</tspan> sequestering approximately <tspan font-weight="bold">${(adopterData.fundedTreePoolTotal * 22)} kg CO₂/year</tspan> and restoring local watershed biodiversity.
+          </text>
         `
         : `
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 14px;text-align:center;">
-            <div style="font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;">Trees Nurtured</div>
-            <div style="font-size:16px;font-weight:800;color:#14532d;">${caretakerData.survivingTreesCount} Active Trees</div>
-          </div>
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 14px;text-align:center;">
-            <div style="font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;">Survival Rate</div>
-            <div style="font-size:16px;font-weight:800;color:#14532d;">${caretakerData.survivalRatePct}%</div>
-          </div>
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 14px;text-align:center;">
-            <div style="font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;">Net Earned Incentive</div>
-            <div style="font-size:16px;font-weight:800;color:#14532d;">₱${caretakerData.netReceivableIncentivePhp.toLocaleString()} PHP</div>
-          </div>
+          <text x="502" y="331" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-size="16.4">
+            In grateful recognition of their exemplary field dedication, monthly health monitoring compliance
+          </text>
+          <text x="502" y="354" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-size="16.4">
+            (<tspan font-weight="bold">${caretakerData.compliancePct}% Verified Monthly Logs</tspan>), and active stewardship in nurturing <tspan font-weight="bold">${caretakerData.survivingTreesCount} of ${caretakerData.totalAssignedTrees} Assigned Trees</tspan>
+          </text>
+          <text x="502" y="377" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-size="16.4">
+            (<tspan font-weight="bold">${caretakerData.survivalRatePct}% Survival Rate</tspan> • <tspan font-weight="bold">₱${caretakerData.netReceivableIncentivePhp.toLocaleString()} PHP</tspan> Net Earned Incentive) across <tspan font-weight="bold">Catbalogan City, Samar.</tspan>
+          </text>
         `;
 
       const primaryTree = (isAdopter ? adopterData.batches[0] : getTreesCache()[0]) || getTreesCache()[0];
       const { traceUrl } = getTreeQrUrls(primaryTree);
-      const qrSvg = QRGenerator.renderToSvg(traceUrl, 86);
+
+      // Build embedded SVG QR code positioned inside the center QR frame (x=461, y=480, size=102x102)
+      const qrGrid = QRGenerator.createMatrix(traceUrl);
+      const qrN = qrGrid.length;
+      const qrQuiet = 1;
+      const qrTotal = qrN + qrQuiet * 2;
+      let qrPaths = '';
+      for (let r = 0; r < qrN; r++) {
+        for (let c = 0; c < qrN; c++) {
+          if (qrGrid[r][c] === 1) {
+            qrPaths += `M${c + qrQuiet},${r + qrQuiet}h1v1h-1z`;
+          }
+        }
+      }
+
+      const nameFontSize = recipientName.length > 22 ? 38 : (recipientName.length > 16 ? 46 : 55);
+      const card3FontSize = card3Value.length > 16 ? 19 : 23.5;
+
+      const recipientsList = getAllRegisteredRecipients(isAdopter);
+      if (recipientName && !recipientsList.some(n => n.toLowerCase() === recipientName.toLowerCase())) {
+        recipientsList.unshift(recipientName);
+      }
+      const recipientSelectHtml = recipientsList.length > 1
+        ? `<select id="certSelectRecipient" style="border:1px solid #cbd5e1;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;color:#0f172a;background:#f8fafc;cursor:pointer;">
+            ${recipientsList.map(n => `<option value="${escapeCertXml(n)}" ${n.toLowerCase() === recipientName.toLowerCase() ? 'selected' : ''}>👤 ${escapeCertXml(n)}</option>`).join('')}
+          </select>`
+        : '';
 
       let modal = document.getElementById('atamanCertificateModal');
       if (!modal) {
@@ -1727,7 +1788,7 @@
       }
 
       modal.innerHTML = `
-        <div style="background:#ffffff;border-radius:18px;max-width:860px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,0.35);padding:20px;box-sizing:border-box;">
+        <div style="background:#ffffff;border-radius:18px;max-width:940px;width:100%;max-height:94vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,0.35);padding:18px 20px;box-sizing:border-box;">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #e2e8f0;">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
               <span style="font-size:1.15rem;font-weight:800;color:#0f172a;">📜 Official Certificate of Recognition</span>
@@ -1735,6 +1796,7 @@
                 <button type="button" id="certSwitchAdopterBtn" style="border:none;padding:5px 11px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;background:${isAdopter ? '#15803d' : 'transparent'};color:${isAdopter ? '#fff' : '#475569'};">Adopter Certificate</button>
                 <button type="button" id="certSwitchCaretakerBtn" style="border:none;padding:5px 11px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;background:${!isAdopter ? '#15803d' : 'transparent'};color:${!isAdopter ? '#fff' : '#475569'};">Caretaker Certificate</button>
               </div>
+              ${recipientSelectHtml}
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
               <button type="button" id="certDownloadPngBtn" style="background:#15803d;color:#ffffff;border:none;padding:8px 14px;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;">⬇ Download Certificate (PNG)</button>
@@ -1743,47 +1805,42 @@
             </div>
           </div>
 
-          <!-- Printable Certificate Frame -->
-          <div id="atamanPrintableCertificate" style="background:linear-gradient(135deg,#ffffff 0%,#f0fdf4 100%);border:6px double #15803d;border-radius:14px;padding:32px 28px;position:relative;text-align:center;color:#0f172a;box-shadow:inset 0 0 0 2px #bbf7d0;">
-            <div style="display:inline-flex;align-items:center;gap:8px;color:#15803d;font-weight:800;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px;">
-              🌱 ATAMAN • TANOM. ATAMAN. PADAYON — SAMAR REFORESTATION INITIATIVE
-            </div>
-            <h1 style="margin:4px 0;font-size:2rem;font-weight:800;color:#14532d;letter-spacing:0.02em;font-family:Georgia,serif;">CERTIFICATE OF RECOGNITION</h1>
-            <div style="font-size:11px;font-weight:800;color:#16a34a;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:16px;">${subtitleRole}</div>
+          <!-- Printable Ornate Certificate Frame -->
+          <div id="atamanPrintableCertificate" style="width:100%;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.18);background:#faf6e8;">
+            <svg id="atamanCertSvg" viewBox="0 0 1024 682" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
+              <image href="assets/certificate-template-bg.jpg" x="0" y="0" width="1024" height="682" preserveAspectRatio="none"/>
 
-            <div style="font-size:13px;color:#475569;font-style:italic;margin-bottom:6px;">This official certificate is proudly presented to</div>
-            <div style="font-size:2rem;font-weight:800;color:#0f172a;border-bottom:2px solid #16a34a;display:inline-block;padding:2px 28px 6px;margin-bottom:16px;font-family:Georgia,serif;">
-              ${recipientName}
-            </div>
+              <!-- Top-Right Subtitle -->
+              <text x="786" y="97" text-anchor="middle" fill="#0c3b1c" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="14.5">${escapeCertXml(subtitleLine1)}</text>
+              <text x="786" y="115" text-anchor="middle" fill="#0c3b1c" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="14.5">${escapeCertXml(subtitleLine2)}</text>
 
-            <p style="max-width:640px;margin:0 auto 18px;font-size:13.5px;line-height:1.65;color:#334155;">
-              ${bodyCitation}
-            </p>
+              <!-- Recipient Name -->
+              <text x="504" y="282" text-anchor="middle" fill="#083b1c" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-style="italic" font-size="${nameFontSize}">${escapeCertXml(recipientName)}</text>
 
-            <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:22px;">
-              ${metricsPillsHtml}
-            </div>
+              <!-- 3-Line Recognition Citation -->
+              ${citationSvgLines}
 
-            <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-top:18px;padding-top:16px;border-top:1px dashed #cbd5e1;text-align:left;">
-              <div>
-                <div style="font-weight:800;font-size:13px;color:#0f172a;border-top:1.5px solid #0f172a;padding-top:4px;min-width:180px;">Ethel Zeta</div>
-                <div style="font-size:11px;color:#64748b;">ATAMAN Program Administrator</div>
-                <div style="font-size:10.5px;color:#64748b;margin-top:4px;">Issued: <strong>${issueDate}</strong></div>
-              </div>
+              <!-- Metric Card 1 -->
+              <text x="266" y="413" text-anchor="middle" fill="#ffffff" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="800" font-size="11.5" letter-spacing="0.5">${escapeCertXml(card1Label)}</text>
+              <text x="266" y="448" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="25">${escapeCertXml(card1Value)}</text>
 
-              <div style="text-align:center;">
-                <div style="display:inline-block;padding:4px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;">
-                  ${qrSvg}
-                </div>
-                <div style="font-size:9.5px;color:#64748b;margin-top:3px;font-family:monospace;">${certSerial}</div>
-              </div>
+              <!-- Metric Card 2 -->
+              <text x="528" y="413" text-anchor="middle" fill="#ffffff" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="800" font-size="10.8" letter-spacing="0.3">${escapeCertXml(card2Label)}</text>
+              <text x="528" y="448" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="25">${escapeCertXml(card2Value)}</text>
 
-              <div style="text-align:right;">
-                <div style="font-weight:800;font-size:13px;color:#0f172a;border-top:1.5px solid #0f172a;padding-top:4px;min-width:180px;">CENRO Catbalogan Sector</div>
-                <div style="font-size:11px;color:#64748b;">Forestry &amp; GIS Verification Office</div>
-                <div style="font-size:10.5px;color:#15803d;font-weight:700;margin-top:4px;">✔ Verified GPS &amp; Registry Record</div>
-              </div>
-            </div>
+              <!-- Metric Card 3 -->
+              <text x="795" y="413" text-anchor="middle" fill="#ffffff" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="800" font-size="11.5" letter-spacing="0.4">${escapeCertXml(card3Label)}</text>
+              <text x="795" y="448" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="${card3FontSize}">${escapeCertXml(card3Value)}</text>
+
+              <!-- Center QR Code -->
+              <svg x="461" y="480" width="102" height="102" viewBox="0 0 ${qrTotal} ${qrTotal}" shape-rendering="crispEdges">
+                <rect width="${qrTotal}" height="${qrTotal}" fill="#ffffff"/>
+                <path d="${qrPaths}" fill="#0f172a"/>
+              </svg>
+
+              <!-- Issue Date under Ethel Zeta -->
+              <text x="220" y="590" text-anchor="middle" fill="#111827" font-family="Georgia, 'Times New Roman', serif" font-size="14.5">Issued: ${escapeCertXml(issueDate)}</text>
+            </svg>
           </div>
         </div>
       `;
@@ -1797,12 +1854,17 @@
       modal.querySelector('#certSwitchCaretakerBtn')?.addEventListener('click', () => {
         openCertificateModal({ role: 'caretaker' });
       });
+      modal.querySelector('#certSelectRecipient')?.addEventListener('change', (e) => {
+        openCertificateModal({ role, personName: e.target.value });
+      });
 
       modal.querySelector('#certPrintBtn')?.addEventListener('click', () => {
-        const printContents = document.getElementById('atamanPrintableCertificate')?.outerHTML || '';
-        const win = window.open('', '_blank', 'width=960,height=720');
+        const absBgUrl = new URL('assets/certificate-template-bg.jpg', window.location.href).href;
+        const rawSvg = (document.getElementById('atamanPrintableCertificate')?.innerHTML || '')
+          .replace('assets/certificate-template-bg.jpg', absBgUrl);
+        const win = window.open('', '_blank', 'width=1080,height=740');
         if (win) {
-          win.document.write(`<!DOCTYPE html><html><head><title>${certSerial}</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:24px;margin:0;background:#fff;} @media print { body{padding:0;} }</style></head><body>${printContents}<script>setTimeout(function(){window.print();},350);<\/script></body></html>`);
+          win.document.write(`<!DOCTYPE html><html><head><title>${certSerial}</title><style>@page{size:landscape;margin:8mm;}body{font-family:Georgia,serif;padding:0;margin:0;background:#fff;display:flex;align-items:center;justify-content:center;}</style></head><body><div style="width:100%;max-width:1024px;">${rawSvg}</div><script>window.onload=function(){setTimeout(function(){window.print();},400);};<\/script></body></html>`);
           win.document.close();
         } else {
           window.print();
@@ -1810,98 +1872,114 @@
       });
 
       modal.querySelector('#certDownloadPngBtn')?.addEventListener('click', () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 1600;
-        canvas.height = 1100;
-        const ctx = canvas.getContext('2d');
+        const bgImg = new Image();
+        bgImg.crossOrigin = 'anonymous';
+        bgImg.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 2048;
+          canvas.height = 1364;
+          const ctx = canvas.getContext('2d');
+          ctx.scale(2, 2);
 
-        // Background & double border
-        const grad = ctx.createLinearGradient(0, 0, 1600, 1100);
-        grad.addColorStop(0, '#ffffff');
-        grad.addColorStop(1, '#f0fdf4');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, 1600, 1100);
+          // 1. Draw the ornate certificate background template
+          ctx.drawImage(bgImg, 0, 0, 1024, 682);
 
-        ctx.strokeStyle = '#15803d';
-        ctx.lineWidth = 10;
-        ctx.strokeRect(36, 36, 1528, 1028);
-        ctx.strokeStyle = '#86efac';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(52, 52, 1496, 996);
+          // 2. Top-Right Subtitle
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#0c3b1c';
+          ctx.font = 'italic 14.5px Georgia, "Times New Roman", serif';
+          ctx.fillText(subtitleLine1, 786, 97);
+          ctx.fillText(subtitleLine2, 786, 115);
 
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#15803d';
-        ctx.font = 'bold 22px sans-serif';
-        ctx.fillText('ATAMAN • TANOM. ATAMAN. PADAYON — SAMAR REFORESTATION INITIATIVE', 800, 130);
+          // 3. Recipient Name
+          ctx.fillStyle = '#083b1c';
+          ctx.font = `bold italic ${nameFontSize}px Georgia, "Times New Roman", serif`;
+          ctx.fillText(recipientName, 504, 282);
 
-        ctx.fillStyle = '#14532d';
-        ctx.font = 'bold 58px Georgia, serif';
-        ctx.fillText('CERTIFICATE OF RECOGNITION', 800, 210);
+          // 4. 3-Line Recognition Citation with inline bold segments
+          const drawMixedBoldLine = (segments, centerX, y, fSize) => {
+            ctx.save();
+            ctx.textAlign = 'left';
+            let totalW = 0;
+            const widths = segments.map(seg => {
+              ctx.font = `${seg.bold ? 'bold ' : ''}${fSize}px Georgia, "Times New Roman", serif`;
+              const w = ctx.measureText(seg.text).width;
+              totalW += w;
+              return w;
+            });
+            let curX = centerX - totalW / 2;
+            segments.forEach((seg, i) => {
+              ctx.font = `${seg.bold ? 'bold ' : ''}${fSize}px Georgia, "Times New Roman", serif`;
+              ctx.fillStyle = '#111827';
+              ctx.fillText(seg.text, curX, y);
+              curX += widths[i];
+            });
+            ctx.restore();
+          };
 
-        ctx.fillStyle = '#16a34a';
-        ctx.font = 'bold 20px sans-serif';
-        ctx.fillText(subtitleRole, 800, 255);
+          if (isAdopter) {
+            drawMixedBoldLine([
+              { text: 'In grateful recognition of their outstanding environmental contribution and financial sponsorship of', bold: false }
+            ], 502, 331, 16.6);
+            drawMixedBoldLine([
+              { text: `${adopterData.fundedTreePoolTotal} Native & Endemic Trees `, bold: true },
+              { text: `(₱${adopterData.totalFundingPhp.toLocaleString()} PHP funded at ₱50.00/tree) planted in `, bold: false },
+              { text: 'Catbalogan City,', bold: true }
+            ], 502, 354, 16.6);
+            drawMixedBoldLine([
+              { text: 'Samar, ', bold: true },
+              { text: 'sequestering approximately ', bold: false },
+              { text: `${adopterData.fundedTreePoolTotal * 22} kg CO₂/year `, bold: true },
+              { text: 'and restoring local watershed biodiversity.', bold: false }
+            ], 502, 377, 16.6);
+          } else {
+            drawMixedBoldLine([
+              { text: 'In grateful recognition of their exemplary field dedication, monthly health monitoring compliance', bold: false }
+            ], 502, 331, 16.4);
+            drawMixedBoldLine([
+              { text: `(${caretakerData.compliancePct}% Verified Monthly Logs), `, bold: true },
+              { text: 'and active stewardship in nurturing ', bold: false },
+              { text: `${caretakerData.survivingTreesCount} of ${caretakerData.totalAssignedTrees} Assigned Trees`, bold: true }
+            ], 502, 354, 16.4);
+            drawMixedBoldLine([
+              { text: `(${caretakerData.survivalRatePct}% Survival Rate • ₱${caretakerData.netReceivableIncentivePhp.toLocaleString()} PHP `, bold: true },
+              { text: 'Net Earned Incentive) across ', bold: false },
+              { text: 'Catbalogan City, Samar.', bold: true }
+            ], 502, 377, 16.4);
+          }
 
-        ctx.fillStyle = '#475569';
-        ctx.font = 'italic 24px Georgia, serif';
-        ctx.fillText('This official certificate is proudly presented to', 800, 325);
+          // 5. Three Metric Cards
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 11.5px "Plus Jakarta Sans", Arial, sans-serif';
+          ctx.fillText(card1Label, 266, 413);
+          ctx.font = 'bold 10.8px "Plus Jakarta Sans", Arial, sans-serif';
+          ctx.fillText(card2Label, 528, 413);
+          ctx.font = 'bold 11.5px "Plus Jakarta Sans", Arial, sans-serif';
+          ctx.fillText(card3Label, 795, 413);
 
-        ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 62px Georgia, serif';
-        ctx.fillText(recipientName, 800, 405);
+          ctx.fillStyle = '#111827';
+          ctx.font = 'bold 25px Georgia, "Times New Roman", serif';
+          ctx.fillText(card1Value, 266, 448);
+          ctx.fillText(card2Value, 528, 448);
+          ctx.font = `bold ${card3FontSize}px Georgia, "Times New Roman", serif`;
+          ctx.fillText(card3Value, 795, 448);
 
-        ctx.strokeStyle = '#16a34a';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(450, 425);
-        ctx.lineTo(1150, 425);
-        ctx.stroke();
+          // 6. Center QR Code
+          QRGenerator.drawOnCanvas(ctx, traceUrl, 461, 480, 102);
 
-        // Body text lines
-        ctx.fillStyle = '#334155';
-        ctx.font = '24px sans-serif';
-        const line1 = isAdopter
-          ? `For outstanding environmental contribution and sponsorship of ${adopterData.fundedTreePoolTotal} Native & Endemic Trees`
-          : `For exemplary field stewardship and verified monthly health monitoring (${caretakerData.compliancePct}% Compliance)`;
-        const line2 = isAdopter
-          ? `(₱${adopterData.totalFundingPhp.toLocaleString()} PHP funded at ₱50.00/tree) planted in Catbalogan City, Samar,`
-          : `nurturing ${caretakerData.survivingTreesCount} of ${caretakerData.totalAssignedTrees} Assigned Trees (${caretakerData.survivalRatePct}% Survival Rate • ₱${caretakerData.netReceivableIncentivePhp.toLocaleString()} PHP Net Incentive)`;
-        const line3 = isAdopter
-          ? `sequestering approximately ${adopterData.fundedTreePoolTotal * 22} kg CO₂/year and restoring local watershed ecosystems.`
-          : `across Catbalogan City, Samar under the ATAMAN Reforestation & GIS Monitoring Program.`;
+          // 7. Issue Date under Ethel Zeta
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#111827';
+          ctx.font = '14.5px Georgia, "Times New Roman", serif';
+          ctx.fillText(`Issued: ${issueDate}`, 220, 590);
 
-        ctx.fillText(line1, 800, 495);
-        ctx.fillText(line2, 800, 535);
-        ctx.fillText(line3, 800, 575);
-
-        // Draw QR code in bottom center
-        QRGenerator.drawOnCanvas(ctx, traceUrl, 710, 740, 180);
-        ctx.fillStyle = '#475569';
-        ctx.font = '16px monospace';
-        ctx.fillText(certSerial, 800, 945);
-        ctx.fillText(`Issued: ${issueDate} • Catbalogan City, Samar`, 800, 972);
-
-        // Signatures
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 24px sans-serif';
-        ctx.fillText('Ethel Zeta', 130, 860);
-        ctx.font = '18px sans-serif';
-        ctx.fillStyle = '#64748b';
-        ctx.fillText('ATAMAN Program Administrator', 130, 890);
-
-        ctx.textAlign = 'right';
-        ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 24px sans-serif';
-        ctx.fillText('CENRO Catbalogan Sector', 1470, 860);
-        ctx.font = '18px sans-serif';
-        ctx.fillStyle = '#64748b';
-        ctx.fillText('Forestry & GIS Verification Office', 1470, 890);
-
-        const link = document.createElement('a');
-        link.download = `${certSerial}-${recipientName.replace(/\s+/g, '_')}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+          const link = document.createElement('a');
+          link.download = `${certSerial}-${recipientName.replace(/\s+/g, '_')}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        };
+        bgImg.src = 'assets/certificate-template-bg.jpg';
       });
     }
 
