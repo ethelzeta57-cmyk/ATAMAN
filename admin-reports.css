@@ -582,7 +582,7 @@ body {
 /* Row 2: Secondary Operations Strip */
 .ops-strip-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
