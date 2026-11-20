@@ -64,7 +64,7 @@
       <!-- Form -->
       <form class="reg-form" id="regForm" novalidate>
 
-        <!-- Row 1: Full Name & Username -->
+        <!-- Row 1: Full Name & Address -->
         <div class="form-row">
           <!-- Full Name -->
           <div class="form-group">
@@ -82,26 +82,8 @@
             </div>
           </div>
 
-          <!-- Username -->
+          <!-- Address -->
           <div class="form-group">
-            <label for="usernameInput" class="form-label">Username <span class="req-star">*</span></label>
-            <div class="input-wrapper">
-              <span class="input-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="4" />
-                  <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94" />
-                </svg>
-              </span>
-              <input type="text" id="usernameInput" name="username" class="form-input" placeholder="e.g. mariasantos"
-                autocomplete="username" autocapitalize="none" required />
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 2: Address -->
-        <div class="form-row">
-          <div class="form-group full-width">
             <label for="addressInput" class="form-label">Address <span class="req-star">*</span></label>
             <div class="input-wrapper">
               <span class="input-icon">
@@ -113,6 +95,24 @@
               </span>
               <input type="text" id="addressInput" name="address" class="form-input"
                 placeholder="e.g. Brgy. Guinsorongan, Catbalogan City" autocomplete="street-address" required />
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Username -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="usernameInput" class="form-label">Username <span class="req-star">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94" />
+                </svg>
+              </span>
+              <input type="text" id="usernameInput" name="username" class="form-input" placeholder="e.g. mariasantos"
+                autocomplete="username" autocapitalize="none" required />
             </div>
           </div>
         </div>
