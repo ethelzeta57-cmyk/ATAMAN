@@ -1168,22 +1168,33 @@
     function getAdopterPoolAllocation(adopterNameOrEmail) {
       const adopters = getAdoptersCache();
       const trees = getTreesCache();
-      const q = String(adopterNameOrEmail || localStorage.getItem('ATAMAN_user_name') || 'Nikki Maga').toLowerCase().trim();
+      const currentEmail = (localStorage.getItem('ATAMAN_user_email') || '').toLowerCase().trim();
+      const currentName = (localStorage.getItem('ATAMAN_user_name') || '').toLowerCase().trim();
+      const q = String(adopterNameOrEmail || currentName || currentEmail || 'Nikki Maga').toLowerCase().trim();
 
-      let adopter = adopters.find(a =>
-        (a.name && a.name.toLowerCase().trim() === q) ||
-        (a.fullName && a.fullName.toLowerCase().trim() === q) ||
-        (a.email && a.email.toLowerCase().trim() === q)
-      );
+      let adopter = adopters.find(a => {
+        if (!a) return false;
+        const an = (a.name || a.fullName || a.displayName || '').toLowerCase().trim();
+        const ae = (a.email || '').toLowerCase().trim();
+        const au = (a.username || '').toLowerCase().trim();
+        const aid = String(a.id || a.uid || '').toLowerCase().trim();
+        return (q && (an === q || ae === q || au === q || aid === q)) ||
+          (currentEmail && ae === currentEmail) ||
+          (currentName && an === currentName);
+      });
       if (!adopter && adopters.length > 0) adopter = adopters[0];
 
-      const adopterName = adopter ? (adopter.name || adopter.fullName || 'Nikki Maga') : 'Nikki Maga';
+      const adopterName = adopter ? (adopter.name || adopter.fullName || adopter.displayName || localStorage.getItem('ATAMAN_user_name') || 'Nikki Maga') : (localStorage.getItem('ATAMAN_user_name') || 'Nikki Maga');
       const adLower = adopterName.toLowerCase().trim();
 
       // Trees linked to this adopter in the tree registry
       const adopterTreeBatches = trees.filter(t => {
-        const sp = String(t.adopter || t.sponsorName || '').toLowerCase().trim();
-        return sp === adLower || (adLower.includes('nikki') && sp.includes('nikki'));
+        const sp = String(t.adopter || t.sponsorName || t.adopterName || '').toLowerCase().trim();
+        const tAdId = String(t.adopterId || '').trim();
+        const curId = String(adopter?.id || adopter?.uid || '').trim();
+        if (curId && tAdId && curId === tAdId) return true;
+        return (adLower && (sp === adLower || (adLower.length > 2 && sp.includes(adLower)))) ||
+          (adLower.includes('nikki') && sp.includes('nikki'));
       });
 
       const adoptedTreesFromRegistry = adopterTreeBatches.reduce((sum, t) => {

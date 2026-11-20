@@ -217,18 +217,40 @@ function getLoggedInAdopterData() {
     }
   }
 
-  // Find the adopter profile matching email, name, contactPerson, or active single adopter record
+  // Find the adopter profile matching email, name, contactPerson, username, or id
   let myAdopter = null;
+  const sessionUser = JSON.parse(localStorage.getItem('ATAMAN_current_user') || localStorage.getItem('saplink_user') || '{}');
+  const userUid = sessionUser.uid || sessionUser.id || '';
+  const userUsername = (sessionUser.username || '').toLowerCase().trim();
+
   if (Array.isArray(adopters) && adopters.length > 0) {
     myAdopter = adopters.find(a => {
+      if (!a) return false;
       const matchEmail = userEmail && a.email && a.email.toLowerCase().trim() === userEmail;
       const matchName = userName && a.name && a.name.toLowerCase().trim() === userName.toLowerCase();
       const matchContact = userName && a.contactPerson && a.contactPerson.toLowerCase().trim() === userName.toLowerCase();
-      return matchEmail || matchName || matchContact;
+      const matchUsername = userUsername && a.username && a.username.toLowerCase().trim() === userUsername;
+      const matchId = userUid && (String(a.id || a.uid) === String(userUid));
+      return matchEmail || matchName || matchContact || matchUsername || matchId;
     });
-    if (!myAdopter && adopters.length === 1) {
+    if (!myAdopter && adopters.length === 1 && !userEmail) {
       myAdopter = adopters[0];
     }
+  }
+
+  if (!myAdopter && (userEmail || userName)) {
+    myAdopter = {
+      id: userUid || ('ADP-' + Date.now()),
+      name: userName || 'Tree Adopter',
+      email: userEmail,
+      username: userUsername,
+      contactPerson: userName || 'Tree Adopter',
+      type: 'Individual',
+      status: 'Active',
+      treesCount: 0,
+      funding: 0,
+      treesList: []
+    };
   }
 
   // Collect adopted trees
@@ -296,13 +318,16 @@ function getLoggedInAdopterData() {
     }
   }
 
-  // Also check if any trees in allTrees list have sponsorName / adopter matching userName or myAdopter.name
+  // Also check if any trees in allTrees list have sponsorName / adopter matching userName, myAdopter.name, or adopterId
   if (adoptedTrees.length === 0 && Array.isArray(allTrees)) {
-    const searchNames = [userName, myAdopter?.name, myAdopter?.contactPerson].filter(Boolean).map(s => s.toLowerCase().trim());
+    const searchNames = [userName, myAdopter?.name, myAdopter?.contactPerson, myAdopter?.username, userUsername].filter(Boolean).map(s => s.toLowerCase().trim());
+    const searchIds = [myAdopter?.id, myAdopter?.uid, userUid].filter(Boolean).map(String);
     allTrees.forEach(t => {
       const spNameStr = (t.sponsorName || '').toLowerCase();
       const adNameStr = (t.adopter || '').toLowerCase();
-      const matchTree = searchNames.some(n => (spNameStr && spNameStr.includes(n)) || (adNameStr && adNameStr.includes(n)));
+      const adIdStr = String(t.adopterId || '');
+      const matchTree = searchIds.some(id => id && adIdStr === id) ||
+        searchNames.some(n => (spNameStr && spNameStr.includes(n)) || (adNameStr && adNameStr.includes(n)));
       if (matchTree) {
         const count = Math.max(1, parseInt(t.takenCount) || 1);
         const species = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || 'Narra';

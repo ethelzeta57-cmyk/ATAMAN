@@ -399,25 +399,51 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         } catch (err) {}
       }
 
-      // If adopter, sync with ATAMAN_adopters_cache (avoid duplicating if already linked by email, name, or contactPerson)
+      // If adopter, sync with ATAMAN_adopters_cache (avoid duplicating if already linked by email, name, username, or id)
       if (userRecord.role === 'adopter') {
         try {
           let ads = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
           if (!Array.isArray(ads)) ads = [];
           const normName = (userRecord.displayName || normEmail.split('@')[0] || '').toLowerCase().trim();
-          const alreadyExists = ads.some(a => {
+          const normUsername = (userRecord.username || '').toLowerCase().trim();
+          const targetUid = String(userRecord.uid || '').trim();
+
+          const existingIdx = ads.findIndex(a => {
             if (!a) return false;
             const em = (a.email || '').toLowerCase().trim();
             const nm = (a.name || '').toLowerCase().trim();
             const ct = (a.contactPerson || a.contact || '').toLowerCase().trim();
-            return (normEmail && em === normEmail) || (normName && (nm === normName || ct === normName));
+            const un = (a.username || '').toLowerCase().trim();
+            const aid = String(a.id || a.uid || '').trim();
+            return (targetUid && aid === targetUid) ||
+              (normUsername && un === normUsername) ||
+              (normEmail && em === normEmail) ||
+              (normName && (nm === normName || ct === normName));
           });
-          if (!alreadyExists) {
+
+          if (existingIdx >= 0) {
+            // Update existing adopter record with consistent identifiers to prevent splitting records
+            const ex = ads[existingIdx];
+            ads[existingIdx] = {
+              ...ex,
+              id: ex.id || targetUid || ('ADP-' + Math.floor(1000 + Math.random() * 9000)),
+              uid: ex.uid || targetUid || ex.id,
+              name: ex.name || userRecord.displayName || normEmail.split('@')[0],
+              email: ex.email || normEmail,
+              username: ex.username || normUsername,
+              address: ex.address || userRecord.address || '',
+              contactPerson: ex.contactPerson || ex.name || userRecord.displayName
+            };
+          } else {
             ads.unshift({
-              id: userRecord.uid || ('ADP-' + Math.floor(1000 + Math.random() * 9000)),
+              id: targetUid || ('ADP-' + Math.floor(1000 + Math.random() * 9000)),
+              uid: targetUid,
               name: userRecord.displayName || normEmail.split('@')[0],
+              username: normUsername,
               email: normEmail,
+              address: userRecord.address || '',
               contact: normEmail,
+              contactPerson: userRecord.displayName || normEmail.split('@')[0],
               status: 'Active',
               treesAdopted: 0,
               treesCount: 0,
@@ -426,9 +452,9 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
               customFunding: false,
               treesList: []
             });
-            localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(ads));
-            localStorage.setItem('saplink_adopters_cache', JSON.stringify(ads));
           }
+          localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(ads));
+          localStorage.setItem('saplink_adopters_cache', JSON.stringify(ads));
         } catch (err) {}
       }
 
