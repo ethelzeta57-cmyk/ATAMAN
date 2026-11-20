@@ -766,25 +766,28 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     },
 
     // Sign Up — saves role to Cloud Firestore and local database
-    async signUp(email, password, fullName, role = 'adopter') {
+    async signUp(email, password, fullName, role = 'adopter', extraFields = {}) {
       const normEmail = (email || '').toLowerCase().trim();
       const validatedRole = this.normalizeRole(role);
       const name = (fullName || normEmail.split('@')[0]).trim();
 
       if (!normEmail) {
-        throw { code: 'auth/invalid-email', message: 'Please provide a valid email address.' };
+        throw { code: 'auth/invalid-email', message: 'Please provide a valid username or email.' };
       }
       if (!password || password.length < 6) {
         throw { code: 'auth/weak-password', message: 'Password must be at least 6 characters long.' };
       }
 
-      // Check if email already registered locally (but allow default/seeded accounts to be upgraded)
+      // Check if email or username already registered locally
       const regUsers = getRegisteredUsersList();
-      const existingLocal = regUsers.find(u => u.email && u.email.toLowerCase() === normEmail);
+      const existingLocal = regUsers.find(u =>
+        (u.email && u.email.toLowerCase() === normEmail) ||
+        (extraFields.username && u.username && u.username.toLowerCase() === String(extraFields.username).toLowerCase().trim())
+      );
       // Only block if the account was explicitly registered (has a real password), not seeded defaults
       const isSeededDefault = DEFAULT_ACCOUNTS.some(d => d.email.toLowerCase() === normEmail);
       if (existingLocal && !isSeededDefault) {
-        throw { code: 'auth/email-already-in-use', message: 'An account with this email already exists. Please sign in.' };
+        throw { code: 'auth/email-already-in-use', message: 'This account already exists. Please sign in.' };
       }
 
       let firebaseUser = null;
@@ -825,7 +828,8 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         displayName: name,
         role: validatedRole,
         password: password,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        ...(extraFields || {})
       };
 
       // 2. Save into persistent local store (with sync to admin users, caretakers, adopters)
@@ -840,7 +844,8 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
             displayName: name,
             role: validatedRole,
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
+            ...(extraFields || {})
           };
           // Save by UID
           await firestoreDb.collection('users').doc(uid).set(firestoreDoc, { merge: true });
@@ -864,8 +869,12 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
             await firestoreDb.collection('adopters').doc(uid).set({
               id: uid,
               name: name,
+              displayName: name,
+              username: extraFields.username || '',
               email: normEmail,
-              contact: normEmail,
+              address: extraFields.address || '',
+              contact: extraFields.username || normEmail,
+              contactPerson: name,
               status: 'Active',
               treesAdopted: 0,
               createdAt: new Date().toISOString()
@@ -881,7 +890,8 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         uid: uid,
         email: normEmail,
         displayName: name,
-        role: validatedRole
+        role: validatedRole,
+        ...(extraFields || {})
       };
       this.setLocalSession(sessionUser);
 

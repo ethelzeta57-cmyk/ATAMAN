@@ -32,7 +32,7 @@
   <link rel="alternate icon" type="image/png" href="favicon.png" />
   <link rel="shortcut icon" href="favicon.ico" />
 
-  <link rel="stylesheet" href="register.css?v=20261120_v15" />
+  <link rel="stylesheet" href="register.css?v=20261120_v16" />
   <script src="ATAMAN-init.js?v=20261120_v9"></script>
 </head>
 
@@ -99,26 +99,9 @@
           </div>
         </div>
 
-        <!-- Row 2: Email & Address -->
+        <!-- Row 2: Address -->
         <div class="form-row">
-          <!-- Email Address -->
-          <div class="form-group">
-            <label for="emailInput" class="form-label">Email Address <span class="req-star">*</span></label>
-            <div class="input-wrapper">
-              <span class="input-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <rect width="20" height="16" x="2" y="4" rx="2" />
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                </svg>
-              </span>
-              <input type="email" id="emailInput" name="email" class="form-input" placeholder="youremail@example.com"
-                autocomplete="email" required />
-            </div>
-          </div>
-
-          <!-- Address -->
-          <div class="form-group">
+          <div class="form-group full-width">
             <label for="addressInput" class="form-label">Address <span class="req-star">*</span></label>
             <div class="input-wrapper">
               <span class="input-icon">
@@ -134,9 +117,9 @@
           </div>
         </div>
 
-        <!-- Row 3: Create Password + Confirm Password -->
+        <!-- Row 3: Password + Confirm Password (Simple) -->
         <div class="form-row">
-          <!-- Create Password -->
+          <!-- Password -->
           <div class="form-group">
             <label for="passwordInput" class="form-label">Password <span class="req-star">*</span></label>
             <div class="input-wrapper">
@@ -147,7 +130,7 @@
                   <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
               </span>
-              <input type="password" id="passwordInput" name="password" class="form-input" placeholder="Enter password"
+              <input type="password" id="passwordInput" name="password" class="form-input" placeholder="Create password"
                 autocomplete="new-password" required />
               <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility"
                 tabindex="-1">
@@ -200,49 +183,6 @@
           </div>
         </div>
 
-        <!-- Password Requirements Box -->
-        <div class="password-requirements" id="passwordRequirements">
-          <p>Password must contain:</p>
-          <ul class="req-list">
-            <li class="req-item unmet" id="req-length">
-              <span class="req-check">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              At least 8 characters
-            </li>
-            <li class="req-item unmet" id="req-upper">
-              <span class="req-check">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              One uppercase letter (A-Z)
-            </li>
-            <li class="req-item unmet" id="req-lower">
-              <span class="req-check">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              One lowercase letter (a-z)
-            </li>
-            <li class="req-item unmet" id="req-number">
-              <span class="req-check">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              One number (0-9)
-            </li>
-          </ul>
-        </div>
-
         <!-- Automatic Adopter Role Indicator (No public Caretaker or Admin role selection) -->
         <div class="adopter-role-badge">
           <div class="role-badge-icon">
@@ -267,7 +207,7 @@
             <path d="M12 16v-4" />
             <path d="M12 8h.01" />
           </svg>
-          <span><strong>Tree Adopter Access:</strong> Track your sponsored trees, download official certificates of recognition, and view field updates. Caretaker and Admin accounts remain admin-managed.</span>
+          <span><strong>Easy Username Login:</strong> Use your chosen username and password anytime to sign in, track sponsored trees, and download certificates.</span>
         </div>
 
         <!-- Submit Button -->
@@ -314,7 +254,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-  <script src="firebase-config.js?v=20261120_v9"></script>
+  <script src="firebase-config.js?v=20261120_v10"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -327,11 +267,9 @@
         const regForm = document.getElementById('regForm');
         const nameInput = document.getElementById('nameInput');
         const usernameInput = document.getElementById('usernameInput');
-        const emailInput = document.getElementById('emailInput');
         const addressInput = document.getElementById('addressInput');
         const passwordInput = document.getElementById('passwordInput');
         const confirmInput = document.getElementById('confirmPasswordInput');
-        const roleSelect = document.getElementById('roleSelect');
         const submitBtn = document.getElementById('submitBtn');
         const btnSpinner = document.getElementById('btnSpinner');
         const btnIcon = document.getElementById('btnIcon');
@@ -340,7 +278,7 @@
         const toastMessage = document.getElementById('toastMessage');
         const toastIcon = document.getElementById('toastIcon');
 
-        // --- Password toggle ---
+        // --- Password visibility toggle ---
         function setupToggle(toggleBtn, input) {
           if (!toggleBtn || !input) return;
           const eyeOpen = toggleBtn.querySelector('.eye-open');
@@ -355,28 +293,6 @@
         }
         setupToggle(document.getElementById('passwordToggle'), passwordInput);
         setupToggle(document.getElementById('confirmPasswordToggle'), confirmInput);
-
-        // --- Live password requirements ---
-        const reqLength = document.getElementById('req-length');
-        const reqUpper = document.getElementById('req-upper');
-        const reqLower = document.getElementById('req-lower');
-        const reqNumber = document.getElementById('req-number');
-
-        function checkReq(el, condition) {
-          if (!el) return;
-          el.classList.toggle('met', condition);
-          el.classList.toggle('unmet', !condition);
-        }
-
-        if (passwordInput) {
-          passwordInput.addEventListener('input', () => {
-            const v = passwordInput.value || '';
-            checkReq(reqLength, v.length >= 8);
-            checkReq(reqUpper, /[A-Z]/.test(v));
-            checkReq(reqLower, /[a-z]/.test(v));
-            checkReq(reqNumber, /[0-9]/.test(v));
-          });
-        }
 
         // --- Form Submit ---
         regForm.addEventListener('submit', async (e) => {
@@ -396,34 +312,50 @@
 
           const name = (nameInput ? nameInput.value : '').trim();
           const username = (usernameInput ? usernameInput.value : '').trim().toLowerCase().replace(/\s+/g, '');
-          const email = (emailInput ? emailInput.value : '').trim().toLowerCase();
           const address = (addressInput ? addressInput.value : '').trim();
           const password = passwordInput ? passwordInput.value : '';
           const confirm = confirmInput ? confirmInput.value : '';
-          const selectedRole = 'adopter'; // Automatically assigned
+          const selectedRole = 'adopter';
 
-          if (!name) { nameInput.focus(); showToast('Please enter your full name.', '⚠️'); return; }
+          if (!name) {
+            if (nameInput) nameInput.focus();
+            showToast('Please enter your full name.', '⚠️');
+            return;
+          }
           if (!username || username.length < 3) {
             if (usernameInput) usernameInput.focus();
             showToast('Please enter a username (at least 3 characters).', '⚠️');
             return;
           }
-          if (!email || !email.includes('@')) { emailInput.focus(); showToast('Please enter a valid email address.', '⚠️'); return; }
-          if (!address) { if (addressInput) addressInput.focus(); showToast('Please enter your address.', '⚠️'); return; }
+          if (!address) {
+            if (addressInput) addressInput.focus();
+            showToast('Please enter your address.', '⚠️');
+            return;
+          }
 
-          const passOk = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password);
-          if (!passOk) { passwordInput.focus(); showToast('Password does not meet all requirements.', '⚠️'); return; }
-          if (password !== confirm) { confirmInput.focus(); showToast('Passwords do not match. Please re-enter.', '⚠️'); return; }
+          // Simple password validation (min 6 characters, no complex restrictions)
+          if (!password || password.length < 6) {
+            if (passwordInput) passwordInput.focus();
+            showToast('Please enter a password with at least 6 characters.', '⚠️');
+            return;
+          }
+          if (password !== confirm) {
+            if (confirmInput) confirmInput.focus();
+            showToast('Passwords do not match. Please re-enter.', '⚠️');
+            return;
+          }
 
-          // Check if username or email is already taken
+          const internalEmail = `${username}@ataman.local`;
+
+          // Check if username already exists locally
           try {
             const regUsers = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || '[]');
             const userTaken = regUsers.some(u =>
               (u.username && u.username.toLowerCase() === username) ||
-              (u.email && u.email.toLowerCase() === email)
+              (u.email && u.email.toLowerCase() === internalEmail)
             );
             if (userTaken) {
-              showToast('An account with this username or email already exists. Please sign in.', '⚠️');
+              showToast('This username is already taken. Please choose another username.', '⚠️');
               return;
             }
           } catch (_) {}
@@ -433,23 +365,19 @@
           try {
             const destination = 'adopter-dashboard.html';
             let userUid = 'ADP-' + Date.now();
-            let isFbSuccess = false;
 
             if (authAPI && typeof authAPI.signUp === 'function') {
               try {
-                const res = await authAPI.signUp(email, password, name, selectedRole);
+                const res = await authAPI.signUp(internalEmail, password, name, selectedRole, { username, address });
                 if (res && res.user && res.user.uid) {
                   userUid = res.user.uid;
-                  isFbSuccess = true;
                 }
               } catch (signUpErr) {
-                // If already in Firebase Auth, proceed to link and log in
                 if (signUpErr.code === 'auth/email-already-in-use') {
                   try {
-                    const signInRes = await authAPI.signIn(email, password, 'adopter');
+                    const signInRes = await authAPI.signIn(username, password, 'adopter');
                     if (signInRes && signInRes.user && signInRes.user.uid) {
                       userUid = signInRes.user.uid;
-                      isFbSuccess = true;
                     }
                   } catch (_) {}
                 } else {
@@ -466,15 +394,15 @@
               let existing = JSON.parse(localStorage.getItem(regKey) || '[]');
               if (!Array.isArray(existing)) existing = [];
               const adminIdx = existing.findIndex(u =>
-                (u.email && u.email.toLowerCase() === email) ||
-                (u.username && u.username.toLowerCase() === username)
+                (u.username && u.username.toLowerCase() === username) ||
+                (u.email && u.email.toLowerCase() === internalEmail)
               );
               const userObj = {
                 id: userUid,
                 uid: userUid,
                 name: name,
                 username: username,
-                email: email,
+                email: internalEmail,
                 address: address,
                 role: 'adopter',
                 status: 'Active',
@@ -496,12 +424,15 @@
             try {
               let cached = JSON.parse(localStorage.getItem('ATAMAN_users_cache') || '[]');
               if (!Array.isArray(cached)) cached = [];
-              const cIdx = cached.findIndex(u => (u.email && u.email.toLowerCase() === email) || (u.username && u.username.toLowerCase() === username));
+              const cIdx = cached.findIndex(u =>
+                (u.username && u.username.toLowerCase() === username) ||
+                (u.email && u.email.toLowerCase() === internalEmail)
+              );
               const cacheObj = {
                 id: userUid,
                 name: name,
                 username: username,
-                email: email,
+                email: internalEmail,
                 address: address,
                 role: 'Adopter',
                 status: 'Active',
@@ -520,8 +451,8 @@
               let existingAd = JSON.parse(localStorage.getItem(adKey) || '[]');
               if (!Array.isArray(existingAd)) existingAd = [];
               const adIdx = existingAd.findIndex(a =>
-                (a.email && a.email.toLowerCase() === email) ||
                 (a.username && a.username.toLowerCase() === username) ||
+                (a.email && a.email.toLowerCase() === internalEmail) ||
                 (a.id && a.id === userUid)
               );
               const adopterRecord = {
@@ -530,9 +461,9 @@
                 name: name,
                 displayName: name,
                 username: username,
-                email: email,
+                email: internalEmail,
                 address: address,
-                contact: email,
+                contact: username,
                 contactPerson: name,
                 type: 'Individual',
                 status: 'Active',
@@ -563,7 +494,7 @@
                   name: name,
                   displayName: name,
                   username: username,
-                  email: email,
+                  email: internalEmail,
                   address: address,
                   role: 'adopter',
                   status: 'Active',
@@ -576,9 +507,9 @@
                   name: name,
                   displayName: name,
                   username: username,
-                  email: email,
+                  email: internalEmail,
                   address: address,
-                  contact: email,
+                  contact: username,
                   contactPerson: name,
                   type: 'Individual',
                   status: 'Active',
@@ -601,7 +532,7 @@
               name: name,
               displayName: name,
               username: username,
-              email: email,
+              email: internalEmail,
               address: address,
               role: 'adopter'
             };
@@ -610,12 +541,12 @@
             localStorage.setItem('ATAMAN_logged_in', 'true');
             localStorage.setItem('ATAMAN_user_role', 'adopter');
             localStorage.setItem('ATAMAN_user_name', name);
-            localStorage.setItem('ATAMAN_user_email', email);
+            localStorage.setItem('ATAMAN_user_email', internalEmail);
 
             showToast(`🎉 Welcome to ATAMAN, ${name}! Redirecting to your dashboard...`, '🌳');
             setTimeout(() => {
               window.location.href = destination;
-            }, 1200);
+            }, 1000);
 
           } catch (err) {
             console.error('Registration error:', err);
@@ -633,9 +564,9 @@
 
         function getFriendlyError(code) {
           const map = {
-            'auth/email-already-in-use': 'An account with this email already exists. Please sign in.',
-            'auth/weak-password': 'Password is too weak. Use at least 8 characters.',
-            'auth/invalid-email': 'Please enter a valid email address.',
+            'auth/email-already-in-use': 'This username is already registered. Please sign in.',
+            'auth/weak-password': 'Password is too short. Use at least 6 characters.',
+            'auth/invalid-email': 'Invalid account details. Please check your username.',
             'auth/network-request-failed': 'Network error. Check your internet connection.'
           };
           return map[code] || (typeof code === 'string' && code.length > 5 ? code : 'Registration failed. Please check your details.');
