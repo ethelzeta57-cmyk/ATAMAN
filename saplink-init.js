@@ -114,7 +114,7 @@
   ];
   window.ATAMAN_DEFAULT_USERS = DEFAULT_USERS;
 
-  const INIT_VERSION = 'ATAMAN_clean_reset_v12_zero_mock_trees_adopters';
+  const INIT_VERSION = 'ATAMAN_clean_reset_v13_clear_all_transactions_20261120';
 
   // Seed / migrate registered data when upgrading or if caches are missing
   if (!localStorage.getItem(INIT_VERSION)) {
@@ -125,6 +125,16 @@
     localStorage.setItem('ATAMAN_monitoring_logs', '[]');
     localStorage.setItem('ATAMAN_tree_transactions', '[]');
     localStorage.setItem('ATAMAN_tree_activities', '[]');
+    // Clear every transactional / input dataset (keeps accounts & login session)
+    ['ATAMAN_monthly_logs_cache','ATAMAN_notifications','ATAMAN_notifications_cache','ATAMAN_caretaker_notifications',
+     'ATAMAN_system_logs','ATAMAN_reports_archive','ATAMAN_unread_notif_count','ATAMAN_last_full_sync'].forEach(function (k) {
+      try { localStorage.removeItem(k); } catch (_) {}
+    });
+    try {
+      Object.keys(localStorage).forEach(function (k) {
+        if (k.indexOf('ATAMAN_monthly_logs_seeded_') === 0) localStorage.removeItem(k);
+      });
+    } catch (_) {}
 
     // 2. Adopters: Reset metrics to 0 while preserving user accounts
     try {
@@ -139,7 +149,15 @@
           customFunding: false,
           treesList: [],
           transactions: [],
-          donations: []
+          donations: [],
+          payments: [],
+          treePhotos: {},
+          treePhoto: '',
+          photo: '',
+          paymentStatus: '',
+          plan: '',
+          project: '',
+          treesCondition: { healthy: 0, care: 0, critical: 0, dead: 0 }
         }));
         localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(existingAdopters));
         localStorage.setItem('saplink_adopters_cache', JSON.stringify(existingAdopters));
@@ -163,7 +181,22 @@
           pendingMonitoring: 0,
           completedMonitoring: 0,
           assignedTrees: [],
-          treesList: []
+          treesList: [],
+          assignedTreeIds: [],
+          assignedTreesList: [],
+          areaBreakdown: [],
+          assignedProjects: [],
+          criticalTrees: [],
+          recentActivity: [],
+          photos: [],
+          photosUploaded: 0,
+          maintenanceRecords: 0,
+          monitoredThisMonth: 0,
+          overdueMonitoring: 0,
+          assignedAdopter: '',
+          assignedAdopterName: '',
+          assignedTreeType: '',
+          treesCondition: { healthy: 0, care: 0, critical: 0, dead: 0 }
         }));
         localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(existingCaretakers));
         localStorage.setItem('saplink_caretakers_cache', JSON.stringify(existingCaretakers));

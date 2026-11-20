@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.12-reports-remove-carbon-card';
+const CACHE_NAME = 'ataman-pwa-v2.2.13-clear-transactions-20261120';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [

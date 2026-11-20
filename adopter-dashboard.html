@@ -36,7 +36,7 @@
 
   <!-- Adopter Dashboard Styles -->
   <link rel="stylesheet" href="adopter-dashboard.css?v=20261110_v14" />
-  <script src="ATAMAN-init.js?v=20261117_v3"></script>
+  <script src="ATAMAN-init.js?v=20261120_v7"></script>
   <link rel="stylesheet" href="ataman-bottom-nav.css?v=20261113_v1" />
 </head>
 
@@ -192,7 +192,7 @@
     <!-- ── TOP HEADER ── -->
     <header class="ad-header">
       <div class="ad-header-left">
-        <h1 class="ad-dash-title">Dashboard</h1>
+        <h1 class="ad-dash-title">Adopter Dashboard</h1>
         <p class="ad-dash-subtitle">Welcome back, <span id="hdrUserName">Adopter</span>! <span
             class="sprout-emoji">🌱</span></p>
         <p class="ad-dash-tagline">Together, we grow a greener tomorrow.</p>
@@ -450,20 +450,28 @@
       </section>
 
       <!-- ─── FUND & TREE POOL ALLOCATION + CERTIFICATE & QR HUB ─── -->
-      <section class="ad-card" id="adPoolAllocationSection" style="margin-bottom:20px; padding:20px; border:1px solid #bbf7d0; background:linear-gradient(135deg,#f0fdf4 0%,#ffffff 65%);">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:16px;">
+      <section class="ad-card" id="adPoolAllocationSection"
+        style="margin-bottom:20px; padding:20px; border:1px solid #bbf7d0; background:linear-gradient(135deg,#f0fdf4 0%,#ffffff 65%);">
+        <div
+          style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:16px;">
           <div>
-            <div style="display:inline-flex; align-items:center; gap:6px; background:#dcfce7; color:#166534; font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;">
+            <div
+              style="display:inline-flex; align-items:center; gap:6px; background:#dcfce7; color:#166534; font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;">
               🌱 Tree Funding &amp; Allocation Pool • ₱50.00 / Tree Rate
             </div>
-            <h2 style="margin:0; font-size:1.1rem; font-weight:800; color:#0f172a;">Adopter Funded Tree Pool &amp; Caretaker Allocation</h2>
-            <p style="margin:4px 0 0; font-size:0.82rem; color:#475569;">Trees funded at <strong>₱50 PHP per tree</strong> are automatically deducted from your available pool as Caretakers are assigned to nurture them.</p>
+            <h2 style="margin:0; font-size:1.1rem; font-weight:800; color:#0f172a;">Adopter Funded Tree Pool &amp;
+              Caretaker Allocation</h2>
+            <p style="margin:4px 0 0; font-size:0.82rem; color:#475569;">Trees funded at <strong>₱50 PHP per
+                tree</strong> are automatically deducted from your available pool as Caretakers are assigned to nurture
+              them.</p>
           </div>
           <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            <button type="button" id="adOpenCertBtn" style="display:inline-flex; align-items:center; gap:7px; background:#15803d; color:#ffffff; border:none; padding:9px 15px; border-radius:10px; font-weight:700; font-size:0.82rem; cursor:pointer; box-shadow:0 4px 12px rgba(21,128,61,0.2);">
+            <button type="button" id="adOpenCertBtn"
+              style="display:inline-flex; align-items:center; gap:7px; background:#15803d; color:#ffffff; border:none; padding:9px 15px; border-radius:10px; font-weight:700; font-size:0.82rem; cursor:pointer; box-shadow:0 4px 12px rgba(21,128,61,0.2);">
               📜 Certificate of Recognition
             </button>
-            <button type="button" id="adOpenQrHubBtn" style="display:inline-flex; align-items:center; gap:7px; background:#0f172a; color:#ffffff; border:none; padding:9px 15px; border-radius:10px; font-weight:700; font-size:0.82rem; cursor:pointer;">
+            <button type="button" id="adOpenQrHubBtn"
+              style="display:inline-flex; align-items:center; gap:7px; background:#0f172a; color:#ffffff; border:none; padding:9px 15px; border-radius:10px; font-weight:700; font-size:0.82rem; cursor:pointer;">
               📱 Tree QR Location Tags
             </button>
           </div>
@@ -471,24 +479,33 @@
 
         <div class="ad-impact-grid" style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px;">
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
-            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Funding Rate &amp; Total Paid</div>
-            <div style="font-size:1.35rem; font-weight:800; color:#15803d; margin:4px 0;" id="adPoolTotalPaid">₱500</div>
+            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Funding Rate &amp;
+              Total Paid</div>
+            <div style="font-size:1.35rem; font-weight:800; color:#15803d; margin:4px 0;" id="adPoolTotalPaid">₱500
+            </div>
             <div style="font-size:0.75rem; color:#475569;" id="adPoolRateSub">₱50 PHP × 10 funded trees</div>
           </div>
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
-            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Total Funded Tree Pool</div>
-            <div style="font-size:1.35rem; font-weight:800; color:#0f172a; margin:4px 0;" id="adPoolTotalTrees">10 Trees</div>
+            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Total Funded Tree
+              Pool</div>
+            <div style="font-size:1.35rem; font-weight:800; color:#0f172a; margin:4px 0;" id="adPoolTotalTrees">10 Trees
+            </div>
             <div style="font-size:0.75rem; color:#16a34a; font-weight:600;">100% Verified Contribution</div>
           </div>
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
-            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Assigned to Caretaker (Deducted)</div>
-            <div style="font-size:1.35rem; font-weight:800; color:#2563eb; margin:4px 0;" id="adPoolAssignedTrees">-10 Trees</div>
+            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Assigned to
+              Caretaker (Deducted)</div>
+            <div style="font-size:1.35rem; font-weight:800; color:#2563eb; margin:4px 0;" id="adPoolAssignedTrees">-10
+              Trees</div>
             <div style="font-size:0.75rem; color:#475569;" id="adPoolCaretakerSub">Nurtured by Dodong Zeta</div>
           </div>
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
-            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Remaining Unassigned Pool</div>
-            <div style="font-size:1.35rem; font-weight:800; color:#0f172a; margin:4px 0;" id="adPoolRemainingTrees">0 Trees</div>
-            <div style="font-size:0.75rem; color:#15803d; font-weight:600;" id="adPoolRemainingSub">All funded trees assigned</div>
+            <div style="font-size:0.74rem; font-weight:700; color:#64748b; text-transform:uppercase;">Remaining
+              Unassigned Pool</div>
+            <div style="font-size:1.35rem; font-weight:800; color:#0f172a; margin:4px 0;" id="adPoolRemainingTrees">0
+              Trees</div>
+            <div style="font-size:0.75rem; color:#15803d; font-weight:600;" id="adPoolRemainingSub">All funded trees
+              assigned</div>
           </div>
         </div>
       </section>
