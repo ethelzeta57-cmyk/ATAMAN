@@ -1323,13 +1323,6 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
             this.setLocalTrees(trees);
             return { data: trees, source: 'firestore' };
           } else {
-            const local = this.getLocalTrees();
-            if (Array.isArray(local) && local.length > 0) {
-              local.forEach(t => {
-                if (t.id) firestoreDb.collection('trees').doc(t.id).set(t, { merge: true }).catch(() => {});
-              });
-              return { data: local, source: 'local-restored' };
-            }
             this.setLocalTrees([]);
             return { data: [], source: 'firestore-empty' };
           }
@@ -1359,16 +1352,8 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
                 this.setLocalTrees(trees);
                 callback(trees, 'firestore');
               } else {
-                const local = this.getLocalTrees();
-                if (Array.isArray(local) && local.length > 0) {
-                  local.forEach(t => {
-                    if (t.id) firestoreDb.collection('trees').doc(t.id).set(t, { merge: true }).catch(() => {});
-                  });
-                  callback(local, 'local-restored');
-                } else {
-                  this.setLocalTrees([]);
-                  callback([], 'firestore');
-                }
+                this.setLocalTrees([]);
+                callback([], 'firestore');
               }
             }, error => {
               console.warn('Firestore onSnapshot error:', error);
