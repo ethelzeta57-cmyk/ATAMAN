@@ -149,6 +149,136 @@ function initFirebaseAuth() {
   }
 }
 
+/* ─── 0.5. Samar Land Coordinates & GIS Accuracy Resolver ─── */
+const SAMAR_LOCATION_COORDINATES = {
+  'canlapwas': { lat: 11.7820, lng: 124.8875, barangay: 'Canlapwas', sector: 'Sector A - Central Watershed Reserve' },
+  'guinsorongan': { lat: 11.7598, lng: 124.8861, barangay: 'Guinsorongan', sector: 'Sector B - Coastal Green Buffer' },
+  'san isidro': { lat: 11.7710, lng: 124.8910, barangay: 'San Isidro', sector: 'Sector C - Ridge & Highland Reserve' },
+  'bunuanan': { lat: 11.7885, lng: 124.8890, barangay: 'Bunuanan', sector: 'Sector D - Biodiversity Forest Corridor' },
+  'mabini': { lat: 11.7740, lng: 124.9030, barangay: 'Mabini', sector: 'Sector E - Upland Conservation Sector' },
+  'darahuway daco': { lat: 11.7580, lng: 124.8450, barangay: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary' },
+  'darahuway': { lat: 11.7580, lng: 124.8450, barangay: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary' },
+  'cagutian': { lat: 11.7830, lng: 124.8895, barangay: 'Cagutian', sector: 'Central North Reserve' },
+  'poblacion 4': { lat: 11.7774, lng: 124.8876, barangay: 'Poblacion 4', sector: 'Urban Forestry & Green Belt' },
+  'poblacion': { lat: 11.7774, lng: 124.8876, barangay: 'Poblacion', sector: 'Urban Forestry & Green Belt' },
+  'mercedes': { lat: 11.7680, lng: 124.8830, barangay: 'Mercedes', sector: 'Coastal Green Belt' },
+  'pangdan': { lat: 11.7580, lng: 124.8850, barangay: 'Pangdan', sector: 'Southern Green Belt' },
+  'muñoz': { lat: 11.7790, lng: 124.8890, barangay: 'Muñoz', sector: 'City Center' },
+  'munoz': { lat: 11.7790, lng: 124.8890, barangay: 'Muñoz', sector: 'City Center' },
+  'iguid': { lat: 11.8020, lng: 124.8720, barangay: 'Iguid', sector: 'Northern Coastal Buffer' },
+  'maulong': { lat: 11.7915, lng: 124.8750, barangay: 'Maulong', sector: 'Northern Reserve' },
+  'silanga': { lat: 11.8210, lng: 124.8550, barangay: 'Silanga', sector: 'Far Northern Reserve' },
+  'catbalogan': { lat: 11.7774, lng: 124.8876, barangay: 'Canlapwas', sector: 'Catbalogan Reforestation' }
+};
+
+const CARETAKER_STATION_COORDINATES = {
+  'june luna': { lat: 11.7580, lng: 124.8450, barangay: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary' },
+  'dodong zeta': { lat: 11.7820, lng: 124.8875, barangay: 'Canlapwas', sector: 'Sector A - Central Watershed Reserve' }
+};
+
+const ADOPTER_HOME_COORDINATES = {
+  'rose yu': { lat: 11.7774, lng: 124.8876, barangay: 'Poblacion 4', sector: 'Urban Forestry & Green Belt' },
+  'nikki maga': { lat: 11.7774, lng: 124.8876, barangay: 'Poblacion', sector: 'Urban Forestry & Green Belt' }
+};
+
+function isCoordinateInWater(lat, lng) {
+  if (lat == null || lng == null || isNaN(lat) || isNaN(lng)) return true;
+  const numLat = Number(lat);
+  const numLng = Number(lng);
+  // Darahuway Daco island bounding box (valid on-land)
+  if (numLat >= 11.745 && numLat <= 11.768 && numLng >= 124.838 && numLng <= 124.855) {
+    return false;
+  }
+  // If west of mainland Catbalogan coastline and not on Darahuway Island, it is in Maqueda Bay (the sea)
+  if (numLng < 124.878) {
+    // In northernmost area (Silanga/Iguid) land extends west to 124.850
+    if (numLat >= 11.800 && numLng >= 124.850) return false;
+    return true; // Offshore / in the ocean
+  }
+  return false;
+}
+
+function resolveAccurateTreeCoordinates({
+  existingLat,
+  existingLng,
+  treeId = '',
+  barangay = '',
+  location = '',
+  caretaker = '',
+  adopter = '',
+  adopterLocation = '',
+  index = 0
+}) {
+  const exLat = parseFloat(existingLat);
+  const exLng = parseFloat(existingLng);
+
+  // If coordinates are already present and verified to be ON LAND (not in sea), retain them
+  if (!isNaN(exLat) && !isNaN(exLng) && !isCoordinateInWater(exLat, exLng)) {
+    return { lat: exLat, lng: exLng, corrected: false, barangay: barangay || 'Catbalogan City' };
+  }
+
+  function findLookup(str) {
+    if (!str) return null;
+    const clean = String(str).toLowerCase().replace(/^(brgy\.?|barangay)\s*/i, '').trim();
+    for (const [key, val] of Object.entries(SAMAR_LOCATION_COORDINATES)) {
+      if (clean.includes(key) || key.includes(clean)) {
+        return val;
+      }
+    }
+    return null;
+  }
+
+  // 1. Check tree planting barangay / location
+  let match = findLookup(barangay) || findLookup(location);
+
+  // 2. Check assigned caretaker's registered area
+  if (!match && caretaker) {
+    const ctKey = String(caretaker).toLowerCase().trim();
+    for (const [k, v] of Object.entries(CARETAKER_STATION_COORDINATES)) {
+      if (ctKey.includes(k) || k.includes(ctKey)) {
+        match = v;
+        break;
+      }
+    }
+    if (!match) match = findLookup(caretaker);
+  }
+
+  // 3. Check adopter's registered address / location
+  if (!match && adopter) {
+    const adKey = String(adopter).toLowerCase().trim();
+    for (const [k, v] of Object.entries(ADOPTER_HOME_COORDINATES)) {
+      if (adKey.includes(k) || k.includes(adKey)) {
+        match = v;
+        break;
+      }
+    }
+  }
+  if (!match && adopterLocation) {
+    match = findLookup(adopterLocation);
+  }
+
+  // 4. Fallback to Canlapwas Watershed Reserve on land
+  if (!match) {
+    match = SAMAR_LOCATION_COORDINATES['canlapwas'];
+  }
+
+  // Deterministic micro-jitter (~15-30m) so multiple pins don't stack directly on top of each other
+  // Strictly bounded to stay on land and never drift into water
+  const seed = (String(treeId || index).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + index * 19) % 100;
+  const microJitterLat = ((seed - 50) / 50) * 0.0003;
+  const microJitterLng = ((((seed * 7) % 100) - 50) / 50) * 0.0003;
+
+  const resolvedLat = Number((match.lat + microJitterLat).toFixed(6));
+  const resolvedLng = Number((match.lng + microJitterLng).toFixed(6));
+
+  return {
+    lat: resolvedLat,
+    lng: resolvedLng,
+    corrected: true,
+    barangay: match.barangay || barangay || 'Canlapwas'
+  };
+}
+
 /* ─── 1. Adopter Data Aggregation ─── */
 function getLoggedInAdopterData() {
   const userEmail = (localStorage.getItem('ATAMAN_user_email') || '').toLowerCase().trim();
@@ -262,21 +392,49 @@ function getLoggedInAdopterData() {
   let critical = 0;
   let dead = 0;
   let totalTrees = 0;
+  let cacheModified = false;
 
   if (myAdopter) {
     // 1. If adopter has treesList array
     if (Array.isArray(myAdopter.treesList) && myAdopter.treesList.length > 0) {
-      myAdopter.treesList.forEach(item => {
+      myAdopter.treesList.forEach((item, idx) => {
         const liveTree = allTrees.find(t => String(t.id) === String(item.id)) || {};
         const count = Math.max(1, parseInt(item.treeCount) || 1);
         const rawSp = item.species || liveTree.species;
         const species = (typeof rawSp === 'object' && rawSp ? rawSp.common : rawSp) || 'Narra';
         const status = (liveTree.status || item.health || item.status || 'healthy').toLowerCase();
-        const lat = liveTree.lat || item.lat || (11.7753 + (Math.random() - 0.5) * 0.04);
-        const lng = liveTree.lng || item.lng || (124.8841 + (Math.random() - 0.5) * 0.04);
         const barangay = liveTree.barangay || item.barangay || '';
+        const caretaker = liveTree.caretaker || item.caretaker || '';
 
-        if (barangay) barangaySet.add(barangay);
+        // Resolve accurate on-land coordinates based on tree planting location, caretaker station, and adopter location:
+        const coords = resolveAccurateTreeCoordinates({
+          existingLat: liveTree.lat || item.lat,
+          existingLng: liveTree.lng || item.lng,
+          treeId: item.id || liveTree.id,
+          barangay: barangay,
+          location: liveTree.location || item.location,
+          caretaker: caretaker,
+          adopter: userName || myAdopter.name,
+          adopterLocation: myAdopter.address || myAdopter.location,
+          index: idx
+        });
+
+        const lat = coords.lat;
+        const lng = coords.lng;
+
+        // Auto-heal cached item if it had ocean / corrupted coordinates
+        if (coords.corrected) {
+          item.lat = lat;
+          item.lng = lng;
+          if (liveTree.id) {
+            liveTree.lat = lat;
+            liveTree.lng = lng;
+          }
+          cacheModified = true;
+        }
+
+        const displayBarangay = coords.barangay || barangay || 'Canlapwas';
+        barangaySet.add(displayBarangay);
         speciesMap[species] = (speciesMap[species] || 0) + count;
         totalTrees += count;
 
@@ -293,8 +451,8 @@ function getLoggedInAdopterData() {
           status: status === 'needs-care' ? 'needs' : status,
           lat,
           lng,
-          barangay: barangay || 'Catbalogan City',
-          caretaker: liveTree.caretaker || 'Assigned Caretaker'
+          barangay: displayBarangay,
+          caretaker: caretaker || 'Assigned Caretaker'
         });
       });
     } else if (parseInt(myAdopter.treesCount) > 0) {
@@ -305,14 +463,30 @@ function getLoggedInAdopterData() {
       const rawSp = firstTree.species;
       const spName = (typeof rawSp === 'object' && rawSp ? rawSp.common : rawSp) || 'Narra';
       speciesMap[spName] = totalTrees;
+
+      const coords = resolveAccurateTreeCoordinates({
+        existingLat: firstTree.lat,
+        existingLng: firstTree.lng,
+        treeId: firstTree.id,
+        barangay: firstTree.barangay,
+        location: firstTree.location,
+        caretaker: firstTree.caretaker,
+        adopter: userName || myAdopter.name,
+        adopterLocation: myAdopter.address || myAdopter.location,
+        index: 0
+      });
+
+      const displayBarangay = coords.barangay || firstTree.barangay || 'Canlapwas';
+      barangaySet.add(displayBarangay);
+
       adoptedTrees.push({
         id: firstTree.id || 'TR-10001',
         species: spName,
         count: totalTrees,
         status: 'healthy',
-        lat: firstTree.lat || 11.7753,
-        lng: firstTree.lng || 124.8841,
-        barangay: firstTree.barangay || 'Catbalogan City',
+        lat: coords.lat,
+        lng: coords.lng,
+        barangay: displayBarangay,
         caretaker: firstTree.caretaker || 'Assigned Caretaker'
       });
     }
@@ -322,7 +496,7 @@ function getLoggedInAdopterData() {
   if (adoptedTrees.length === 0 && Array.isArray(allTrees)) {
     const searchNames = [userName, myAdopter?.name, myAdopter?.contactPerson, myAdopter?.username, userUsername].filter(Boolean).map(s => s.toLowerCase().trim());
     const searchIds = [myAdopter?.id, myAdopter?.uid, userUid].filter(Boolean).map(String);
-    allTrees.forEach(t => {
+    allTrees.forEach((t, idx) => {
       const spNameStr = (t.sponsorName || '').toLowerCase();
       const adNameStr = (t.adopter || '').toLowerCase();
       const adIdStr = String(t.adopterId || '');
@@ -332,11 +506,31 @@ function getLoggedInAdopterData() {
         const count = Math.max(1, parseInt(t.takenCount) || 1);
         const species = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || 'Narra';
         const status = (t.status || 'healthy').toLowerCase();
-        const lat = t.lat || (11.7753 + (Math.random() - 0.5) * 0.04);
-        const lng = t.lng || (124.8841 + (Math.random() - 0.5) * 0.04);
         const barangay = t.barangay || '';
+        const caretaker = t.caretaker || '';
 
-        if (barangay) barangaySet.add(barangay);
+        const coords = resolveAccurateTreeCoordinates({
+          existingLat: t.lat,
+          existingLng: t.lng,
+          treeId: t.id,
+          barangay: barangay,
+          location: t.location,
+          caretaker: caretaker,
+          adopter: t.sponsorName || t.adopter || userName,
+          adopterLocation: myAdopter?.address || myAdopter?.location,
+          index: idx
+        });
+
+        const lat = coords.lat;
+        const lng = coords.lng;
+        if (coords.corrected) {
+          t.lat = lat;
+          t.lng = lng;
+          cacheModified = true;
+        }
+
+        const displayBarangay = coords.barangay || barangay || 'Canlapwas';
+        barangaySet.add(displayBarangay);
         speciesMap[species] = (speciesMap[species] || 0) + count;
         totalTrees += count;
 
@@ -353,11 +547,22 @@ function getLoggedInAdopterData() {
           status: status === 'needs-care' ? 'needs' : status,
           lat,
           lng,
-          barangay: barangay || 'Catbalogan City',
-          caretaker: t.caretaker || 'Assigned Caretaker'
+          barangay: displayBarangay,
+          caretaker: caretaker || 'Assigned Caretaker'
         });
       }
     });
+  }
+
+  // Persist auto-healed accurate coordinates to caches
+  if (cacheModified) {
+    try {
+      localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
+      localStorage.setItem('saplink_trees_cache', JSON.stringify(allTrees));
+      if (myAdopter && adopters) {
+        localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(adopters));
+      }
+    } catch (_) {}
   }
 
   // Raw or formatted funding (count explicitly entered funding)
@@ -514,7 +719,7 @@ function renderAdopterMap(data, filterSpecies = 'All Species') {
     adopterMapInstance = L.map('adopterMap', {
       zoomControl: true,
       attributionControl: false
-    }).setView([11.7753, 124.8841], 12);
+    }).setView([11.7774, 124.8876], 13);
 
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 17
@@ -581,10 +786,22 @@ function renderAdopterMap(data, filterSpecies = 'All Species') {
 
   if (validTrees.length > 0) {
     const bounds = [];
-    validTrees.forEach(t => {
-      const lat = parseFloat(t.lat);
-      const lng = parseFloat(t.lng);
-      if (isNaN(lat) || isNaN(lng)) return;
+    validTrees.forEach((t, idx) => {
+      let lat = parseFloat(t.lat);
+      let lng = parseFloat(t.lng);
+      if (isNaN(lat) || isNaN(lng) || isCoordinateInWater(lat, lng)) {
+        const resolved = resolveAccurateTreeCoordinates({
+          existingLat: lat,
+          existingLng: lng,
+          treeId: t.id,
+          barangay: t.barangay,
+          caretaker: t.caretaker,
+          adopter: data.name,
+          index: idx
+        });
+        lat = resolved.lat;
+        lng = resolved.lng;
+      }
 
       bounds.push([lat, lng]);
       const statusClass = t.status === 'healthy' ? '#16a34a' : (t.status === 'critical' ? '#dc2626' : (t.status === 'dead' ? '#64748b' : '#d97706'));
@@ -592,14 +809,18 @@ function renderAdopterMap(data, filterSpecies = 'All Species') {
 
       const marker = L.marker([lat, lng], { icon: createCustomIcon(t.status) })
         .bindPopup(`
-          <div style="font-family:'Plus Jakarta Sans',sans-serif; padding:4px;">
-            <strong style="font-size:13px; color:#0f172a;">${t.species} (${t.id})</strong><br>
-            <span style="font-size:11px; font-weight:600; color:${statusClass}">
-              ● Status: ${statusLabel}
-            </span><br>
-            <span style="font-size:11px; color:#475569;">Quantity: ${t.count} tree(s) • Funded: ₱${t.count * 50}</span><br>
-            <span style="font-size:10px; color:#64748b;">Location: Brgy. ${t.barangay} (${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E)</span><br>
-            <button type="button" onclick="window.ATAMAN_INCENTIVES && window.ATAMAN_INCENTIVES.openTreeQrModal('${t.id}')" style="margin-top:6px;width:100%;background:#15803d;color:#fff;border:none;padding:5px 8px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">📱 QR Code Location Tag</button>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif; padding:4px; min-width:180px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px;">
+              <strong style="font-size:13px; color:#0f172a;">${t.species} (${t.id})</strong>
+              <span style="font-size:10.5px;font-weight:700;color:${statusClass};background:${statusClass}18;padding:1px 6px;border-radius:999px;">
+                ● ${statusLabel}
+              </span>
+            </div>
+            <div style="font-size:11.5px; color:#475569; margin-bottom:2px;">Quantity: <strong>${t.count} tree(s)</strong> • Funded: <strong>₱${(t.count * 50).toLocaleString()}</strong></div>
+            <div style="font-size:11.5px; color:#1e293b; margin-bottom:2px;">📍 <strong>Planting Location:</strong> ${t.barangay || 'Catbalogan City'}</div>
+            <div style="font-size:11.5px; color:#15803d; margin-bottom:4px;">🧑‍🌾 <strong>Assigned Caretaker:</strong> ${t.caretaker || 'Assigned Caretaker'}</div>
+            <div style="font-size:10px; color:#64748b; margin-bottom:6px;">GPS: ${lat.toFixed(5)}°N, ${lng.toFixed(5)}°E (Verified Land)</div>
+            <button type="button" onclick="window.ATAMAN_INCENTIVES && window.ATAMAN_INCENTIVES.openTreeQrModal('${t.id}')" style="width:100%;background:#15803d;color:#fff;border:none;padding:5px 8px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">📱 QR Code Location Tag</button>
           </div>
         `)
         .addTo(adopterMapInstance);
@@ -613,8 +834,8 @@ function renderAdopterMap(data, filterSpecies = 'All Species') {
       adopterMapInstance.setView(bounds[0], 14);
     }
   } else {
-    // Empty state: default to Samar / Catbalogan
-    adopterMapInstance.setView([11.7753, 124.8841], 12);
+    // Empty state: default to Samar / Catbalogan on land
+    adopterMapInstance.setView([11.7774, 124.8876], 13);
   }
 }
 
@@ -917,11 +1138,13 @@ function openAdoptTreeModal() {
   const speciesOptions = getAdminAvailableTreesAndSpecies();
 
   const locationOptions = [
-    { name: 'Brgy. Canlapwas', sector: 'Sector A - Central Watershed Reserve', lat: 11.7820, lng: 124.8870 },
-    { name: 'Brgy. Guinsorongan', sector: 'Sector B - Coastal Green Buffer', lat: 11.7650, lng: 124.8780 },
-    { name: 'Brgy. San Isidro', sector: 'Sector C - Ridge & Highland Reserve', lat: 11.7910, lng: 124.8960 },
-    { name: 'Brgy. Bunuanan', sector: 'Sector D - Biodiversity Forest Corridor', lat: 11.7580, lng: 124.8910 },
-    { name: 'Brgy. Mabini', sector: 'Sector E - Upland Conservation Sector', lat: 11.7740, lng: 124.9030 }
+    { name: 'Brgy. Canlapwas', sector: 'Sector A - Central Watershed Reserve', lat: 11.7820, lng: 124.8875, defaultCaretaker: 'Dodong Zeta' },
+    { name: 'Brgy. Guinsorongan', sector: 'Sector B - Coastal Green Buffer', lat: 11.7598, lng: 124.8861, defaultCaretaker: 'Dodong Zeta' },
+    { name: 'Brgy. San Isidro', sector: 'Sector C - Ridge & Highland Reserve', lat: 11.7710, lng: 124.8910, defaultCaretaker: 'Dodong Zeta' },
+    { name: 'Brgy. Bunuanan', sector: 'Sector D - Biodiversity Forest Corridor', lat: 11.7885, lng: 124.8890, defaultCaretaker: 'Dodong Zeta' },
+    { name: 'Brgy. Mabini', sector: 'Sector E - Upland Conservation Sector', lat: 11.7740, lng: 124.9030, defaultCaretaker: 'Dodong Zeta' },
+    { name: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary', lat: 11.7580, lng: 124.8450, defaultCaretaker: 'June Luna' },
+    { name: 'Poblacion 4', sector: 'Urban Forestry & Green Belt', lat: 11.7774, lng: 124.8876, defaultCaretaker: 'Dodong Zeta' }
   ];
 
   const caretakerOptions = getAvailableCaretakersList();
@@ -1086,16 +1309,35 @@ function openAdoptTreeModal() {
     modal.querySelector('#closeAdoptModalBtn')?.addEventListener('click', closeAdoptTreeModal);
     modal.querySelector('#cancelAdoptModalBtn')?.addEventListener('click', closeAdoptTreeModal);
 
-    // Dynamic Caretaker recommendation on location change
+    // Dynamic Caretaker recommendation on location change and vice versa
     const locSelect = modal.querySelector('#adoptLocSelect');
     const ctSelect = modal.querySelector('#adoptCaretakerSelect');
     if (locSelect && ctSelect) {
       locSelect.addEventListener('change', () => {
-        const locName = locSelect.value.toLowerCase();
+        const selectedLoc = locSelect.value.toLowerCase();
         for (let i = 0; i < ctSelect.options.length; i++) {
           const opt = ctSelect.options[i];
-          if (opt.textContent.toLowerCase().includes(locName) || opt.value.toLowerCase().includes(locName)) {
+          const optText = opt.textContent.toLowerCase();
+          const optVal = opt.value.toLowerCase();
+          if (selectedLoc.includes('darahuway') && (optVal.includes('june') || optText.includes('june'))) {
             ctSelect.selectedIndex = i;
+            break;
+          } else if (!selectedLoc.includes('darahuway') && (optVal.includes('dodong') || optText.includes('dodong'))) {
+            ctSelect.selectedIndex = i;
+            break;
+          }
+        }
+      });
+
+      ctSelect.addEventListener('change', () => {
+        const ctVal = ctSelect.value.toLowerCase();
+        let targetLoc = 'canlapwas';
+        if (ctVal.includes('june')) {
+          targetLoc = 'darahuway';
+        }
+        for (let i = 0; i < locSelect.options.length; i++) {
+          if (locSelect.options[i].value.toLowerCase().includes(targetLoc)) {
+            locSelect.selectedIndex = i;
             break;
           }
         }
@@ -1233,6 +1475,22 @@ function openAdoptTreeModal() {
           const autoDateDisplay = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
           const autoDateTimeDisplay = now.toLocaleTimeString('en-US');
 
+          // Resolve verified on-land coordinates based on tree planting location, caretaker, and adopter
+          const sessionUser = JSON.parse(localStorage.getItem('ATAMAN_current_user') || localStorage.getItem('saplink_user') || '{}');
+          const userLocation = sessionUser.location || sessionUser.address || '';
+
+          const resolvedCoords = resolveAccurateTreeCoordinates({
+            existingLat: locObj.lat,
+            existingLng: locObj.lng,
+            treeId: chosenTreeId || 'TR-ADOPT',
+            barangay: chosenLocName,
+            caretaker: chosenCaretakerName,
+            adopter: userName,
+            adopterLocation: userLocation
+          });
+          const resolvedLat = resolvedCoords.lat;
+          const resolvedLng = resolvedCoords.lng;
+
           if (targetAdminTree) {
             adoptedTreeId = targetAdminTree.id;
             targetAdminTree.takenCount = (parseInt(targetAdminTree.takenCount, 10) || 0) + selectedQty;
@@ -1241,7 +1499,10 @@ function openAdoptTreeModal() {
             targetAdminTree.caretaker = chosenCaretakerName;
             targetAdminTree.caretakerId = chosenCaretakerId;
             targetAdminTree.caretakerEmail = chosenCaretakerEmail;
-            if (!targetAdminTree.barangay) targetAdminTree.barangay = chosenLocName;
+            targetAdminTree.barangay = chosenLocName;
+            targetAdminTree.location = `${chosenLocName}, Catbalogan City, Samar`;
+            targetAdminTree.lat = resolvedLat;
+            targetAdminTree.lng = resolvedLng;
             targetAdminTree.updatedAt = now.toISOString();
           } else {
             // Generate sequential TR ID
@@ -1251,9 +1512,6 @@ function openAdoptTreeModal() {
             }).filter(n => n >= 10000);
             const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 10001;
             adoptedTreeId = 'TR-' + nextNum;
-
-            const lat = locObj.lat + (Math.random() - 0.5) * 0.006;
-            const lng = locObj.lng + (Math.random() - 0.5) * 0.006;
 
             const newTreeRecord = {
               id: adoptedTreeId,
@@ -1280,8 +1538,8 @@ function openAdoptTreeModal() {
               location: `${chosenLocName}, Catbalogan City, Samar`,
               province: 'Samar',
               status: 'healthy',
-              lat: lat,
-              lng: lng,
+              lat: resolvedLat,
+              lng: resolvedLng,
               plantingDate: now.toISOString().slice(0, 10),
               dateAdded: autoDateDisplay,
               savedAt: autoDateTimeDisplay,
@@ -1341,12 +1599,30 @@ function openAdoptTreeModal() {
               treeCount: selectedQty,
               status: 'healthy',
               barangay: chosenLocName,
-              lat: locObj.lat,
-              lng: locObj.lng,
+              lat: resolvedLat,
+              lng: resolvedLng,
               caretaker: chosenCaretakerName,
               caretakerId: chosenCaretakerId,
               caretakerEmail: chosenCaretakerEmail,
               fundingAmount: 50
+            });
+
+            // Sanitize all items in treesList to ensure no sea/water coordinates persist
+            treesList.forEach((it, idx) => {
+              if (isCoordinateInWater(it.lat, it.lng)) {
+                const rep = resolveAccurateTreeCoordinates({
+                  existingLat: it.lat,
+                  existingLng: it.lng,
+                  treeId: it.id,
+                  barangay: it.barangay,
+                  caretaker: it.caretaker,
+                  adopter: userName,
+                  adopterLocation: userLocation,
+                  index: idx
+                });
+                it.lat = rep.lat;
+                it.lng = rep.lng;
+              }
             });
 
             adopters[adIdx] = {
@@ -1387,8 +1663,8 @@ function openAdoptTreeModal() {
                 treeCount: selectedQty,
                 status: 'healthy',
                 barangay: chosenLocName,
-                lat: locObj.lat,
-                lng: locObj.lng,
+                lat: resolvedLat,
+                lng: resolvedLng,
                 caretaker: chosenCaretakerName,
                 caretakerId: chosenCaretakerId,
                 caretakerEmail: chosenCaretakerEmail,
