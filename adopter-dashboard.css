@@ -1420,3 +1420,35 @@ html, body {
     width: 100% !important;
   }
 }
+
+
+/* ── Adopt a Tree Header Button ── */
+.ad-hdr-adopt-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: var(--color-primary, #166534);
+  color: #ffffff;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(22, 101, 52, 0.22);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.ad-hdr-adopt-btn:hover {
+  background: var(--color-primary-hover, #14532d);
+  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.32);
+  transform: translateY(-1px);
+}
+.ad-hdr-adopt-btn svg {
+  width: 16px;
+  height: 16px;
+  color: #ffffff;
+}
