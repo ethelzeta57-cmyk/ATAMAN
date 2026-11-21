@@ -298,19 +298,73 @@ function setAvailabilityFilter(filter) {
 }
 window.setAvailabilityFilter = setAvailabilityFilter;
 
+/* ── 1. POPULATE DYNAMIC FILTERS ── */
+function populateDynamicFilters() {
+  try {
+    const filterSpecies = document.getElementById('filterSpecies');
+    if (filterSpecies) {
+      const currentVal = filterSpecies.value || 'all';
+      const speciesSet = new Set();
+      (ALL_TREES || []).forEach(t => {
+        const sp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon;
+        if (sp) speciesSet.add(sp.trim());
+      });
+      const sorted = Array.from(speciesSet).sort();
+      filterSpecies.innerHTML = '<option value="all">All Species</option>' +
+        sorted.map(s => `<option value="${s}" ${s === currentVal ? 'selected' : ''}>${s}</option>`).join('');
+    }
+
+    const filterCaretaker = document.getElementById('filterCaretaker');
+    if (filterCaretaker) {
+      const currentVal = filterCaretaker.value || 'all';
+      const ctSet = new Set();
+      (ALL_TREES || []).forEach(t => {
+        if (t.caretaker && t.caretaker !== 'Unassigned' && t.caretaker !== 'None') {
+          ctSet.add(t.caretaker.trim());
+        }
+      });
+      try {
+        const users = JSON.parse(localStorage.getItem('ATAMAN_users_cache') || '[]');
+        if (Array.isArray(users)) {
+          users.forEach(u => {
+            if (String(u.role || '').toLowerCase().includes('caretaker')) {
+              const name = u.displayName || u.fullName || u.name;
+              if (name) ctSet.add(name.trim());
+            }
+          });
+        }
+      } catch (_) {}
+      const sortedCt = Array.from(ctSet).sort();
+      filterCaretaker.innerHTML = '<option value="all">All Caretakers</option>' +
+        sortedCt.map(c => `<option value="${c}" ${c === currentVal ? 'selected' : ''}>🧑‍🌾 ${c}</option>`).join('');
+    }
+  } catch (err) {
+    console.warn('populateDynamicFilters notice:', err);
+  }
+}
+window.populateDynamicFilters = populateDynamicFilters;
+
 /* ── 1. INIT ── */
 document.addEventListener('DOMContentLoaded', () => {
-  initAuth();
-  initSidebarToggles();
-  initDatabaseSync();
-  populateDynamicFilters();
-  renderTable();
-  initFilters();
-  initSummaryCards();
-  updateStats();
-  initBulkActions();
-  initModals();
-  initDrawer();
+  const safeRun = (fn, name) => {
+    try {
+      if (typeof fn === 'function') fn();
+    } catch (err) {
+      console.warn(`[ATAMAN Trees] ${name} notice:`, err);
+    }
+  };
+
+  safeRun(initAuth, 'initAuth');
+  safeRun(initSidebarToggles, 'initSidebarToggles');
+  safeRun(initDatabaseSync, 'initDatabaseSync');
+  safeRun(populateDynamicFilters, 'populateDynamicFilters');
+  safeRun(renderTable, 'renderTable');
+  safeRun(initFilters, 'initFilters');
+  safeRun(initSummaryCards, 'initSummaryCards');
+  safeRun(updateStats, 'updateStats');
+  safeRun(initBulkActions, 'initBulkActions');
+  safeRun(initModals, 'initModals');
+  safeRun(initDrawer, 'initDrawer');
 
   // Support ?filter=critical / ?filter=monitoring-due links from dashboard
   const urlParams = new URLSearchParams(window.location.search);
@@ -321,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Support #add anchor from dashboard
   if (window.location.hash === '#add') {
     setTimeout(() => {
-      document.getElementById('btnAddTree')?.click();
+      openEditTree();
     }, 100);
   }
 });
@@ -1723,16 +1777,21 @@ async function saveTree() {
     window.ATAMAN_SYNC.notifyTrees(ALL_TREES);
   }
 
-  if (window.ATAMAN_DB) {
-    if (existingIdx >= 0) {
-      await window.ATAMAN_DB.updateTree(treeId, treeData);
-      showAdminToast(`✅ Tree ${treeId} updated!`);
+  try {
+    if (window.ATAMAN_DB) {
+      if (existingIdx >= 0) {
+        await window.ATAMAN_DB.updateTree(treeId, treeData);
+        showAdminToast(`✅ Tree ${treeId} updated!`);
+      } else {
+        await window.ATAMAN_DB.addTree(treeData);
+        showAdminToast(`✅ Tree ${treeId} saved! (Auto-saved: ${autoDateTimeDisplay})`);
+      }
     } else {
-      await window.ATAMAN_DB.addTree(treeData);
       showAdminToast(`✅ Tree ${treeId} saved! (Auto-saved: ${autoDateTimeDisplay})`);
     }
-  } else {
-    showAdminToast(`✅ Tree ${treeId} saved! (Auto-saved: ${autoDateTimeDisplay})`);
+  } catch (dbErr) {
+    console.warn('DB tree save notice:', dbErr);
+    showAdminToast(`✅ Tree ${treeId} saved locally!`);
   }
 
   filteredTrees = [...ALL_TREES];
@@ -1743,6 +1802,8 @@ async function saveTree() {
     openTreeProfile(treeId);
   }
 }
+window.openEditTree = openEditTree;
+window.saveTree = saveTree;
 
 function confirmArchiveSingle(treeId) {
   currentArchiveTreeId = treeId;
@@ -1826,10 +1887,12 @@ function initModals() {
 function openModal(id) {
   document.getElementById(id)?.classList.add('show');
 }
+window.openModal = openModal;
 
 function closeModal(id) {
   document.getElementById(id)?.classList.remove('show');
 }
+window.closeModal = closeModal;
 
 /* ── 11.1 PHOTO EVIDENCE VIEWER & UPLOAD CONTROLLER ── */
 const PHOTO_KEYS = ['treePhoto', 'leaves', 'trunk', 'soil'];

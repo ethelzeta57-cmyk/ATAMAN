@@ -1599,6 +1599,7 @@ function openAdoptTreeModal() {
   renderModalContent();
   modal.style.display = 'flex';
 }
+window.openAdoptTreeModal = openAdoptTreeModal;
 
 function closeAdoptTreeModal() {
   const modal = document.getElementById('adopterAdoptTreeModal');
@@ -1606,6 +1607,7 @@ function closeAdoptTreeModal() {
     modal.style.display = 'none';
   }
 }
+window.closeAdoptTreeModal = closeAdoptTreeModal;
 
 /* ─── 9. Interactive Buttons & CTA Handlers ─── */
 function initAdopterActions() {
