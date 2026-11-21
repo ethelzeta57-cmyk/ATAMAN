@@ -109,8 +109,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         try {
           firestoreDb.settings({
             experimentalForceLongPolling: true,
-            ignoreUndefinedProperties: true,
-            merge: true
+            ignoreUndefinedProperties: true
           });
         } catch (settingsErr) {
           // settings() may throw if already applied; safe to ignore
@@ -130,11 +129,21 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   // Cross-Device Cloud Firestore Synchronization & Real Account Seeding (v8)
   const FIRESTORE_SYNC_FLAG = 'ATAMAN_firestore_sync_v8';
   let firestoreCleanPromise = Promise.resolve();
-  if (isFirestoreReady && firestoreDb) {
+  if (isFirestoreReady && firestoreDb && localStorage.getItem(FIRESTORE_SYNC_FLAG) !== 'done') {
     firestoreCleanPromise = (async () => {
       try {
-        // 1. Sync & Seed Users across devices (remove only deprecated sample accounts)
-        const usersSnap = await firestoreDb.collection('users').get();
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+          localStorage.setItem(FIRESTORE_SYNC_FLAG, 'done');
+          return;
+        }
+
+        // 1. Sync & Seed Users across devices (safely handle any offline/permission rejection)
+        const usersSnap = await firestoreDb.collection('users').get().catch(() => null);
+        if (!usersSnap) {
+          localStorage.setItem(FIRESTORE_SYNC_FLAG, 'done');
+          return;
+        }
+
         const batch = firestoreDb.batch();
         let hasBatchOps = false;
         const deprecatedEmails = ['pedro.reyes@ataman.org', 'john.sho@gmail.com', 'contact@centurycatbalogan.com'];
@@ -174,17 +183,19 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         });
 
         // 2. Clean deprecated sample adopters/caretakers & seed real ones if missing
-        const adoptersSnap = await firestoreDb.collection('adopters').get();
+        const adoptersSnap = await firestoreDb.collection('adopters').get().catch(() => null);
         let validAdoptersCount = 0;
-        adoptersSnap.forEach(doc => {
-          const d = doc.data() || {};
-          if (d.name === 'John Sho' || d.name === 'Century Catbalogan' || d.email === 'john.sho@gmail.com') {
-            batch.delete(doc.ref);
-            hasBatchOps = true;
-          } else {
-            validAdoptersCount++;
-          }
-        });
+        if (adoptersSnap) {
+          adoptersSnap.forEach(doc => {
+            const d = doc.data() || {};
+            if (d.name === 'John Sho' || d.name === 'Century Catbalogan' || d.email === 'john.sho@gmail.com') {
+              batch.delete(doc.ref);
+              hasBatchOps = true;
+            } else {
+              validAdoptersCount++;
+            }
+          });
+        }
         if (validAdoptersCount === 0 && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS)) {
           window.ATAMAN_DEFAULT_ADOPTERS.forEach(ad => {
             batch.set(firestoreDb.collection('adopters').doc(ad.id), ad, { merge: true });
@@ -192,17 +203,19 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
           });
         }
 
-        const caretakersSnap = await firestoreDb.collection('caretakers').get();
+        const caretakersSnap = await firestoreDb.collection('caretakers').get().catch(() => null);
         let validCaretakersCount = 0;
-        caretakersSnap.forEach(doc => {
-          const d = doc.data() || {};
-          if (d.name === 'Pedro Reyes' || d.email === 'pedro.reyes@ataman.org') {
-            batch.delete(doc.ref);
-            hasBatchOps = true;
-          } else {
-            validCaretakersCount++;
-          }
-        });
+        if (caretakersSnap) {
+          caretakersSnap.forEach(doc => {
+            const d = doc.data() || {};
+            if (d.name === 'Pedro Reyes' || d.email === 'pedro.reyes@ataman.org') {
+              batch.delete(doc.ref);
+              hasBatchOps = true;
+            } else {
+              validCaretakersCount++;
+            }
+          });
+        }
         if (validCaretakersCount === 0 && typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS)) {
           window.ATAMAN_DEFAULT_CARETAKERS.forEach(ct => {
             batch.set(firestoreDb.collection('caretakers').doc(ct.id), ct, { merge: true });
@@ -213,7 +226,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         // Selective Reset completed: user-inputted trees are always preserved
 
         if (hasBatchOps) {
-          await batch.commit();
+          await batch.commit().catch(() => null);
         }
 
         // Merge any cloud-registered users into local storage so cellphone & PC stay in sync
@@ -239,7 +252,9 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       } catch (syncErr) {
         localStorage.setItem(FIRESTORE_SYNC_FLAG, 'done');
       }
-    })();
+    })().catch(() => {
+      localStorage.setItem(FIRESTORE_SYNC_FLAG, 'done');
+    });
   }
   window.ATAMAN_FIRESTORE_CLEAN_PROMISE = firestoreCleanPromise;
 
