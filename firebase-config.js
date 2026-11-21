@@ -1362,20 +1362,22 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
 
     // Get all trees (from Firestore or fallback cache)
     async getTrees() {
-      await firestoreCleanPromise;
-      if (this.isFirestore) {
+      await Promise.resolve(firestoreCleanPromise).catch(() => null);
+      if (this.isFirestore && firestoreDb) {
         try {
-          const snapshot = await firestoreDb.collection('trees').get();
-          let trees = [];
-          snapshot.forEach(doc => {
-            trees.push({ id: doc.id, ...doc.data() });
-          });
-          if (trees.length > 0) {
-            this.setLocalTrees(trees);
-            return { data: trees, source: 'firestore' };
-          } else {
-            this.setLocalTrees([]);
-            return { data: [], source: 'firestore-empty' };
+          const snapshot = await firestoreDb.collection('trees').get().catch(() => null);
+          if (snapshot) {
+            let trees = [];
+            snapshot.forEach(doc => {
+              trees.push({ id: doc.id, ...doc.data() });
+            });
+            if (trees.length > 0) {
+              this.setLocalTrees(trees);
+              return { data: trees, source: 'firestore' };
+            } else {
+              this.setLocalTrees([]);
+              return { data: [], source: 'firestore-empty' };
+            }
           }
         } catch (error) {
           console.warn("Firestore fetch error, reading local cache:", error);
@@ -1389,56 +1391,78 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
 
     // Real-time listener for trees
     onTreesChange(callback) {
-      // onSnapshot requires an active http/https connection — skip on file://
-      if (this.isFirestore && window.location.protocol.startsWith('http')) {
-        try {
-          let unsubscribe = () => {};
-          firestoreCleanPromise.then(() => {
-            unsubscribe = firestoreDb.collection('trees').onSnapshot(snapshot => {
-              const trees = [];
-              snapshot.forEach(doc => {
-                trees.push({ id: doc.id, ...doc.data() });
-              });
-              if (trees.length > 0) {
-                this.setLocalTrees(trees);
-                callback(trees, 'firestore');
-              } else {
-                this.setLocalTrees([]);
-                callback([], 'firestore');
-              }
-            }, error => {
-              console.warn('Firestore onSnapshot error:', error);
-              callback(this.getLocalTrees() || [], 'local');
-            });
-          });
-
-          // Also listen to window event for local instant updates
-          const localHandler = (e) => {
-            if (e.detail && Array.isArray(e.detail)) {
-              callback(e.detail, 'local-event');
-            }
-          };
-          window.addEventListener('ATAMAN:trees-updated', localHandler);
-
-          return () => {
-            unsubscribe();
-            window.removeEventListener('ATAMAN:trees-updated', localHandler);
-          };
-        } catch (e) {
-          console.warn('onTreesChange init error:', e);
-        }
+      // 1. Immediately provide cached local data so UI paints instantly
+      const cached = this.getLocalTrees() || [];
+      if (typeof callback === 'function') {
+        try { callback(cached, 'local'); } catch (_) {}
       }
 
-      // Offline / Local-only fallback
-      const cached = this.getLocalTrees() || [];
-      callback(cached, 'local');
+      // 2. Listen to local custom event for instant cross-tab / in-memory sync
       const localHandler = (e) => {
-        if (e.detail && Array.isArray(e.detail)) {
-          callback(e.detail, 'local-event');
+        if (e.detail && Array.isArray(e.detail) && typeof callback === 'function') {
+          try { callback(e.detail, 'local-event'); } catch (_) {}
         }
       };
       window.addEventListener('ATAMAN:trees-updated', localHandler);
-      return () => window.removeEventListener('ATAMAN:trees-updated', localHandler);
+
+      let isUnsubscribed = false;
+      let unsubscribeSnapshot = null;
+
+      // 3. Connect Cloud Firestore real-time listener if ready & on http/https
+      if (this.isFirestore && firestoreDb && window.location.protocol.startsWith('http')) {
+        Promise.resolve(firestoreCleanPromise)
+          .catch(() => null)
+          .then(() => {
+            if (isUnsubscribed) return;
+            try {
+              if (!firestoreDb || typeof firestoreDb.collection !== 'function') return;
+              const unsub = firestoreDb.collection('trees').onSnapshot(
+                snapshot => {
+                  if (isUnsubscribed) return;
+                  try {
+                    const trees = [];
+                    snapshot.forEach(doc => {
+                      trees.push({ id: doc.id, ...doc.data() });
+                    });
+                    if (trees.length > 0) {
+                      this.setLocalTrees(trees);
+                      if (typeof callback === 'function') callback(trees, 'firestore');
+                    } else {
+                      this.setLocalTrees([]);
+                      if (typeof callback === 'function') callback([], 'firestore');
+                    }
+                  } catch (parseErr) {
+                    if (typeof callback === 'function') callback(this.getLocalTrees() || [], 'local');
+                  }
+                },
+                error => {
+                  console.warn('Firestore onTreesChange snapshot notice:', error?.message || error);
+                  if (typeof callback === 'function') callback(this.getLocalTrees() || [], 'local');
+                }
+              );
+              if (isUnsubscribed && typeof unsub === 'function') {
+                unsub();
+              } else {
+                unsubscribeSnapshot = unsub;
+              }
+            } catch (err) {
+              console.warn('Firestore onTreesChange setup notice:', err?.message || err);
+              if (typeof callback === 'function') callback(this.getLocalTrees() || [], 'local');
+            }
+          })
+          .catch(pErr => {
+            console.warn('Firestore onTreesChange promise notice:', pErr?.message || pErr);
+            if (typeof callback === 'function') callback(this.getLocalTrees() || [], 'local');
+          });
+      }
+
+      return () => {
+        isUnsubscribed = true;
+        if (typeof unsubscribeSnapshot === 'function') {
+          try { unsubscribeSnapshot(); } catch (_) {}
+        }
+        window.removeEventListener('ATAMAN:trees-updated', localHandler);
+      };
     },
 
     // Add a new tree
@@ -1521,20 +1545,22 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
 
     /* ── ADOPTERS CRUD & REAL-TIME ── */
     async getAdopters() {
-      await firestoreCleanPromise;
-      if (this.isFirestore) {
+      await Promise.resolve(firestoreCleanPromise).catch(() => null);
+      if (this.isFirestore && firestoreDb) {
         try {
-          const snapshot = await firestoreDb.collection('adopters').get();
-          const list = [];
-          snapshot.forEach(doc => {
-            const d = doc.data() || {};
-            if (d.name !== 'John Sho' && d.name !== 'Century Catbalogan') {
-              list.push({ id: doc.id, ...d });
+          const snapshot = await firestoreDb.collection('adopters').get().catch(() => null);
+          if (snapshot) {
+            const list = [];
+            snapshot.forEach(doc => {
+              const d = doc.data() || {};
+              if (d.name !== 'John Sho' && d.name !== 'Century Catbalogan') {
+                list.push({ id: doc.id, ...d });
+              }
+            });
+            if (list.length > 0) {
+              this.setLocalAdopters(list);
+              return list;
             }
-          });
-          if (list.length > 0) {
-            this.setLocalAdopters(list);
-            return list;
           }
           return this.getLocalAdopters();
         } catch (err) {
@@ -1545,61 +1571,85 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     },
 
     onAdoptersChange(callback) {
-      // onSnapshot requires an active http/https connection — skip on file://
-      if (this.isFirestore && window.location.protocol.startsWith('http')) {
-        try {
-          let unsubscribe = () => {};
-          firestoreCleanPromise.then(() => {
-            unsubscribe = firestoreDb.collection('adopters').onSnapshot(snapshot => {
-              const adopters = [];
-              snapshot.forEach(doc => adopters.push({ id: doc.id, ...doc.data() }));
-              if (adopters.length > 0) {
-                this.setLocalAdopters(adopters);
-                callback(adopters, 'firestore');
-              } else {
-                const local = this.getLocalAdopters();
-                const fallback = (Array.isArray(local) && local.length > 0)
-                  ? local
-                  : (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS) ? window.ATAMAN_DEFAULT_ADOPTERS : []);
-                if (fallback.length > 0) {
-                  this.setLocalAdopters(fallback);
-                  callback(fallback, 'local-fallback');
-                } else {
-                  this.setLocalAdopters([]);
-                  callback([], 'firestore');
-                }
-              }
-            }, error => {
-              console.warn('Firestore onAdoptersChange error:', error);
-              callback(this.getLocalAdopters(), 'local');
-            });
-          });
-
-          const localHandler = (e) => {
-            if (e.detail && Array.isArray(e.detail)) {
-              callback(e.detail, 'local-event');
-            }
-          };
-          window.addEventListener('ATAMAN:adopters-updated', localHandler);
-
-          return () => {
-            unsubscribe();
-            window.removeEventListener('ATAMAN:adopters-updated', localHandler);
-          };
-        } catch (e) {
-          console.warn('onAdoptersChange init error:', e);
-        }
+      // 1. Immediately provide cached local data
+      const cached = this.getLocalAdopters();
+      if (typeof callback === 'function') {
+        try { callback(cached, 'local'); } catch (_) {}
       }
 
-      const cached = this.getLocalAdopters();
-      callback(cached, 'local');
+      // 2. Listen to local custom event
       const localHandler = (e) => {
-        if (e.detail && Array.isArray(e.detail)) {
-          callback(e.detail, 'local-event');
+        if (e.detail && Array.isArray(e.detail) && typeof callback === 'function') {
+          try { callback(e.detail, 'local-event'); } catch (_) {}
         }
       };
       window.addEventListener('ATAMAN:adopters-updated', localHandler);
-      return () => window.removeEventListener('ATAMAN:adopters-updated', localHandler);
+
+      let isUnsubscribed = false;
+      let unsubscribeSnapshot = null;
+
+      // 3. Cloud Firestore real-time listener
+      if (this.isFirestore && firestoreDb && window.location.protocol.startsWith('http')) {
+        Promise.resolve(firestoreCleanPromise)
+          .catch(() => null)
+          .then(() => {
+            if (isUnsubscribed) return;
+            try {
+              if (!firestoreDb || typeof firestoreDb.collection !== 'function') return;
+              const unsub = firestoreDb.collection('adopters').onSnapshot(
+                snapshot => {
+                  if (isUnsubscribed) return;
+                  try {
+                    const adopters = [];
+                    snapshot.forEach(doc => adopters.push({ id: doc.id, ...doc.data() }));
+                    if (adopters.length > 0) {
+                      this.setLocalAdopters(adopters);
+                      if (typeof callback === 'function') callback(adopters, 'firestore');
+                    } else {
+                      const local = this.getLocalAdopters();
+                      const fallback = (Array.isArray(local) && local.length > 0)
+                        ? local
+                        : (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS) ? window.ATAMAN_DEFAULT_ADOPTERS : []);
+                      if (fallback.length > 0) {
+                        this.setLocalAdopters(fallback);
+                        if (typeof callback === 'function') callback(fallback, 'local-fallback');
+                      } else {
+                        this.setLocalAdopters([]);
+                        if (typeof callback === 'function') callback([], 'firestore');
+                      }
+                    }
+                  } catch (parseErr) {
+                    if (typeof callback === 'function') callback(this.getLocalAdopters(), 'local');
+                  }
+                },
+                error => {
+                  console.warn('Firestore onAdoptersChange notice:', error?.message || error);
+                  if (typeof callback === 'function') callback(this.getLocalAdopters(), 'local');
+                }
+              );
+              if (isUnsubscribed && typeof unsub === 'function') {
+                unsub();
+              } else {
+                unsubscribeSnapshot = unsub;
+              }
+            } catch (err) {
+              console.warn('Firestore onAdoptersChange setup notice:', err?.message || err);
+              if (typeof callback === 'function') callback(this.getLocalAdopters(), 'local');
+            }
+          })
+          .catch(pErr => {
+            console.warn('Firestore onAdoptersChange promise notice:', pErr?.message || pErr);
+            if (typeof callback === 'function') callback(this.getLocalAdopters(), 'local');
+          });
+      }
+
+      return () => {
+        isUnsubscribed = true;
+        if (typeof unsubscribeSnapshot === 'function') {
+          try { unsubscribeSnapshot(); } catch (_) {}
+        }
+        window.removeEventListener('ATAMAN:adopters-updated', localHandler);
+      };
     },
 
     async addAdopter(adopterData) {
@@ -1666,21 +1716,23 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
 
     /* ── CARETAKERS CRUD & REAL-TIME ── */
     async getCaretakers() {
-      await firestoreCleanPromise;
-      if (this.isFirestore) {
+      await Promise.resolve(firestoreCleanPromise).catch(() => null);
+      if (this.isFirestore && firestoreDb) {
         try {
-          const snapshot = await firestoreDb.collection('caretakers').get();
-          const list = [];
-          snapshot.forEach(doc => {
-            const d = doc.data() || {};
-            if (d.name !== 'Pedro Reyes') {
-              list.push({ ...d, id: doc.id });
+          const snapshot = await firestoreDb.collection('caretakers').get().catch(() => null);
+          if (snapshot) {
+            const list = [];
+            snapshot.forEach(doc => {
+              const d = doc.data() || {};
+              if (d.name !== 'Pedro Reyes') {
+                list.push({ ...d, id: doc.id });
+              }
+            });
+            if (list.length > 0) {
+              const deduped = this._dedupeCaretakersList(list, true);
+              this.setLocalCaretakers(deduped);
+              return deduped;
             }
-          });
-          if (list.length > 0) {
-            const deduped = this._dedupeCaretakersList(list, true);
-            this.setLocalCaretakers(deduped);
-            return deduped;
           }
           return this.getLocalCaretakers();
         } catch (err) {
@@ -1691,62 +1743,86 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
     },
 
     onCaretakersChange(callback) {
-      // onSnapshot requires an active http/https connection — skip on file://
-      if (this.isFirestore && window.location.protocol.startsWith('http')) {
-        try {
-          let unsubscribe = () => {};
-          firestoreCleanPromise.then(() => {
-            unsubscribe = firestoreDb.collection('caretakers').onSnapshot(snapshot => {
-              const rawCaretakers = [];
-              snapshot.forEach(doc => rawCaretakers.push({ ...doc.data(), id: doc.id }));
-              if (rawCaretakers.length > 0) {
-                const caretakers = this._dedupeCaretakersList(rawCaretakers, true);
-                this.setLocalCaretakers(caretakers);
-                callback(caretakers, 'firestore');
-              } else {
-                const local = this.getLocalCaretakers();
-                const fallback = (Array.isArray(local) && local.length > 0)
-                  ? local
-                  : (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS) ? window.ATAMAN_DEFAULT_CARETAKERS : []);
-                if (fallback.length > 0) {
-                  this.setLocalCaretakers(fallback);
-                  callback(fallback, 'local-fallback');
-                } else {
-                  this.setLocalCaretakers([]);
-                  callback([], 'firestore');
-                }
-              }
-            }, error => {
-              console.warn('Firestore onCaretakersChange error:', error);
-              callback(this.getLocalCaretakers(), 'local');
-            });
-          });
-
-          const localHandler = (e) => {
-            if (e.detail && Array.isArray(e.detail)) {
-              callback(this._dedupeCaretakersList(e.detail, false), 'local-event');
-            }
-          };
-          window.addEventListener('ATAMAN:caretakers-updated', localHandler);
-
-          return () => {
-            unsubscribe();
-            window.removeEventListener('ATAMAN:caretakers-updated', localHandler);
-          };
-        } catch (e) {
-          console.warn('onCaretakersChange init error:', e);
-        }
+      // 1. Immediately provide cached local data
+      const cached = this.getLocalCaretakers();
+      if (typeof callback === 'function') {
+        try { callback(cached, 'local'); } catch (_) {}
       }
 
-      const cached = this.getLocalCaretakers();
-      callback(cached, 'local');
+      // 2. Listen to local custom event
       const localHandler = (e) => {
-        if (e.detail && Array.isArray(e.detail)) {
-          callback(this._dedupeCaretakersList(e.detail, false), 'local-event');
+        if (e.detail && Array.isArray(e.detail) && typeof callback === 'function') {
+          try { callback(this._dedupeCaretakersList(e.detail, false), 'local-event'); } catch (_) {}
         }
       };
       window.addEventListener('ATAMAN:caretakers-updated', localHandler);
-      return () => window.removeEventListener('ATAMAN:caretakers-updated', localHandler);
+
+      let isUnsubscribed = false;
+      let unsubscribeSnapshot = null;
+
+      // 3. Cloud Firestore real-time listener
+      if (this.isFirestore && firestoreDb && window.location.protocol.startsWith('http')) {
+        Promise.resolve(firestoreCleanPromise)
+          .catch(() => null)
+          .then(() => {
+            if (isUnsubscribed) return;
+            try {
+              if (!firestoreDb || typeof firestoreDb.collection !== 'function') return;
+              const unsub = firestoreDb.collection('caretakers').onSnapshot(
+                snapshot => {
+                  if (isUnsubscribed) return;
+                  try {
+                    const rawCaretakers = [];
+                    snapshot.forEach(doc => rawCaretakers.push({ ...doc.data(), id: doc.id }));
+                    if (rawCaretakers.length > 0) {
+                      const caretakers = this._dedupeCaretakersList(rawCaretakers, true);
+                      this.setLocalCaretakers(caretakers);
+                      if (typeof callback === 'function') callback(caretakers, 'firestore');
+                    } else {
+                      const local = this.getLocalCaretakers();
+                      const fallback = (Array.isArray(local) && local.length > 0)
+                        ? local
+                        : (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS) ? window.ATAMAN_DEFAULT_CARETAKERS : []);
+                      if (fallback.length > 0) {
+                        this.setLocalCaretakers(fallback);
+                        if (typeof callback === 'function') callback(fallback, 'local-fallback');
+                      } else {
+                        this.setLocalCaretakers([]);
+                        if (typeof callback === 'function') callback([], 'firestore');
+                      }
+                    }
+                  } catch (parseErr) {
+                    if (typeof callback === 'function') callback(this.getLocalCaretakers(), 'local');
+                  }
+                },
+                error => {
+                  console.warn('Firestore onCaretakersChange notice:', error?.message || error);
+                  if (typeof callback === 'function') callback(this.getLocalCaretakers(), 'local');
+                }
+              );
+              if (isUnsubscribed && typeof unsub === 'function') {
+                unsub();
+              } else {
+                unsubscribeSnapshot = unsub;
+              }
+            } catch (err) {
+              console.warn('Firestore onCaretakersChange setup notice:', err?.message || err);
+              if (typeof callback === 'function') callback(this.getLocalCaretakers(), 'local');
+            }
+          })
+          .catch(pErr => {
+            console.warn('Firestore onCaretakersChange promise notice:', pErr?.message || pErr);
+            if (typeof callback === 'function') callback(this.getLocalCaretakers(), 'local');
+          });
+      }
+
+      return () => {
+        isUnsubscribed = true;
+        if (typeof unsubscribeSnapshot === 'function') {
+          try { unsubscribeSnapshot(); } catch (_) {}
+        }
+        window.removeEventListener('ATAMAN:caretakers-updated', localHandler);
+      };
     },
 
     async addCaretaker(caretakerData) {
