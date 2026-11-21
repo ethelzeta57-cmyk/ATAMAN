@@ -753,12 +753,466 @@ function renderTopSpecies(data) {
   container.innerHTML = html;
 }
 
+
+/* ─── 8.5. Interactive Adopt a Tree Modal Flow ─── */
+function openAdoptTreeModal() {
+  const currentData = getLoggedInAdopterData();
+  const userName = localStorage.getItem('ATAMAN_user_name') || 'Rose Yu';
+  const userEmail = (localStorage.getItem('ATAMAN_user_email') || '').toLowerCase().trim();
+  const sessionUser = JSON.parse(localStorage.getItem('ATAMAN_current_user') || localStorage.getItem('saplink_user') || '{}');
+  const userUid = sessionUser.uid || sessionUser.id || ('ADP-' + Date.now());
+
+  let modal = document.getElementById('adopterAdoptTreeModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'adopterAdoptTreeModal';
+    modal.className = 'adopt-modal-overlay';
+    document.body.appendChild(modal);
+  }
+
+  const speciesOptions = [
+    { name: 'Narra', sc: 'Pterocarpus indicus', type: 'Native', icon: '🌳', desc: 'Philippine National Tree, strong watershed canopy' },
+    { name: 'Molave', sc: 'Vitex parviflora', type: 'Native', icon: '🌲', desc: 'Dense hardwood, exceptional carbon sequestration' },
+    { name: 'Toog', sc: 'Petersianthus quadrialatus', type: 'Endemic', icon: '🌿', desc: 'Samar giant native hardwood & biodiversity host' },
+    { name: 'Banaba', sc: 'Lagerstroemia speciosa', type: 'Native', icon: '🌸', desc: 'Vibrant flowering watershed canopy tree' },
+    { name: 'Kamagong', sc: 'Diospyros blancoi', type: 'Endemic', icon: '🌴', desc: 'Precious Samar ironwood forest species' },
+    { name: 'Guyabano', sc: 'Annona muricata', type: 'Fruit/Native', icon: '🍃', desc: 'Community agroforestry native tree' }
+  ];
+
+  const locationOptions = [
+    { name: 'Brgy. Canlapwas', sector: 'Sector A - Central Watershed Reserve', lat: 11.7820, lng: 124.8870 },
+    { name: 'Brgy. Guinsorongan', sector: 'Sector B - Coastal Green Buffer', lat: 11.7650, lng: 124.8780 },
+    { name: 'Brgy. San Isidro', sector: 'Sector C - Ridge & Highland Reserve', lat: 11.7910, lng: 124.8960 },
+    { name: 'Brgy. Bunuanan', sector: 'Sector D - Biodiversity Forest Corridor', lat: 11.7580, lng: 124.8910 },
+    { name: 'Brgy. Mabini', sector: 'Sector E - Upland Conservation Sector', lat: 11.7740, lng: 124.9030 }
+  ];
+
+  let selectedQty = 10;
+  const ratePerTree = 50;
+
+  function renderModalContent() {
+    const totalCost = selectedQty * ratePerTree;
+    const co2Offset = selectedQty * 22;
+
+    modal.innerHTML = `
+      <div class="adopt-modal-card">
+        <div class="adopt-modal-header">
+          <div>
+            <div style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#166534;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">
+              🌱 Samar Reforestation • ₱50.00 / Tree Contribution
+            </div>
+            <h2 style="margin:0;font-size:1.25rem;font-weight:800;color:#0f172a;">Adopt &amp; Sponsor Trees</h2>
+            <p style="margin:4px 0 0;font-size:0.83rem;color:#64748b;">
+              Directly sponsor and fund native trees in Catbalogan City, Samar with verified field care.
+            </p>
+          </div>
+          <button type="button" class="adopt-modal-close" id="closeAdoptModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <form id="adoptTreeForm" style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- 1. Select Species -->
+          <div>
+            <label style="display:block;font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px;">
+              1. Select Tree Species <span style="color:#dc2626;">*</span>
+            </label>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:10px;" id="speciesCardGrid">
+              ${speciesOptions.map((sp, idx) => `
+                <label style="display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1.5px solid ${idx === 0 ? '#16a34a' : '#e2e8f0'};background:${idx === 0 ? '#f0fdf4' : '#ffffff'};border-radius:12px;cursor:pointer;transition:all 0.18s ease;" class="species-choice-card">
+                  <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <span style="font-size:20px;">${sp.icon}</span>
+                    <input type="radio" name="adoptSpecies" value="${sp.name}" ${idx === 0 ? 'checked' : ''} style="accent-color:#16a34a;" />
+                  </div>
+                  <strong style="font-size:13.5px;color:#0f172a;margin-top:2px;">${sp.name}</strong>
+                  <span style="font-size:11px;color:#64748b;font-style:italic;">${sp.sc}</span>
+                  <span style="font-size:10.5px;color:#15803d;background:#dcfce7;padding:2px 6px;border-radius:4px;align-self:flex-start;font-weight:700;margin-top:4px;">${sp.type}</span>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- 2. Quantity Selector -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <label style="font-size:13px;font-weight:700;color:#1e293b;">
+                2. Number of Trees to Adopt <span style="color:#dc2626;">*</span>
+              </label>
+              <span style="font-size:12px;color:#15803d;font-weight:700;">Rate: ₱50.00 / Tree</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+              ${[5, 10, 20, 50, 100].map(q => `
+                <button type="button" class="qty-preset-btn ${q === selectedQty ? 'active' : ''}" data-qty="${q}"
+                  style="flex:1 1 50px;height:36px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;transition:all 0.18s;border:1.5px solid ${q === selectedQty ? '#16a34a' : '#cbd5e1'};background:${q === selectedQty ? '#16a34a' : '#ffffff'};color:${q === selectedQty ? '#ffffff' : '#334155'};">
+                  ${q} Trees
+                </button>
+              `).join('')}
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:12px;color:#64748b;">Or enter custom count:</span>
+              <input type="number" id="customQtyInput" min="1" max="1000" value="${selectedQty}"
+                style="width:90px;height:36px;border-radius:8px;border:1.5px solid #cbd5e1;padding:0 10px;font-size:13.5px;font-weight:700;text-align:center;outline:none;" />
+              <span style="font-size:12px;color:#475569;font-weight:600;">Trees</span>
+            </div>
+          </div>
+
+          <!-- 3. Location & Caretaker Row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="display:block;font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px;">
+                3. Planting Location <span style="color:#dc2626;">*</span>
+              </label>
+              <select id="adoptLocSelect" style="width:100%;height:42px;border-radius:10px;border:1.5px solid #cbd5e1;padding:0 10px;font-size:13px;color:#0f172a;background:#ffffff;outline:none;font-family:inherit;">
+                ${locationOptions.map((loc, i) => `
+                  <option value="${loc.name}" ${i === 0 ? 'selected' : ''}>${loc.name} (${loc.sector.split(' - ')[0]})</option>
+                `).join('')}
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px;">
+                4. Assigned Caretaker
+              </label>
+              <div style="height:42px;border-radius:10px;border:1.5px solid #cbd5e1;background:#f8fafc;padding:0 12px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#1e293b;">
+                <span>🧑‍🌾</span>
+                <span>Dodong Zeta</span>
+                <span style="margin-left:auto;font-size:11px;color:#16a34a;background:#dcfce7;padding:2px 6px;border-radius:4px;font-weight:700;">Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Dedication Message (Optional) -->
+          <div>
+            <label style="display:block;font-size:13px;font-weight:700;color:#1e293b;margin-bottom:4px;">
+              5. Personal Dedication / Message (Optional)
+            </label>
+            <input type="text" id="adoptDedication" placeholder="e.g. In honor of our family / Samar Green Legacy"
+              style="width:100%;height:40px;border-radius:10px;border:1.5px solid #cbd5e1;padding:0 12px;font-size:13px;outline:none;font-family:inherit;box-sizing:border-box;" />
+          </div>
+
+          <!-- 5. Real-Time Impact & Contribution Summary -->
+          <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:14px 16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:800;color:#166534;text-transform:uppercase;letter-spacing:0.5px;">Adoption Sponsorship Summary</span>
+              <span style="font-size:11.5px;color:#15803d;font-weight:700;">Official Certificate Included ✓</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;text-align:center;">
+              <div style="background:#ffffff;padding:10px 8px;border-radius:10px;border:1px solid #bbf7d0;">
+                <span style="display:block;font-size:11px;color:#64748b;font-weight:600;">TREES SPONSORED</span>
+                <strong style="font-size:16px;color:#15803d;" id="sumTreesCount">${selectedQty} Trees</strong>
+              </div>
+              <div style="background:#ffffff;padding:10px 8px;border-radius:10px;border:1px solid #bbf7d0;">
+                <span style="display:block;font-size:11px;color:#64748b;font-weight:600;">TOTAL SPONSORSHIP</span>
+                <strong style="font-size:16px;color:#0f172a;" id="sumTotalCost">₱${totalCost.toLocaleString()} PHP</strong>
+              </div>
+              <div style="background:#ffffff;padding:10px 8px;border-radius:10px;border:1px solid #bbf7d0;">
+                <span style="display:block;font-size:11px;color:#64748b;font-weight:600;">EST. CO₂ ABSORPTION</span>
+                <strong style="font-size:16px;color:#15803d;" id="sumCo2Offset">~${co2Offset.toLocaleString()} kg/yr</strong>
+              </div>
+            </div>
+            <p style="margin:10px 0 0;font-size:11.5px;color:#475569;text-align:center;">
+              Each tree is permanently linked to your Adopter ID with GPS tagging and recorded in the Samar reforestation registry.
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:6px;">
+            <button type="button" id="cancelAdoptModalBtn" style="height:44px;padding:0 20px;border-radius:10px;border:1px solid #cbd5e1;background:#ffffff;color:#475569;font-size:13.5px;font-weight:700;cursor:pointer;">
+              Cancel
+            </button>
+            <button type="submit" id="submitAdoptTreeBtn" style="height:44px;padding:0 24px;border-radius:10px;border:none;background:#166534;color:#ffffff;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(22,101,52,0.3);transition:all 0.2s ease;">
+              <span>🌱 Confirm Adoption (₱${totalCost.toLocaleString()} PHP)</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    `;
+
+    // Bind event listeners
+    modal.querySelector('#closeAdoptModalBtn')?.addEventListener('click', closeAdoptTreeModal);
+    modal.querySelector('#cancelAdoptModalBtn')?.addEventListener('click', closeAdoptTreeModal);
+
+    // Quantity Presets
+    modal.querySelectorAll('.qty-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const q = parseInt(btn.dataset.qty, 10) || 10;
+        selectedQty = q;
+        const customInput = modal.querySelector('#customQtyInput');
+        if (customInput) customInput.value = q;
+        updateImpactSummary();
+      });
+    });
+
+    // Custom Quantity Input
+    const customQtyInput = modal.querySelector('#customQtyInput');
+    if (customQtyInput) {
+      customQtyInput.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (val > 0) {
+          selectedQty = val;
+          modal.querySelectorAll('.qty-preset-btn').forEach(btn => {
+            const bq = parseInt(btn.dataset.qty, 10);
+            btn.style.border = bq === selectedQty ? '1.5px solid #16a34a' : '1.5px solid #cbd5e1';
+            btn.style.background = bq === selectedQty ? '#16a34a' : '#ffffff';
+            btn.style.color = bq === selectedQty ? '#ffffff' : '#334155';
+          });
+          updateImpactSummary();
+        }
+      });
+    }
+
+    // Species card clicks
+    modal.querySelectorAll('.species-choice-card').forEach(card => {
+      card.addEventListener('click', () => {
+        modal.querySelectorAll('.species-choice-card').forEach(c => {
+          c.style.border = '1.5px solid #e2e8f0';
+          c.style.background = '#ffffff';
+        });
+        card.style.border = '1.5px solid #16a34a';
+        card.style.background = '#f0fdf4';
+        const radio = card.querySelector('input[type=radio]');
+        if (radio) radio.checked = true;
+      });
+    });
+
+    function updateImpactSummary() {
+      const sumTrees = modal.querySelector('#sumTreesCount');
+      const sumCost = modal.querySelector('#sumTotalCost');
+      const sumCo2 = modal.querySelector('#sumCo2Offset');
+      const submitBtn = modal.querySelector('#submitAdoptTreeBtn span');
+      const cost = selectedQty * ratePerTree;
+      const co2 = selectedQty * 22;
+
+      if (sumTrees) sumTrees.textContent = `${selectedQty} Trees`;
+      if (sumCost) sumCost.textContent = `₱${cost.toLocaleString()} PHP`;
+      if (sumCo2) sumCo2.textContent = `~${co2.toLocaleString()} kg/yr`;
+      if (submitBtn) submitBtn.textContent = `🌱 Confirm Adoption (₱${cost.toLocaleString()} PHP)`;
+    }
+
+    // Form Submit
+    const adoptForm = modal.querySelector('#adoptTreeForm');
+    if (adoptForm) {
+      adoptForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = modal.querySelector('#submitAdoptTreeBtn');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>Processing Adoption...</span>';
+        }
+
+        try {
+          const speciesRadio = modal.querySelector('input[name="adoptSpecies"]:checked');
+          const chosenSpecies = speciesRadio ? speciesRadio.value : 'Narra';
+          const chosenLocName = modal.querySelector('#adoptLocSelect')?.value || 'Brgy. Canlapwas';
+          const locObj = locationOptions.find(l => l.name === chosenLocName) || locationOptions[0];
+          const dedication = modal.querySelector('#adoptDedication')?.value?.trim() || '';
+
+          // 1. Load Trees Cache
+          let allTrees = [];
+          try {
+            allTrees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
+          } catch (_) { allTrees = []; }
+          if (!Array.isArray(allTrees)) allTrees = [];
+
+          // Generate sequential TR ID
+          const existingNums = allTrees.map(t => {
+            const m = String(t.id || '').match(/\d+/);
+            return m ? parseInt(m[0], 10) : 0;
+          }).filter(n => n >= 10000);
+          const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 10001;
+          const newTreeId = 'TR-' + nextNum;
+
+          const now = new Date();
+          const autoDateDisplay = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+          const autoDateTimeDisplay = now.toLocaleTimeString('en-US');
+
+          // Generate randomized accurate coordinate within selected barangay sector
+          const lat = locObj.lat + (Math.random() - 0.5) * 0.006;
+          const lng = locObj.lng + (Math.random() - 0.5) * 0.006;
+
+          const newTreeRecord = {
+            id: newTreeId,
+            species: chosenSpecies,
+            treeType: 'Native',
+            treeCount: selectedQty,
+            takenCount: selectedQty,
+            sponsorName: userName,
+            adopter: userName,
+            adopterId: userUid,
+            adopterEmail: userEmail,
+            caretaker: 'Dodong Zeta',
+            municipality: 'Catbalogan City',
+            barangay: chosenLocName,
+            province: 'Samar',
+            status: 'healthy',
+            lat: lat,
+            lng: lng,
+            plantingDate: now.toISOString().slice(0, 10),
+            dateAdded: autoDateDisplay,
+            savedAt: autoDateTimeDisplay,
+            savedTimestamp: now.getTime(),
+            createdAt: now.toISOString(),
+            dedication: dedication
+          };
+
+          // Append to Trees Cache
+          allTrees.unshift(newTreeRecord);
+          localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
+          localStorage.setItem('saplink_trees_cache', JSON.stringify(allTrees));
+
+          // Save to Firestore trees collection if online
+          if (typeof firebase !== 'undefined' && firebase.firestore) {
+            try {
+              const db = firebase.firestore();
+              await db.collection('trees').doc(newTreeId).set(newTreeRecord, { merge: true });
+            } catch (fsErr) {
+              console.warn('[ATAMAN] Firestore tree save notice:', fsErr);
+            }
+          }
+
+          // 2. Update Adopter Profile & Cache
+          let adopters = [];
+          try {
+            adopters = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
+          } catch (_) { adopters = []; }
+          if (!Array.isArray(adopters)) adopters = [];
+
+          let adIdx = adopters.findIndex(a => {
+            if (!a) return false;
+            const em = (a.email || '').toLowerCase().trim();
+            const nm = (a.name || '').toLowerCase().trim();
+            const aid = String(a.id || a.uid || '').trim();
+            return (userUid && aid === userUid) || (userEmail && em === userEmail) || (userName && nm === userName.toLowerCase().trim());
+          });
+
+          const addedFunding = selectedQty * ratePerTree;
+
+          if (adIdx >= 0) {
+            const ex = adopters[adIdx];
+            const prevCount = parseInt(ex.treesCount || ex.treesAdopted, 10) || 0;
+            const prevFunding = parseFloat(ex.funding || ex.fundingPaid) || 0;
+            const treesList = Array.isArray(ex.treesList) ? [...ex.treesList] : [];
+
+            treesList.unshift({
+              id: newTreeId,
+              species: chosenSpecies,
+              treeCount: selectedQty,
+              status: 'healthy',
+              barangay: chosenLocName,
+              lat: lat,
+              lng: lng,
+              caretaker: 'Dodong Zeta'
+            });
+
+            adopters[adIdx] = {
+              ...ex,
+              treesCount: prevCount + selectedQty,
+              treesAdopted: prevCount + selectedQty,
+              funding: prevFunding + addedFunding,
+              fundingPaid: prevFunding + addedFunding,
+              customFunding: true,
+              treesList: treesList,
+              updatedAt: now.toISOString()
+            };
+          } else {
+            adopters.unshift({
+              id: userUid,
+              uid: userUid,
+              name: userName,
+              email: userEmail,
+              contactPerson: userName,
+              type: 'Individual',
+              status: 'Active',
+              treesCount: selectedQty,
+              treesAdopted: selectedQty,
+              funding: addedFunding,
+              fundingPaid: addedFunding,
+              customFunding: true,
+              joinedDate: now.toISOString().slice(0, 10),
+              createdAt: now.toISOString(),
+              treesList: [{
+                id: newTreeId,
+                species: chosenSpecies,
+                treeCount: selectedQty,
+                status: 'healthy',
+                barangay: chosenLocName,
+                lat: lat,
+                lng: lng,
+                caretaker: 'Dodong Zeta'
+              }]
+            });
+          }
+
+          localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(adopters));
+          localStorage.setItem('saplink_adopters_cache', JSON.stringify(adopters));
+
+          // Save to Firestore adopters collection if online
+          if (typeof firebase !== 'undefined' && firebase.firestore) {
+            try {
+              const db = firebase.firestore();
+              const updatedAd = adopters[adIdx >= 0 ? adIdx : 0];
+              await db.collection('adopters').doc(userUid).set(updatedAd, { merge: true });
+            } catch (fsErr) {
+              console.warn('[ATAMAN] Firestore adopter update notice:', fsErr);
+            }
+          }
+
+          // 3. Trigger Global Updates & Re-render Dashboard
+          window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated'));
+          window.dispatchEvent(new CustomEvent('ATAMAN:adopters-updated'));
+
+          refreshAdopterDashboard();
+          if (window.ATAMAN_INCENTIVES && typeof window.ATAMAN_INCENTIVES.refreshDashboardIncentiveWidgets === 'function') {
+            window.ATAMAN_INCENTIVES.refreshDashboardIncentiveWidgets();
+          }
+
+          closeAdoptTreeModal();
+
+          // Celebration Toast with Certificate Button
+          showAdToast(`🎉 Congratulations ${userName}! You have adopted ${selectedQty} ${chosenSpecies} trees in ${chosenLocName}.`);
+
+          // Smoothly scroll to map overview to view new trees
+          const mapSection = document.getElementById('adopterMap');
+          if (mapSection) {
+            setTimeout(() => {
+              mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+          }
+
+        } catch (err) {
+          console.error('Tree adoption error:', err);
+          showAdToast('❌ Could not complete adoption: ' + (err.message || 'Please try again'));
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>🌱 Confirm Adoption</span>';
+          }
+        }
+      });
+    }
+  }
+
+  renderModalContent();
+  modal.style.display = 'flex';
+}
+
+function closeAdoptTreeModal() {
+  const modal = document.getElementById('adopterAdoptTreeModal');
+  if (modal) modal.style.display = 'none';
+}
+
 /* ─── 9. Interactive Buttons & CTA Handlers ─── */
 function initAdopterActions() {
   const btnAdoptTree = document.getElementById('btnAdoptTree');
   if (btnAdoptTree) {
     btnAdoptTree.addEventListener('click', () => {
-      showAdToast('🌱 Opening Tree Adoption Catalog...');
+      openAdoptTreeModal();
+    });
+  }
+
+  const navAdoption = document.getElementById('navAdoption');
+  if (navAdoption) {
+    navAdoption.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAdoptTreeModal();
     });
   }
 

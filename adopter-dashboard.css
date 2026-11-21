@@ -1452,3 +1452,68 @@ html, body {
   height: 16px;
   color: #ffffff;
 }
+
+
+/* ── Adopt a Tree Modal Styles ── */
+.adopt-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  animation: adModalFadeIn 0.2s ease;
+}
+
+@keyframes adModalFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.adopt-modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  border: 1px solid #e2e8f0;
+  padding: 24px 28px;
+  box-sizing: border-box;
+}
+
+.adopt-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+}
+
+.adopt-modal-close {
+  background: #f1f5f9;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.adopt-modal-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
