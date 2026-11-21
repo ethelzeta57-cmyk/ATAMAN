@@ -837,64 +837,62 @@ function getAvailableCaretakersList() {
   const list = [];
   const seen = new Set();
 
-  function add(name, loc, id, email) {
+  function add(name, loc, id, email, status) {
     if (!name || name === 'Unassigned' || name === 'None') return;
     const clean = name.trim();
     const key = clean.toLowerCase();
+    if (status && String(status).toLowerCase().includes('inactive')) return;
     if (!seen.has(key)) {
       seen.add(key);
+      let cleanLoc = (loc || '').trim();
+      if (!cleanLoc || cleanLoc.toLowerCase() === 'not specified') {
+        cleanLoc = '';
+      }
       list.push({
         name: clean,
-        location: loc || 'Catbalogan City',
+        location: cleanLoc,
         id: id || ('CT-' + (100 + list.length + 1)),
         email: email || ''
       });
     }
   }
 
-  // 1. ATAMAN_caretakers_cache
-  try {
-    const raw = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-    if (Array.isArray(raw)) {
-      raw.forEach(c => {
-        if (!c) return;
-        const cName = c.name || c.fullName || c.displayName;
-        const cLoc = c.primaryArea || c.barangay || c.location || c.address;
-        add(cName, cLoc, c.id || c.empId, c.email);
-      });
-    }
-  } catch (_) {}
-
-  // 2. ATAMAN_registered_users / ATAMAN_users_cache
-  ['ATAMAN_registered_users', 'ATAMAN_users_cache', 'saplink_registered_users', 'saplink_users_cache'].forEach(key => {
+  // 1. Gather strictly registered user accounts with role 'Caretaker' from User Management stores
+  ['ATAMAN_users_cache', 'saplink_users_cache', 'ATAMAN_registered_users', 'saplink_registered_users'].forEach(key => {
     try {
       const users = JSON.parse(localStorage.getItem(key) || '[]');
       if (Array.isArray(users)) {
         users.forEach(u => {
           if (!u) return;
-          const role = (u.role || '').toLowerCase();
-          if (role.includes('caretaker')) {
-            const uName = u.fullName || u.displayName || u.name;
-            const uLoc = u.barangay || u.address || u.location;
-            add(uName, uLoc, u.empId || u.id || u.uid, u.email);
+          const role = String(u.role || '').toLowerCase().trim();
+          if (role === 'caretaker' || role.includes('caretaker')) {
+            const uName = u.displayName || u.fullName || u.name;
+            const uLoc = (u.location && u.location !== 'Not specified') ? u.location : (u.barangay || u.address || '');
+            add(uName, uLoc, u.empId || u.id || u.uid, u.email, u.status);
           }
         });
       }
     } catch (_) {}
   });
 
-  // 3. Fallback seeds across Catbalogan City sectors
+  // 2. Also check ATAMAN_caretakers_cache (for any synced active field caretakers)
+  try {
+    const raw = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+    if (Array.isArray(raw)) {
+      raw.forEach(c => {
+        if (!c) return;
+        const cRole = String(c.role || 'Caretaker').toLowerCase().trim();
+        if (!cRole.includes('caretaker')) return;
+        const cName = c.name || c.fullName || c.displayName;
+        const cLoc = c.location || c.primaryArea || c.barangay || c.address || '';
+        add(cName, cLoc, c.empId || c.id, c.email, c.status);
+      });
+    }
+  } catch (_) {}
+
+  // 3. Include default system Caretaker account from User Management (Dodong Zeta) if not yet added
   if (!seen.has('dodong zeta')) {
-    add('Dodong Zeta', 'Brgy. Canlapwas (Sector A)', 'CT-101', 'zetadodong@gmail.com');
-  }
-  if (!seen.has('ramil ocenar')) {
-    add('Ramil Ocenar', 'Brgy. Guinsorongan (Sector B)', 'CT-102', 'ramil.ocenar@ataman.org');
-  }
-  if (!seen.has('eduardo tan')) {
-    add('Eduardo Tan', 'Brgy. San Isidro (Sector C)', 'CT-103', 'eduardo.tan@ataman.org');
-  }
-  if (!seen.has('nestor cabael')) {
-    add('Nestor Cabael', 'Brgy. Bunuanan (Sector D)', 'CT-104', 'nestor.cabael@ataman.org');
+    add('Dodong Zeta', 'Brgy. Canlapwas', 'EMP-002', 'zetadodong@gmail.com', 'Active');
   }
 
   return list;
@@ -1028,9 +1026,10 @@ function openAdoptTreeModal() {
                 4. Assigned Caretaker <span style="color:#dc2626;">*</span>
               </label>
               <select id="adoptCaretakerSelect" style="width:100%;height:42px;border-radius:10px;border:1.5px solid #cbd5e1;padding:0 10px;font-size:13px;color:#0f172a;background:#ffffff;outline:none;font-family:inherit;cursor:pointer;">
-                ${caretakerOptions.map((ct, i) => `
-                  <option value="${ct.name}" data-id="${ct.id}" data-email="${ct.email || ''}" ${i === 0 ? 'selected' : ''}>🧑‍🌾 ${ct.name} (${ct.location} • Active)</option>
-                `).join('')}
+                ${caretakerOptions.map((ct, i) => {
+                  const locPart = ct.location && ct.location !== 'Not specified' ? `${ct.location} • ` : '';
+                  return `<option value="${ct.name}" data-id="${ct.id}" data-email="${ct.email || ''}" ${i === 0 ? 'selected' : ''}>🧑‍🌾 ${ct.name} (${locPart}Active)</option>`;
+                }).join('')}
               </select>
             </div>
           </div>
