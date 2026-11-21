@@ -17,7 +17,7 @@ function syncLinkedAdopterAndCaretaker(allTrees) {
         const treesList = myTrees.map(t => ({
           id: t.id,
           treeCount: parseInt(t.takenCount || t.treeCount) || 1,
-          species: t.species?.common || 'Tree',
+          species: (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Tree',
           location: [t.barangay, t.municipality].filter(Boolean).join(', ') || 'Samar',
           fundingAmount: parseInt(t.fundingAmount) || 50
         }));
@@ -303,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAuth();
   initSidebarToggles();
   initDatabaseSync();
+  populateDynamicFilters();
   renderTable();
   initFilters();
   initSummaryCards();
@@ -494,8 +495,15 @@ function renderTable() {
         </td>
         <td>
           <div class="tree-species-cell">
-            <span class="species-common">${t.species?.common || '—'}</span>
-            <span class="species-scientific" style="font-style:italic; color:#64748b; font-size:12px;">${t.species?.scientific || ''}</span>
+            <span class="species-common">${(typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Tree'}</span>
+            <span class="species-scientific" style="font-style:italic; color:#64748b; font-size:12px;">${(typeof t.species === 'object' && t.species ? t.species.scientific : '') || t.scientificName || ''}</span>
+            ${t.caretaker && t.caretaker !== 'Unassigned' ? `
+              <div style="margin-top:2px;">
+                <span style="display:inline-flex; align-items:center; gap:3px; padding:1px 7px; font-size:11px; font-weight:600; border-radius:4px; background:#f0fdf4; color:#166534; border:1px solid #bbf7d0;">
+                  🧑‍🌾 Caretaker: ${t.caretaker}
+                </span>
+              </div>
+            ` : ''}
             ${displayAdopter ? `
               <div style="margin-top:3px;">
                 <span style="display:inline-flex; align-items:center; gap:3px; padding:1px 7px; font-size:11px; font-weight:700; border-radius:4px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">
@@ -739,7 +747,8 @@ function applyFilters() {
         if (t.status !== statusFilter) return false;
       }
     }
-    if (species !== 'all' && t.species?.common !== species) return false;
+    const rowSp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon;
+    if (species !== 'all' && rowSp !== species) return false;
     if (ctaker !== 'all' && t.caretaker !== ctaker) return false;
     if (prov !== 'all' && t.province !== prov) return false;
     if (muni !== 'all' && t.municipality !== muni) return false;
@@ -909,7 +918,10 @@ function openTreeProfile(treeId) {
   const t = ALL_TREES.find(x => x.id === treeId);
   if (!t) return;
 
-  document.getElementById('drawerTopTitle').textContent = `${t.id} — ${t.species.common}`;
+  const spCommon = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Tree';
+  const spScientific = (typeof t.species === 'object' && t.species ? t.species.scientific : '') || t.scientificName || '';
+  const spType = t.treeType || (typeof t.species === 'object' && t.species ? t.species.type : '') || 'Native';
+  document.getElementById('drawerTopTitle').textContent = `${t.id} — ${spCommon}`;
 
   const statusColors = {
     healthy: { bg: '#dcfce7', color: '#15803d' },
@@ -932,8 +944,8 @@ function openTreeProfile(treeId) {
     <!-- Header -->
     <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px;">
       <div class="profile-id-headline">
-        <div class="profile-tree-id">${t.id} — ${t.species.common.toUpperCase()}</div>
-        <div class="profile-botanical-tag">${t.species.scientific}</div>
+        <div class="profile-tree-id">${t.id} — ${spCommon.toUpperCase()}</div>
+        <div class="profile-botanical-tag">${spScientific || 'Botanical Species'}</div>
       </div>
       <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
         <span class="profile-status-badge" style="background:${sc.bg}; color:${sc.color};">${statusLabel}</span>
@@ -956,9 +968,9 @@ function openTreeProfile(treeId) {
     <div class="profile-section-card">
       <div class="profile-section-hdr">📋 Basic Information &amp; Availability</div>
       <div class="profile-data-row"><span class="profile-data-label">Tree ID</span><span class="profile-data-val">${t.id}</span></div>
-      <div class="profile-data-row"><span class="profile-data-label">Name of Tree</span><span class="profile-data-val">${t.species?.common || '—'}</span></div>
-      <div class="profile-data-row"><span class="profile-data-label">Scientific Name</span><span class="profile-data-val" style="font-style:italic;">${t.species?.scientific || '—'}</span></div>
-      <div class="profile-data-row"><span class="profile-data-label">Tree Type</span><span class="profile-data-val">${t.treeType || t.species?.type || 'Native'}</span></div>
+      <div class="profile-data-row"><span class="profile-data-label">Name of Tree</span><span class="profile-data-val">${spCommon}</span></div>
+      <div class="profile-data-row"><span class="profile-data-label">Scientific Name</span><span class="profile-data-val" style="font-style:italic;">${spScientific || '—'}</span></div>
+      <div class="profile-data-row"><span class="profile-data-label">Tree Type</span><span class="profile-data-val">${spType}</span></div>
       <div class="profile-data-row"><span class="profile-data-label">Total Trees Registered</span><span class="profile-data-val" style="font-weight:800; color:#0f172a;">🌳 ${total.toLocaleString()}</span></div>
       <div class="profile-data-row"><span class="profile-data-label">Trees Taken / Adopted</span><span class="profile-data-val" style="font-weight:700; color:#2563eb;">🤝 ${taken.toLocaleString()} ${taken > 0 && (t.sponsorName || t.adopter || adopterNames) ? `(by ${t.sponsorName || t.adopter || adopterNames})` : ''}</span></div>
       <div class="profile-data-row"><span class="profile-data-label">Remaining &amp; Available</span><span class="profile-data-val" style="font-weight:800; color:#16a34a;">🟢 ${remaining.toLocaleString()} trees available</span></div>
@@ -2227,4 +2239,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('editMunicipality')?.addEventListener('change', updateTreeModalBarangays);
   document.getElementById('editProvince')?.addEventListener('change', updateTreeModalBarangays);
   updateTreeModalBarangays();
+});
+
+// Auto reload dynamic filters on updates
+window.addEventListener('ATAMAN:trees-updated', () => {
+  try {
+    const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
+    if (Array.isArray(raw)) ALL_TREES = raw;
+  } catch (_) {}
+  populateDynamicFilters();
+  applyFilters();
+});
+window.addEventListener('ATAMAN:caretakers-updated', () => {
+  populateDynamicFilters();
 });

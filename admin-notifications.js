@@ -1101,3 +1101,25 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHistoryTable();
 
 });
+
+// Live cross-tab & custom event listener for instant admin notifications
+window.addEventListener('storage', (e) => {
+  if (e.key === 'ATAMAN_notifications') {
+    try {
+      notifications = JSON.parse(e.newValue || '[]');
+      updateCounters();
+      renderFeed();
+      renderHistoryTable();
+    } catch (_) {}
+  }
+});
+window.addEventListener('ATAMAN:notifications-updated', (e) => {
+  if (e.detail && Array.isArray(e.detail)) {
+    notifications = e.detail;
+  } else {
+    try { notifications = JSON.parse(localStorage.getItem('ATAMAN_notifications') || '[]'); } catch (_) {}
+  }
+  updateCounters();
+  renderFeed();
+  renderHistoryTable();
+});

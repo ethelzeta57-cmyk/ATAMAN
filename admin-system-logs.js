@@ -10,7 +10,16 @@
   const INITIAL_LOGS = [];
 
   // 2. STATE MANAGEMENT
-  let allLogs = [];
+  let allLogs = (() => {
+    try {
+      const saved = localStorage.getItem('ATAMAN_system_logs');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (_) {}
+    return [];
+  })();
   let currentTab = 'all';
   let currentSearchQuery = '';
   let selectedDateFilter = 'all';
@@ -847,3 +856,22 @@
     init();
   }
 })();
+
+// Live cross-tab & custom event listener for instant system audit logs
+window.addEventListener('storage', (e) => {
+  if (e.key === 'ATAMAN_system_logs') {
+    try {
+      const parsed = JSON.parse(e.newValue || '[]');
+      if (Array.isArray(parsed)) {
+        allLogs = parsed;
+        renderLogs();
+      }
+    } catch (_) {}
+  }
+});
+window.addEventListener('ATAMAN:logs-updated', (e) => {
+  if (e.detail && Array.isArray(e.detail)) {
+    allLogs = e.detail;
+    renderLogs();
+  }
+});

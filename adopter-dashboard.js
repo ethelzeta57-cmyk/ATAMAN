@@ -755,6 +755,73 @@ function renderTopSpecies(data) {
 
 
 /* ─── 8.5. Interactive Adopt a Tree Modal Flow ─── */
+function getAvailableCaretakersList() {
+  const list = [];
+  const seen = new Set();
+
+  function add(name, loc, id, email) {
+    if (!name || name === 'Unassigned' || name === 'None') return;
+    const clean = name.trim();
+    const key = clean.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      list.push({
+        name: clean,
+        location: loc || 'Catbalogan City',
+        id: id || ('CT-' + (100 + list.length + 1)),
+        email: email || ''
+      });
+    }
+  }
+
+  // 1. ATAMAN_caretakers_cache
+  try {
+    const raw = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+    if (Array.isArray(raw)) {
+      raw.forEach(c => {
+        if (!c) return;
+        const cName = c.name || c.fullName || c.displayName;
+        const cLoc = c.primaryArea || c.barangay || c.location || c.address;
+        add(cName, cLoc, c.id || c.empId, c.email);
+      });
+    }
+  } catch (_) {}
+
+  // 2. ATAMAN_registered_users / ATAMAN_users_cache
+  ['ATAMAN_registered_users', 'ATAMAN_users_cache', 'saplink_registered_users', 'saplink_users_cache'].forEach(key => {
+    try {
+      const users = JSON.parse(localStorage.getItem(key) || '[]');
+      if (Array.isArray(users)) {
+        users.forEach(u => {
+          if (!u) return;
+          const role = (u.role || '').toLowerCase();
+          if (role.includes('caretaker')) {
+            const uName = u.fullName || u.displayName || u.name;
+            const uLoc = u.barangay || u.address || u.location;
+            add(uName, uLoc, u.empId || u.id || u.uid, u.email);
+          }
+        });
+      }
+    } catch (_) {}
+  });
+
+  // 3. Fallback seeds across Catbalogan City sectors
+  if (!seen.has('dodong zeta')) {
+    add('Dodong Zeta', 'Brgy. Canlapwas (Sector A)', 'CT-101', 'zetadodong@gmail.com');
+  }
+  if (!seen.has('ramil ocenar')) {
+    add('Ramil Ocenar', 'Brgy. Guinsorongan (Sector B)', 'CT-102', 'ramil.ocenar@ataman.org');
+  }
+  if (!seen.has('eduardo tan')) {
+    add('Eduardo Tan', 'Brgy. San Isidro (Sector C)', 'CT-103', 'eduardo.tan@ataman.org');
+  }
+  if (!seen.has('nestor cabael')) {
+    add('Nestor Cabael', 'Brgy. Bunuanan (Sector D)', 'CT-104', 'nestor.cabael@ataman.org');
+  }
+
+  return list;
+}
+
 function openAdoptTreeModal() {
   const currentData = getLoggedInAdopterData();
   const userName = localStorage.getItem('ATAMAN_user_name') || 'Rose Yu';
@@ -786,6 +853,8 @@ function openAdoptTreeModal() {
     { name: 'Brgy. Bunuanan', sector: 'Sector D - Biodiversity Forest Corridor', lat: 11.7580, lng: 124.8910 },
     { name: 'Brgy. Mabini', sector: 'Sector E - Upland Conservation Sector', lat: 11.7740, lng: 124.9030 }
   ];
+
+  const caretakerOptions = getAvailableCaretakersList();
 
   let selectedQty = 10;
   const ratePerTree = 50;
@@ -855,13 +924,13 @@ function openAdoptTreeModal() {
             </div>
           </div>
 
-          <!-- 3. Location & Caretaker Row -->
+          <!-- 3. Location & Caretaker Dropdown Row -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div>
               <label style="display:block;font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px;">
                 3. Planting Location <span style="color:#dc2626;">*</span>
               </label>
-              <select id="adoptLocSelect" style="width:100%;height:42px;border-radius:10px;border:1.5px solid #cbd5e1;padding:0 10px;font-size:13px;color:#0f172a;background:#ffffff;outline:none;font-family:inherit;">
+              <select id="adoptLocSelect" style="width:100%;height:42px;border-radius:10px;border:1.5px solid #cbd5e1;padding:0 10px;font-size:13px;color:#0f172a;background:#ffffff;outline:none;font-family:inherit;cursor:pointer;">
                 ${locationOptions.map((loc, i) => `
                   <option value="${loc.name}" ${i === 0 ? 'selected' : ''}>${loc.name} (${loc.sector.split(' - ')[0]})</option>
                 `).join('')}
@@ -869,17 +938,17 @@ function openAdoptTreeModal() {
             </div>
             <div>
               <label style="display:block;font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px;">
-                4. Assigned Caretaker
+                4. Assigned Caretaker <span style="color:#dc2626;">*</span>
               </label>
-              <div style="height:42px;border-radius:10px;border:1.5px solid #cbd5e1;background:#f8fafc;padding:0 12px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#1e293b;">
-                <span>🧑‍🌾</span>
-                <span>Dodong Zeta</span>
-                <span style="margin-left:auto;font-size:11px;color:#16a34a;background:#dcfce7;padding:2px 6px;border-radius:4px;font-weight:700;">Active</span>
-              </div>
+              <select id="adoptCaretakerSelect" style="width:100%;height:42px;border-radius:10px;border:1.5px solid #cbd5e1;padding:0 10px;font-size:13px;color:#0f172a;background:#ffffff;outline:none;font-family:inherit;cursor:pointer;">
+                ${caretakerOptions.map((ct, i) => `
+                  <option value="${ct.name}" data-id="${ct.id}" data-email="${ct.email || ''}" ${i === 0 ? 'selected' : ''}>🧑‍🌾 ${ct.name} (${ct.location} • Active)</option>
+                `).join('')}
+              </select>
             </div>
           </div>
 
-          <!-- 4. Dedication Message (Optional) -->
+          <!-- 5. Dedication Message (Optional) -->
           <div>
             <label style="display:block;font-size:13px;font-weight:700;color:#1e293b;margin-bottom:4px;">
               5. Personal Dedication / Message (Optional)
@@ -888,7 +957,7 @@ function openAdoptTreeModal() {
               style="width:100%;height:40px;border-radius:10px;border:1.5px solid #cbd5e1;padding:0 12px;font-size:13px;outline:none;font-family:inherit;box-sizing:border-box;" />
           </div>
 
-          <!-- 5. Real-Time Impact & Contribution Summary -->
+          <!-- Real-Time Impact & Contribution Summary -->
           <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:14px 16px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
               <span style="font-size:12px;font-weight:800;color:#166534;text-transform:uppercase;letter-spacing:0.5px;">Adoption Sponsorship Summary</span>
@@ -930,6 +999,22 @@ function openAdoptTreeModal() {
     // Bind event listeners
     modal.querySelector('#closeAdoptModalBtn')?.addEventListener('click', closeAdoptTreeModal);
     modal.querySelector('#cancelAdoptModalBtn')?.addEventListener('click', closeAdoptTreeModal);
+
+    // Dynamic Caretaker recommendation on location change
+    const locSelect = modal.querySelector('#adoptLocSelect');
+    const ctSelect = modal.querySelector('#adoptCaretakerSelect');
+    if (locSelect && ctSelect) {
+      locSelect.addEventListener('change', () => {
+        const locName = locSelect.value.toLowerCase();
+        for (let i = 0; i < ctSelect.options.length; i++) {
+          const opt = ctSelect.options[i];
+          if (opt.textContent.toLowerCase().includes(locName) || opt.value.toLowerCase().includes(locName)) {
+            ctSelect.selectedIndex = i;
+            break;
+          }
+        }
+      });
+    }
 
     // Quantity Presets
     modal.querySelectorAll('.qty-preset-btn').forEach(btn => {
@@ -1001,9 +1086,18 @@ function openAdoptTreeModal() {
 
         try {
           const speciesRadio = modal.querySelector('input[name="adoptSpecies"]:checked');
-          const chosenSpecies = speciesRadio ? speciesRadio.value : 'Narra';
+          const chosenSpeciesName = speciesRadio ? speciesRadio.value : 'Narra';
+          const chosenSpeciesObj = speciesOptions.find(s => s.name === chosenSpeciesName) || speciesOptions[0];
+
           const chosenLocName = modal.querySelector('#adoptLocSelect')?.value || 'Brgy. Canlapwas';
           const locObj = locationOptions.find(l => l.name === chosenLocName) || locationOptions[0];
+
+          const caretakerDropdown = modal.querySelector('#adoptCaretakerSelect');
+          const chosenCtOpt = caretakerDropdown ? caretakerDropdown.selectedOptions[0] : null;
+          const chosenCaretakerName = caretakerDropdown ? caretakerDropdown.value : 'Dodong Zeta';
+          const chosenCaretakerId = chosenCtOpt?.dataset?.id || 'CT-101';
+          const chosenCaretakerEmail = chosenCtOpt?.dataset?.email || '';
+
           const dedication = modal.querySelector('#adoptDedication')?.value?.trim() || '';
 
           // 1. Load Trees Cache
@@ -1031,17 +1125,27 @@ function openAdoptTreeModal() {
 
           const newTreeRecord = {
             id: newTreeId,
-            species: chosenSpecies,
-            treeType: 'Native',
+            species: {
+              common: chosenSpeciesObj.name,
+              scientific: chosenSpeciesObj.sc,
+              type: chosenSpeciesObj.type
+            },
+            speciesCommon: chosenSpeciesObj.name,
+            commonName: chosenSpeciesObj.name,
+            scientificName: chosenSpeciesObj.sc,
+            treeType: chosenSpeciesObj.type,
             treeCount: selectedQty,
             takenCount: selectedQty,
             sponsorName: userName,
             adopter: userName,
             adopterId: userUid,
             adopterEmail: userEmail,
-            caretaker: 'Dodong Zeta',
+            caretaker: chosenCaretakerName,
+            caretakerId: chosenCaretakerId,
+            caretakerEmail: chosenCaretakerEmail,
             municipality: 'Catbalogan City',
             barangay: chosenLocName,
+            location: `${chosenLocName}, Catbalogan City, Samar`,
             province: 'Samar',
             status: 'healthy',
             lat: lat,
@@ -1094,13 +1198,22 @@ function openAdoptTreeModal() {
 
             treesList.unshift({
               id: newTreeId,
-              species: chosenSpecies,
+              species: chosenSpeciesObj.name,
+              speciesObj: {
+                common: chosenSpeciesObj.name,
+                scientific: chosenSpeciesObj.sc,
+                type: chosenSpeciesObj.type
+              },
+              treeType: chosenSpeciesObj.type,
               treeCount: selectedQty,
               status: 'healthy',
               barangay: chosenLocName,
               lat: lat,
               lng: lng,
-              caretaker: 'Dodong Zeta'
+              caretaker: chosenCaretakerName,
+              caretakerId: chosenCaretakerId,
+              caretakerEmail: chosenCaretakerEmail,
+              fundingAmount: 50
             });
 
             adopters[adIdx] = {
@@ -1131,13 +1244,22 @@ function openAdoptTreeModal() {
               createdAt: now.toISOString(),
               treesList: [{
                 id: newTreeId,
-                species: chosenSpecies,
+                species: chosenSpeciesObj.name,
+                speciesObj: {
+                  common: chosenSpeciesObj.name,
+                  scientific: chosenSpeciesObj.sc,
+                  type: chosenSpeciesObj.type
+                },
+                treeType: chosenSpeciesObj.type,
                 treeCount: selectedQty,
                 status: 'healthy',
                 barangay: chosenLocName,
                 lat: lat,
                 lng: lng,
-                caretaker: 'Dodong Zeta'
+                caretaker: chosenCaretakerName,
+                caretakerId: chosenCaretakerId,
+                caretakerEmail: chosenCaretakerEmail,
+                fundingAmount: 50
               }]
             });
           }
@@ -1156,9 +1278,160 @@ function openAdoptTreeModal() {
             }
           }
 
-          // 3. Trigger Global Updates & Re-render Dashboard
+          // 3. Update Caretaker Cache & Assignment
+          let caretakers = [];
+          try {
+            caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
+          } catch (_) { caretakers = []; }
+          if (!Array.isArray(caretakers)) caretakers = [];
+
+          let ctIdx = caretakers.findIndex(c => {
+            if (!c) return false;
+            const cn = (c.name || c.fullName || '').toLowerCase().trim();
+            const cid = String(c.id || c.empId || '').trim();
+            return (chosenCaretakerId && cid === chosenCaretakerId) || (chosenCaretakerName && cn === chosenCaretakerName.toLowerCase().trim());
+          });
+
+          if (ctIdx >= 0) {
+            const exCt = caretakers[ctIdx];
+            const assignedTrees = Array.isArray(exCt.assignedTreeIds) ? [...exCt.assignedTreeIds] : (Array.isArray(exCt.assignedTrees) ? [...exCt.assignedTrees] : []);
+            if (!assignedTrees.includes(newTreeId)) assignedTrees.push(newTreeId);
+            const prevCtCount = parseInt(exCt.assignedTreeCount || exCt.assignedTrees, 10) || 0;
+            caretakers[ctIdx] = {
+              ...exCt,
+              assignedTreeCount: prevCtCount + selectedQty,
+              assignedTrees: prevCtCount + selectedQty,
+              assignedTreeIds: assignedTrees,
+              assignedTreeType: exCt.assignedTreeType && exCt.assignedTreeType !== 'Native Hardwood' ? `${exCt.assignedTreeType}, ${chosenSpeciesObj.name}` : chosenSpeciesObj.name,
+              updatedAt: now.toISOString()
+            };
+          } else {
+            caretakers.push({
+              id: chosenCaretakerId || ('CT-' + (100 + caretakers.length + 1)),
+              empId: chosenCaretakerId || 'EMP-002',
+              name: chosenCaretakerName,
+              fullName: chosenCaretakerName,
+              email: chosenCaretakerEmail || '',
+              phone: '+63 918 333 4455',
+              address: `${chosenLocName}, Catbalogan City, Samar`,
+              role: 'Field Caretaker',
+              status: 'Active',
+              assignedTrees: selectedQty,
+              assignedTreeCount: selectedQty,
+              assignedTreeIds: [newTreeId],
+              assignedTreeType: chosenSpeciesObj.name,
+              location: 'Catbalogan City, Samar',
+              municipality: 'Catbalogan City',
+              barangay: chosenLocName,
+              joinedDate: now.toISOString().slice(0, 10),
+              createdAt: now.toISOString()
+            });
+          }
+          localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakers));
+          localStorage.setItem('saplink_caretakers_cache', JSON.stringify(caretakers));
+
+          // Save to Firestore caretakers collection if online
+          if (typeof firebase !== 'undefined' && firebase.firestore) {
+            try {
+              const db = firebase.firestore();
+              const updatedCt = caretakers[ctIdx >= 0 ? ctIdx : caretakers.length - 1];
+              await db.collection('caretakers').doc(updatedCt.id).set(updatedCt, { merge: true });
+            } catch (fsErr) {
+              console.warn('[ATAMAN] Firestore caretaker sync notice:', fsErr);
+            }
+          }
+
+          // 4. Log Admin Notification
+          try {
+            let notifs = [];
+            try { notifs = JSON.parse(localStorage.getItem('ATAMAN_notifications') || '[]'); } catch (_) {}
+            if (!Array.isArray(notifs)) notifs = [];
+            const notifItem = {
+              id: 'NTF-' + Date.now(),
+              title: `New Tree Adoption: ${selectedQty}x ${chosenSpeciesObj.name}`,
+              message: `${userName} adopted ${selectedQty} ${chosenSpeciesObj.name} tree(s) in ${chosenLocName}. Assigned field caretaker: ${chosenCaretakerName}.`,
+              category: 'adopters',
+              priority: 'high',
+              status: 'unread',
+              read: false,
+              timestamp: now.getTime(),
+              createdAt: now.toISOString(),
+              date: now.toISOString(),
+              treeId: newTreeId,
+              species: chosenSpeciesObj.name,
+              treeCount: selectedQty,
+              adopter: userName,
+              caretaker: chosenCaretakerName,
+              location: chosenLocName
+            };
+            notifs.unshift(notifItem);
+            localStorage.setItem('ATAMAN_notifications', JSON.stringify(notifs));
+            localStorage.setItem('ATAMAN_unread_notif_count', String(notifs.filter(n => !n.read).length));
+            window.dispatchEvent(new CustomEvent('ATAMAN:notifications-updated', { detail: notifs }));
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+              firebase.firestore().collection('notifications').doc(notifItem.id).set(notifItem, { merge: true }).catch(() => {});
+            }
+          } catch (nErr) {
+            console.warn('[ATAMAN] Notification record notice:', nErr);
+          }
+
+          // 5. Log System Audit Log
+          try {
+            let logs = [];
+            try { logs = JSON.parse(localStorage.getItem('ATAMAN_system_logs') || '[]'); } catch (_) {}
+            if (!Array.isArray(logs)) logs = [];
+            const logItem = {
+              id: 'LOG-' + Date.now(),
+              timestamp: now.toISOString(),
+              user: userName,
+              userRole: 'Adopter',
+              userType: 'adopter',
+              action: `Adopted ${selectedQty}x ${chosenSpeciesObj.name}`,
+              actionIcon: '🌱',
+              module: 'Tree Registry',
+              targetId: newTreeId,
+              level: 'info',
+              ip: '192.168.1.100',
+              details: {
+                treeId: newTreeId,
+                species: chosenSpeciesObj.name,
+                scientific: chosenSpeciesObj.sc,
+                treeCount: selectedQty,
+                location: chosenLocName,
+                caretaker: chosenCaretakerName,
+                adopter: userName,
+                funding: selectedQty * ratePerTree
+              }
+            };
+            logs.unshift(logItem);
+            localStorage.setItem('ATAMAN_system_logs', JSON.stringify(logs));
+            window.dispatchEvent(new CustomEvent('ATAMAN:logs-updated', { detail: logs }));
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+              firebase.firestore().collection('system_logs').doc(logItem.id).set(logItem, { merge: true }).catch(() => {});
+            }
+          } catch (lErr) {
+            console.warn('[ATAMAN] System log record notice:', lErr);
+          }
+
+          // 6. Log Tree Activity for Admin Dashboard Feed
+          try {
+            let acts = [];
+            try { acts = JSON.parse(localStorage.getItem('ATAMAN_tree_activities') || '[]'); } catch (_) {}
+            if (!Array.isArray(acts)) acts = [];
+            acts.unshift({
+              iconClass: 'ai-green',
+              desc: `<strong>${userName}</strong> adopted <strong>${selectedQty}x ${chosenSpeciesObj.name}</strong> in ${chosenLocName} (Caretaker: ${chosenCaretakerName})`,
+              actor: `${userName} (Adopter)`,
+              time: 'Just now',
+              timestamp: now.getTime()
+            });
+            localStorage.setItem('ATAMAN_tree_activities', JSON.stringify(acts.slice(0, 30)));
+          } catch (_) {}
+
+          // 7. Trigger Global Updates & Re-render Dashboard
           window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated'));
           window.dispatchEvent(new CustomEvent('ATAMAN:adopters-updated'));
+          window.dispatchEvent(new CustomEvent('ATAMAN:caretakers-updated'));
 
           refreshAdopterDashboard();
           if (window.ATAMAN_INCENTIVES && typeof window.ATAMAN_INCENTIVES.refreshDashboardIncentiveWidgets === 'function') {
@@ -1168,7 +1441,7 @@ function openAdoptTreeModal() {
           closeAdoptTreeModal();
 
           // Celebration Toast with Certificate Button
-          showAdToast(`🎉 Congratulations ${userName}! You have adopted ${selectedQty} ${chosenSpecies} trees in ${chosenLocName}.`);
+          showAdToast(`🎉 Congratulations ${userName}! You have adopted ${selectedQty} ${chosenSpeciesObj.name} trees in ${chosenLocName} cared by ${chosenCaretakerName}.`);
 
           // Smoothly scroll to map overview to view new trees
           const mapSection = document.getElementById('adopterMap');
@@ -1179,8 +1452,8 @@ function openAdoptTreeModal() {
           }
 
         } catch (err) {
-          console.error('Tree adoption error:', err);
-          showAdToast('❌ Could not complete adoption: ' + (err.message || 'Please try again'));
+          console.error('[ATAMAN] Error completing adoption:', err);
+          showAdToast('⚠️ Could not complete adoption. Please try again.');
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<span>🌱 Confirm Adoption</span>';
@@ -1196,7 +1469,9 @@ function openAdoptTreeModal() {
 
 function closeAdoptTreeModal() {
   const modal = document.getElementById('adopterAdoptTreeModal');
-  if (modal) modal.style.display = 'none';
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 
 /* ─── 9. Interactive Buttons & CTA Handlers ─── */
