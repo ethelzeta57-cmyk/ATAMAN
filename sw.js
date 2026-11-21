@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.22-firestore-sync-fix';
+const CACHE_NAME = 'ataman-pwa-v2.2.23-dynamic-admin-trees';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [

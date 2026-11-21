@@ -1478,6 +1478,8 @@ function saveMaintenanceRecord() {
 
   // Persist updated ALL_TREES
   localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(ALL_TREES));
+  localStorage.setItem('saplink_trees_cache', JSON.stringify(ALL_TREES));
+  window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated', { detail: ALL_TREES }));
   if (window.ATAMAN_SYNC && typeof window.ATAMAN_SYNC.notifyTrees === 'function') {
     window.ATAMAN_SYNC.notifyTrees(ALL_TREES);
   }

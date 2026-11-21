@@ -755,6 +755,84 @@ function renderTopSpecies(data) {
 
 
 /* ─── 8.5. Interactive Adopt a Tree Modal Flow ─── */
+function getAdminAvailableTreesAndSpecies() {
+  const botanicalInfoMap = {
+    'narra': { sc: 'Pterocarpus indicus', type: 'Native', icon: '🌳', desc: 'Philippine National Tree, strong watershed canopy' },
+    'molave': { sc: 'Vitex parviflora', type: 'Native', icon: '🌲', desc: 'Dense hardwood, exceptional carbon sequestration' },
+    'yakal': { sc: 'Shorea astylosa', type: 'Native', icon: '🪵', desc: 'High-grade Samar timber, high canopy & erosion control' },
+    'tindalo': { sc: 'Afzelia rhomboidea', type: 'Native', icon: '🌱', desc: 'Vulnerable Samar indigenous hardwood species' },
+    'dao': { sc: 'Dracontomelon dao', type: 'Native', icon: '🍃', desc: 'Massive Samar buttress-rooted canopy watershed tree' },
+    'banaba': { sc: 'Lagerstroemia speciosa', type: 'Native', icon: '🌸', desc: 'Vibrant flowering watershed canopy tree' },
+    'toog': { sc: 'Petersianthus quadrialatus', type: 'Endemic', icon: '🌿', desc: 'Samar giant native hardwood & biodiversity host' },
+    'kamagong': { sc: 'Diospyros blancoi', type: 'Endemic', icon: '🌴', desc: 'Precious Samar ironwood forest species' },
+    'guyabano': { sc: 'Annona muricata', type: 'Fruit/Native', icon: '🍈', desc: 'Community agroforestry native tree' },
+    'mahogany': { sc: 'Swietenia macrophylla', type: 'Hardwood', icon: '🌲', desc: 'High-canopy watershed timber tree' },
+    'acacia': { sc: 'Vachellia farnesiana', type: 'Native', icon: '🌳', desc: 'Fast-growing nitrogen-fixing native canopy' },
+    'ipil-ipil': { sc: 'Leucaena leucocephala', type: 'Native', icon: '🌿', desc: 'Soil enrichment & agroforestry nurse tree' }
+  };
+
+  let allAdminTrees = [];
+  try {
+    allAdminTrees = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
+  } catch (_) { allAdminTrees = []; }
+  if (!Array.isArray(allAdminTrees)) allAdminTrees = [];
+
+  // When admin has trees in registry, dynamically build options directly from them
+  if (allAdminTrees.length > 0) {
+    const list = [];
+    allAdminTrees.forEach(t => {
+      if (!t) return;
+      const rawCommon = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Tree';
+      const commonName = String(rawCommon).trim();
+      if (!commonName || commonName === '—') return;
+
+      const totalCount = Math.max(1, parseInt(t.treeCount, 10) || 1);
+      const takenCount = parseInt(t.takenCount, 10) || 0;
+      const availableCount = Math.max(0, totalCount - takenCount);
+
+      const key = commonName.toLowerCase();
+      const bot = botanicalInfoMap[key] || {
+        sc: (typeof t.species === 'object' && t.species ? t.species.scientific : '') || t.scientificName || 'Botanical Species',
+        type: t.treeType || (typeof t.species === 'object' && t.species ? t.species.type : '') || 'Native',
+        icon: '🌳',
+        desc: 'Samar reforestation native tree'
+      };
+
+      const scientificName = (typeof t.species === 'object' && t.species ? t.species.scientific : '') || t.scientificName || bot.sc;
+      const treeType = t.treeType || (typeof t.species === 'object' && t.species ? t.species.type : '') || bot.type;
+
+      list.push({
+        id: t.id,
+        name: commonName,
+        sc: scientificName,
+        type: treeType,
+        icon: bot.icon || '🌳',
+        desc: bot.desc,
+        adminTreeId: t.id,
+        adminTree: t,
+        totalTrees: totalCount,
+        availableCount: availableCount,
+        location: t.barangay || t.municipality || 'Brgy. Canlapwas',
+        caretaker: t.caretaker || 'Dodong Zeta'
+      });
+    });
+
+    if (list.length > 0) {
+      return list;
+    }
+  }
+
+  // Fallback defaults reflecting Samar Admin Tree Catalogue
+  return [
+    { id: 'TR-10001', name: 'Narra', sc: 'Pterocarpus indicus', type: 'Native', icon: '🌳', desc: 'Philippine National Tree, strong watershed canopy', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10001' },
+    { id: 'TR-10002', name: 'Molave', sc: 'Vitex parviflora', type: 'Native', icon: '🌲', desc: 'Dense hardwood, exceptional carbon sequestration', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10002' },
+    { id: 'TR-10003', name: 'Yakal', sc: 'Shorea astylosa', type: 'Native', icon: '🪵', desc: 'High-grade Samar timber, high canopy & erosion control', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10003' },
+    { id: 'TR-10004', name: 'Tindalo', sc: 'Afzelia rhomboidea', type: 'Native', icon: '🌱', desc: 'Vulnerable Samar indigenous hardwood species', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10004' },
+    { id: 'TR-10005', name: 'Dao', sc: 'Dracontomelon dao', type: 'Native', icon: '🍃', desc: 'Massive Samar buttress-rooted canopy watershed tree', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10005' },
+    { id: 'TR-10006', name: 'Banaba', sc: 'Lagerstroemia speciosa', type: 'Native', icon: '🌸', desc: 'Vibrant flowering watershed canopy tree', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10006' }
+  ];
+}
+
 function getAvailableCaretakersList() {
   const list = [];
   const seen = new Set();
@@ -837,14 +915,8 @@ function openAdoptTreeModal() {
     document.body.appendChild(modal);
   }
 
-  const speciesOptions = [
-    { name: 'Narra', sc: 'Pterocarpus indicus', type: 'Native', icon: '🌳', desc: 'Philippine National Tree, strong watershed canopy' },
-    { name: 'Molave', sc: 'Vitex parviflora', type: 'Native', icon: '🌲', desc: 'Dense hardwood, exceptional carbon sequestration' },
-    { name: 'Toog', sc: 'Petersianthus quadrialatus', type: 'Endemic', icon: '🌿', desc: 'Samar giant native hardwood & biodiversity host' },
-    { name: 'Banaba', sc: 'Lagerstroemia speciosa', type: 'Native', icon: '🌸', desc: 'Vibrant flowering watershed canopy tree' },
-    { name: 'Kamagong', sc: 'Diospyros blancoi', type: 'Endemic', icon: '🌴', desc: 'Precious Samar ironwood forest species' },
-    { name: 'Guyabano', sc: 'Annona muricata', type: 'Fruit/Native', icon: '🍃', desc: 'Community agroforestry native tree' }
-  ];
+  // Dynamically load the trees & species added by the Admin in Admin Trees
+  const speciesOptions = getAdminAvailableTreesAndSpecies();
 
   const locationOptions = [
     { name: 'Brgy. Canlapwas', sector: 'Sector A - Central Watershed Reserve', lat: 11.7820, lng: 124.8870 },
@@ -872,7 +944,7 @@ function openAdoptTreeModal() {
             </div>
             <h2 style="margin:0;font-size:1.25rem;font-weight:800;color:#0f172a;">Adopt &amp; Sponsor Trees</h2>
             <p style="margin:4px 0 0;font-size:0.83rem;color:#64748b;">
-              Directly sponsor and fund native trees in Catbalogan City, Samar with verified field care.
+              Directly sponsor and fund trees from the Samar reforestation registry with verified field care.
             </p>
           </div>
           <button type="button" class="adopt-modal-close" id="closeAdoptModalBtn" aria-label="Close modal">&times;</button>
@@ -880,21 +952,36 @@ function openAdoptTreeModal() {
 
         <form id="adoptTreeForm" style="display:flex;flex-direction:column;gap:16px;">
 
-          <!-- 1. Select Species -->
+          <!-- 1. Select Species (From Admin Trees) -->
           <div>
-            <label style="display:block;font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px;">
-              1. Select Tree Species <span style="color:#dc2626;">*</span>
-            </label>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <label style="font-size:13px;font-weight:700;color:#1e293b;">
+                1. Select Tree Species <span style="color:#dc2626;">*</span>
+              </label>
+              <span style="font-size:11.5px;color:#166534;font-weight:700;background:#dcfce7;padding:2px 8px;border-radius:999px;">
+                ${speciesOptions.length} Tree Batches from Admin Trees
+              </span>
+            </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:10px;" id="speciesCardGrid">
               ${speciesOptions.map((sp, idx) => `
-                <label style="display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1.5px solid ${idx === 0 ? '#16a34a' : '#e2e8f0'};background:${idx === 0 ? '#f0fdf4' : '#ffffff'};border-radius:12px;cursor:pointer;transition:all 0.18s ease;" class="species-choice-card">
+                <label style="display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1.5px solid ${idx === 0 ? '#16a34a' : '#e2e8f0'};background:${idx === 0 ? '#f0fdf4' : '#ffffff'};border-radius:12px;cursor:pointer;transition:all 0.18s ease;position:relative;" class="species-choice-card" data-species="${sp.name}" data-tree-id="${sp.adminTreeId || ''}">
                   <div style="display:flex;align-items:center;justify-content:space-between;">
                     <span style="font-size:20px;">${sp.icon}</span>
-                    <input type="radio" name="adoptSpecies" value="${sp.name}" ${idx === 0 ? 'checked' : ''} style="accent-color:#16a34a;" />
+                    <input type="radio" name="adoptSpecies" value="${sp.name}" data-tree-id="${sp.adminTreeId || ''}" ${idx === 0 ? 'checked' : ''} style="accent-color:#16a34a;width:15px;height:15px;" />
                   </div>
-                  <strong style="font-size:13.5px;color:#0f172a;margin-top:2px;">${sp.name}</strong>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
+                    <strong style="font-size:13.5px;color:#0f172a;">${sp.name}</strong>
+                    ${sp.adminTreeId ? `<span style="font-size:9.5px;color:#0369a1;background:#e0f2fe;font-weight:800;padding:1px 5px;border-radius:4px;">${sp.adminTreeId}</span>` : ''}
+                  </div>
                   <span style="font-size:11px;color:#64748b;font-style:italic;">${sp.sc}</span>
-                  <span style="font-size:10.5px;color:#15803d;background:#dcfce7;padding:2px 6px;border-radius:4px;align-self:flex-start;font-weight:700;margin-top:4px;">${sp.type}</span>
+                  <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:4px;">
+                    <span style="font-size:10px;color:#15803d;background:#dcfce7;padding:2px 6px;border-radius:4px;font-weight:700;">${sp.type}</span>
+                    ${sp.availableCount != null ? `
+                      <span style="font-size:10px;color:${sp.availableCount > 0 ? '#15803d' : '#b91c1c'};background:${sp.availableCount > 0 ? '#f0fdf4' : '#fef2f2'};border:1px solid ${sp.availableCount > 0 ? '#bbf7d0' : '#fecaca'};padding:1px 5px;border-radius:4px;font-weight:700;">
+                        ${sp.availableCount > 0 ? `🟢 ${sp.availableCount} available` : '🔴 Taken'}
+                      </span>
+                    ` : ''}
+                  </div>
                 </label>
               `).join('')}
             </div>
@@ -1045,7 +1132,7 @@ function openAdoptTreeModal() {
       });
     }
 
-    // Species card clicks
+    // Species card clicks - auto sync location & caretaker from admin tree data
     modal.querySelectorAll('.species-choice-card').forEach(card => {
       card.addEventListener('click', () => {
         modal.querySelectorAll('.species-choice-card').forEach(c => {
@@ -1056,6 +1143,28 @@ function openAdoptTreeModal() {
         card.style.background = '#f0fdf4';
         const radio = card.querySelector('input[type=radio]');
         if (radio) radio.checked = true;
+
+        const targetTreeId = card.dataset.treeId;
+        const targetSp = speciesOptions.find(s => (targetTreeId && String(s.adminTreeId) === String(targetTreeId)) || s.name === card.dataset.species);
+        if (targetSp && targetSp.location && locSelect) {
+          for (let i = 0; i < locSelect.options.length; i++) {
+            if (locSelect.options[i].value.toLowerCase().includes(targetSp.location.toLowerCase()) ||
+                targetSp.location.toLowerCase().includes(locSelect.options[i].value.toLowerCase())) {
+              locSelect.selectedIndex = i;
+              locSelect.dispatchEvent(new Event('change'));
+              break;
+            }
+          }
+        }
+        if (targetSp && targetSp.caretaker && ctSelect) {
+          for (let i = 0; i < ctSelect.options.length; i++) {
+            if (ctSelect.options[i].value.toLowerCase() === targetSp.caretaker.toLowerCase() ||
+                ctSelect.options[i].textContent.toLowerCase().includes(targetSp.caretaker.toLowerCase())) {
+              ctSelect.selectedIndex = i;
+              break;
+            }
+          }
+        }
       });
     });
 
@@ -1086,8 +1195,9 @@ function openAdoptTreeModal() {
 
         try {
           const speciesRadio = modal.querySelector('input[name="adoptSpecies"]:checked');
-          const chosenSpeciesName = speciesRadio ? speciesRadio.value : 'Narra';
-          const chosenSpeciesObj = speciesOptions.find(s => s.name === chosenSpeciesName) || speciesOptions[0];
+          const chosenSpeciesName = speciesRadio ? speciesRadio.value : (speciesOptions[0]?.name || 'Narra');
+          const chosenTreeId = speciesRadio?.dataset?.treeId;
+          const chosenSpeciesObj = speciesOptions.find(s => (chosenTreeId && String(s.adminTreeId) === String(chosenTreeId)) || s.name === chosenSpeciesName) || speciesOptions[0];
 
           const chosenLocName = modal.querySelector('#adoptLocSelect')?.value || 'Brgy. Canlapwas';
           const locObj = locationOptions.find(l => l.name === chosenLocName) || locationOptions[0];
@@ -1107,59 +1217,82 @@ function openAdoptTreeModal() {
           } catch (_) { allTrees = []; }
           if (!Array.isArray(allTrees)) allTrees = [];
 
-          // Generate sequential TR ID
-          const existingNums = allTrees.map(t => {
-            const m = String(t.id || '').match(/\d+/);
-            return m ? parseInt(m[0], 10) : 0;
-          }).filter(n => n >= 10000);
-          const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 10001;
-          const newTreeId = 'TR-' + nextNum;
+          // Match or link to Admin Tree in registry
+          let targetAdminTree = null;
+          if (chosenTreeId) {
+            targetAdminTree = allTrees.find(t => String(t.id) === String(chosenTreeId));
+          }
+          if (!targetAdminTree) {
+            targetAdminTree = allTrees.find(t => {
+              const com = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon;
+              return com && com.toLowerCase().trim() === chosenSpeciesName.toLowerCase().trim();
+            });
+          }
 
+          let adoptedTreeId = '';
           const now = new Date();
           const autoDateDisplay = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
           const autoDateTimeDisplay = now.toLocaleTimeString('en-US');
 
-          // Generate randomized accurate coordinate within selected barangay sector
-          const lat = locObj.lat + (Math.random() - 0.5) * 0.006;
-          const lng = locObj.lng + (Math.random() - 0.5) * 0.006;
+          if (targetAdminTree) {
+            adoptedTreeId = targetAdminTree.id;
+            targetAdminTree.takenCount = (parseInt(targetAdminTree.takenCount, 10) || 0) + selectedQty;
+            targetAdminTree.sponsorName = userName;
+            targetAdminTree.adopter = userName;
+            targetAdminTree.caretaker = chosenCaretakerName;
+            targetAdminTree.caretakerId = chosenCaretakerId;
+            targetAdminTree.caretakerEmail = chosenCaretakerEmail;
+            if (!targetAdminTree.barangay) targetAdminTree.barangay = chosenLocName;
+            targetAdminTree.updatedAt = now.toISOString();
+          } else {
+            // Generate sequential TR ID
+            const existingNums = allTrees.map(t => {
+              const m = String(t.id || '').match(/\d+/);
+              return m ? parseInt(m[0], 10) : 0;
+            }).filter(n => n >= 10000);
+            const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 10001;
+            adoptedTreeId = 'TR-' + nextNum;
 
-          const newTreeRecord = {
-            id: newTreeId,
-            species: {
-              common: chosenSpeciesObj.name,
-              scientific: chosenSpeciesObj.sc,
-              type: chosenSpeciesObj.type
-            },
-            speciesCommon: chosenSpeciesObj.name,
-            commonName: chosenSpeciesObj.name,
-            scientificName: chosenSpeciesObj.sc,
-            treeType: chosenSpeciesObj.type,
-            treeCount: selectedQty,
-            takenCount: selectedQty,
-            sponsorName: userName,
-            adopter: userName,
-            adopterId: userUid,
-            adopterEmail: userEmail,
-            caretaker: chosenCaretakerName,
-            caretakerId: chosenCaretakerId,
-            caretakerEmail: chosenCaretakerEmail,
-            municipality: 'Catbalogan City',
-            barangay: chosenLocName,
-            location: `${chosenLocName}, Catbalogan City, Samar`,
-            province: 'Samar',
-            status: 'healthy',
-            lat: lat,
-            lng: lng,
-            plantingDate: now.toISOString().slice(0, 10),
-            dateAdded: autoDateDisplay,
-            savedAt: autoDateTimeDisplay,
-            savedTimestamp: now.getTime(),
-            createdAt: now.toISOString(),
-            dedication: dedication
-          };
+            const lat = locObj.lat + (Math.random() - 0.5) * 0.006;
+            const lng = locObj.lng + (Math.random() - 0.5) * 0.006;
 
-          // Append to Trees Cache
-          allTrees.unshift(newTreeRecord);
+            const newTreeRecord = {
+              id: adoptedTreeId,
+              species: {
+                common: chosenSpeciesObj.name,
+                scientific: chosenSpeciesObj.sc,
+                type: chosenSpeciesObj.type
+              },
+              speciesCommon: chosenSpeciesObj.name,
+              commonName: chosenSpeciesObj.name,
+              scientificName: chosenSpeciesObj.sc,
+              treeType: chosenSpeciesObj.type,
+              treeCount: selectedQty,
+              takenCount: selectedQty,
+              sponsorName: userName,
+              adopter: userName,
+              adopterId: userUid,
+              adopterEmail: userEmail,
+              caretaker: chosenCaretakerName,
+              caretakerId: chosenCaretakerId,
+              caretakerEmail: chosenCaretakerEmail,
+              municipality: 'Catbalogan City',
+              barangay: chosenLocName,
+              location: `${chosenLocName}, Catbalogan City, Samar`,
+              province: 'Samar',
+              status: 'healthy',
+              lat: lat,
+              lng: lng,
+              plantingDate: now.toISOString().slice(0, 10),
+              dateAdded: autoDateDisplay,
+              savedAt: autoDateTimeDisplay,
+              savedTimestamp: now.getTime(),
+              createdAt: now.toISOString(),
+              dedication: dedication
+            };
+            allTrees.unshift(newTreeRecord);
+          }
+
           localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
           localStorage.setItem('saplink_trees_cache', JSON.stringify(allTrees));
 
@@ -1167,7 +1300,8 @@ function openAdoptTreeModal() {
           if (typeof firebase !== 'undefined' && firebase.firestore) {
             try {
               const db = firebase.firestore();
-              await db.collection('trees').doc(newTreeId).set(newTreeRecord, { merge: true });
+              const saveRec = targetAdminTree || allTrees[0];
+              await db.collection('trees').doc(adoptedTreeId).set(saveRec, { merge: true });
             } catch (fsErr) {
               console.warn('[ATAMAN] Firestore tree save notice:', fsErr);
             }
@@ -1197,7 +1331,7 @@ function openAdoptTreeModal() {
             const treesList = Array.isArray(ex.treesList) ? [...ex.treesList] : [];
 
             treesList.unshift({
-              id: newTreeId,
+              id: adoptedTreeId,
               species: chosenSpeciesObj.name,
               speciesObj: {
                 common: chosenSpeciesObj.name,
@@ -1208,8 +1342,8 @@ function openAdoptTreeModal() {
               treeCount: selectedQty,
               status: 'healthy',
               barangay: chosenLocName,
-              lat: lat,
-              lng: lng,
+              lat: locObj.lat,
+              lng: locObj.lng,
               caretaker: chosenCaretakerName,
               caretakerId: chosenCaretakerId,
               caretakerEmail: chosenCaretakerEmail,
@@ -1243,7 +1377,7 @@ function openAdoptTreeModal() {
               joinedDate: now.toISOString().slice(0, 10),
               createdAt: now.toISOString(),
               treesList: [{
-                id: newTreeId,
+                id: adoptedTreeId,
                 species: chosenSpeciesObj.name,
                 speciesObj: {
                   common: chosenSpeciesObj.name,
@@ -1254,8 +1388,8 @@ function openAdoptTreeModal() {
                 treeCount: selectedQty,
                 status: 'healthy',
                 barangay: chosenLocName,
-                lat: lat,
-                lng: lng,
+                lat: locObj.lat,
+                lng: locObj.lng,
                 caretaker: chosenCaretakerName,
                 caretakerId: chosenCaretakerId,
                 caretakerEmail: chosenCaretakerEmail,
@@ -1295,7 +1429,7 @@ function openAdoptTreeModal() {
           if (ctIdx >= 0) {
             const exCt = caretakers[ctIdx];
             const assignedTrees = Array.isArray(exCt.assignedTreeIds) ? [...exCt.assignedTreeIds] : (Array.isArray(exCt.assignedTrees) ? [...exCt.assignedTrees] : []);
-            if (!assignedTrees.includes(newTreeId)) assignedTrees.push(newTreeId);
+            if (!assignedTrees.includes(adoptedTreeId)) assignedTrees.push(adoptedTreeId);
             const prevCtCount = parseInt(exCt.assignedTreeCount || exCt.assignedTrees, 10) || 0;
             caretakers[ctIdx] = {
               ...exCt,
@@ -1318,7 +1452,7 @@ function openAdoptTreeModal() {
               status: 'Active',
               assignedTrees: selectedQty,
               assignedTreeCount: selectedQty,
-              assignedTreeIds: [newTreeId],
+              assignedTreeIds: [adoptedTreeId],
               assignedTreeType: chosenSpeciesObj.name,
               location: 'Catbalogan City, Samar',
               municipality: 'Catbalogan City',
@@ -1348,8 +1482,8 @@ function openAdoptTreeModal() {
             if (!Array.isArray(notifs)) notifs = [];
             const notifItem = {
               id: 'NTF-' + Date.now(),
-              title: `New Tree Adoption: ${selectedQty}x ${chosenSpeciesObj.name}`,
-              message: `${userName} adopted ${selectedQty} ${chosenSpeciesObj.name} tree(s) in ${chosenLocName}. Assigned field caretaker: ${chosenCaretakerName}.`,
+              title: `New Tree Adoption: ${selectedQty}x ${chosenSpeciesObj.name} (${adoptedTreeId})`,
+              message: `${userName} adopted ${selectedQty} ${chosenSpeciesObj.name} tree(s) (${adoptedTreeId}) in ${chosenLocName}. Assigned field caretaker: ${chosenCaretakerName}.`,
               category: 'adopters',
               priority: 'high',
               status: 'unread',
@@ -1357,7 +1491,7 @@ function openAdoptTreeModal() {
               timestamp: now.getTime(),
               createdAt: now.toISOString(),
               date: now.toISOString(),
-              treeId: newTreeId,
+              treeId: adoptedTreeId,
               species: chosenSpeciesObj.name,
               treeCount: selectedQty,
               adopter: userName,
@@ -1386,14 +1520,14 @@ function openAdoptTreeModal() {
               user: userName,
               userRole: 'Adopter',
               userType: 'adopter',
-              action: `Adopted ${selectedQty}x ${chosenSpeciesObj.name}`,
+              action: `Adopted ${selectedQty}x ${chosenSpeciesObj.name} (${adoptedTreeId})`,
               actionIcon: '🌱',
               module: 'Tree Registry',
-              targetId: newTreeId,
+              targetId: adoptedTreeId,
               level: 'info',
               ip: '192.168.1.100',
               details: {
-                treeId: newTreeId,
+                treeId: adoptedTreeId,
                 species: chosenSpeciesObj.name,
                 scientific: chosenSpeciesObj.sc,
                 treeCount: selectedQty,
@@ -1420,7 +1554,7 @@ function openAdoptTreeModal() {
             if (!Array.isArray(acts)) acts = [];
             acts.unshift({
               iconClass: 'ai-green',
-              desc: `<strong>${userName}</strong> adopted <strong>${selectedQty}x ${chosenSpeciesObj.name}</strong> in ${chosenLocName} (Caretaker: ${chosenCaretakerName})`,
+              desc: `<strong>${userName}</strong> adopted <strong>${selectedQty}x ${chosenSpeciesObj.name}</strong> (${adoptedTreeId}) in ${chosenLocName} (Caretaker: ${chosenCaretakerName})`,
               actor: `${userName} (Adopter)`,
               time: 'Just now',
               timestamp: now.getTime()
@@ -1441,7 +1575,7 @@ function openAdoptTreeModal() {
           closeAdoptTreeModal();
 
           // Celebration Toast with Certificate Button
-          showAdToast(`🎉 Congratulations ${userName}! You have adopted ${selectedQty} ${chosenSpeciesObj.name} trees in ${chosenLocName} cared by ${chosenCaretakerName}.`);
+          showAdToast(`🎉 Congratulations ${userName}! You have adopted ${selectedQty} ${chosenSpeciesObj.name} trees (${adoptedTreeId}) in ${chosenLocName} cared by ${chosenCaretakerName}.`);
 
           // Smoothly scroll to map overview to view new trees
           const mapSection = document.getElementById('adopterMap');
