@@ -248,7 +248,7 @@ function initAdminTreeMap() {
             return Array.isArray(raw) && raw.length > 0 ? raw : null;
           } catch (_) { return null; }
         })();
-        ALL_TREES = local || trees || [];
+        ALL_TREES = (local && local.length > 0) ? local : ((Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0) ? window.ATAMAN_DEFAULT_TREES : (trees || []));
       }
       CURRENT_FILTERED_TREES = [...ALL_TREES];
       renderTreeMarkers(CURRENT_FILTERED_TREES);

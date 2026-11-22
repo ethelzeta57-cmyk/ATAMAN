@@ -99,8 +99,13 @@ function loadDashboardData() {
     if (cachedTrees) {
       try { parsed = JSON.parse(cachedTrees); } catch (_) {}
     }
-    if (!Array.isArray(parsed)) {
-      parsed = [];
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      if (Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0) {
+        parsed = [...window.ATAMAN_DEFAULT_TREES];
+        try { localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(parsed)); } catch (_) {}
+      } else {
+        parsed = [];
+      }
     }
     if (Array.isArray(parsed)) {
       let treesChanged = false;

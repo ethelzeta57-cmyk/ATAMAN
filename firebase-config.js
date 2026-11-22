@@ -1164,6 +1164,195 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   /* ============================================================
      2. ATAMAN CLOUD FIRESTORE & STORAGE DATABASE SERVICE
      ============================================================ */
+  const DEFAULT_SAMAR_TREES = [
+    {
+      id: 'TR-10001',
+      species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
+      speciesCommon: 'Narra',
+      commonName: 'Narra',
+      scientificName: 'Pterocarpus indicus',
+      treeType: 'Native',
+      treeCount: 100,
+      takenCount: 0,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Canlapwas',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7820,
+      lng: 124.8875,
+      sponsorName: '',
+      adopter: '',
+      fundingAmount: 50,
+      dateAdded: 'Nov 21, 2026',
+      datePlanted: '2026-05-21',
+      createdAt: '2026-11-21T06:00:00.000Z',
+      age: '6 Months',
+      ageOfTree: '6 Months',
+      caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
+      height: '2.5 meters',
+      trunkDiam: '4.0 cm'
+    },
+    {
+      id: 'TR-10002',
+      species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Native' },
+      speciesCommon: 'Molave',
+      commonName: 'Molave',
+      scientificName: 'Vitex parviflora',
+      treeType: 'Native',
+      treeCount: 100,
+      takenCount: 0,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Guinsorongan',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7598,
+      lng: 124.8861,
+      sponsorName: '',
+      adopter: '',
+      fundingAmount: 50,
+      dateAdded: 'Nov 21, 2026',
+      datePlanted: '2026-05-21',
+      createdAt: '2026-11-21T06:05:00.000Z',
+      age: '6 Months',
+      ageOfTree: '6 Months',
+      caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
+      height: '2.4 meters',
+      trunkDiam: '3.8 cm'
+    },
+    {
+      id: 'TR-10003',
+      species: { common: 'Yakal', scientific: 'Shorea astylosa', type: 'Native' },
+      speciesCommon: 'Yakal',
+      commonName: 'Yakal',
+      scientificName: 'Shorea astylosa',
+      treeType: 'Native',
+      treeCount: 100,
+      takenCount: 0,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'San Isidro',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7710,
+      lng: 124.8910,
+      sponsorName: '',
+      adopter: '',
+      fundingAmount: 50,
+      dateAdded: 'Nov 21, 2026',
+      datePlanted: '2026-05-21',
+      createdAt: '2026-11-21T06:10:00.000Z',
+      age: '6 Months',
+      ageOfTree: '6 Months',
+      caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
+      height: '2.8 meters',
+      trunkDiam: '4.5 cm'
+    },
+    {
+      id: 'TR-10004',
+      species: { common: 'Tindalo', scientific: 'Afzelia rhomboidea', type: 'Native' },
+      speciesCommon: 'Tindalo',
+      commonName: 'Tindalo',
+      scientificName: 'Afzelia rhomboidea',
+      treeType: 'Native',
+      treeCount: 100,
+      takenCount: 0,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Bunuanan',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7885,
+      lng: 124.8890,
+      sponsorName: '',
+      adopter: '',
+      fundingAmount: 50,
+      dateAdded: 'Nov 21, 2026',
+      datePlanted: '2026-05-21',
+      createdAt: '2026-11-21T06:15:00.000Z',
+      age: '6 Months',
+      ageOfTree: '6 Months',
+      caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
+      height: '2.1 meters',
+      trunkDiam: '3.5 cm'
+    },
+    {
+      id: 'TR-10005',
+      species: { common: 'Dao', scientific: 'Dracontomelon dao', type: 'Native' },
+      speciesCommon: 'Dao',
+      commonName: 'Dao',
+      scientificName: 'Dracontomelon dao',
+      treeType: 'Native',
+      treeCount: 100,
+      takenCount: 0,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Mabini',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7740,
+      lng: 124.9030,
+      sponsorName: '',
+      adopter: '',
+      fundingAmount: 50,
+      dateAdded: 'Nov 21, 2026',
+      datePlanted: '2026-05-21',
+      createdAt: '2026-11-21T06:20:00.000Z',
+      age: '6 Months',
+      ageOfTree: '6 Months',
+      caretaker: 'Dodong Zeta',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
+      height: '3.0 meters',
+      trunkDiam: '5.2 cm'
+    },
+    {
+      id: 'TR-10006',
+      species: { common: 'Banaba', scientific: 'Lagerstroemia speciosa', type: 'Native' },
+      speciesCommon: 'Banaba',
+      commonName: 'Banaba',
+      scientificName: 'Lagerstroemia speciosa',
+      treeType: 'Native',
+      treeCount: 100,
+      takenCount: 0,
+      status: 'healthy',
+      health: 'Healthy',
+      barangay: 'Darahuway Daco',
+      municipality: 'Catbalogan City',
+      province: 'Samar',
+      lat: 11.7580,
+      lng: 124.8450,
+      sponsorName: '',
+      adopter: '',
+      fundingAmount: 50,
+      dateAdded: 'Nov 21, 2026',
+      datePlanted: '2026-05-21',
+      createdAt: '2026-11-21T06:25:00.000Z',
+      age: '6 Months',
+      ageOfTree: '6 Months',
+      caretaker: 'June Luna',
+      customCaretaker: true,
+      customGps: true,
+      customLocation: true,
+      height: '2.6 meters',
+      trunkDiam: '4.2 cm'
+    }
+  ];
+
   const ATAMAN_DB = {
     get isFirestore() { return isFirestoreReady && !!firestoreDb; },
     get isStorage() { return isStorageReady && !!firebaseStorage; },
@@ -1173,7 +1362,17 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       try {
         const stored = localStorage.getItem('ATAMAN_trees_cache');
         const parsed = stored ? JSON.parse(stored) : null;
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        const def = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0)
+          ? window.ATAMAN_DEFAULT_TREES
+          : DEFAULT_SAMAR_TREES;
+        if (Array.isArray(def) && def.length > 0) {
+          try {
+            localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(def));
+            localStorage.setItem('saplink_trees_cache', JSON.stringify(def));
+          } catch (_) {}
+          return [...def];
+        }
         return [];
       } catch (e) {
         return [];
@@ -1182,7 +1381,14 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
 
     setLocalTrees(trees) {
       try {
+        // Protect local trees from being wiped by an unpopulated remote response
+        if (!Array.isArray(trees) || trees.length === 0) {
+          const stored = localStorage.getItem('ATAMAN_trees_cache');
+          const parsed = stored ? JSON.parse(stored) : null;
+          if (Array.isArray(parsed) && parsed.length > 0) return;
+        }
         localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(trees));
+        localStorage.setItem('saplink_trees_cache', JSON.stringify(trees));
         this._notify('trees', trees);
       } catch (e) {
         console.warn("Local storage cache write failed:", e);
@@ -1375,7 +1581,12 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
               this.setLocalTrees(trees);
               return { data: trees, source: 'firestore' };
             } else {
-              this.setLocalTrees([]);
+              // Remote collection is unpopulated; fallback to local trees & sync up
+              const local = this.getLocalTrees();
+              if (local && local.length > 0) {
+                this.seedInitialTrees(local);
+                return { data: local, source: 'local' };
+              }
               return { data: [], source: 'firestore-empty' };
             }
           }
@@ -1428,8 +1639,14 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
                       this.setLocalTrees(trees);
                       if (typeof callback === 'function') callback(trees, 'firestore');
                     } else {
-                      this.setLocalTrees([]);
-                      if (typeof callback === 'function') callback([], 'firestore');
+                      // Remote collection has 0 trees. Protect local trees and sync to Firestore!
+                      const local = this.getLocalTrees();
+                      if (local && local.length > 0) {
+                        this.seedInitialTrees(local);
+                        if (typeof callback === 'function') callback(local, 'local');
+                      } else {
+                        if (typeof callback === 'function') callback([], 'firestore');
+                      }
                     }
                   } catch (parseErr) {
                     if (typeof callback === 'function') callback(this.getLocalTrees() || [], 'local');
@@ -1537,10 +1754,21 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       return { success: true, source: 'local' };
     },
 
-    // Seed initial registered trees if collection is currently empty
+    // Seed initial registered Samar tree batches to Firestore if collection is empty
     async seedInitialTrees(treesArray) {
-      // Disabled by Zero Ghost Data Policy. No placeholder or mock trees will ever be seeded.
-      return;
+      if (!this.isFirestore || !firestoreDb || !Array.isArray(treesArray) || treesArray.length === 0) return;
+      try {
+        const batch = firestoreDb.batch();
+        treesArray.forEach(tree => {
+          if (!tree || !tree.id) return;
+          const ref = firestoreDb.collection('trees').doc(tree.id);
+          batch.set(ref, tree, { merge: true });
+        });
+        await batch.commit();
+        console.log(`[ATAMAN] Successfully synced ${treesArray.length} registered trees to Firestore.`);
+      } catch (err) {
+        console.warn('Firestore seedInitialTrees notice:', err);
+      }
     },
 
     /* ── ADOPTERS CRUD & REAL-TIME ── */

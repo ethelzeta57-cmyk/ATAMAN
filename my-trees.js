@@ -51,11 +51,15 @@ function isTreeAssignedToCaretakerOrAdopter(t) {
 function loadInitialTreesData() {
   try {
     const raw = localStorage.getItem('ATAMAN_trees_cache');
+    let parsed = null;
     if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.filter(isTreeAssignedToCaretakerOrAdopter).map(mapRawTreeToMyTree);
-      }
+      try { parsed = JSON.parse(raw); } catch (_) {}
+    }
+    if ((!Array.isArray(parsed) || parsed.length === 0) && Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0) {
+      parsed = window.ATAMAN_DEFAULT_TREES;
+    }
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed.filter(isTreeAssignedToCaretakerOrAdopter).map(mapRawTreeToMyTree);
     }
   } catch (e) {}
   return [];
