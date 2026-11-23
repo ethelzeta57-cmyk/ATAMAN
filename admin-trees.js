@@ -2709,11 +2709,11 @@ async function saveExistingTreeRecord() {
   const lng = parseFloat(document.getElementById('exTreeLng')?.value) || 124.8910;
 
   const ctSelect = document.getElementById('exTreeCaretaker');
-  const chosenCtOpt = ctSelect?.options[ctSelect.selectedIndex];
-  const caretakerName = ctSelect?.value || 'Dodong Zeta';
+  const chosenCtOpt = ctSelect?.options ? ctSelect.options[ctSelect.selectedIndex] : null;
+  const caretakerName = ctSelect?.value || 'Awaiting Caretaker';
   const caretakerId = chosenCtOpt?.dataset?.id || (caretakerName.includes('Dodong') ? 'CT-101' : (caretakerName.includes('June') ? 'CT-102' : ''));
   const caretakerEmail = chosenCtOpt?.dataset?.email || (caretakerId === 'CT-101' ? 'zetadodong@gmail.com' : '');
-  const isAwaiting = caretakerName === 'Awaiting Caretaker' || !caretakerId;
+  const isAwaiting = !caretakerName || caretakerName === 'Awaiting Caretaker' || !caretakerId;
 
   const adopterName = document.getElementById('exTreeAdopter')?.value?.trim() || '';
   const notes = document.getElementById('exTreeNotes')?.value?.trim() || 'Existing standing native tree documented and registered in ATAMAN.';
