@@ -742,7 +742,10 @@ function renderTable() {
         <td>
           <div class="tree-id-cell" onclick="openTreeProfile('${t.id}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-            ${t.id}
+            <span style="font-weight:800; ${String(t.id).toUpperCase().startsWith('EXT-') ? 'color:#15803d;' : ''}">${t.id}</span>
+            ${(String(t.id).toUpperCase().startsWith('EXT-') || String(t.id).toUpperCase().startsWith('EX-') || (t.stage || '').toLowerCase().includes('existing')) ? `
+              <span style="font-size:9.5px; font-weight:800; padding:1px 5px; border-radius:4px; background:#064e3b; color:#86efac; border:1px solid #059669; letter-spacing:0.3px; margin-left:4px;" title="Unique Existing Tree ID">EXT</span>
+            ` : ''}
           </div>
         </td>
         <td>
@@ -981,7 +984,9 @@ function applyFilters() {
     if (currentAvailabilityFilter === 'available' && remaining <= 0) return false;
     if (currentAvailabilityFilter === 'taken' && taken <= 0) return false;
     if (currentAvailabilityFilter === 'existing') {
-      const isExisting = (t.stage || '').toLowerCase().includes('existing') ||
+      const isExisting = String(t.id || '').toUpperCase().startsWith('EXT-') ||
+                         String(t.id || '').toUpperCase().startsWith('EX-') ||
+                         (t.stage || '').toLowerCase().includes('existing') ||
                          (t.stageDescription || '').toLowerCase().includes('existing') ||
                          (t.treeClassification || '').toLowerCase().includes('existing') ||
                          (t.ageOfTree || t.age || '').toLowerCase().includes('year') ||
@@ -997,7 +1002,7 @@ function applyFilters() {
 
     if (keyword) {
       const adopterStr = `${t.sponsorName || ''} ${t.adopter || ''}`;
-      const haystack = `${t.id} ${t.species?.common || ''} ${t.species?.scientific || ''} ${t.caretaker || ''} ${t.barangay || ''} ${t.municipality || ''} ${t.landowner || ''} ${adopterStr}`.toLowerCase();
+      const haystack = `${t.id} ${t.species?.common || ''} ${t.species?.scientific || ''} ${t.caretaker || ''} ${t.barangay || ''} ${t.municipality || ''} ${t.landowner || ''} ${t.stage || ''} ${t.stageDescription || ''} ${adopterStr}`.toLowerCase();
       if (!haystack.includes(keyword)) return false;
     }
     if (statusFilter) {
@@ -1204,7 +1209,12 @@ function openTreeProfile(treeId) {
     <!-- Header -->
     <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px;">
       <div class="profile-id-headline">
-        <div class="profile-tree-id">${t.id} — ${spCommon.toUpperCase()}</div>
+        <div class="profile-tree-id" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span>${t.id} — ${spCommon.toUpperCase()}</span>
+          ${(String(t.id).toUpperCase().startsWith('EXT-') || String(t.id).toUpperCase().startsWith('EX-') || (t.stage || '').toLowerCase().includes('existing')) ? `
+            <span style="font-size:11px; font-weight:800; background:#064e3b; color:#86efac; border:1px solid #059669; padding:2px 8px; border-radius:999px; letter-spacing:0.3px;">🌳 EXISTING TREE</span>
+          ` : ''}
+        </div>
         <div class="profile-botanical-tag">${spScientific || 'Botanical Species'}</div>
       </div>
       <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
@@ -2540,8 +2550,22 @@ const SAMAR_EXISTING_TREE_SPECIES_MAP = {
   'Banaba': 'Lagerstroemia speciosa'
 };
 
+function getNextExistingTreeId() {
+  let maxNum = 10000;
+  ALL_TREES.forEach(t => {
+    const idStr = String(t.id || '').toUpperCase();
+    const m = idStr.match(/^EXT-(\d+)$/) || idStr.match(/^EX-(\d+)$/);
+    if (m) {
+      const n = parseInt(m[1], 10);
+      if (n > maxNum) maxNum = n;
+    }
+  });
+  return `EXT-${maxNum + 1}`;
+}
+window.getNextExistingTreeId = getNextExistingTreeId;
+
 function openExistingTreeInfoModal(defaultTab = 'info') {
-  const nextId = getNextTreeId();
+  const nextId = getNextExistingTreeId();
   const idInput = document.getElementById('exTreeId');
   if (idInput) idInput.value = nextId;
 
@@ -2633,7 +2657,7 @@ function filterExistingTreesFromModal() {
 window.filterExistingTreesFromModal = filterExistingTreesFromModal;
 
 async function saveExistingTreeRecord() {
-  const treeId = document.getElementById('exTreeId')?.value?.trim() || getNextTreeId();
+  const treeId = document.getElementById('exTreeId')?.value?.trim() || getNextExistingTreeId();
   const speciesSelect = document.getElementById('exSpeciesSelect');
   const speciesCommon = speciesSelect?.value || 'Narra';
   const opt = speciesSelect?.options[speciesSelect.selectedIndex];
@@ -2668,6 +2692,9 @@ async function saveExistingTreeRecord() {
 
   const newTree = {
     id: treeId,
+    treeClassification: 'Existing Tree',
+    stage: 'Existing Tree',
+    isExistingTree: true,
     species: { common: speciesCommon, scientific: scientific, type: 'Native' },
     speciesCommon: speciesCommon,
     commonName: speciesCommon,
