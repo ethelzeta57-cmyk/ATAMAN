@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.37-darahuway-island-coords';
+const CACHE_NAME = 'ataman-pwa-v2.2.38-css-compat';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
