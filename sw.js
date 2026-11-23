@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.35-nav-signin-link';
+const CACHE_NAME = 'ataman-pwa-v2.2.36-remove-hero-signin';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
