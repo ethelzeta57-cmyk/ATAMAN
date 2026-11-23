@@ -114,6 +114,14 @@ function mapRawTreeToCaretakerTreeMap(t, index) {
     lng = 124.8850 + (Math.cos((index + 1) * 1.5) * 0.012);
   }
 
+  // Exact on-land coordinate fix for Darahuway Daco island
+  if (t.id === 'TR-10006' || String(location).toLowerCase().includes('darahuway')) {
+    if (lat === 11.7580 || lng === 124.8450 || (lng < 124.86 && lat > 11.75)) {
+      lat = 11.7450;
+      lng = 124.8761;
+    }
+  }
+
   const activeCaretaker = getActiveCaretakerName();
 
   return {

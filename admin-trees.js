@@ -285,8 +285,8 @@ const DEFAULT_SAMAR_TREES = [
     barangay: 'Darahuway Daco',
     municipality: 'Catbalogan City',
     province: 'Samar',
-    lat: 11.7580,
-    lng: 124.8450,
+    lat: 11.7450,
+    lng: 124.8761,
     sponsorName: '',
     adopter: '',
     fundingAmount: 50,
@@ -1818,6 +1818,8 @@ function openEditTree(treeId) {
 }
 
 const SAMAR_BARANGAY_COORDS = {
+  'Darahuway Daco': { lat: 11.7450, lng: 124.8761, mun: 'Catbalogan City' },
+  'Brgy. Darahuway Daco': { lat: 11.7450, lng: 124.8761, mun: 'Catbalogan City' },
   'Guinsorongan': { lat: 11.7598, lng: 124.8861, mun: 'Catbalogan City' },
   'Brgy. Guinsorongan': { lat: 11.7598, lng: 124.8861, mun: 'Catbalogan City' },
   'San Isidro': { lat: 11.7710, lng: 124.8910, mun: 'Catbalogan City' },

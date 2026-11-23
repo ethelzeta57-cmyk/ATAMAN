@@ -56,6 +56,8 @@ function initFirebaseAuth() {
 
 /* ─── 1. System-Wide Tree Dataset Generation & Coordinate Mapping ─── */
 const SAMAR_BARANGAY_COORDS = {
+  'Darahuway Daco': { lat: 11.745000, lng: 124.876100, name: 'Brgy. Darahuway Daco', mun: 'Catbalogan City' },
+  'Brgy. Darahuway Daco': { lat: 11.745000, lng: 124.876100, name: 'Brgy. Darahuway Daco', mun: 'Catbalogan City' },
   'Guinsorongan': { lat: 11.759800, lng: 124.886100, name: 'Brgy. Guinsorongan', mun: 'Catbalogan City' },
   'Brgy. Guinsorongan': { lat: 11.759800, lng: 124.886100, name: 'Brgy. Guinsorongan', mun: 'Catbalogan City' },
   'San Isidro': { lat: 11.771000, lng: 124.891000, name: 'Brgy. San Isidro', mun: 'Catbalogan City' },

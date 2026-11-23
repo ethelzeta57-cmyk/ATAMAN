@@ -156,8 +156,8 @@ const SAMAR_LOCATION_COORDINATES = {
   'san isidro': { lat: 11.7710, lng: 124.8910, barangay: 'San Isidro', sector: 'Sector C - Ridge & Highland Reserve' },
   'bunuanan': { lat: 11.7885, lng: 124.8890, barangay: 'Bunuanan', sector: 'Sector D - Biodiversity Forest Corridor' },
   'mabini': { lat: 11.7740, lng: 124.9030, barangay: 'Mabini', sector: 'Sector E - Upland Conservation Sector' },
-  'darahuway daco': { lat: 11.7580, lng: 124.8450, barangay: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary' },
-  'darahuway': { lat: 11.7580, lng: 124.8450, barangay: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary' },
+  'darahuway daco': { lat: 11.7450, lng: 124.8761, barangay: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary' },
+  'darahuway': { lat: 11.7450, lng: 124.8761, barangay: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary' },
   'cagutian': { lat: 11.7830, lng: 124.8895, barangay: 'Cagutian', sector: 'Central North Reserve' },
   'poblacion 4': { lat: 11.7774, lng: 124.8876, barangay: 'Poblacion 4', sector: 'Urban Forestry & Green Belt' },
   'poblacion': { lat: 11.7774, lng: 124.8876, barangay: 'Poblacion', sector: 'Urban Forestry & Green Belt' },
@@ -172,7 +172,7 @@ const SAMAR_LOCATION_COORDINATES = {
 };
 
 const CARETAKER_STATION_COORDINATES = {
-  'june luna': { lat: 11.7580, lng: 124.8450, barangay: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary' },
+  'june luna': { lat: 11.7450, lng: 124.8761, barangay: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary' },
   'dodong zeta': { lat: 11.7820, lng: 124.8875, barangay: 'Canlapwas', sector: 'Sector A - Central Watershed Reserve' }
 };
 
@@ -186,7 +186,7 @@ function isCoordinateInWater(lat, lng) {
   const numLat = Number(lat);
   const numLng = Number(lng);
   // Darahuway Daco island bounding box (valid on-land)
-  if (numLat >= 11.745 && numLat <= 11.768 && numLng >= 124.838 && numLng <= 124.855) {
+  if (numLat >= 11.738 && numLat <= 11.752 && numLng >= 124.870 && numLng <= 124.882) {
     return false;
   }
   // If west of mainland Catbalogan coastline and not on Darahuway Island, it is in Maqueda Bay (the sea)
@@ -1143,7 +1143,7 @@ function openAdoptTreeModal() {
     { name: 'Brgy. San Isidro', sector: 'Sector C - Ridge & Highland Reserve', lat: 11.7710, lng: 124.8910, defaultCaretaker: 'Dodong Zeta' },
     { name: 'Brgy. Bunuanan', sector: 'Sector D - Biodiversity Forest Corridor', lat: 11.7885, lng: 124.8890, defaultCaretaker: 'Dodong Zeta' },
     { name: 'Brgy. Mabini', sector: 'Sector E - Upland Conservation Sector', lat: 11.7740, lng: 124.9030, defaultCaretaker: 'Dodong Zeta' },
-    { name: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary', lat: 11.7580, lng: 124.8450, defaultCaretaker: 'June Luna' },
+    { name: 'Darahuway Daco', sector: 'Marine & Mangrove Forest Sanctuary', lat: 11.7450, lng: 124.8761, defaultCaretaker: 'June Luna' },
     { name: 'Poblacion 4', sector: 'Urban Forestry & Green Belt', lat: 11.7774, lng: 124.8876, defaultCaretaker: 'Dodong Zeta' }
   ];
 

@@ -1334,8 +1334,8 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       barangay: 'Darahuway Daco',
       municipality: 'Catbalogan City',
       province: 'Samar',
-      lat: 11.7580,
-      lng: 124.8450,
+      lat: 11.7450,
+      lng: 124.8761,
       sponsorName: '',
       adopter: '',
       fundingAmount: 50,
@@ -1362,7 +1362,26 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
       try {
         const stored = localStorage.getItem('ATAMAN_trees_cache');
         const parsed = stored ? JSON.parse(stored) : null;
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Auto-migrate Darahuway Daco island coordinates if pointing offshore
+          let updated = false;
+          parsed.forEach(t => {
+            if (t && (t.id === 'TR-10006' || (t.barangay && String(t.barangay).toLowerCase().includes('darahuway')))) {
+              if (t.lat === 11.7580 || t.lng === 124.8450 || (Number(t.lng) < 124.86 && Number(t.lat) > 11.75)) {
+                t.lat = 11.7450;
+                t.lng = 124.8761;
+                updated = true;
+              }
+            }
+          });
+          if (updated) {
+            try {
+              localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(parsed));
+              localStorage.setItem('saplink_trees_cache', JSON.stringify(parsed));
+            } catch (_) {}
+          }
+          return parsed;
+        }
         const def = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0)
           ? window.ATAMAN_DEFAULT_TREES
           : DEFAULT_SAMAR_TREES;
