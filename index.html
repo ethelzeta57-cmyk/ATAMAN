@@ -39,6 +39,9 @@
   <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/icon-192.png" />
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon-512.png" />
 
+  <!-- Leaflet CSS for Public Tree Map Showcase -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1787906634580" crossorigin="anonymous" />
+
   <style>
     /* ── Reset & Variables ── */
     *, *::before, *::after {
@@ -1309,6 +1312,469 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* ── Live Samar Tree Map (Public Showing) ── */
+    .showing-only-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 8px 18px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      color: #1e40af;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .showing-only-badge strong {
+      color: #1d4ed8;
+    }
+
+    .map-stats-ribbon {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .map-stat-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid var(--forest);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .map-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    .map-stat-ico {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .map-stat-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .map-stat-val {
+      font-size: 1.55rem;
+      font-weight: 800;
+      line-height: 1.1;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .map-stat-lbl {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+    }
+    .map-stat-sub {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Filter & Controls Bar */
+    .map-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .map-filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-lbl {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-right: 4px;
+    }
+    .map-filter-btn {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s;
+      font-family: inherit;
+    }
+    .map-filter-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .map-filter-btn.active {
+      background: var(--forest);
+      color: #ffffff;
+      border-color: var(--forest);
+      box-shadow: 0 2px 6px rgba(22, 101, 52, 0.35);
+    }
+    .map-control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .map-species-select {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #1e293b;
+      outline: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .map-species-select:focus {
+      border-color: var(--forest);
+      box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.15);
+    }
+    .map-toggle-layer-btn, .map-recenter-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s;
+      font-family: inherit;
+    }
+    .map-toggle-layer-btn:hover, .map-recenter-btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    /* Map Canvas */
+    .map-canvas-container {
+      position: relative;
+      border-radius: 16px;
+      border: 2px solid #cbd5e1;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+      overflow: hidden;
+      background: #0f172a;
+    }
+    .public-landing-map {
+      height: 540px;
+      width: 100%;
+      z-index: 1;
+    }
+    .map-watermark-pill {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 500;
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(8px);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* Custom Leaflet Pins */
+    .portal-pin-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .portal-pin-wrapper:hover {
+      transform: scale(1.18) translateY(-4px);
+      z-index: 9999 !important;
+    }
+    .portal-pin-badge {
+      background: #14532d;
+      color: #86efac;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1.5px solid #86efac;
+      white-space: nowrap;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+      margin-bottom: -4px;
+      z-index: 3;
+      letter-spacing: 0.02em;
+    }
+    .portal-pin-icon-box {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #16a34a, #14532d);
+      border: 2px solid #ffffff;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+      position: relative;
+    }
+    .portal-pin-icon-inner {
+      transform: rotate(45deg);
+      font-size: 18px;
+      line-height: 1;
+    }
+    .portal-pin-caretaker-dot {
+      position: absolute;
+      bottom: -3px;
+      right: -3px;
+      width: 18px;
+      height: 18px;
+      background: #1d4ed8;
+      border: 1.5px solid #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      z-index: 4;
+    }
+
+    /* Popup Styling */
+    .portal-popup-card {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      padding: 4px;
+      min-width: 250px;
+      max-width: 290px;
+    }
+    .popup-species-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    .popup-species-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+    .popup-species-sci {
+      font-size: 0.78rem;
+      font-style: italic;
+      color: #64748b;
+    }
+    .popup-batch-badge {
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .popup-info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: #334155;
+      margin-bottom: 7px;
+    }
+    .popup-info-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      line-height: 1.2;
+    }
+    .popup-caretaker-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+    .popup-caretaker-box strong {
+      color: #1e40af;
+      display: block;
+      font-size: 0.84rem;
+    }
+    .popup-caretaker-box span {
+      font-size: 0.76rem;
+      color: #3b82f6;
+    }
+    .popup-avail-box {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+    }
+    .popup-avail-box strong {
+      color: #065f46;
+      display: block;
+      font-size: 0.84rem;
+    }
+    .popup-avail-box span {
+      font-size: 0.76rem;
+      color: #059669;
+    }
+    .popup-avail-bar {
+      height: 6px;
+      background: #cbd5e1;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .popup-avail-fill {
+      height: 100%;
+      background: #10b981;
+      border-radius: 999px;
+    }
+    .popup-cta-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--forest);
+      color: #ffffff !important;
+      font-weight: 700;
+      font-size: 0.84rem;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s;
+      box-shadow: 0 2px 6px rgba(22, 101, 52, 0.3);
+    }
+    .popup-cta-btn:hover {
+      background: #14532d;
+    }
+
+    /* Map Legend Footer */
+    .map-legend-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-top: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .legend-items {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.84rem;
+      color: #475569;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .legend-dot.green { background: #10b981; border: 2px solid #a7f3d0; }
+    .legend-dot.blue { background: #3b82f6; border: 2px solid #bfdbfe; }
+    .legend-dot.gold { background: #f59e0b; border: 2px solid #fde68a; }
+    .legend-action {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.84rem;
+      color: #475569;
+    }
+    .legend-cta-btn {
+      background: var(--forest);
+      color: #ffffff !important;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 6px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.18s;
+      white-space: nowrap;
+    }
+    .legend-cta-btn:hover {
+      background: #14532d;
+    }
+
+    @media (max-width: 900px) {
+      .map-stats-ribbon {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 600px) {
+      .map-stats-ribbon {
+        grid-template-columns: 1fr;
+      }
+      .public-landing-map {
+        height: 400px;
+      }
+      .map-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .map-control-group {
+        justify-content: space-between;
+      }
+      .map-legend-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
   </style>
   <script src="ATAMAN-init.js?v=20261122_v8"></script>
 </head>
@@ -1330,6 +1796,7 @@
         <ul class="nav-links" id="navLinks">
           <li><a href="#about" class="nav-link">About Initiative</a></li>
           <li><a href="#species" class="nav-link">Native Trees</a></li>
+          <li><a href="#live-map" class="nav-link">Live Tree Map</a></li>
           <li><a href="#sectors" class="nav-link">Watershed Sectors</a></li>
           <li><a href="#roles" class="nav-link">Portals</a></li>
           <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
@@ -1366,7 +1833,7 @@
       <div class="hero-ctas">
         <a href="register-adopter.html" class="hero-btn-primary">🌱 Sponsor &amp; Adopt Trees</a>
         <button type="button" class="hero-btn-secondary" id="heroSignInBtn">🔐 Enter Portal / Sign In</button>
-        <a href="#sectors" class="hero-btn-tertiary">🗺️ Explore Watershed Sectors →</a>
+        <a href="#live-map" class="hero-btn-tertiary">🗺️ View Live Samar Map (Public) →</a>
       </div>
 
       <!-- Real-Time Metrics Bar -->
@@ -1572,6 +2039,120 @@
     </div>
   </section>
 
+  <!-- Live Samar Tree Map Showcase (Public Showing Only) -->
+  <section class="section-wrap" style="background:#f8fafc;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;" id="live-map">
+    <div class="section-header">
+      <span class="section-badge" style="background:#e0f2fe;color:#0369a1;border-color:#bae6fd;">
+        🗺️ Public GIS Registry Viewer • Showing Only
+      </span>
+      <h2 class="section-title">Samar Native Tree Map: Caretakers &amp; Adoption Availability</h2>
+      <p class="section-desc">
+        Explore all registered Samar reforestation trees in real time. See how many trees have active field caretakers protecting them and how many trees are immediately available for citizen adoption.
+      </p>
+      <div>
+        <div class="showing-only-badge">
+          <span>👁️ <strong>Public Showing Only:</strong> Real-time demonstration of Samar tree registry, caretaker assignments, and available quota. Sign in to your account to adopt or submit field updates.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Metric Overview Cards -->
+    <div class="map-stats-ribbon">
+      <div class="map-stat-card">
+        <div class="map-stat-ico" style="background:#ecfdf5;color:#059669;">🌲</div>
+        <div class="map-stat-info">
+          <span class="map-stat-val" id="statTotalMonitored">600</span>
+          <span class="map-stat-lbl">Total Monitored Trees</span>
+          <span class="map-stat-sub" id="statBatchesCount">6 Samar Batches</span>
+        </div>
+      </div>
+
+      <div class="map-stat-card" style="border-left:4px solid #3b82f6;">
+        <div class="map-stat-ico" style="background:#eff6ff;color:#2563eb;">🛡️</div>
+        <div class="map-stat-info">
+          <span class="map-stat-val" style="color:#1d4ed8;" id="statWithCaretaker">600</span>
+          <span class="map-stat-lbl">Trees with Caretaker</span>
+          <span class="map-stat-sub" id="statCaretakerNames">Dodong Zeta &amp; June Luna</span>
+        </div>
+      </div>
+
+      <div class="map-stat-card" style="border-left:4px solid #10b981;">
+        <div class="map-stat-ico" style="background:#ecfdf5;color:#10b981;">🌱</div>
+        <div class="map-stat-info">
+          <span class="map-stat-val" style="color:#047857;" id="statAvailableAdoption">600</span>
+          <span class="map-stat-lbl">Available for Adoption</span>
+          <span class="map-stat-sub">Rate: ₱50.00 / tree</span>
+        </div>
+      </div>
+
+      <div class="map-stat-card" style="border-left:4px solid #f59e0b;">
+        <div class="map-stat-ico" style="background:#fffbeb;color:#d97706;">📍</div>
+        <div class="map-stat-info">
+          <span class="map-stat-val" style="color:#b45309;" id="statSectorsCount">6</span>
+          <span class="map-stat-lbl">Protected Samar Sectors</span>
+          <span class="map-stat-sub">100% Geotagged on Land</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Interactive Controls & Filter Bar -->
+    <div class="map-filter-bar">
+      <div class="map-filter-group">
+        <span class="filter-lbl">Quick Filter:</span>
+        <button type="button" class="map-filter-btn active" data-filter="all" id="btnFilterAll">
+          🌐 All Trees (<span id="countAllFilter">600</span>)
+        </button>
+        <button type="button" class="map-filter-btn" data-filter="caretaker" id="btnFilterCaretaker">
+          🛡️ With Caretaker (<span id="countCaretakerFilter">600</span>)
+        </button>
+        <button type="button" class="map-filter-btn" data-filter="available" id="btnFilterAvailable">
+          🌱 Available for Adoption (<span id="countAvailableFilter">600</span>)
+        </button>
+      </div>
+
+      <div class="map-control-group">
+        <select id="speciesMapFilter" class="map-species-select" aria-label="Filter by Species">
+          <option value="all">🌿 All Native Species</option>
+          <option value="Narra">Narra (Pterocarpus indicus)</option>
+          <option value="Molave">Molave (Vitex parviflora)</option>
+          <option value="Yakal">Yakal (Shorea astylosa)</option>
+          <option value="Tindalo">Tindalo (Afzelia rhomboidea)</option>
+          <option value="Dao">Dao (Dracontomelon dao)</option>
+          <option value="Banaba">Banaba (Lagerstroemia speciosa)</option>
+        </select>
+
+        <button type="button" class="map-toggle-layer-btn" id="btnToggleLayer" title="Switch Between Satellite & Street Map">
+          🛰️ Satellite View
+        </button>
+
+        <button type="button" class="map-recenter-btn" id="btnRecenterSamar" title="Recenter to Samar / Catbalogan City">
+          🎯 Samar Center
+        </button>
+      </div>
+    </div>
+
+    <!-- Leaflet Map Canvas -->
+    <div class="map-canvas-container">
+      <div id="publicLandingMap" class="public-landing-map"></div>
+      <div class="map-watermark-pill">
+        <span>👁️ Public Demo Viewer • Read-Only Samar Registry</span>
+      </div>
+    </div>
+
+    <!-- Map Legend & Action Footer -->
+    <div class="map-legend-footer">
+      <div class="legend-items">
+        <div class="legend-item"><span class="legend-dot green"></span> <strong>Available for Adoption:</strong> Ready for citizen sponsorship</div>
+        <div class="legend-item"><span class="legend-dot blue"></span> <strong>Assigned Caretaker:</strong> Protected by active field personnel</div>
+        <div class="legend-item"><span class="legend-dot gold"></span> <strong>Verified Sector:</strong> Catbalogan City &amp; Samar watershed</div>
+      </div>
+      <div class="legend-action">
+        <span>Want to sponsor or track your trees?</span>
+        <a href="register-adopter.html" class="legend-cta-btn">🌱 Sponsor &amp; Adopt Trees</a>
+      </div>
+    </div>
+  </section>
+
   <!-- Watershed & Conservation Sectors -->
   <section class="section-wrap" style="background:#f1f5f9;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;" id="sectors">
     <div class="section-header">
@@ -1641,9 +2222,12 @@
             Unlike generic tree planting programs, ATAMAN guarantees verified coordinates on land with pinpoint accuracy.
             Every tree adopter can view their trees' exact location and scan field QR tags.
           </p>
-          <div style="margin-top:14px;">
-            <button type="button" class="hero-btn-primary" onclick="openLoginModal()" style="font-size:0.88rem;padding:10px 22px;">
-              🗺️ Sign In to View Live Map
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="#live-map" class="hero-btn-primary" style="font-size:0.86rem;padding:9px 18px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+              🗺️ Explore Live Map Above ↑
+            </a>
+            <button type="button" class="hero-btn-secondary" onclick="openLoginModal()" style="font-size:0.86rem;padding:9px 18px;">
+              🔐 Sign In to Portal
             </button>
           </div>
         </div>
@@ -1943,6 +2527,367 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <script src="firebase-config.js?v=20261122_v12"></script>
+
+  <!-- Leaflet JS for Public GIS Showcase Map -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+
+  <!-- Interactive Public Landing Map Logic -->
+  <script>
+    (function initPublicLandingMap() {
+      // Default Samar Reforestation Trees fallback
+      const DEFAULT_PORTAL_TREES = [
+        {
+          id: 'TR-10001',
+          commonName: 'Narra',
+          scientificName: 'Pterocarpus indicus',
+          treeType: 'Native',
+          treeCount: 100,
+          takenCount: 0,
+          barangay: 'Canlapwas (Sector A)',
+          municipality: 'Catbalogan City',
+          province: 'Samar',
+          lat: 11.7820,
+          lng: 124.8875,
+          caretaker: 'Dodong Zeta'
+        },
+        {
+          id: 'TR-10002',
+          commonName: 'Molave',
+          scientificName: 'Vitex parviflora',
+          treeType: 'Native',
+          treeCount: 100,
+          takenCount: 0,
+          barangay: 'Guinsorongan (Sector B)',
+          municipality: 'Catbalogan City',
+          province: 'Samar',
+          lat: 11.7598,
+          lng: 124.8861,
+          caretaker: 'Dodong Zeta'
+        },
+        {
+          id: 'TR-10003',
+          commonName: 'Yakal',
+          scientificName: 'Shorea astylosa',
+          treeType: 'Native',
+          treeCount: 100,
+          takenCount: 0,
+          barangay: 'San Isidro (Sector C)',
+          municipality: 'Catbalogan City',
+          province: 'Samar',
+          lat: 11.7710,
+          lng: 124.8910,
+          caretaker: 'Dodong Zeta'
+        },
+        {
+          id: 'TR-10004',
+          commonName: 'Tindalo',
+          scientificName: 'Afzelia rhomboidea',
+          treeType: 'Native',
+          treeCount: 100,
+          takenCount: 0,
+          barangay: 'Bunuanan (Sector D)',
+          municipality: 'Catbalogan City',
+          province: 'Samar',
+          lat: 11.7885,
+          lng: 124.8890,
+          caretaker: 'Dodong Zeta'
+        },
+        {
+          id: 'TR-10005',
+          commonName: 'Dao',
+          scientificName: 'Dracontomelon dao',
+          treeType: 'Native',
+          treeCount: 100,
+          takenCount: 0,
+          barangay: 'Mabini (Sector E)',
+          municipality: 'Catbalogan City',
+          province: 'Samar',
+          lat: 11.7740,
+          lng: 124.9030,
+          caretaker: 'Dodong Zeta'
+        },
+        {
+          id: 'TR-10006',
+          commonName: 'Banaba',
+          scientificName: 'Lagerstroemia speciosa',
+          treeType: 'Native',
+          treeCount: 100,
+          takenCount: 0,
+          barangay: 'Darahuway Daco (Island Sanctuary)',
+          municipality: 'Catbalogan City',
+          province: 'Samar',
+          lat: 11.7580,
+          lng: 124.8450,
+          caretaker: 'June Luna'
+        }
+      ];
+
+      function getTreeData() {
+        try {
+          if (window.ATAMAN_DB && typeof window.ATAMAN_DB.getLocalTrees === 'function') {
+            const dbTrees = window.ATAMAN_DB.getLocalTrees();
+            if (Array.isArray(dbTrees) && dbTrees.length > 0) return dbTrees;
+          }
+          const cache = localStorage.getItem('ATAMAN_trees_cache') || localStorage.getItem('admin_trees_data');
+          if (cache) {
+            const parsed = JSON.parse(cache);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (err) {
+          console.warn('[PublicMap] Error reading local tree cache, using defaults:', err);
+        }
+        return DEFAULT_PORTAL_TREES;
+      }
+
+      function init() {
+        const mapContainer = document.getElementById('publicLandingMap');
+        if (!mapContainer || typeof L === 'undefined') {
+          setTimeout(init, 100);
+          return;
+        }
+
+        const trees = getTreeData();
+
+        // 1. Calculate & Display Live Metrics
+        let totalCount = 0;
+        let withCaretakerCount = 0;
+        let availableCount = 0;
+        const caretakersSet = new Set();
+        const locationsSet = new Set();
+
+        trees.forEach(t => {
+          const count = parseInt(t.treeCount, 10) || 100;
+          const taken = parseInt(t.takenCount, 10) || 0;
+          const avail = Math.max(0, count - taken);
+          totalCount += count;
+          availableCount += avail;
+
+          const caretaker = t.caretaker && t.caretaker.trim();
+          if (caretaker) {
+            withCaretakerCount += count;
+            caretakersSet.add(caretaker);
+          }
+          if (t.barangay) locationsSet.add(t.barangay);
+        });
+
+        const statTotal = document.getElementById('statTotalMonitored');
+        const statCaretaker = document.getElementById('statWithCaretaker');
+        const statAvail = document.getElementById('statAvailableAdoption');
+        const statSectors = document.getElementById('statSectorsCount');
+        const statBatches = document.getElementById('statBatchesCount');
+        const statCaretakerNames = document.getElementById('statCaretakerNames');
+        const countAll = document.getElementById('countAllFilter');
+        const countCaretaker = document.getElementById('countCaretakerFilter');
+        const countAvail = document.getElementById('countAvailableFilter');
+
+        if (statTotal) statTotal.textContent = totalCount.toLocaleString();
+        if (statCaretaker) statCaretaker.textContent = withCaretakerCount.toLocaleString();
+        if (statAvail) statAvail.textContent = availableCount.toLocaleString();
+        if (statSectors) statSectors.textContent = Math.max(6, locationsSet.size);
+        if (statBatches) statBatches.textContent = `${trees.length} Samar Batches`;
+        if (statCaretakerNames && caretakersSet.size > 0) {
+          statCaretakerNames.textContent = Array.from(caretakersSet).join(' & ');
+        }
+        if (countAll) countAll.textContent = totalCount;
+        if (countCaretaker) countCaretaker.textContent = withCaretakerCount;
+        if (countAvail) countAvail.textContent = availableCount;
+
+        // 2. Setup Leaflet Map centered on Catbalogan City / Samar
+        const defaultCenter = [11.7753, 124.8850];
+        const map = L.map('publicLandingMap', {
+          center: defaultCenter,
+          zoom: 13,
+          zoomControl: true,
+          scrollWheelZoom: false // prevents accidental scroll capture on landing page
+        });
+
+        // Base Tile Layers (Esri Satellite World Imagery & OpenStreetMap)
+        const satelliteLayer = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          {
+            attribution: 'Tiles &copy; Esri &mdash; Samar Geographic Registry',
+            maxZoom: 19
+          }
+        );
+        const streetLayer = L.tileLayer(
+          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+          }
+        );
+
+        satelliteLayer.addTo(map);
+        let currentLayer = 'satellite';
+
+        // 3. Render Markers
+        const markersGroup = L.layerGroup().addTo(map);
+        let activeFilter = 'all';
+        let activeSpecies = 'all';
+
+        function renderMapMarkers() {
+          markersGroup.clearLayers();
+
+          const bounds = [];
+
+          trees.forEach(tree => {
+            const count = parseInt(tree.treeCount, 10) || 100;
+            const taken = parseInt(tree.takenCount, 10) || 0;
+            const avail = Math.max(0, count - taken);
+            const caretaker = (tree.caretaker && tree.caretaker.trim()) || 'Dodong Zeta';
+            const hasCaretaker = Boolean(tree.caretaker && tree.caretaker.trim());
+            const speciesName = tree.commonName || tree.speciesCommon || (tree.species && tree.species.common) || 'Narra';
+
+            // Filter checks
+            if (activeFilter === 'caretaker' && !hasCaretaker) return;
+            if (activeFilter === 'available' && avail <= 0) return;
+            if (activeSpecies !== 'all' && !speciesName.toLowerCase().includes(activeSpecies.toLowerCase())) return;
+
+            const lat = parseFloat(tree.lat) || 11.7753;
+            const lng = parseFloat(tree.lng) || 124.8850;
+            bounds.push([lat, lng]);
+
+            const customIcon = L.divIcon({
+              className: 'portal-marker-icon',
+              html: `
+                <div class="portal-pin-wrapper" title="${speciesName} • Caretaker: ${caretaker}">
+                  <div class="portal-pin-badge">${avail} avail</div>
+                  <div class="portal-pin-icon-box">
+                    <span class="portal-pin-icon-inner">🌳</span>
+                    <div class="portal-pin-caretaker-dot" title="Assigned Caretaker: ${caretaker}">🛡️</div>
+                  </div>
+                </div>
+              `,
+              iconSize: [44, 52],
+              iconAnchor: [22, 50],
+              popupAnchor: [0, -48]
+            });
+
+            const marker = L.marker([lat, lng], { icon: customIcon });
+
+            const percentAvailable = Math.min(100, Math.round((avail / count) * 100));
+            const popupContent = `
+              <div class="portal-popup-card">
+                <div class="popup-species-header">
+                  <div>
+                    <div class="popup-species-title">${speciesName}</div>
+                    <div class="popup-species-sci">${tree.scientificName || ''}</div>
+                  </div>
+                  <span class="popup-batch-badge">${tree.id || 'TR-SAMAR'}</span>
+                </div>
+
+                <div class="popup-caretaker-box">
+                  <strong>🛡️ Assigned Caretaker: ${caretaker}</strong>
+                  <span>Active Field Protection • Regular Weeding & Health Monitoring</span>
+                </div>
+
+                <div class="popup-avail-box">
+                  <strong>🌱 Available to Sponsor: ${avail} of ${count} Trees</strong>
+                  <span>Sponsorship Rate: ₱50.00 / tree contribution</span>
+                  <div class="popup-avail-bar">
+                    <div class="popup-avail-fill" style="width:${percentAvailable}%;"></div>
+                  </div>
+                </div>
+
+                <div class="popup-info-row">
+                  <span class="popup-info-icon">📍</span>
+                  <div><strong>Sector:</strong> ${tree.barangay || 'Catbalogan Reserve'}, ${tree.municipality || 'Catbalogan City'}</div>
+                </div>
+
+                <div class="popup-info-row" style="font-size:0.75rem;color:#64748b;margin-bottom:10px;">
+                  <span class="popup-info-icon">🌐</span>
+                  <div><strong>Verified GPS:</strong> ${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E</div>
+                </div>
+
+                <a href="register-adopter.html" class="popup-cta-btn">🌱 Sponsor &amp; Adopt Trees</a>
+              </div>
+            `;
+
+            marker.bindPopup(popupContent, { maxWidth: 300, className: 'portal-custom-popup' });
+            markersGroup.addLayer(marker);
+          });
+
+          if (bounds.length > 1 && (activeFilter !== 'all' || activeSpecies !== 'all')) {
+            map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+          }
+        }
+
+        renderMapMarkers();
+
+        // 4. UI Filter Button Events
+        const btnAll = document.getElementById('btnFilterAll');
+        const btnCaretaker = document.getElementById('btnFilterCaretaker');
+        const btnAvailable = document.getElementById('btnFilterAvailable');
+        const filterBtns = [btnAll, btnCaretaker, btnAvailable].filter(Boolean);
+
+        filterBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter || 'all';
+            renderMapMarkers();
+          });
+        });
+
+        // Species dropdown filter
+        const speciesSelect = document.getElementById('speciesMapFilter');
+        if (speciesSelect) {
+          speciesSelect.addEventListener('change', (e) => {
+            activeSpecies = e.target.value;
+            renderMapMarkers();
+          });
+        }
+
+        // Layer Switcher (Satellite vs Streets)
+        const toggleLayerBtn = document.getElementById('btnToggleLayer');
+        if (toggleLayerBtn) {
+          toggleLayerBtn.addEventListener('click', () => {
+            if (currentLayer === 'satellite') {
+              map.removeLayer(satelliteLayer);
+              streetLayer.addTo(map);
+              currentLayer = 'streets';
+              toggleLayerBtn.innerHTML = '🗺️ Street View (Active)';
+            } else {
+              map.removeLayer(streetLayer);
+              satelliteLayer.addTo(map);
+              currentLayer = 'satellite';
+              toggleLayerBtn.innerHTML = '🛰️ Satellite View';
+            }
+          });
+        }
+
+        // Recenter to Samar
+        const recenterBtn = document.getElementById('btnRecenterSamar');
+        if (recenterBtn) {
+          recenterBtn.addEventListener('click', () => {
+            map.setView(defaultCenter, 13, { animate: true });
+          });
+        }
+
+        // Refresh tiles when user scrolls into view or resizes window
+        setTimeout(() => map.invalidateSize(), 350);
+        window.addEventListener('resize', () => map.invalidateSize());
+
+        if ('IntersectionObserver' in window) {
+          const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                map.invalidateSize();
+              }
+            });
+          }, { threshold: 0.1 });
+          const liveSection = document.getElementById('live-map');
+          if (liveSection) obs.observe(liveSection);
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
 
   <!-- Landing Page & Portal Modal Logic -->
   <script>
