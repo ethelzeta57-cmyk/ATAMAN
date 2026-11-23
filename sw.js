@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.28-restore-tree-registry';
+const CACHE_NAME = 'ataman-pwa-v2.2.29-web-portal-landing';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
