@@ -18,7 +18,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ATAMAN — Samar Reforestation & Native Tree Stewardship Web Portal</title>
-  <meta name="description" content="ATAMAN - Tanom. Ataman. Padayon. The official digital tree registry and community reforestation portal for Catbalogan City and Samar, Philippines." />
+  <meta name="description"
+    content="ATAMAN - Tanom. Ataman. Padayon. The official digital tree registry and community reforestation portal for Catbalogan City and Samar, Philippines." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -40,11 +41,14 @@
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon-512.png" />
 
   <!-- Leaflet CSS for Public Tree Map Showcase -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1787906634580" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1787906634580"
+    crossorigin="anonymous" />
 
   <style>
     /* ── Reset & Variables ── */
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -157,14 +161,15 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: clamp(10px, 1.4vw, 22px);
       list-style: none;
     }
 
     .nav-link {
-      font-size: 0.9rem;
+      font-size: 0.86rem;
       font-weight: 600;
       color: #cbd5e1;
+      white-space: nowrap;
       transition: color 0.2s ease;
       position: relative;
     }
@@ -176,17 +181,20 @@
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     .btn-portal-signin {
       background: rgba(255, 255, 255, 0.12);
       color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.25);
-      padding: 9px 18px;
+      padding: 8px 16px;
       border-radius: var(--radius-xl);
-      font-size: 0.88rem;
+      font-size: 0.84rem;
       font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -204,10 +212,12 @@
       background: #16a34a;
       color: #ffffff;
       border: 1px solid #22c55e;
-      padding: 9px 20px;
+      padding: 8px 18px;
       border-radius: var(--radius-xl);
-      font-size: 0.88rem;
+      font-size: 0.84rem;
       font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -229,6 +239,8 @@
       color: #ffffff;
       font-size: 1.6rem;
       cursor: pointer;
+      padding: 4px;
+      line-height: 1;
     }
 
     /* ── Hero Section ── */
@@ -259,7 +271,7 @@
       position: absolute;
       inset: 0;
       background: radial-gradient(circle at 60% 40%, rgba(21, 128, 61, 0.22) 0%, rgba(6, 28, 14, 0.95) 75%),
-                  linear-gradient(to bottom, rgba(6, 28, 14, 0.7) 0%, rgba(6, 28, 14, 0.98) 100%);
+        linear-gradient(to bottom, rgba(6, 28, 14, 0.7) 0%, rgba(6, 28, 14, 0.98) 100%);
     }
 
     .hero-content {
@@ -425,8 +437,13 @@
       margin-bottom: 4px;
     }
 
-    .stat-number.gold { color: #fde047; }
-    .stat-number.green { color: #86efac; }
+    .stat-number.gold {
+      color: #fde047;
+    }
+
+    .stat-number.green {
+      color: #86efac;
+    }
 
     .stat-label {
       font-size: 0.76rem;
@@ -803,9 +820,20 @@
       margin-bottom: 16px;
     }
 
-    .role-card.adopter .role-icon-circle { background: #dcfce7; color: #166534; }
-    .role-card.caretaker .role-icon-circle { background: #fef3c7; color: #b45309; }
-    .role-card.admin .role-icon-circle { background: #fee2e2; color: #b91c1c; }
+    .role-card.adopter .role-icon-circle {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .role-card.caretaker .role-icon-circle {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .role-card.admin .role-icon-circle {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
 
     .role-title {
       font-size: 1.3rem;
@@ -862,6 +890,7 @@
       background: #16a34a;
       color: #ffffff;
     }
+
     .role-card.adopter .role-action-btn:hover {
       background: #15803d;
     }
@@ -870,6 +899,7 @@
       background: #f59e0b;
       color: #ffffff;
     }
+
     .role-card.caretaker .role-action-btn:hover {
       background: #d97706;
     }
@@ -878,6 +908,7 @@
       background: #0f172a;
       color: #ffffff;
     }
+
     .role-card.admin .role-action-btn:hover {
       background: #1e293b;
     }
@@ -1035,18 +1066,21 @@
       background: rgba(4, 20, 10, 0.78);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
       opacity: 0;
+      visibility: hidden;
       pointer-events: none;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
     }
 
     .portal-modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
+      display: flex !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
     }
 
     .portal-modal-card {
@@ -1054,8 +1088,9 @@
       border-radius: var(--radius-lg);
       width: 100%;
       max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: var(--shadow-lg);
-      overflow: hidden;
       transform: translateY(20px) scale(0.97);
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
@@ -1187,7 +1222,10 @@
       font-weight: 700;
       text-decoration: none;
     }
-    .lv-forgot:hover { text-decoration: underline; }
+
+    .lv-forgot:hover {
+      text-decoration: underline;
+    }
 
     .lv-submit {
       width: 100%;
@@ -1229,10 +1267,14 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
-    .hide { display: none !important; }
+    .hide {
+      display: none !important;
+    }
 
     /* Toast */
     .lv-toast {
@@ -1263,53 +1305,173 @@
     }
 
     /* ── Responsive Queries ── */
-    @media (max-width: 960px) {
+    @media (max-width: 1060px) {
+      .nav-links {
+        display: none;
+      }
+
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 66px;
+        left: 0;
+        right: 0;
+        background: rgba(6, 28, 14, 0.97);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 20px 24px 28px;
+        border-bottom: 1px solid rgba(134, 239, 172, 0.25);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        gap: 8px;
+        z-index: 1500;
+        max-height: calc(100vh - 66px);
+        overflow-y: auto;
+      }
+
+      .nav-links.open .nav-link {
+        font-size: 1.02rem;
+        padding: 12px 14px;
+        border-radius: 8px;
+        color: #f1f5f9;
+        display: block;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .nav-links.open .nav-link:hover {
+        background: rgba(22, 101, 52, 0.35);
+        color: #86efac;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .pillars-grid,
+      .roles-grid,
+      .sectors-grid {
+        grid-template-columns: 1fr;
+      }
+
       .hero-stats-bar {
         grid-template-columns: repeat(2, 1fr);
         gap: 16px;
       }
-      .stat-box:nth-child(2)::after { display: none; }
-      .pillars-grid, .roles-grid {
-        grid-template-columns: 1fr;
+
+      .stat-box:nth-child(2)::after {
+        display: none;
       }
-      .sectors-grid {
-        grid-template-columns: 1fr;
-      }
+
       .steps-grid {
         grid-template-columns: repeat(2, 1fr);
       }
+
       .footer-container {
         grid-template-columns: 1fr 1fr;
       }
     }
 
     @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .nav-links.open {
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: #061c0e;
-        padding: 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        gap: 16px;
-      }
-      .mobile-menu-btn { display: block; }
       .hero-section {
         padding: 50px 16px 70px;
+        min-height: auto;
       }
+
+      .hero-badge {
+        font-size: 0.78rem;
+        padding: 6px 14px;
+        text-align: center;
+      }
+
+      .hero-title {
+        font-size: clamp(1.9rem, 7vw, 2.6rem);
+      }
+
+      .hero-subtitle {
+        font-size: 0.92rem;
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+      }
+
+      .hero-btn-primary,
+      .hero-btn-secondary,
+      .hero-btn-tertiary {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+      }
+
       .hero-stats-bar {
         grid-template-columns: 1fr 1fr;
-        padding: 16px;
+        padding: 16px 12px;
       }
+
       .steps-grid {
         grid-template-columns: 1fr;
       }
+
       .footer-container {
         grid-template-columns: 1fr;
+        gap: 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .portal-nav .nav-container {
+        padding: 10px 14px;
+        gap: 8px;
+      }
+
+      .brand-tagline {
+        display: none;
+      }
+
+      .brand-title {
+        font-size: 1.15rem;
+      }
+
+      .brand-logo-img {
+        height: 36px;
+      }
+
+      .btn-portal-adopt {
+        padding: 7px 11px;
+        font-size: 0.76rem;
+      }
+
+      .btn-portal-signin {
+        padding: 7px 9px;
+        font-size: 0.76rem;
+      }
+
+      .mobile-menu-btn {
+        font-size: 1.45rem;
+        padding: 2px 4px;
+      }
+
+      .hero-stats-bar {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .stat-box {
+        padding: 10px;
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+      }
+
+      .section-wrap {
+        padding: 44px 14px;
+      }
+
+      .section-title {
+        font-size: 1.55rem;
       }
     }
 
@@ -1325,8 +1487,9 @@
       border-radius: 999px;
       font-size: 0.88rem;
       color: #1e40af;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
+
     .showing-only-badge strong {
       color: #1d4ed8;
     }
@@ -1337,6 +1500,7 @@
       gap: 16px;
       margin-bottom: 22px;
     }
+
     .map-stat-card {
       background: #ffffff;
       border: 1px solid #e2e8f0;
@@ -1346,13 +1510,15 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
       transition: transform 0.2s, box-shadow 0.2s;
     }
+
     .map-stat-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     }
+
     .map-stat-ico {
       width: 46px;
       height: 46px;
@@ -1363,11 +1529,13 @@
       font-size: 1.4rem;
       flex-shrink: 0;
     }
+
     .map-stat-info {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
+
     .map-stat-val {
       font-size: 1.55rem;
       font-weight: 800;
@@ -1375,6 +1543,7 @@
       color: #0f172a;
       letter-spacing: -0.02em;
     }
+
     .map-stat-lbl {
       font-size: 0.82rem;
       font-weight: 700;
@@ -1383,6 +1552,7 @@
       letter-spacing: 0.04em;
       margin-top: 2px;
     }
+
     .map-stat-sub {
       font-size: 0.78rem;
       color: #64748b;
@@ -1404,14 +1574,16 @@
       border-radius: 14px;
       padding: 12px 16px;
       margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     }
+
     .map-filter-group {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 8px;
     }
+
     .filter-lbl {
       font-size: 0.82rem;
       font-weight: 700;
@@ -1420,6 +1592,7 @@
       letter-spacing: 0.04em;
       margin-right: 4px;
     }
+
     .map-filter-btn {
       background: #f1f5f9;
       color: #334155;
@@ -1435,22 +1608,26 @@
       transition: all 0.18s;
       font-family: inherit;
     }
+
     .map-filter-btn:hover {
       background: #e2e8f0;
       color: #0f172a;
     }
+
     .map-filter-btn.active {
       background: var(--forest);
       color: #ffffff;
       border-color: var(--forest);
       box-shadow: 0 2px 6px rgba(22, 101, 52, 0.35);
     }
+
     .map-control-group {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
     }
+
     .map-species-select {
       background: #ffffff;
       border: 1px solid #cbd5e1;
@@ -1463,11 +1640,14 @@
       cursor: pointer;
       font-family: inherit;
     }
+
     .map-species-select:focus {
       border-color: var(--forest);
       box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.15);
     }
-    .map-toggle-layer-btn, .map-recenter-btn {
+
+    .map-toggle-layer-btn,
+    .map-recenter-btn {
       background: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
@@ -1482,7 +1662,9 @@
       transition: all 0.18s;
       font-family: inherit;
     }
-    .map-toggle-layer-btn:hover, .map-recenter-btn:hover {
+
+    .map-toggle-layer-btn:hover,
+    .map-recenter-btn:hover {
       background: #f8fafc;
       border-color: #94a3b8;
     }
@@ -1492,15 +1674,17 @@
       position: relative;
       border-radius: 16px;
       border: 2px solid #cbd5e1;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
       overflow: hidden;
       background: #0f172a;
     }
+
     .public-landing-map {
       height: 540px;
       width: 100%;
       z-index: 1;
     }
+
     .map-watermark-pill {
       position: absolute;
       top: 14px;
@@ -1516,7 +1700,7 @@
       font-weight: 600;
       letter-spacing: 0.03em;
       pointer-events: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     /* Custom Leaflet Pins */
@@ -1529,10 +1713,12 @@
       cursor: pointer;
       transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+
     .portal-pin-wrapper:hover {
       transform: scale(1.18) translateY(-4px);
       z-index: 9999 !important;
     }
+
     .portal-pin-badge {
       background: #14532d;
       color: #86efac;
@@ -1542,11 +1728,12 @@
       border-radius: 999px;
       border: 1.5px solid #86efac;
       white-space: nowrap;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
       margin-bottom: -4px;
       z-index: 3;
       letter-spacing: 0.02em;
     }
+
     .portal-pin-icon-box {
       width: 38px;
       height: 38px;
@@ -1557,14 +1744,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
       position: relative;
     }
+
     .portal-pin-icon-inner {
       transform: rotate(45deg);
       font-size: 18px;
       line-height: 1;
     }
+
     .portal-pin-caretaker-dot {
       position: absolute;
       bottom: -3px;
@@ -1578,7 +1767,7 @@
       align-items: center;
       justify-content: center;
       font-size: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       z-index: 4;
     }
 
@@ -1589,6 +1778,7 @@
       min-width: 250px;
       max-width: 290px;
     }
+
     .popup-species-header {
       display: flex;
       align-items: center;
@@ -1598,17 +1788,20 @@
       padding-bottom: 8px;
       margin-bottom: 10px;
     }
+
     .popup-species-title {
       font-size: 1.05rem;
       font-weight: 800;
       color: #0f172a;
       line-height: 1.2;
     }
+
     .popup-species-sci {
       font-size: 0.78rem;
       font-style: italic;
       color: #64748b;
     }
+
     .popup-batch-badge {
       background: #e2e8f0;
       color: #334155;
@@ -1618,6 +1811,7 @@
       border-radius: 6px;
       white-space: nowrap;
     }
+
     .popup-info-row {
       display: flex;
       align-items: flex-start;
@@ -1626,11 +1820,13 @@
       color: #334155;
       margin-bottom: 7px;
     }
+
     .popup-info-icon {
       font-size: 1rem;
       flex-shrink: 0;
       line-height: 1.2;
     }
+
     .popup-caretaker-box {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
@@ -1638,15 +1834,18 @@
       padding: 8px 10px;
       margin-bottom: 8px;
     }
+
     .popup-caretaker-box strong {
       color: #1e40af;
       display: block;
       font-size: 0.84rem;
     }
+
     .popup-caretaker-box span {
       font-size: 0.76rem;
       color: #3b82f6;
     }
+
     .popup-avail-box {
       background: #ecfdf5;
       border: 1px solid #a7f3d0;
@@ -1654,15 +1853,18 @@
       padding: 8px 10px;
       margin-bottom: 10px;
     }
+
     .popup-avail-box strong {
       color: #065f46;
       display: block;
       font-size: 0.84rem;
     }
+
     .popup-avail-box span {
       font-size: 0.76rem;
       color: #059669;
     }
+
     .popup-avail-bar {
       height: 6px;
       background: #cbd5e1;
@@ -1670,11 +1872,13 @@
       overflow: hidden;
       margin-top: 6px;
     }
+
     .popup-avail-fill {
       height: 100%;
       background: #10b981;
       border-radius: 999px;
     }
+
     .popup-cta-btn {
       display: block;
       width: 100%;
@@ -1689,6 +1893,7 @@
       transition: background 0.2s;
       box-shadow: 0 2px 6px rgba(22, 101, 52, 0.3);
     }
+
     .popup-cta-btn:hover {
       background: #14532d;
     }
@@ -1705,8 +1910,9 @@
       border-radius: 12px;
       padding: 14px 20px;
       margin-top: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     }
+
     .legend-items {
       display: flex;
       flex-wrap: wrap;
@@ -1715,20 +1921,35 @@
       font-size: 0.84rem;
       color: #475569;
     }
+
     .legend-item {
       display: flex;
       align-items: center;
       gap: 6px;
     }
+
     .legend-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .legend-dot.green { background: #10b981; border: 2px solid #a7f3d0; }
-    .legend-dot.blue { background: #3b82f6; border: 2px solid #bfdbfe; }
-    .legend-dot.gold { background: #f59e0b; border: 2px solid #fde68a; }
+
+    .legend-dot.green {
+      background: #10b981;
+      border: 2px solid #a7f3d0;
+    }
+
+    .legend-dot.blue {
+      background: #3b82f6;
+      border: 2px solid #bfdbfe;
+    }
+
+    .legend-dot.gold {
+      background: #f59e0b;
+      border: 2px solid #fde68a;
+    }
+
     .legend-action {
       display: flex;
       align-items: center;
@@ -1736,6 +1957,7 @@
       font-size: 0.84rem;
       color: #475569;
     }
+
     .legend-cta-btn {
       background: var(--forest);
       color: #ffffff !important;
@@ -1747,6 +1969,7 @@
       transition: background 0.18s;
       white-space: nowrap;
     }
+
     .legend-cta-btn:hover {
       background: #14532d;
     }
@@ -1756,20 +1979,25 @@
         grid-template-columns: 1fr 1fr;
       }
     }
+
     @media (max-width: 600px) {
       .map-stats-ribbon {
         grid-template-columns: 1fr;
       }
+
       .public-landing-map {
         height: 400px;
       }
+
       .map-filter-bar {
         flex-direction: column;
         align-items: stretch;
       }
+
       .map-control-group {
         justify-content: space-between;
       }
+
       .map-legend-footer {
         flex-direction: column;
         align-items: flex-start;
@@ -1777,6 +2005,35 @@
     }
   </style>
   <script src="ATAMAN-init.js?v=20261122_v8"></script>
+  <script>
+    window.openLoginModal = function (e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const m = document.getElementById('portalLoginModal');
+      if (m) {
+        m.style.display = 'flex';
+        void m.offsetWidth;
+        m.classList.add('active');
+        m.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        const inp = m.querySelector('#emailInput');
+        if (inp) setTimeout(() => inp.focus(), 80);
+      } else {
+        window.location.href = 'login.html';
+      }
+    };
+    window.closeLoginModal = function (e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const m = document.getElementById('portalLoginModal');
+      if (m) {
+        m.classList.remove('active');
+        m.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+          if (!m.classList.contains('active')) m.style.display = 'none';
+        }, 250);
+      }
+    };
+  </script>
 </head>
 
 <body>
@@ -1785,7 +2042,8 @@
   <header class="portal-nav" id="portalNav">
     <div class="nav-container">
       <div class="brand-group" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-        <img src="assets/ataman-logo-transparent.png" alt="ATAMAN Logo" class="brand-logo-img" onerror="this.src='assets/atamanlogo.png'" />
+        <img src="assets/ataman-logo-transparent.png" alt="ATAMAN Logo" class="brand-logo-img"
+          onerror="this.src='assets/atamanlogo.png'" />
         <div class="brand-meta">
           <span class="brand-title">ATAMAN</span>
           <span class="brand-tagline">Tanom • Ataman • Padayon</span>
@@ -1794,10 +2052,10 @@
 
       <nav>
         <ul class="nav-links" id="navLinks">
-          <li><a href="#about" class="nav-link">About Initiative</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
           <li><a href="#species" class="nav-link">Native Trees</a></li>
-          <li><a href="#live-map" class="nav-link">Live Tree Map</a></li>
-          <li><a href="#sectors" class="nav-link">Watershed Sectors</a></li>
+          <li><a href="#live-map" class="nav-link">Live Map</a></li>
+          <li><a href="#sectors" class="nav-link">Sectors</a></li>
           <li><a href="#roles" class="nav-link">Portals</a></li>
           <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
         </ul>
@@ -1906,7 +2164,8 @@
       <h2 class="section-title">Indigenous Samar Native Trees</h2>
       <p class="section-desc">
         Explore the 6 native species actively cultivated in the Samar reforestation nursery.
-        Each species is specifically chosen for typhoon resistance, watershed protection, and local biodiversity support.
+        Each species is specifically chosen for typhoon resistance, watershed protection, and local biodiversity
+        support.
       </p>
     </div>
 
@@ -1921,7 +2180,8 @@
           <h3 class="species-name">Narra</h3>
           <p class="species-scientific">Pterocarpus indicus</p>
           <p class="species-desc">
-            The Philippine National Tree. Exceptional strength, sprawling watershed canopy, and superior resistance to heavy tropical rains.
+            The Philippine National Tree. Exceptional strength, sprawling watershed canopy, and superior resistance to
+            heavy tropical rains.
           </p>
           <div class="species-meta-row">
             <div class="species-meta-item"><span>Classification:</span><strong>Native Hardwood</strong></div>
@@ -1942,7 +2202,8 @@
           <h3 class="species-name">Molave</h3>
           <p class="species-scientific">Vitex parviflora</p>
           <p class="species-desc">
-            Extremely dense, durable hardwood that thrives in limestone soil. Provides vital root stabilization for coastal green buffers.
+            Extremely dense, durable hardwood that thrives in limestone soil. Provides vital root stabilization for
+            coastal green buffers.
           </p>
           <div class="species-meta-row">
             <div class="species-meta-item"><span>Classification:</span><strong>Native Hardwood</strong></div>
@@ -1963,7 +2224,8 @@
           <h3 class="species-name">Yakal</h3>
           <p class="species-scientific">Shorea astylosa</p>
           <p class="species-desc">
-            High-grade Samar indigenous timber capable of reaching massive heights. Vital for erosion control on mountainous ridge reserves.
+            High-grade Samar indigenous timber capable of reaching massive heights. Vital for erosion control on
+            mountainous ridge reserves.
           </p>
           <div class="species-meta-row">
             <div class="species-meta-item"><span>Classification:</span><strong>Native Samar Dipterocarp</strong></div>
@@ -1984,7 +2246,8 @@
           <h3 class="species-name">Tindalo</h3>
           <p class="species-scientific">Afzelia rhomboidea</p>
           <p class="species-desc">
-            Vulnerable and revered native hardwood. Its deep root systems prevent soil subsidence along biodiversity forest corridors.
+            Vulnerable and revered native hardwood. Its deep root systems prevent soil subsidence along biodiversity
+            forest corridors.
           </p>
           <div class="species-meta-row">
             <div class="species-meta-item"><span>Classification:</span><strong>Native Hardwood</strong></div>
@@ -2005,7 +2268,8 @@
           <h3 class="species-name">Dao</h3>
           <p class="species-scientific">Dracontomelon dao</p>
           <p class="species-desc">
-            Gigantic canopy tree with distinctive buttress roots that shelter wildlife and anchor riverbanks in upland conservation sectors.
+            Gigantic canopy tree with distinctive buttress roots that shelter wildlife and anchor riverbanks in upland
+            conservation sectors.
           </p>
           <div class="species-meta-row">
             <div class="species-meta-item"><span>Classification:</span><strong>Native Buttress Canopy</strong></div>
@@ -2026,7 +2290,8 @@
           <h3 class="species-name">Banaba</h3>
           <p class="species-scientific">Lagerstroemia speciosa</p>
           <p class="species-desc">
-            Vibrant purple flowering tree renowned for medicinal properties, coastal soil stabilization, and biodiversity enhancement.
+            Vibrant purple flowering tree renowned for medicinal properties, coastal soil stabilization, and
+            biodiversity enhancement.
           </p>
           <div class="species-meta-row">
             <div class="species-meta-item"><span>Classification:</span><strong>Native Flowering Canopy</strong></div>
@@ -2040,18 +2305,21 @@
   </section>
 
   <!-- Live Samar Tree Map Showcase (Public Showing Only) -->
-  <section class="section-wrap" style="background:#f8fafc;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;" id="live-map">
+  <section class="section-wrap" style="background:#f8fafc;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;"
+    id="live-map">
     <div class="section-header">
       <span class="section-badge" style="background:#e0f2fe;color:#0369a1;border-color:#bae6fd;">
         🗺️ Public GIS Registry Viewer • Showing Only
       </span>
       <h2 class="section-title">Samar Native Tree Map: Caretakers &amp; Adoption Availability</h2>
       <p class="section-desc">
-        Explore all registered Samar reforestation trees in real time. See how many trees have active field caretakers protecting them and how many trees are immediately available for citizen adoption.
+        Explore all registered Samar reforestation trees in real time. See how many trees have active field caretakers
+        protecting them and how many trees are immediately available for citizen adoption.
       </p>
       <div>
         <div class="showing-only-badge">
-          <span>👁️ <strong>Public Showing Only:</strong> Real-time demonstration of Samar tree registry, caretaker assignments, and available quota. Sign in to your account to adopt or submit field updates.</span>
+          <span>👁️ <strong>Public Showing Only:</strong> Real-time demonstration of Samar tree registry, caretaker
+            assignments, and available quota. Sign in to your account to adopt or submit field updates.</span>
         </div>
       </div>
     </div>
@@ -2121,11 +2389,13 @@
           <option value="Banaba">Banaba (Lagerstroemia speciosa)</option>
         </select>
 
-        <button type="button" class="map-toggle-layer-btn" id="btnToggleLayer" title="Switch Between Satellite & Street Map">
+        <button type="button" class="map-toggle-layer-btn" id="btnToggleLayer"
+          title="Switch Between Satellite & Street Map">
           🛰️ Satellite View
         </button>
 
-        <button type="button" class="map-recenter-btn" id="btnRecenterSamar" title="Recenter to Samar / Catbalogan City">
+        <button type="button" class="map-recenter-btn" id="btnRecenterSamar"
+          title="Recenter to Samar / Catbalogan City">
           🎯 Samar Center
         </button>
       </div>
@@ -2142,9 +2412,12 @@
     <!-- Map Legend & Action Footer -->
     <div class="map-legend-footer">
       <div class="legend-items">
-        <div class="legend-item"><span class="legend-dot green"></span> <strong>Available for Adoption:</strong> Ready for citizen sponsorship</div>
-        <div class="legend-item"><span class="legend-dot blue"></span> <strong>Assigned Caretaker:</strong> Protected by active field personnel</div>
-        <div class="legend-item"><span class="legend-dot gold"></span> <strong>Verified Sector:</strong> Catbalogan City &amp; Samar watershed</div>
+        <div class="legend-item"><span class="legend-dot green"></span> <strong>Available for Adoption:</strong> Ready
+          for citizen sponsorship</div>
+        <div class="legend-item"><span class="legend-dot blue"></span> <strong>Assigned Caretaker:</strong> Protected by
+          active field personnel</div>
+        <div class="legend-item"><span class="legend-dot gold"></span> <strong>Verified Sector:</strong> Catbalogan City
+          &amp; Samar watershed</div>
       </div>
       <div class="legend-action">
         <span>Want to sponsor or track your trees?</span>
@@ -2154,12 +2427,14 @@
   </section>
 
   <!-- Watershed & Conservation Sectors -->
-  <section class="section-wrap" style="background:#f1f5f9;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;" id="sectors">
+  <section class="section-wrap" style="background:#f1f5f9;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;"
+    id="sectors">
     <div class="section-header">
       <span class="section-badge">Geographic Registry</span>
       <h2 class="section-title">Catbalogan City &amp; Samar Sectors</h2>
       <p class="section-desc">
-        Trees are strategically distributed across verified on-land sectors to form a continuous green protective belt around Catbalogan City.
+        Trees are strategically distributed across verified on-land sectors to form a continuous green protective belt
+        around Catbalogan City.
       </p>
     </div>
 
@@ -2219,14 +2494,17 @@
         <div class="map-preview-meta">
           <h3>Interactive GIS Positioning</h3>
           <p>
-            Unlike generic tree planting programs, ATAMAN guarantees verified coordinates on land with pinpoint accuracy.
+            Unlike generic tree planting programs, ATAMAN guarantees verified coordinates on land with pinpoint
+            accuracy.
             Every tree adopter can view their trees' exact location and scan field QR tags.
           </p>
           <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
-            <a href="#live-map" class="hero-btn-primary" style="font-size:0.86rem;padding:9px 18px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+            <a href="#live-map" class="hero-btn-primary"
+              style="font-size:0.86rem;padding:9px 18px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
               🗺️ Explore Live Map Above ↑
             </a>
-            <button type="button" class="hero-btn-secondary" onclick="openLoginModal()" style="font-size:0.86rem;padding:9px 18px;">
+            <button type="button" class="hero-btn-secondary" onclick="openLoginModal()"
+              style="font-size:0.86rem;padding:9px 18px;">
               🔐 Sign In to Portal
             </button>
           </div>
@@ -2252,7 +2530,8 @@
           <div class="role-icon-circle">🌱</div>
           <h3 class="role-title">Tree Adopter Portal</h3>
           <p class="role-desc">
-            For individuals, families, and organizations sponsoring trees in Samar. Track your sponsored impact with complete transparency.
+            For individuals, families, and organizations sponsoring trees in Samar. Track your sponsored impact with
+            complete transparency.
           </p>
           <ul class="role-features">
             <li>Direct adoption at ₱50 per tree</li>
@@ -2263,7 +2542,8 @@
         </div>
         <div>
           <a href="register-adopter.html" class="role-action-btn">Register as Adopter →</a>
-          <button type="button" class="role-action-btn" onclick="openLoginModal()" style="background:#f1f5f9;color:#334155;border-color:#cbd5e1;margin-top:8px;">
+          <button type="button" class="role-action-btn" onclick="openLoginModal()"
+            style="background:#f1f5f9;color:#334155;border-color:#cbd5e1;margin-top:8px;">
             Adopter Sign In
           </button>
         </div>
@@ -2275,7 +2555,8 @@
           <div class="role-icon-circle">🧑‍🌾</div>
           <h3 class="role-title">Field Caretaker Portal</h3>
           <p class="role-desc">
-            Designed for field stewards (Dodong Zeta, June Luna) monitoring tree survival and logging regular maintenance records.
+            Designed for field stewards (Dodong Zeta, June Luna) monitoring tree survival and logging regular
+            maintenance records.
           </p>
           <ul class="role-features">
             <li>Fast mobile-first inspection logging</li>
@@ -2297,7 +2578,8 @@
           <div class="role-icon-circle">🛡️</div>
           <h3 class="role-title">Administrative Console</h3>
           <p class="role-desc">
-            Complete executive oversight for municipal CICTO and forestry directors over the entire Samar reforestation initiative.
+            Complete executive oversight for municipal CICTO and forestry directors over the entire Samar reforestation
+            initiative.
           </p>
           <ul class="role-features">
             <li>Batch inventory &amp; species registry controls</li>
@@ -2321,7 +2603,8 @@
       <span class="section-badge">Simple 4-Step Process</span>
       <h2 class="section-title">How Tree Adoption Works</h2>
       <p class="section-desc">
-        From species selection to field care and growth tracking, your sponsorship directly contributes to Samar's canopy.
+        From species selection to field care and growth tracking, your sponsorship directly contributes to Samar's
+        canopy.
       </p>
     </div>
 
@@ -2329,25 +2612,29 @@
       <div class="step-item">
         <div class="step-num">1</div>
         <h4>Choose Species &amp; Quantity</h4>
-        <p>Pick from 6 indigenous Samar species (Narra, Molave, Yakal, etc.) and select how many trees you want to sponsor.</p>
+        <p>Pick from 6 indigenous Samar species (Narra, Molave, Yakal, etc.) and select how many trees you want to
+          sponsor.</p>
       </div>
 
       <div class="step-item">
         <div class="step-num">2</div>
         <h4>Select Sector &amp; Caretaker</h4>
-        <p>Assign your trees to verified watershed locations (Canlapwas, Guinsorongan, etc.) maintained by dedicated field personnel.</p>
+        <p>Assign your trees to verified watershed locations (Canlapwas, Guinsorongan, etc.) maintained by dedicated
+          field personnel.</p>
       </div>
 
       <div class="step-item">
         <div class="step-num">3</div>
         <h4>Instant Official Certificate</h4>
-        <p>Receive your personalized Samar Reforestation Certificate of Recognition with your Adopter ID and GPS tags.</p>
+        <p>Receive your personalized Samar Reforestation Certificate of Recognition with your Adopter ID and GPS tags.
+        </p>
       </div>
 
       <div class="step-item">
         <div class="step-num">4</div>
         <h4>Monitor Live in Dashboard</h4>
-        <p>Access your dashboard anytime to view GPS coordinates, tree health indicators, and field photographic updates.</p>
+        <p>Access your dashboard anytime to view GPS coordinates, tree health indicators, and field photographic
+          updates.</p>
       </div>
     </div>
   </section>
@@ -2360,7 +2647,8 @@
       Every tree planted today protects Samar's watersheds and future generations.
     </p>
     <div class="cta-banner-buttons">
-      <a href="register-adopter.html" class="hero-btn-primary" style="background:#ffffff;color:#166534;border-color:#ffffff;">
+      <a href="register-adopter.html" class="hero-btn-primary"
+        style="background:#ffffff;color:#166534;border-color:#ffffff;">
         🌱 Register as an Adopter
       </a>
       <button type="button" class="hero-btn-secondary" onclick="openLoginModal()">
@@ -2374,7 +2662,8 @@
     <div class="footer-container">
       <div class="footer-brand">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <img src="assets/ataman-logo-transparent.png" alt="ATAMAN" style="height:38px;width:auto;" onerror="this.src='assets/atamanlogo.png'" />
+          <img src="assets/ataman-logo-transparent.png" alt="ATAMAN" style="height:38px;width:auto;"
+            onerror="this.src='assets/atamanlogo.png'" />
           <h3 style="margin:0;">ATAMAN</h3>
         </div>
         <p>
@@ -2427,8 +2716,10 @@
   <div class="portal-modal-overlay" id="portalLoginModal" aria-hidden="true">
     <div class="portal-modal-card">
       <div class="modal-header-banner">
-        <button type="button" class="modal-close-btn" id="closeLoginModalBtn" aria-label="Close Sign In Dialog">&times;</button>
-        <img src="assets/ataman-logo-stacked.png" alt="ATAMAN Logo" style="height:70px;width:auto;margin:0 auto 8px;object-fit:contain;" />
+        <button type="button" class="modal-close-btn" id="closeLoginModalBtn"
+          aria-label="Close Sign In Dialog">&times;</button>
+        <img src="assets/ataman-logo-stacked.png" alt="ATAMAN Logo"
+          style="height:70px;width:auto;margin:0 auto 8px;object-fit:contain;" />
         <h2 style="font-size:1.35rem;font-weight:800;margin:0;">Sign In to ATAMAN</h2>
         <p style="font-size:0.82rem;color:#dcfce7;margin:4px 0 0;">Access your Adopter, Caretaker, or Admin Portal</p>
       </div>
@@ -2497,8 +2788,10 @@
         </form>
 
         <!-- Register Adopter Link -->
-        <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid #f1f5f9;font-size:0.86rem;color:#64748b;">
-          New to Samar Reforestation? <a href="register-adopter.html" style="color:#15803d;font-weight:700;">Register as an Adopter</a>
+        <div
+          style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid #f1f5f9;font-size:0.86rem;color:#64748b;">
+          New to Samar Reforestation? <a href="register-adopter.html" style="color:#15803d;font-weight:700;">Register as
+            an Adopter</a>
         </div>
       </div>
     </div>
@@ -2898,20 +3191,35 @@
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const navLinks = document.getElementById('navLinks');
 
-    function openLoginModal() {
-      if (modal) {
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
-        const inp = modal.querySelector('#emailInput');
-        if (inp) setTimeout(() => inp.focus(), 100);
+    function openLoginModal(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const m = document.getElementById('portalLoginModal');
+      if (m) {
+        m.style.display = 'flex';
+        void m.offsetWidth; // force reflow for smooth animation
+        m.classList.add('active');
+        m.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        const inp = m.querySelector('#emailInput');
+        if (inp) setTimeout(() => inp.focus(), 80);
+      } else {
+        window.location.href = 'login.html';
       }
     }
     window.openLoginModal = openLoginModal;
 
-    function closeLoginModal() {
-      if (modal) {
-        modal.classList.remove('active');
-        modal.setAttribute('aria-hidden', 'true');
+    function closeLoginModal(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const m = document.getElementById('portalLoginModal');
+      if (m) {
+        m.classList.remove('active');
+        m.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+          if (!m.classList.contains('active')) {
+            m.style.display = 'none';
+          }
+        }, 250);
       }
     }
     window.closeLoginModal = closeLoginModal;
@@ -2935,11 +3243,15 @@
     // Mobile nav hamburger toggle
     if (mobileMenuBtn && navLinks) {
       mobileMenuBtn.addEventListener('click', () => {
-        navLinks.classList.toggle('open');
+        const isOpen = navLinks.classList.toggle('open');
+        mobileMenuBtn.innerHTML = isOpen ? '✕' : '☰';
+        mobileMenuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
       navLinks.querySelectorAll('a').forEach(a => {
         a.addEventListener('click', () => {
           navLinks.classList.remove('open');
+          mobileMenuBtn.innerHTML = '☰';
+          mobileMenuBtn.setAttribute('aria-expanded', 'false');
         });
       });
     }
