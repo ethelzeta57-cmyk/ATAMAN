@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.38-css-compat';
+const CACHE_NAME = 'ataman-pwa-v2.2.39-caretaker-claim-workflow';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
@@ -15,6 +15,7 @@ const PRECACHE_ASSETS = [
   './splash.html',
   './register-adopter.html',
   './register-caretaker.html',
+  './caretaker-dashboard.html',
   './my-trees.html',
   './admin-tree-map.html',
   './admin-trees.html',
@@ -22,11 +23,13 @@ const PRECACHE_ASSETS = [
   './manifest.json',
   './dashboard.css',
   './style.css',
+  './caretaker-dashboard.css',
   './my-trees.css',
   './admin-tree-map.css',
   './admin-trees.css',
   './register.css',
   './ATAMAN-init.js',
+  './caretaker-dashboard.js',
   './ataman-connectivity.js',
   './realtime-admin.js',
   './firebase-config.js',

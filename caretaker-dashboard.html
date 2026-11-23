@@ -35,8 +35,8 @@
   <link rel="shortcut icon" href="favicon.ico" />
 
   <!-- Caretaker Dashboard Styles -->
-  <link rel="stylesheet" href="caretaker-dashboard.css?v=20261110_v14" />
-  <script src="ATAMAN-init.js?v=20261120_v7"></script>
+  <link rel="stylesheet" href="caretaker-dashboard.css?v=20261123_v1" />
+  <script src="ATAMAN-init.js?v=20261123_v1"></script>
   <link rel="stylesheet" href="ataman-bottom-nav.css?v=20261113_v1" />
 </head>
 
@@ -80,6 +80,19 @@
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
             <span>Dashboard</span>
+          </a>
+        </li>
+
+        <!-- 2. Claim Adopter Trees (Queue) -->
+        <li class="ct-nav-item">
+          <a href="#ctAwaitingQueueSection" class="ct-nav-link" id="navClaimTrees">
+            <svg class="ct-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+            <span>Claim Adopter Trees</span>
+            <span class="ct-badge-count-green" id="ctAwaitingNavBadge"
+              style="margin-left:auto; background:#22c55e; color:#0c381e; font-size:10px; font-weight:800; padding:2px 7px; border-radius:999px;">0</span>
           </a>
         </li>
 
@@ -564,6 +577,132 @@
           <div style="font-size:0.76rem; color:#475569;" id="ctAdopterPoolLinkNote">
             🤝 Linked Adopter Pool: <strong>Nikki Maga</strong> (10 funded trees • ₱500 allocated)
           </div>
+        </div>
+      </section>
+
+      <!-- ─── CARETAKER QUEUE: ADOPTED TREES AWAITING CARETAKER ─── -->
+      <section class="ct-awaiting-section" id="ctAwaitingQueueSection">
+        <div class="ct-awaiting-header-wrap">
+          <div class="ct-awaiting-badge-tagline">
+            <span>🌱</span> ATAMAN • Tanom. Ataman. Padayon. | Catbalogan City Reforestation Initiative
+          </div>
+          <div class="ct-awaiting-title-row">
+            <div class="ct-awaiting-titles">
+              <h2 class="ct-awaiting-title">
+                Adopted Trees Awaiting Caretaker
+                <span class="ct-awaiting-count-badge" id="ctAwaitingCountBadge">0 Trees Available</span>
+              </h2>
+              <p class="ct-awaiting-desc">
+                Review verified trees and saplings sponsored by community adopters in Catbalogan City. Click <strong>"Take Tree" / "Claim Tree"</strong> to bind a tree directly to your unified Caretaker ID (CT-101), moving it into your active care monitoring schedule, GPS field route, and photo logs with full record continuity.
+              </p>
+            </div>
+            <div class="ct-awaiting-actions-top">
+              <button type="button" class="ct-btn-refresh-queue" id="btnRefreshQueue" title="Refresh Live Queue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                <span>Live Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Queue Filter & Search Toolbar -->
+          <div class="ct-awaiting-toolbar">
+            <div class="ct-awaiting-search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ct-queue-search-ico">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="queueSearchInput" class="ct-queue-search-input" placeholder="Search by Tree ID, Native Species, Zone, Plot, or Adopter..." />
+              <button type="button" class="ct-queue-clear-btn hide" id="queueClearSearchBtn">✕</button>
+            </div>
+
+            <!-- Stage Filter Pills -->
+            <div class="ct-queue-stage-pills" id="queueStageFilterPills">
+              <button type="button" class="ct-stage-pill active" data-stage="all">All Trees (<span id="cntStageAll">0</span>)</button>
+              <button type="button" class="ct-stage-pill" data-stage="sapling">🌱 Saplings (<span id="cntStageSapling">0</span>)</button>
+              <button type="button" class="ct-stage-pill" data-stage="existing">🌳 Existing Trees (<span id="cntStageExisting">0</span>)</button>
+            </div>
+
+            <!-- Zone Dropdown Filter -->
+            <div class="ct-queue-zone-wrap">
+              <select id="queueZoneFilter" class="ct-queue-zone-select">
+                <option value="all">📍 All Watershed Sectors</option>
+                <option value="Canlapwas">Sector A • Canlapwas (Zone 1)</option>
+                <option value="Guinsorongan">Sector B • Guinsorongan (Zone 2)</option>
+                <option value="San Isidro">Sector C • San Isidro (Zone 3)</option>
+                <option value="Bunuanan">Sector D • Bunuanan (Zone 4)</option>
+                <option value="Mabini">Sector E • Mabini (Zone 5)</option>
+                <option value="Darahuway Daco">Island Sanctuary • Darahuway Daco (Zone 6)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards Grid for Awaiting Trees -->
+        <div class="ct-awaiting-grid" id="ctAwaitingTreesGrid">
+          <!-- Dynamically populated in real-time -->
+        </div>
+
+        <!-- Empty State Container -->
+        <div class="ct-queue-empty hide" id="ctQueueEmpty">
+          <div class="ct-queue-empty-icon">🌱</div>
+          <h3 class="ct-queue-empty-title">All Adopted Trees Are Currently Stewarded!</h3>
+          <p class="ct-queue-empty-text">
+            There are no unassigned adopted trees in the queue right now. As soon as community adopters sponsor new native trees or saplings in Catbalogan City, they will immediately appear here for you to claim.
+          </p>
+        </div>
+      </section>
+
+      <!-- ─── LIVE ZONE / PLOT STATUS MATRIX ─── -->
+      <section class="ct-card ct-matrix-section" id="ctZonePlotMatrixSection" style="margin-bottom:24px;">
+        <div class="ct-card-header" style="flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+          <div class="ct-card-title-group">
+            <svg class="ct-card-title-ico text-green" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+              <path d="M3 9h18"></path>
+              <path d="M3 15h18"></path>
+              <path d="M9 3v18"></path>
+              <path d="M15 3v18"></path>
+            </svg>
+            <div>
+              <h2 class="ct-card-title" style="margin:0;">Live Samar Watershed Zone &amp; Plot Status Matrix</h2>
+              <p style="margin:3px 0 0; font-size:0.8rem; color:#64748b;">
+                Real-time stewardship mapping across protected Samar reforestation sectors, registered plots, and adopter sponsorships.
+              </p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="live-sync-indicator-pill">
+              <span class="pulse-green-dot"></span> Live Adopter &amp; Matrix Sync Active
+            </span>
+          </div>
+        </div>
+
+        <div class="ct-table-responsive" style="max-height:360px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:12px;">
+          <table class="ct-table ct-matrix-table">
+            <thead>
+              <tr>
+                <th>Tree ID</th>
+                <th>Native Species</th>
+                <th>Planting Zone &amp; Sector</th>
+                <th>Plot / Book</th>
+                <th>Stage</th>
+                <th>Adopter Name</th>
+                <th>Stewardship / Caretaker</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="ctZonePlotMatrixTbody">
+              <!-- Dynamically populated in real-time -->
+            </tbody>
+          </table>
+        </div>
+        <div class="ct-table-footer" style="padding:10px 16px; font-size:0.78rem; color:#64748b; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span id="ctMatrixFooterSummary">Showing 0 sectors &amp; plots</span>
+          <span>Unified Caretaker ID: <strong style="color:#166534;" id="ctMatrixCaregiverIdDisplay">CT-101 (EMP-002)</strong></span>
         </div>
       </section>
 
@@ -1121,6 +1260,94 @@
     </div>
   </div>
 
+  <!-- ══════════════════ CLAIM / TAKE ADOPTER TREE CONFIRMATION MODAL ══════════════════ -->
+  <div class="modal-backdrop hide" id="claimTreeConfirmModal">
+    <div class="custom-modal" role="dialog" aria-modal="true" style="max-width:560px;">
+      <div class="modal-hdr" style="background:linear-gradient(135deg, #0c381e 0%, #166534 100%); color:#ffffff;">
+        <div class="modal-hdr-left">
+          <div class="modal-icon-badge" style="background:rgba(255,255,255,0.18); color:#86efac;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-ttl" style="color:#ffffff;">Confirm Tree Stewardship Claim</h3>
+            <span class="modal-sub" style="color:#bbf7d0;">ATAMAN • Tanom. Ataman. Padayon.</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeClaimModalBtn" type="button" aria-label="Close" style="color:#ffffff;">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding:22px;">
+        <!-- Summary Box for Selected Tree -->
+        <div style="background:#fbfbee; border:1.5px solid #dcfce7; border-radius:14px; padding:16px; margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:#166534; text-transform:uppercase; letter-spacing:0.04em;" id="claimTreeStageBadge">🌱 Sapling (Nursery Stage)</span>
+              <h4 style="margin:4px 0 2px; font-size:1.15rem; font-weight:800; color:#0f172a;" id="claimTreeIdSpecies">TR-10007 — Narra</h4>
+              <span style="font-size:0.8rem; font-style:italic; color:#64748b;" id="claimTreeSciName">Pterocarpus indicus</span>
+            </div>
+            <span style="display:inline-block; background:#dcfce7; color:#14532d; font-weight:800; font-size:12px; padding:4px 10px; border-radius:8px; border:1px solid #86efac;" id="claimTreeIdPill">TR-10007</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.82rem; color:#334155; margin-top:12px; padding-top:10px; border-top:1px dashed #cbd5e1;">
+            <div>
+              <span style="display:block; font-size:11px; color:#64748b; font-weight:600;">PLANTING SECTOR &amp; PLOT</span>
+              <strong id="claimTreePlotZone" style="color:#0f172a;">Zone 1 • Plot A-14 (Book 1)</strong>
+            </div>
+            <div>
+              <span style="display:block; font-size:11px; color:#64748b; font-weight:600;">COMMUNITY ADOPTER</span>
+              <strong id="claimTreeAdopterName" style="color:#166534;">Nikki Maga</strong>
+            </div>
+            <div>
+              <span style="display:block; font-size:11px; color:#64748b; font-weight:600;">FIELD BIOMETRICS</span>
+              <span id="claimTreeBiometrics">Height: 1.8m • Trunk: 2.8cm</span>
+            </div>
+            <div>
+              <span style="display:block; font-size:11px; color:#64748b; font-weight:600;">LOCATION COORDINATES</span>
+              <span id="claimTreeCoords">11.7828° N, 124.8860° E</span>
+            </div>
+          </div>
+
+          <div id="claimTreeDedicationRow" style="margin-top:10px; padding:8px 10px; background:#ffffff; border-radius:8px; border:1px solid #e2e8f0; font-size:0.78rem; color:#475569;">
+            💬 Dedication: <em id="claimTreeDedicationText">"For the future green youth of Catbalogan"</em>
+          </div>
+        </div>
+
+        <!-- Caretaker Unified ID Assurance Card -->
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:12px; padding:14px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <span style="font-size:16px;">🛡️</span>
+            <strong style="font-size:0.85rem; color:#14532d;">Unified Caretaker Account Assignment</strong>
+          </div>
+          <p style="margin:0 0 10px; font-size:0.8rem; color:#166534; line-height:1.5;">
+            This tree will be bound directly to your official Caretaker ID. All record continuity (Adopter account linkage, QR code, GPS pin, official certificates, and health monitoring logs) will be preserved under your single unified profile without duplicate entries.
+          </p>
+          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; font-size:0.78rem; background:#ffffff; padding:10px; border-radius:8px; border:1px solid #bbf7d0;">
+            <div>Assigned Caretaker: <strong id="modalCtName">Dodong Zeta</strong></div>
+            <div>Unified ID: <strong style="color:#15803d;" id="modalCtId">CT-101 (EMP-002)</strong></div>
+            <div>Caretaker Email: <strong id="modalCtEmail">zetadodong@gmail.com</strong></div>
+            <div>Station: <strong>Catbalogan City, Samar</strong></div>
+          </div>
+        </div>
+
+        <!-- Real-Time Sync Notice -->
+        <div style="display:flex; align-items:center; gap:8px; font-size:0.77rem; color:#475569; padding:6px 4px;">
+          <span class="pulse-green-dot"></span>
+          <span>Immediately syncs to the Adopter's portal, Tree Locator map, and the Live Samar Zone Matrix upon claiming.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions" style="padding:16px 22px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn-cancel" id="cancelClaimModalBtn">Cancel</button>
+        <button type="button" class="btn-submit-green" id="confirmTakeTreeBtn" style="padding:10px 22px; font-size:0.88rem; font-weight:800; background:linear-gradient(135deg, #166534 0%, #15803d 100%);">
+          🤝 Confirm &amp; Take Tree
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div class="ct-toast" id="ctToast">
     <span id="ctToastMsg">Action completed</span>
@@ -1135,7 +1362,7 @@
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
   <!-- Caretaker Logic -->
-  <script src="caretaker-dashboard.js"></script>
+  <script src="caretaker-dashboard.js?v=20261123_v1"></script>
   <!-- Connectivity Guard & Native Mobile Browser Escape Engine -->
   <script src="ataman-connectivity.js"></script>
   <!-- PWA Service Worker Registration & Project Updates -->

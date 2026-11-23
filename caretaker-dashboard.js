@@ -23,16 +23,23 @@ document.addEventListener('DOMContentLoaded', () => {
   initCaretakerMap();
   initCaretakerActions();
   initMobileNav();
+  initAwaitingTreesQueue();
+  renderZonePlotMatrix();
+  initClaimTreeWorkflow();
 
   if (window.ATAMAN_DB && typeof window.ATAMAN_DB.onTreesChange === 'function') {
     window.ATAMAN_DB.onTreesChange((trees) => {
       syncCaretakerStats(trees);
+      initAwaitingTreesQueue(trees);
+      renderZonePlotMatrix(trees);
     });
   }
 
   window.addEventListener('storage', (e) => {
-    if (e.key === 'ATAMAN_trees_cache') {
+    if (e.key === 'ATAMAN_trees_cache' || e.key === 'ATAMAN_caretakers_cache') {
       syncCaretakerStats();
+      initAwaitingTreesQueue();
+      renderZonePlotMatrix();
     }
   });
 });
@@ -1498,4 +1505,792 @@ function initMobileNav() {
       }
     });
   }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CARETAKER QUEUE: "ADOPTED TREES AWAITING CARETAKER" WORKFLOW
+   Forest-Green and Soft Warm-Cream Aesthetic
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const SEED_AWAITING_ADOPTED_TREES = [
+  {
+    id: 'TR-10007',
+    species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
+    speciesCommon: 'Narra',
+    commonName: 'Narra',
+    scientificName: 'Pterocarpus indicus',
+    treeType: 'Native',
+    treeCount: 1,
+    takenCount: 1,
+    status: 'healthy',
+    health: 'Healthy',
+    stage: 'Sapling',
+    stageDescription: '6-Month Nursery Sapling',
+    plantingZone: 'Zone 1 (Sector A • Canlapwas Watershed)',
+    zone: 'Zone 1',
+    plot: 'Plot A-14',
+    book: 'Book 1',
+    plotBook: 'Zone 1 • Plot A-14 (Book 1)',
+    barangay: 'Canlapwas',
+    municipality: 'Catbalogan City',
+    province: 'Samar',
+    lat: 11.7828,
+    lng: 124.8860,
+    sponsorName: 'Nikki Maga',
+    adopter: 'Nikki Maga',
+    adopterId: 'ADP-101',
+    adopterEmail: 'nikkimaga24@gmail.com',
+    adopterPhone: '+63 917 123 4567',
+    adopterType: 'Individual Community Sponsor',
+    dedication: 'For the future green youth of Catbalogan',
+    caretaker: 'Awaiting Caretaker',
+    caretakerId: '',
+    caretakerEmail: '',
+    caretakerStatus: 'awaiting',
+    height: '1.8 meters',
+    trunkDiam: '2.8 cm',
+    datePlanted: '2026-05-21',
+    dateAdded: 'Nov 22, 2026',
+    createdAt: '2026-11-22T08:00:00.000Z',
+    photo: 'assets/tree.jpg'
+  },
+  {
+    id: 'TR-10008',
+    species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Native' },
+    speciesCommon: 'Molave',
+    commonName: 'Molave',
+    scientificName: 'Vitex parviflora',
+    treeType: 'Native',
+    treeCount: 1,
+    takenCount: 1,
+    status: 'healthy',
+    health: 'Healthy',
+    stage: 'Sapling',
+    stageDescription: '8-Month Nursery Sapling',
+    plantingZone: 'Zone 2 (Sector B • Guinsorongan Coastal Buffer)',
+    zone: 'Zone 2',
+    plot: 'Plot B-08',
+    book: 'Book 2',
+    plotBook: 'Zone 2 • Plot B-08 (Book 2)',
+    barangay: 'Guinsorongan',
+    municipality: 'Catbalogan City',
+    province: 'Samar',
+    lat: 11.7612,
+    lng: 124.8870,
+    sponsorName: 'Elena Cruz',
+    adopter: 'Elena Cruz',
+    adopterId: 'ADP-102',
+    adopterEmail: 'elenacruz.samar@gmail.com',
+    adopterPhone: '+63 920 445 6789',
+    adopterType: 'Samar Heritage Foundation',
+    dedication: 'In memory of Samar natural coastal heritage',
+    caretaker: 'Awaiting Caretaker',
+    caretakerId: '',
+    caretakerEmail: '',
+    caretakerStatus: 'awaiting',
+    height: '2.1 meters',
+    trunkDiam: '3.2 cm',
+    datePlanted: '2026-05-21',
+    dateAdded: 'Nov 22, 2026',
+    createdAt: '2026-11-22T08:30:00.000Z',
+    photo: 'assets/tree.jpg'
+  },
+  {
+    id: 'TR-10009',
+    species: { common: 'Yakal', scientific: 'Shorea astylosa', type: 'Native' },
+    speciesCommon: 'Yakal',
+    commonName: 'Yakal',
+    scientificName: 'Shorea astylosa',
+    treeType: 'Native',
+    treeCount: 1,
+    takenCount: 1,
+    status: 'healthy',
+    health: 'Healthy',
+    stage: 'Existing Tree',
+    stageDescription: 'Young Native Tree (1.5 Years Old)',
+    plantingZone: 'Zone 3 (Sector C • San Isidro Upland Slope)',
+    zone: 'Zone 3',
+    plot: 'Plot C-03',
+    book: 'Book 1',
+    plotBook: 'Zone 3 • Plot C-03 (Book 1)',
+    barangay: 'San Isidro',
+    municipality: 'Catbalogan City',
+    province: 'Samar',
+    lat: 11.7725,
+    lng: 124.8935,
+    sponsorName: 'Catbalogan Youth Eco-Alliance',
+    adopter: 'Catbalogan Youth Eco-Alliance',
+    adopterId: 'ADP-103',
+    adopterEmail: 'youth.eco@catbalogan.gov.ph',
+    adopterPhone: '+63 939 888 1234',
+    adopterType: 'Student Environmental Organization',
+    dedication: 'Preserving old-growth Samar rainforest canopy',
+    caretaker: 'Awaiting Caretaker',
+    caretakerId: '',
+    caretakerEmail: '',
+    caretakerStatus: 'awaiting',
+    height: '3.4 meters',
+    trunkDiam: '5.6 cm',
+    datePlanted: '2025-05-20',
+    dateAdded: 'Nov 22, 2026',
+    createdAt: '2026-11-22T09:00:00.000Z',
+    photo: 'assets/tree.jpg'
+  },
+  {
+    id: 'TR-10010',
+    species: { common: 'Banaba', scientific: 'Lagerstroemia speciosa', type: 'Native' },
+    speciesCommon: 'Banaba',
+    commonName: 'Banaba',
+    scientificName: 'Lagerstroemia speciosa',
+    treeType: 'Native',
+    treeCount: 1,
+    takenCount: 1,
+    status: 'healthy',
+    health: 'Healthy',
+    stage: 'Sapling',
+    stageDescription: '5-Month Nursery Sapling',
+    plantingZone: 'Zone 6 (Darahuway Daco Island Sanctuary)',
+    zone: 'Zone 6',
+    plot: 'Plot DD-04',
+    book: 'Book 1',
+    plotBook: 'Zone 6 • Plot DD-04 (Book 1)',
+    barangay: 'Darahuway Daco',
+    municipality: 'Catbalogan City',
+    province: 'Samar',
+    lat: 11.7455,
+    lng: 124.8765,
+    sponsorName: 'Governor & Samar Eco-Patrons',
+    adopter: 'Governor & Samar Eco-Patrons',
+    adopterId: 'ADP-104',
+    adopterEmail: 'ecopatrons.samar@gov.ph',
+    adopterPhone: '+63 917 555 9876',
+    adopterType: 'Civic Patron Group',
+    dedication: 'Coastal green barrier & island biodiversity protection',
+    caretaker: 'Awaiting Caretaker',
+    caretakerId: '',
+    caretakerEmail: '',
+    caretakerStatus: 'awaiting',
+    height: '1.6 meters',
+    trunkDiam: '2.4 cm',
+    datePlanted: '2026-06-15',
+    dateAdded: 'Nov 22, 2026',
+    createdAt: '2026-11-22T09:30:00.000Z',
+    photo: 'assets/tree.jpg'
+  }
+];
+
+function getActiveUnifiedCaretaker() {
+  const currentName = localStorage.getItem('ATAMAN_user_name') || 'Dodong Zeta';
+  const currentEmail = (localStorage.getItem('ATAMAN_user_email') || 'zetadodong@gmail.com').toLowerCase().trim();
+  let currentId = localStorage.getItem('ATAMAN_caretaker_id') || localStorage.getItem('ATAMAN_user_id') || '';
+  let empId = 'EMP-002';
+  let phone = '+63 918 333 4455';
+  let address = 'Brgy. Canlapwas, Catbalogan City, Samar';
+
+  try {
+    const rawCt = localStorage.getItem('ATAMAN_caretakers_cache');
+    const caretakers = rawCt ? JSON.parse(rawCt) : [];
+    if (Array.isArray(caretakers)) {
+      const match = caretakers.find(c => {
+        if (!c) return false;
+        const cEmail = (c.email || '').toLowerCase().trim();
+        const cName = (c.name || c.fullName || '').toLowerCase().trim();
+        return (currentEmail && cEmail === currentEmail) ||
+               (currentName && cName.includes(currentName.toLowerCase().trim())) ||
+               (c.id === 'CT-101' || c.empId === 'EMP-002');
+      });
+      if (match) {
+        currentId = match.id || currentId || 'CT-101';
+        empId = match.empId || empId;
+        phone = match.phone || phone;
+        address = match.address || match.primaryArea || address;
+      }
+    }
+  } catch (_) {}
+
+  if (!currentId) currentId = 'CT-101';
+
+  return {
+    id: currentId,
+    empId: empId,
+    name: currentName,
+    email: currentEmail,
+    phone: phone,
+    address: address
+  };
+}
+
+function ensureAwaitingSeedTreesInCache() {
+  try {
+    let allTrees = [];
+    const raw = localStorage.getItem('ATAMAN_trees_cache');
+    if (raw) {
+      try { allTrees = JSON.parse(raw); } catch (_) { allTrees = []; }
+    }
+    if (!Array.isArray(allTrees)) allTrees = [];
+
+    let modified = false;
+    SEED_AWAITING_ADOPTED_TREES.forEach(seed => {
+      const exists = allTrees.some(t => String(t.id) === String(seed.id));
+      if (!exists) {
+        allTrees.push({ ...seed });
+        modified = true;
+      }
+    });
+
+    if (modified) {
+      localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
+      localStorage.setItem('saplink_trees_cache', JSON.stringify(allTrees));
+    }
+    return allTrees;
+  } catch (e) {
+    return SEED_AWAITING_ADOPTED_TREES;
+  }
+}
+
+let activeQueueStageFilter = 'all';
+let activeQueueZoneFilter = 'all';
+let activeQueueSearchQuery = '';
+
+function isTreeAwaitingCaretaker(t) {
+  if (!t) return false;
+  const hasAdopter = Boolean(
+    (t.adopter && t.adopter !== 'None' && t.adopter !== 'Available for Adoption') ||
+    (t.sponsorName && t.sponsorName !== 'None' && t.sponsorName !== 'Available for Adoption') ||
+    (parseInt(t.takenCount) || 0) > 0 ||
+    t.adopterId ||
+    t.isAdopted
+  );
+  const ct = (t.caretaker || '').trim().toLowerCase();
+  const ctId = (t.caretakerId || '').trim();
+  const isUnassignedCt = !ct ||
+    ct === 'unassigned' ||
+    ct === 'none' ||
+    ct === 'awaiting caretaker' ||
+    ct === 'awaiting' ||
+    !ctId ||
+    t.caretakerStatus === 'awaiting' ||
+    t.caretakerStatus === 'unassigned';
+
+  return hasAdopter && isUnassignedCt;
+}
+
+function initAwaitingTreesQueue(treesList = null) {
+  let allTrees = treesList;
+  if (!Array.isArray(allTrees) || allTrees.length === 0) {
+    allTrees = ensureAwaitingSeedTreesInCache();
+  }
+
+  const awaitingTrees = allTrees.filter(isTreeAwaitingCaretaker);
+
+  // Update Badge Counts
+  const navBadge = document.getElementById('ctAwaitingNavBadge');
+  if (navBadge) navBadge.textContent = awaitingTrees.length;
+
+  const countBadge = document.getElementById('ctAwaitingCountBadge');
+  if (countBadge) countBadge.textContent = `${awaitingTrees.length} Tree${awaitingTrees.length === 1 ? '' : 's'} Available`;
+
+  // Stage counts
+  const saplingCount = awaitingTrees.filter(t => (t.stage || '').toLowerCase().includes('sapling') || (parseInt(t.ageOfTree || t.age) || 0) <= 8).length;
+  const existingCount = awaitingTrees.length - saplingCount;
+
+  const cntAllEl = document.getElementById('cntStageAll');
+  const cntSapEl = document.getElementById('cntStageSapling');
+  const cntExEl = document.getElementById('cntStageExisting');
+  if (cntAllEl) cntAllEl.textContent = awaitingTrees.length;
+  if (cntSapEl) cntSapEl.textContent = saplingCount;
+  if (cntExEl) cntExEl.textContent = existingCount;
+
+  // Filter based on active controls
+  let filtered = awaitingTrees.filter(t => {
+    // Stage filter
+    if (activeQueueStageFilter === 'sapling') {
+      const isSap = (t.stage || '').toLowerCase().includes('sapling') || (parseInt(t.ageOfTree || t.age) || 0) <= 8;
+      if (!isSap) return false;
+    } else if (activeQueueStageFilter === 'existing') {
+      const isSap = (t.stage || '').toLowerCase().includes('sapling') || (parseInt(t.ageOfTree || t.age) || 0) <= 8;
+      if (isSap) return false;
+    }
+
+    // Zone filter
+    if (activeQueueZoneFilter !== 'all') {
+      const zoneStr = `${t.barangay || ''} ${t.plantingZone || ''} ${t.zone || ''} ${t.location || ''}`.toLowerCase();
+      if (!zoneStr.includes(activeQueueZoneFilter.toLowerCase())) return false;
+    }
+
+    // Search query
+    if (activeQueueSearchQuery) {
+      const sp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || '';
+      const sc = (typeof t.species === 'object' && t.species ? t.species.scientific : '') || t.scientificName || '';
+      const textPool = `${t.id || ''} ${sp} ${sc} ${t.barangay || ''} ${t.plot || ''} ${t.book || ''} ${t.plantingZone || ''} ${t.adopter || ''} ${t.sponsorName || ''}`.toLowerCase();
+      if (!textPool.includes(activeQueueSearchQuery.toLowerCase())) return false;
+    }
+
+    return true;
+  });
+
+  const grid = document.getElementById('ctAwaitingTreesGrid');
+  const emptyBox = document.getElementById('ctQueueEmpty');
+
+  if (!grid) return;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    if (emptyBox) emptyBox.classList.remove('hide');
+  } else {
+    if (emptyBox) emptyBox.classList.add('hide');
+    grid.innerHTML = filtered.map(t => {
+      const sp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Native Tree';
+      const sci = (typeof t.species === 'object' && t.species ? t.species.scientific : '') || t.scientificName || 'Native Samar Species';
+      const isSapling = (t.stage || '').toLowerCase().includes('sapling') || (parseInt(t.ageOfTree || t.age) || 0) <= 8;
+      const stageLabel = isSapling ? '🌱 Sapling' : '🌳 Existing Tree';
+      const stageClass = isSapling ? 'stage-badge-sapling' : 'stage-badge-existing';
+      const stageSub = t.stageDescription || (isSapling ? 'Nursery Stage' : 'Young Native Tree');
+
+      const zoneDisplay = t.plantingZone || (t.barangay ? `Brgy. ${t.barangay} Sector` : 'Catbalogan Sector');
+      const plotDisplay = t.plotBook || (t.plot ? `${t.plot}${t.book ? ' (' + t.book + ')' : ''}` : 'Plot B-01 (Book 1)');
+      const adopterName = t.adopter || t.sponsorName || 'Community Adopter';
+      const adopterType = t.adopterType || 'Community Sponsor';
+      const dedication = t.dedication ? `💬 "${t.dedication}"` : '';
+      const height = t.height || '2.0 meters';
+      const trunk = t.trunkDiam || '3.0 cm';
+      const coords = (t.lat && t.lng) ? `${Number(t.lat).toFixed(4)}° N, ${Number(t.lng).toFixed(4)}° E` : 'Catbalogan Coordinates';
+
+      return `
+        <div class="ct-queue-card" id="queueCard_${t.id}">
+          <div class="ct-queue-card-top">
+            <div class="ct-queue-card-header">
+              <span class="ct-queue-id-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px;">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                ${t.id}
+              </span>
+              <span class="ct-queue-stage-badge ${stageClass}">${stageLabel}</span>
+            </div>
+
+            <div class="ct-queue-species-box">
+              <div class="ct-queue-species-title">
+                <span>${sp}</span>
+                <span class="ct-queue-species-badge">Native Hardwood</span>
+              </div>
+              <span class="ct-queue-species-sci">${sci}</span>
+              <div style="font-size:11.5px; color:#15803d; font-weight:700;">${stageSub}</div>
+            </div>
+
+            <div class="ct-queue-meta-list">
+              <div class="ct-queue-meta-item">
+                <span class="meta-ico">📍</span>
+                <div>
+                  <strong>${zoneDisplay}</strong>
+                  <div style="font-size:11px; color:#64748b;">${plotDisplay} • ${coords}</div>
+                </div>
+              </div>
+              <div class="ct-queue-meta-item">
+                <span class="meta-ico">📏</span>
+                <div>Biometrics: <strong>${height}</strong> height • <strong>${trunk}</strong> trunk</div>
+              </div>
+            </div>
+
+            <div class="ct-queue-adopter-pill">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span>Adopter: <strong class="ct-queue-adopter-name">${adopterName}</strong></span>
+                <span style="font-size:10.5px; color:#15803d; font-weight:700;">${adopterType}</span>
+              </div>
+              ${dedication ? `<div class="ct-queue-dedication">${dedication}</div>` : ''}
+            </div>
+          </div>
+
+          <div class="ct-queue-card-footer">
+            <button type="button" class="btn-inspect-queue" data-tree-inspect="${t.id}" title="Inspect Tree Details">
+              🔍 Inspect
+            </button>
+            <button type="button" class="btn-claim-tree" data-claim-tree="${t.id}">
+              <span>🤝 Take Tree</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Bind filter toolbar events
+  setupQueueToolbarEvents();
+}
+
+function setupQueueToolbarEvents() {
+  const searchInput = document.getElementById('queueSearchInput');
+  const clearBtn = document.getElementById('queueClearSearchBtn');
+  if (searchInput && !searchInput.dataset.bound) {
+    searchInput.dataset.bound = 'true';
+    searchInput.addEventListener('input', (e) => {
+      activeQueueSearchQuery = e.target.value.trim();
+      if (clearBtn) clearBtn.classList.toggle('hide', !activeQueueSearchQuery);
+      initAwaitingTreesQueue();
+    });
+  }
+  if (clearBtn && !clearBtn.dataset.bound) {
+    clearBtn.dataset.bound = 'true';
+    clearBtn.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      activeQueueSearchQuery = '';
+      clearBtn.classList.add('hide');
+      initAwaitingTreesQueue();
+    });
+  }
+
+  const stagePills = document.querySelectorAll('#queueStageFilterPills .ct-stage-pill');
+  stagePills.forEach(pill => {
+    if (!pill.dataset.bound) {
+      pill.dataset.bound = 'true';
+      pill.addEventListener('click', () => {
+        stagePills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeQueueStageFilter = pill.dataset.stage || 'all';
+        initAwaitingTreesQueue();
+      });
+    }
+  });
+
+  const zoneSelect = document.getElementById('queueZoneFilter');
+  if (zoneSelect && !zoneSelect.dataset.bound) {
+    zoneSelect.dataset.bound = 'true';
+    zoneSelect.addEventListener('change', (e) => {
+      activeQueueZoneFilter = e.target.value || 'all';
+      initAwaitingTreesQueue();
+    });
+  }
+
+  const refreshBtn = document.getElementById('btnRefreshQueue');
+  if (refreshBtn && !refreshBtn.dataset.bound) {
+    refreshBtn.dataset.bound = 'true';
+    refreshBtn.addEventListener('click', () => {
+      initAwaitingTreesQueue();
+      renderZonePlotMatrix();
+      showCtToast('🔄 Queue and Live Zone Matrix refreshed with real-time database');
+    });
+  }
+}
+
+function renderZonePlotMatrix(treesList = null) {
+  let allTrees = treesList;
+  if (!Array.isArray(allTrees) || allTrees.length === 0) {
+    try {
+      const raw = localStorage.getItem('ATAMAN_trees_cache');
+      allTrees = raw ? JSON.parse(raw) : [];
+    } catch (_) { allTrees = []; }
+  }
+  if (!Array.isArray(allTrees) || allTrees.length === 0) {
+    allTrees = ensureAwaitingSeedTreesInCache();
+  }
+
+  const tbody = document.getElementById('ctZonePlotMatrixTbody');
+  const summaryEl = document.getElementById('ctMatrixFooterSummary');
+  const caregiverEl = document.getElementById('ctMatrixCaregiverIdDisplay');
+
+  const ct = getActiveUnifiedCaretaker();
+  if (caregiverEl) caregiverEl.textContent = `${ct.name} (${ct.id})`;
+
+  if (!tbody) return;
+
+  const relevantTrees = allTrees.slice(0, 12);
+  if (summaryEl) summaryEl.textContent = `Showing ${relevantTrees.length} registered Samar tree plots across 6 sectors`;
+
+  tbody.innerHTML = relevantTrees.map(t => {
+    const sp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Narra';
+    const zone = t.plantingZone || (t.barangay ? `Brgy. ${t.barangay} (Zone ${t.id.slice(-1) || '1'})` : 'Zone 1');
+    const plot = t.plotBook || (t.plot ? `${t.plot}${t.book ? ' (' + t.book + ')' : ''}` : 'Plot A-01');
+    const isSapling = (t.stage || '').toLowerCase().includes('sapling') || (parseInt(t.ageOfTree || t.age) || 0) <= 8;
+    const stageBadge = isSapling ? '<span class="ct-queue-stage-badge stage-badge-sapling">🌱 Sapling</span>' : '<span class="ct-queue-stage-badge stage-badge-existing">🌳 Existing</span>';
+    const adopter = t.adopter || t.sponsorName || 'Unassigned Adopter';
+
+    const isAwaiting = isTreeAwaitingCaretaker(t);
+    const ctAssignedName = t.caretaker && t.caretaker !== 'Awaiting Caretaker' && t.caretaker !== 'Unassigned' ? t.caretaker : '';
+    const ctAssignedId = t.caretakerId || (ctAssignedName ? 'CT-101' : '');
+
+    let ctStatusHtml = '';
+    let actionHtml = '';
+
+    if (isAwaiting) {
+      ctStatusHtml = '<span class="status-badge-awaiting">⏳ Awaiting Caretaker Claim</span>';
+      actionHtml = `<button type="button" class="btn-claim-tree" data-claim-tree="${t.id}" style="padding:5px 11px;font-size:11.5px;">🤝 Take Tree</button>`;
+    } else {
+      ctStatusHtml = `<span class="status-badge-claimed">✅ ${ctAssignedName || ct.name} (${ctAssignedId || ct.id})</span>`;
+      actionHtml = `<button type="button" class="btn-inspect-queue" data-tree-inspect="${t.id}" style="padding:5px 10px;font-size:11.5px;">View Profile</button>`;
+    }
+
+    return `
+      <tr>
+        <td class="font-bold" style="color:#166534;">${t.id}</td>
+        <td><strong>${sp}</strong></td>
+        <td>${zone}</td>
+        <td><span style="background:#f1f5f9;padding:2px 7px;border-radius:5px;font-weight:700;font-size:11.5px;">${plot}</span></td>
+        <td>${stageBadge}</td>
+        <td><strong>${adopter}</strong></td>
+        <td>${ctStatusHtml}</td>
+        <td>${actionHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+let pendingClaimTreeId = null;
+
+function initClaimTreeWorkflow() {
+  const modal = document.getElementById('claimTreeConfirmModal');
+  const closeBtn = document.getElementById('closeClaimModalBtn');
+  const cancelBtn = document.getElementById('cancelClaimModalBtn');
+  const confirmBtn = document.getElementById('confirmTakeTreeBtn');
+
+  function closeModal() {
+    if (modal) modal.classList.add('hide');
+    pendingClaimTreeId = null;
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+  // Global delegation for claim buttons in queue and matrix
+  document.addEventListener('click', (e) => {
+    const claimBtn = e.target.closest('[data-claim-tree]');
+    if (claimBtn) {
+      e.preventDefault();
+      const treeId = claimBtn.getAttribute('data-claim-tree');
+      openClaimConfirmModal(treeId);
+      return;
+    }
+
+    const inspectBtn = e.target.closest('[data-tree-inspect]');
+    if (inspectBtn) {
+      e.preventDefault();
+      const treeId = inspectBtn.getAttribute('data-tree-inspect');
+      showCtToast(`🔍 Inspecting Tree ${treeId} — View complete details on Caretaker Tree Map.`);
+      const mapSection = document.getElementById('caretakerMap') || document.querySelector('.ct-mid-grid');
+      if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', async () => {
+      if (!pendingClaimTreeId) return;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing Claim & Syncing...';
+
+      try {
+        await executeClaimTree(pendingClaimTreeId);
+        closeModal();
+      } catch (err) {
+        console.error('Error executing tree claim:', err);
+        showCtToast('❌ Failed to claim tree. Please try again.');
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = '🤝 Confirm & Take Tree';
+      }
+    });
+  }
+}
+
+function openClaimConfirmModal(treeId) {
+  const modal = document.getElementById('claimTreeConfirmModal');
+  if (!modal) return;
+
+  let allTrees = [];
+  try {
+    const raw = localStorage.getItem('ATAMAN_trees_cache');
+    allTrees = raw ? JSON.parse(raw) : [];
+  } catch (_) { allTrees = []; }
+
+  const tree = allTrees.find(t => String(t.id) === String(treeId)) || SEED_AWAITING_ADOPTED_TREES.find(t => String(t.id) === String(treeId));
+  if (!tree) {
+    showCtToast('⚠️ Tree record not found.');
+    return;
+  }
+
+  pendingClaimTreeId = tree.id;
+  const ct = getActiveUnifiedCaretaker();
+
+  const sp = (typeof tree.species === 'object' && tree.species ? tree.species.common : tree.species) || tree.speciesCommon || 'Native Tree';
+  const sci = (typeof tree.species === 'object' && tree.species ? tree.species.scientific : '') || tree.scientificName || 'Native Samar Hardwood';
+  const isSap = (tree.stage || '').toLowerCase().includes('sapling') || (parseInt(tree.ageOfTree || tree.age) || 0) <= 8;
+
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  setEl('claimTreeStageBadge', isSap ? '🌱 Sapling (Nursery Handover Stage)' : '🌳 Existing Tree (Active Field Stage)');
+  setEl('claimTreeIdSpecies', `${tree.id} — ${sp}`);
+  setEl('claimTreeSciName', sci);
+  setEl('claimTreeIdPill', tree.id);
+  setEl('claimTreePlotZone', `${tree.plantingZone || tree.barangay || 'Zone 1'} • ${tree.plotBook || tree.plot || 'Plot A-01'}`);
+  setEl('claimTreeAdopterName', tree.adopter || tree.sponsorName || 'Community Adopter');
+  setEl('claimTreeBiometrics', `Height: ${tree.height || '2.0m'} • Trunk: ${tree.trunkDiam || '3.0cm'}`);
+  setEl('claimTreeCoords', (tree.lat && tree.lng) ? `${Number(tree.lat).toFixed(4)}° N, ${Number(tree.lng).toFixed(4)}° E` : 'Catbalogan Coordinates');
+
+  const dedRow = document.getElementById('claimTreeDedicationRow');
+  const dedText = document.getElementById('claimTreeDedicationText');
+  if (dedRow && dedText) {
+    if (tree.dedication) {
+      dedRow.style.display = 'block';
+      dedText.textContent = `"${tree.dedication}"`;
+    } else {
+      dedRow.style.display = 'none';
+    }
+  }
+
+  setEl('modalCtName', ct.name);
+  setEl('modalCtId', `${ct.id} (${ct.empId})`);
+  setEl('modalCtEmail', ct.email);
+
+  modal.classList.remove('hide');
+}
+
+async function executeClaimTree(treeId) {
+  const ct = getActiveUnifiedCaretaker();
+
+  let allTrees = [];
+  try {
+    const raw = localStorage.getItem('ATAMAN_trees_cache');
+    allTrees = raw ? JSON.parse(raw) : [];
+  } catch (_) { allTrees = []; }
+
+  const treeIdx = allTrees.findIndex(t => String(t.id) === String(treeId));
+  let tree = null;
+
+  if (treeIdx !== -1) {
+    tree = allTrees[treeIdx];
+  } else {
+    const seed = SEED_AWAITING_ADOPTED_TREES.find(t => String(t.id) === String(treeId));
+    if (seed) {
+      tree = { ...seed };
+      allTrees.push(tree);
+    }
+  }
+
+  if (!tree) throw new Error('Tree not found');
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+
+  // 1. Attach tree directly to the logged-in Caretaker's single unified Caretaker ID
+  tree.caretaker = ct.name;
+  tree.caretakerId = ct.id; // Single unified ID: 'CT-101'
+  tree.caretakerEmail = ct.email;
+  tree.caretakerStatus = 'assigned';
+  tree.claimedAt = now.toISOString();
+  tree.lastCheck = dateStr;
+  tree.nextMonitoring = 'Due Today';
+  tree.dueCategory = 'Due Today';
+  tree.status = tree.status || 'healthy';
+  tree.health = tree.health || 'Healthy';
+
+  // Add onboarding log in history
+  if (!Array.isArray(tree.history)) tree.history = [];
+  tree.history.unshift({
+    date: dateStr,
+    health: 'Healthy',
+    class: 'healthy',
+    notes: `Tree claimed and onboarded into field care by Caretaker ${ct.name} (Unified ID: ${ct.id}) for Adopter ${tree.adopter || tree.sponsorName || 'Community Adopter'}.`
+  });
+
+  // Save updated trees array
+  localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
+  localStorage.setItem('saplink_trees_cache', JSON.stringify(allTrees));
+
+  // 2. Maintain Single Unified Caretaker Profile in ATAMAN_caretakers_cache
+  try {
+    const rawCt = localStorage.getItem('ATAMAN_caretakers_cache');
+    let caretakers = rawCt ? JSON.parse(rawCt) : [];
+    if (!Array.isArray(caretakers) || caretakers.length === 0) {
+      if (Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS)) {
+        caretakers = [...window.ATAMAN_DEFAULT_CARETAKERS];
+      }
+    }
+
+    const ctIdx = caretakers.findIndex(c => c && (c.id === ct.id || c.empId === ct.empId || (c.email && c.email.toLowerCase() === ct.email.toLowerCase())));
+    if (ctIdx !== -1) {
+      const targetCt = caretakers[ctIdx];
+      if (!Array.isArray(targetCt.assignedTreeIds)) targetCt.assignedTreeIds = [];
+      if (!targetCt.assignedTreeIds.includes(tree.id)) {
+        targetCt.assignedTreeIds.push(tree.id);
+      }
+      if (!Array.isArray(targetCt.assignedTrees)) targetCt.assignedTrees = [];
+      if (!targetCt.assignedTrees.includes(tree.id)) {
+        targetCt.assignedTrees.push(tree.id);
+      }
+      targetCt.assignedTreeCount = targetCt.assignedTrees.length;
+      targetCt.treesAssigned = targetCt.assignedTrees.length;
+      targetCt.updatedAt = now.toISOString();
+      caretakers[ctIdx] = targetCt;
+      localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(caretakers));
+      localStorage.setItem('saplink_caretakers_cache', JSON.stringify(caretakers));
+    }
+  } catch (err) {
+    console.warn('Error updating caretaker record:', err);
+  }
+
+  // 3. Keep Link Intact in Adopter's Record
+  try {
+    const rawAd = localStorage.getItem('ATAMAN_adopters_cache');
+    let adopters = rawAd ? JSON.parse(rawAd) : [];
+    if (Array.isArray(adopters) && adopters.length > 0) {
+      let adChanged = false;
+      adopters.forEach(a => {
+        if (!a) return;
+        if (Array.isArray(a.treesList)) {
+          const matchTree = a.treesList.find(t => String(t.id) === String(tree.id));
+          if (matchTree) {
+            matchTree.caretaker = ct.name;
+            matchTree.caretakerId = ct.id;
+            matchTree.caretakerEmail = ct.email;
+            matchTree.caretakerStatus = 'assigned';
+            adChanged = true;
+          }
+        }
+      });
+      if (adChanged) {
+        localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(adopters));
+      }
+    }
+  } catch (err) {
+    console.warn('Error updating adopter record link:', err);
+  }
+
+  // 4. Remote Sync via ATAMAN_DB if available
+  if (window.ATAMAN_DB && typeof window.ATAMAN_DB.updateTree === 'function') {
+    window.ATAMAN_DB.updateTree(tree.id, {
+      caretaker: ct.name,
+      caretakerId: ct.id,
+      caretakerEmail: ct.email,
+      caretakerStatus: 'assigned',
+      claimedAt: tree.claimedAt,
+      lastCheck: tree.lastCheck,
+      nextMonitoring: tree.nextMonitoring,
+      history: tree.history
+    }).catch(() => {});
+  }
+
+  // 5. Broadcast Sync Events for real-time reflection across tabs
+  window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated', { detail: allTrees }));
+  window.dispatchEvent(new CustomEvent('ATAMAN:tree-claimed', { detail: { treeId: tree.id, caretaker: ct } }));
+
+  // 6. Immediate Local Dashboard Re-render
+  syncCaretakerStats(allTrees);
+  initAwaitingTreesQueue(allTrees);
+  renderZonePlotMatrix(allTrees);
+
+  const card = document.getElementById(`queueCard_${tree.id}`);
+  if (card) {
+    card.style.transition = 'all 0.4s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.9)';
+    setTimeout(() => card.remove(), 400);
+  }
+
+  const spName = (typeof tree.species === 'object' && tree.species ? tree.species.common : tree.species) || 'Tree';
+  const adopterName = tree.adopter || tree.sponsorName || 'Adopter';
+  showCtToast(`🎉 ${tree.id} (${spName}) Claimed! Added to your assigned trees and synced with Adopter ${adopterName}.`);
 }
