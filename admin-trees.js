@@ -478,6 +478,8 @@ function setAvailabilityFilter(filter) {
     document.getElementById('cardTakenTrees')?.classList.add('active-filter');
   } else if (filter === 'available') {
     document.getElementById('cardAvailableTrees')?.classList.add('active-filter');
+  } else if (filter === 'existing') {
+    // Keep existing pill active
   }
 
   const dropdown = document.getElementById('filterAvailability');
@@ -978,6 +980,14 @@ function applyFilters() {
     // Quick Pill / Metric Card Availability Filter
     if (currentAvailabilityFilter === 'available' && remaining <= 0) return false;
     if (currentAvailabilityFilter === 'taken' && taken <= 0) return false;
+    if (currentAvailabilityFilter === 'existing') {
+      const isExisting = (t.stage || '').toLowerCase().includes('existing') ||
+                         (t.stageDescription || '').toLowerCase().includes('existing') ||
+                         (t.treeClassification || '').toLowerCase().includes('existing') ||
+                         (t.ageOfTree || t.age || '').toLowerCase().includes('year') ||
+                         (parseInt(t.ageOfTree || t.age) || 0) >= 1;
+      if (!isExisting) return false;
+    }
 
     // Advanced Dropdown Filter
     if (avail === 'has-available' && remaining <= 0) return false;
@@ -2516,3 +2526,218 @@ window.addEventListener('ATAMAN:trees-updated', () => {
 window.addEventListener('ATAMAN:caretakers-updated', () => {
   populateDynamicFilters();
 });
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EXISTING TREE INFORMATION & REGISTRATION CONTROLLER
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const SAMAR_EXISTING_TREE_SPECIES_MAP = {
+  'Narra': 'Pterocarpus indicus',
+  'Molave': 'Vitex parviflora',
+  'Yakal': 'Shorea astylosa',
+  'Tindalo': 'Afzelia rhomboidea',
+  'Dao': 'Dracontomelon dao',
+  'Banaba': 'Lagerstroemia speciosa'
+};
+
+function openExistingTreeInfoModal(defaultTab = 'info') {
+  const nextId = getNextTreeId();
+  const idInput = document.getElementById('exTreeId');
+  if (idInput) idInput.value = nextId;
+
+  syncExistingTreeCoords();
+  switchExistingTreeTab(defaultTab);
+  openModal('modalExistingTreeInfo');
+}
+window.openExistingTreeInfoModal = openExistingTreeInfoModal;
+
+function switchExistingTreeTab(tab) {
+  const infoTab = document.getElementById('tabContentExistingInfo');
+  const formTab = document.getElementById('tabContentExistingForm');
+  const btnInfo = document.getElementById('tabBtnExistingInfo');
+  const btnForm = document.getElementById('tabBtnExistingForm');
+  const saveBtn = document.getElementById('btnSaveExistingTree');
+  const viewTableBtn = document.getElementById('btnExistingViewInTable');
+
+  if (tab === 'form') {
+    if (infoTab) infoTab.style.display = 'none';
+    if (formTab) formTab.style.display = 'block';
+
+    if (btnInfo) {
+      btnInfo.style.color = '#64748b';
+      btnInfo.style.borderBottomColor = 'transparent';
+    }
+    if (btnForm) {
+      btnForm.style.color = '#166534';
+      btnForm.style.borderBottomColor = '#166534';
+    }
+
+    if (saveBtn) saveBtn.style.display = 'inline-flex';
+    if (viewTableBtn) viewTableBtn.style.display = 'none';
+  } else {
+    if (infoTab) infoTab.style.display = 'block';
+    if (formTab) formTab.style.display = 'none';
+
+    if (btnInfo) {
+      btnInfo.style.color = '#166534';
+      btnInfo.style.borderBottomColor = '#166534';
+    }
+    if (btnForm) {
+      btnForm.style.color = '#64748b';
+      btnForm.style.borderBottomColor = 'transparent';
+    }
+
+    if (saveBtn) saveBtn.style.display = 'none';
+    if (viewTableBtn) viewTableBtn.style.display = 'inline-flex';
+  }
+}
+window.switchExistingTreeTab = switchExistingTreeTab;
+
+function syncExistingTreeScientific() {
+  const sel = document.getElementById('exSpeciesSelect');
+  if (!sel) return;
+  const opt = sel.options[sel.selectedIndex];
+  const sci = opt?.dataset?.sci || SAMAR_EXISTING_TREE_SPECIES_MAP[sel.value] || '';
+}
+window.syncExistingTreeScientific = syncExistingTreeScientific;
+
+function syncExistingTreeCoords() {
+  const brgySelect = document.getElementById('exTreeBarangay');
+  const latInput = document.getElementById('exTreeLat');
+  const lngInput = document.getElementById('exTreeLng');
+  if (!brgySelect || !latInput || !lngInput) return;
+
+  const brgy = brgySelect.value;
+  const coordsMap = {
+    'Canlapwas': { lat: 11.7820, lng: 124.8870 },
+    'Guinsorongan': { lat: 11.7598, lng: 124.8861 },
+    'San Isidro': { lat: 11.7710, lng: 124.8910 },
+    'Bunuanan': { lat: 11.7885, lng: 124.8790 },
+    'Mabini': { lat: 11.7740, lng: 124.9030 },
+    'Darahuway Daco': { lat: 11.7450, lng: 124.8761 }
+  };
+
+  const c = coordsMap[brgy] || { lat: 11.7710, lng: 124.8910 };
+  latInput.value = c.lat.toFixed(6);
+  lngInput.value = c.lng.toFixed(6);
+}
+window.syncExistingTreeCoords = syncExistingTreeCoords;
+
+function filterExistingTreesFromModal() {
+  closeModal('modalExistingTreeInfo');
+  setAvailabilityFilter('existing');
+  showAdminToast('🌳 Filtered table to show all registered Existing Trees.', 'success');
+  const tableCard = document.querySelector('.table-card');
+  if (tableCard) tableCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+window.filterExistingTreesFromModal = filterExistingTreesFromModal;
+
+async function saveExistingTreeRecord() {
+  const treeId = document.getElementById('exTreeId')?.value?.trim() || getNextTreeId();
+  const speciesSelect = document.getElementById('exSpeciesSelect');
+  const speciesCommon = speciesSelect?.value || 'Narra';
+  const opt = speciesSelect?.options[speciesSelect.selectedIndex];
+  const scientific = opt?.dataset?.sci || SAMAR_EXISTING_TREE_SPECIES_MAP[speciesCommon] || 'Pterocarpus indicus';
+
+  const stageDesc = document.getElementById('exTreeStage')?.value || 'Existing Tree (Young Native - 2 yrs)';
+  const treeAge = document.getElementById('exTreeAge')?.value?.trim() || '2 Years';
+  const height = document.getElementById('exTreeHeight')?.value?.trim() || '3.2 meters';
+  const trunkDiam = document.getElementById('exTreeTrunk')?.value?.trim() || '5.4 cm';
+  const health = document.getElementById('exTreeHealth')?.value || 'healthy';
+
+  const barangay = document.getElementById('exTreeBarangay')?.value || 'San Isidro';
+  const plot = document.getElementById('exTreePlot')?.value?.trim() || 'Plot C-04 (Book 1)';
+  const lat = parseFloat(document.getElementById('exTreeLat')?.value) || 11.7710;
+  const lng = parseFloat(document.getElementById('exTreeLng')?.value) || 124.8910;
+
+  const ctSelect = document.getElementById('exTreeCaretaker');
+  const chosenCtOpt = ctSelect?.options[ctSelect.selectedIndex];
+  const caretakerName = ctSelect?.value || 'Dodong Zeta';
+  const caretakerId = chosenCtOpt?.dataset?.id || (caretakerName.includes('Dodong') ? 'CT-101' : (caretakerName.includes('June') ? 'CT-102' : ''));
+  const caretakerEmail = chosenCtOpt?.dataset?.email || (caretakerId === 'CT-101' ? 'zetadodong@gmail.com' : '');
+  const isAwaiting = caretakerName === 'Awaiting Caretaker' || !caretakerId;
+
+  const adopterName = document.getElementById('exTreeAdopter')?.value?.trim() || '';
+  const notes = document.getElementById('exTreeNotes')?.value?.trim() || 'Existing standing native tree documented and registered in ATAMAN.';
+
+  const now = new Date();
+  const autoDateDisplay = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const autoDateTimeDisplay = now.toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true
+  });
+
+  const newTree = {
+    id: treeId,
+    species: { common: speciesCommon, scientific: scientific, type: 'Native' },
+    speciesCommon: speciesCommon,
+    commonName: speciesCommon,
+    scientificName: scientific,
+    treeType: 'Native',
+    treeCount: 1,
+    takenCount: adopterName ? 1 : 0,
+    stage: 'Existing Tree',
+    stageDescription: stageDesc,
+    age: treeAge,
+    ageOfTree: treeAge,
+    height: height,
+    trunkDiam: trunkDiam,
+    status: health,
+    health: health === 'healthy' ? 'Healthy' : (health === 'critical' ? 'Critical' : 'Needs Care'),
+    barangay: barangay,
+    municipality: 'Catbalogan City',
+    province: 'Samar',
+    plantingZone: `Zone ${treeId.slice(-1) || '1'} (${barangay} Sector)`,
+    plot: plot,
+    plotBook: plot,
+    lat: lat,
+    lng: lng,
+    caretaker: isAwaiting ? 'Awaiting Caretaker' : caretakerName,
+    caretakerId: isAwaiting ? '' : caretakerId,
+    caretakerEmail: isAwaiting ? '' : caretakerEmail,
+    caretakerStatus: isAwaiting ? 'awaiting' : 'assigned',
+    sponsorName: adopterName,
+    adopter: adopterName,
+    adopterType: adopterName ? 'Community Sponsor' : '',
+    notes: notes,
+    dateAdded: autoDateDisplay,
+    datePlanted: '2024-05-20',
+    savedAt: autoDateTimeDisplay,
+    savedTimestamp: now.getTime(),
+    createdAt: now.toISOString(),
+    photo: 'assets/tree.jpg',
+    history: [
+      {
+        date: autoDateDisplay,
+        health: health === 'healthy' ? 'Healthy' : 'Needs Care',
+        class: health,
+        notes: `Existing tree registered into ATAMAN inventory. Height: ${height}, DBH: ${trunkDiam}. ${notes}`
+      }
+    ]
+  };
+
+  ALL_TREES.unshift(newTree);
+
+  // Save to localStorage
+  try {
+    localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(ALL_TREES));
+    localStorage.setItem('saplink_trees_cache', JSON.stringify(ALL_TREES));
+  } catch (err) {
+    console.warn('Error updating localStorage trees cache:', err);
+  }
+
+  // Sync to database if available
+  if (window.ATAMAN_DB && typeof window.ATAMAN_DB.updateTree === 'function') {
+    window.ATAMAN_DB.updateTree(treeId, newTree).catch(() => {});
+  }
+
+  // Dispatch sync event
+  window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated', { detail: ALL_TREES }));
+
+  // Re-render and update UI
+  applyFilters();
+  updateStats();
+  closeModal('modalExistingTreeInfo');
+
+  showAdminToast(`🌳 Successfully registered Existing Tree ${treeId} (${speciesCommon})!`, 'success');
+}
+window.saveExistingTreeRecord = saveExistingTreeRecord;

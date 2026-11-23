@@ -266,6 +266,13 @@
           </svg>
           <span>Add Tree</span>
         </button>
+        <button class="btn-nav-action" id="btnExistingTree" type="button" title="Existing Trees Information & Registration" onclick="openExistingTreeInfoModal()"
+          style="background:#064e3b; color:#ffffff; border:1.5px solid #047857; font-weight:700; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(6,78,59,0.25);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.4 4.8 3.5 6l.5 6h6l.5-6c2.1-1.2 3.5-3.5 3.5-6a7 7 0 0 0-7-7z" />
+          </svg>
+          <span>Existing Tree</span>
+        </button>
       </div>
 
       <div class="nav-actions-group">
@@ -562,6 +569,7 @@
                 Available Only</button>
               <button class="btn-avail-pill" data-filter="taken" onclick="setAvailabilityFilter('taken')">🤝 Taken /
                 Adopted</button>
+              <button class="btn-avail-pill" data-filter="existing" onclick="setAvailabilityFilter('existing')">🌳 Existing Trees</button>
             </div>
           </div>
           <div style="display:flex; gap:10px; align-items:center;">
@@ -698,6 +706,236 @@
       <div class="modal-footer">
         <button class="btn-nav-action" onclick="closeModal('modalAddTree')">Cancel</button>
         <button class="btn-nav-action primary" id="btnSaveTree" onclick="saveTree()">💾 Save Tree</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════ MODAL: EXISTING TREE INFO & REGISTRATION ════════════════════════ -->
+  <div class="admin-modal-overlay" id="modalExistingTreeInfo">
+    <div class="admin-modal-card" style="max-width:760px;">
+      <div class="modal-header" style="background:linear-gradient(135deg, #064e3b 0%, #166534 100%); color:#ffffff; padding:18px 24px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:24px;">🌳</span>
+          <div>
+            <span class="modal-title" style="color:#ffffff; font-size:18px;">Existing Native Tree — Information &amp; Registration</span>
+            <div style="font-size:11.5px; color:#bbf7d0; margin-top:2px;">ATAMAN • Tanom. Ataman. Padayon. | Catbalogan City Forest Heritage</div>
+          </div>
+        </div>
+        <button class="drawer-close-btn" onclick="closeModal('modalExistingTreeInfo')" style="color:#ffffff; font-size:20px; background:none; border:none; cursor:pointer;" aria-label="Close">✕</button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div style="display:flex; border-bottom:1.5px solid #e2e8f0; background:#f8fafc; padding:0 24px;">
+        <button type="button" id="tabBtnExistingInfo" onclick="switchExistingTreeTab('info')"
+          style="padding:12px 20px; border:none; background:none; font-family:inherit; font-size:13px; font-weight:800; color:#166534; border-bottom:2.5px solid #166534; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+          <span>ℹ️</span> Existing Tree Information &amp; Criteria
+        </button>
+        <button type="button" id="tabBtnExistingForm" onclick="switchExistingTreeTab('form')"
+          style="padding:12px 20px; border:none; background:none; font-family:inherit; font-size:13px; font-weight:700; color:#64748b; border-bottom:2.5px solid transparent; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+          <span>➕</span> Register Existing Tree Form
+        </button>
+      </div>
+
+      <!-- Tab 1: Information & Criteria -->
+      <div id="tabContentExistingInfo" class="modal-body" style="padding:22px 26px; max-height:calc(85vh - 180px); overflow-y:auto; background:#ffffff;">
+        <!-- Overview Banner -->
+        <div style="background:linear-gradient(135deg, #fdfdf5 0%, #f0fdf4 100%); border:1.5px solid #bbf7d0; border-radius:14px; padding:18px 20px; margin-bottom:18px;">
+          <div style="display:inline-flex; align-items:center; gap:6px; background:#dcfce7; color:#166534; font-size:11px; font-weight:800; padding:3px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px;">
+            🌱 Conservation Tagging • Standing Tree Protection
+          </div>
+          <h3 style="margin:0 0 6px; font-size:1.15rem; font-weight:800; color:#0f172a;">What is an Existing Tree in ATAMAN?</h3>
+          <p style="margin:0; font-size:0.86rem; color:#334155; line-height:1.6;">
+            In the <strong>ATAMAN Catbalogan City Reforestation Initiative</strong> (<em>"Tanom. Ataman. Padayon."</em>), an <strong>Existing Tree</strong> refers to an established standing native hardwood, semi-mature tree, or mature canopy tree already rooted within Catbalogan's protected watershed sectors. Unlike newly propagated nursery seedlings, existing trees already provide active slope stabilization, microclimate cooling, and wildlife habitat.
+          </p>
+        </div>
+
+        <!-- 3-Column Highlights Grid -->
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:18px;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
+            <div style="font-size:20px; margin-bottom:6px;">📏</div>
+            <strong style="display:block; font-size:13px; color:#0f172a; margin-bottom:4px;">Minimum Criteria</strong>
+            <p style="margin:0; font-size:11.5px; color:#64748b; line-height:1.45;">Height &ge; 1.5m, trunk diameter (DBH) &ge; 2.5cm, and established root system (&ge; 1 year age).</p>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
+            <div style="font-size:20px; margin-bottom:6px;">📍</div>
+            <strong style="display:block; font-size:13px; color:#0f172a; margin-bottom:4px;">Sector Tagging</strong>
+            <p style="margin:0; font-size:11.5px; color:#64748b; line-height:1.45;">Assigned to official Samar Watershed Sectors &amp; Plots (Zones 1–6) with verified GPS pins.</p>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
+            <div style="font-size:20px; margin-bottom:6px;">🤝</div>
+            <strong style="display:block; font-size:13px; color:#0f172a; margin-bottom:4px;">Adoption &amp; Care</strong>
+            <p style="margin:0; font-size:11.5px; color:#64748b; line-height:1.45;">Eligible for community adoption and claimed by field caretakers in the live Caretaker Queue.</p>
+          </div>
+        </div>
+
+        <!-- Registered Samar Native Hardwood Species -->
+        <div style="border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px;">
+          <h4 style="margin:0 0 10px; font-size:13.5px; font-weight:800; color:#0f172a;">Priority Native Hardwood Species for Existing Trees</h4>
+          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; font-size:12px; color:#334155;">
+            <div style="background:#f0fdf4; padding:8px 12px; border-radius:8px; border:1px solid #bbf7d0;">
+              <strong>Narra</strong> (<em>Pterocarpus indicus</em>) • High timber &amp; canopy value
+            </div>
+            <div style="background:#f0fdf4; padding:8px 12px; border-radius:8px; border:1px solid #bbf7d0;">
+              <strong>Molave</strong> (<em>Vitex parviflora</em>) • Resilient coastal limestone hardwood
+            </div>
+            <div style="background:#f0fdf4; padding:8px 12px; border-radius:8px; border:1px solid #bbf7d0;">
+              <strong>Yakal</strong> (<em>Shorea astylosa</em>) • Critically endangered Samar dipterocarp
+            </div>
+            <div style="background:#f0fdf4; padding:8px 12px; border-radius:8px; border:1px solid #bbf7d0;">
+              <strong>Banaba</strong> (<em>Lagerstroemia speciosa</em>) • Watershed buffer &amp; floral canopy
+            </div>
+            <div style="background:#f0fdf4; padding:8px 12px; border-radius:8px; border:1px solid #bbf7d0;">
+              <strong>Tindalo</strong> (<em>Afzelia rhomboidea</em>) • Premium native lowland tree
+            </div>
+            <div style="background:#f0fdf4; padding:8px 12px; border-radius:8px; border:1px solid #bbf7d0;">
+              <strong>Dao</strong> (<em>Dracontomelon dao</em>) • Massive buttressed riverbank protector
+            </div>
+          </div>
+        </div>
+
+        <!-- Life Stages Guide -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px;">
+          <h4 style="margin:0 0 10px; font-size:13.5px; font-weight:800; color:#0f172a;">Existing Tree Life Stages &amp; Classifications</h4>
+          <div style="display:flex; flex-direction:column; gap:8px; font-size:12px; color:#475569;">
+            <div><strong>🌱 Young Native Tree (1–3 yrs):</strong> Height 1.5m–3.5m, established beyond nursery stage, requires ongoing weed clearing and fertilization.</div>
+            <div><strong>🌳 Semi-Mature Tree (3–10 yrs):</strong> Height 3.5m–8.0m, robust trunk, actively expanding canopy, excellent for community adoption sponsorship.</div>
+            <div><strong>🌲 Mature Canopy Hardwood (10+ yrs):</strong> Height &gt; 8m, primary watershed stabilizer, measured for annual carbon stock and seed source preservation.</div>
+            <div><strong>👑 Centennial Heritage Tree:</strong> Iconic landmark trees of exceptional age or cultural significance in Samar protected under municipal ordinance.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Registration Form -->
+      <div id="tabContentExistingForm" class="modal-body" style="display:none; padding:22px 26px; max-height:calc(85vh - 180px); overflow-y:auto; background:#ffffff;">
+        <form id="formRegisterExistingTree" onsubmit="event.preventDefault(); saveExistingTreeRecord();">
+          <div style="background:#fdfdf5; border:1.5px solid #dcfce7; border-radius:12px; padding:12px 16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:#166534; text-transform:uppercase;">Classification</span>
+              <div style="font-size:14px; font-weight:800; color:#0f172a;">🌳 Existing Native Tree Registration</div>
+            </div>
+            <span style="background:#166534; color:#fff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px;">STAGE: EXISTING</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Tree ID (Sequential)</label>
+              <input type="text" id="exTreeId" class="modal-input" readonly style="background:#f1f5f9; font-weight:700; color:#166534;" />
+            </div>
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Native Species *</label>
+              <select id="exSpeciesSelect" class="modal-input" onchange="syncExistingTreeScientific()" required>
+                <option value="Narra" data-sci="Pterocarpus indicus">Narra (Pterocarpus indicus)</option>
+                <option value="Molave" data-sci="Vitex parviflora">Molave (Vitex parviflora)</option>
+                <option value="Yakal" data-sci="Shorea astylosa">Yakal (Shorea astylosa)</option>
+                <option value="Tindalo" data-sci="Afzelia rhomboidea">Tindalo (Afzelia rhomboidea)</option>
+                <option value="Dao" data-sci="Dracontomelon dao">Dao (Dracontomelon dao)</option>
+                <option value="Banaba" data-sci="Lagerstroemia speciosa">Banaba (Lagerstroemia speciosa)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Life Stage Sub-Classification</label>
+              <select id="exTreeStage" class="modal-input">
+                <option value="Existing Tree (Young Native - 1.5 yrs)">Young Native Tree (1.5 yrs)</option>
+                <option value="Existing Tree (Young Native - 2 yrs)">Young Native Tree (2 yrs)</option>
+                <option value="Existing Tree (Semi-Mature - 5 yrs)">Semi-Mature Tree (5 yrs)</option>
+                <option value="Existing Tree (Mature Canopy - 10+ yrs)">Mature Canopy Hardwood (10+ yrs)</option>
+                <option value="Centennial Heritage Native Tree">Centennial Heritage Native Tree</option>
+              </select>
+            </div>
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Estimated Tree Age</label>
+              <input type="text" id="exTreeAge" class="modal-input" placeholder="e.g. 2 Years" value="2 Years" />
+            </div>
+          </div>
+
+          <!-- Biometrics Row -->
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:14px;">
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Height (meters)</label>
+              <input type="text" id="exTreeHeight" class="modal-input" placeholder="e.g. 3.2 meters" value="3.2 meters" />
+            </div>
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Trunk DBH (cm)</label>
+              <input type="text" id="exTreeTrunk" class="modal-input" placeholder="e.g. 5.4 cm" value="5.4 cm" />
+            </div>
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Health Status</label>
+              <select id="exTreeHealth" class="modal-input">
+                <option value="healthy" selected>🟢 Healthy</option>
+                <option value="needs-care">🟡 Needs Care</option>
+                <option value="critical">🔴 Critical</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Location Row -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Watershed Sector / Barangay *</label>
+              <select id="exTreeBarangay" class="modal-input" onchange="syncExistingTreeCoords()">
+                <option value="Canlapwas">Sector A • Canlapwas (Zone 1)</option>
+                <option value="Guinsorongan">Sector B • Guinsorongan (Zone 2)</option>
+                <option value="San Isidro" selected>Sector C • San Isidro (Zone 3)</option>
+                <option value="Bunuanan">Sector D • Bunuanan (Zone 4)</option>
+                <option value="Mabini">Sector E • Mabini (Zone 5)</option>
+                <option value="Darahuway Daco">Island Sanctuary • Darahuway Daco (Zone 6)</option>
+              </select>
+            </div>
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Plot &amp; Book Reference</label>
+              <input type="text" id="exTreePlot" class="modal-input" placeholder="e.g. Plot C-04 (Book 1)" value="Plot C-04 (Book 1)" />
+            </div>
+          </div>
+
+          <!-- Coordinates Row -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Latitude (On-land)</label>
+              <input type="number" step="0.000001" id="exTreeLat" class="modal-input" value="11.771000" />
+            </div>
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Longitude (On-land)</label>
+              <input type="number" step="0.000001" id="exTreeLng" class="modal-input" value="124.891000" />
+            </div>
+          </div>
+
+          <!-- Stewardship Row -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Assigned Field Caretaker</label>
+              <select id="exTreeCaretaker" class="modal-input">
+                <option value="Dodong Zeta" data-id="CT-101" data-email="zetadodong@gmail.com" selected>🧑‍🌾 Dodong Zeta (CT-101 • Canlapwas/San Isidro)</option>
+                <option value="June Luna" data-id="CT-102" data-email="juneluna@gmail.com">🧑‍🌾 June Luna (CT-102 • Darahuway Daco Island)</option>
+                <option value="Awaiting Caretaker" data-id="" data-email="">⏳ Open for Caretaker Claim Queue</option>
+              </select>
+            </div>
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Community Adopter (Optional)</label>
+              <input type="text" id="exTreeAdopter" class="modal-input" placeholder="Leave blank if Available for Adoption" />
+            </div>
+          </div>
+
+          <div class="modal-form-group" style="margin-bottom:6px;">
+            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Ecological / Field Notes</label>
+            <textarea id="exTreeNotes" class="modal-input" rows="2" style="resize:vertical;" placeholder="Describe tree canopy, crown health, soil conditions, or historical significance..."></textarea>
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer" style="padding:14px 24px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" class="btn-nav-action" onclick="closeModal('modalExistingTreeInfo')">Close</button>
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn-nav-action" id="btnExistingViewInTable" onclick="filterExistingTreesFromModal()" style="background:#ffffff; color:#166534; border:1px solid #bbf7d0;">
+            🔍 View Existing Trees in Table
+          </button>
+          <button type="button" class="btn-nav-action primary" id="btnSaveExistingTree" onclick="saveExistingTreeRecord()" style="background:#166534; display:none;">
+            💾 Save &amp; Register Existing Tree
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1135,7 +1373,7 @@
       <div class="admin-toast-container" id="adminToastContainer"></div>
 
       <!-- Scripts -->
-      <script src="ATAMAN-init.js?v=20261122_v8"></script>
+      <script src="ATAMAN-init.js?v=20261123_v1"></script>
       <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
       <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
       <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -1143,7 +1381,7 @@
       <script src="firebase-config.js?v=20261122_v12"></script>
       <!-- Real-Time Sync Engine -->
       <script src="realtime-admin.js?v=20261110_v14"></script>
-      <script src="admin-trees.js?v=20261122_v13"></script>
+      <script src="admin-trees.js?v=20261123_v1"></script>
       <!-- Mobile Bottom Navigation Bar -->
       <script src="ataman-bottom-nav.js?v=20261113_v1"></script>
 </body>
