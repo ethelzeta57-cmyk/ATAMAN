@@ -2547,7 +2547,23 @@ const SAMAR_EXISTING_TREE_SPECIES_MAP = {
   'Yakal': 'Shorea astylosa',
   'Tindalo': 'Afzelia rhomboidea',
   'Dao': 'Dracontomelon dao',
-  'Banaba': 'Lagerstroemia speciosa'
+  'Banaba': 'Lagerstroemia speciosa',
+  'Kamagong': 'Diospyros blancoi',
+  'Ipil': 'Intsia bijuga',
+  'Toog': 'Petersianthus quadrialatus',
+  'Balete': 'Ficus balete',
+  'Talisay': 'Terminalia catappa',
+  'Katmon': 'Dillenia philippinensis',
+  'Almon': 'Shorea almon',
+  'Bagtikan': 'Parashorea malaanonan',
+  'White Lauan': 'Shorea contorta',
+  'Red Lauan': 'Shorea negrosensis',
+  'Mayapis': 'Shorea palosapis',
+  'Guijo': 'Shorea guiso',
+  'Apitong': 'Dipterocarpus grandiflorus',
+  'Dalingdingan': 'Hopea acuminata',
+  'Mahogany': 'Swietenia macrophylla',
+  'Acacia': 'Samanea saman'
 };
 
 function getNextExistingTreeId() {
@@ -2568,6 +2584,12 @@ function openExistingTreeInfoModal(defaultTab = 'info') {
   const nextId = getNextExistingTreeId();
   const idInput = document.getElementById('exTreeId');
   if (idInput) idInput.value = nextId;
+
+  const spInput = document.getElementById('exSpeciesSelect');
+  if (spInput && !spInput.value) spInput.value = 'Narra';
+
+  const sciInput = document.getElementById('exScientific');
+  if (sciInput && !sciInput.value) sciInput.value = 'Pterocarpus indicus';
 
   syncExistingTreeCoords();
   switchExistingTreeTab(defaultTab);
@@ -2618,10 +2640,18 @@ function switchExistingTreeTab(tab) {
 window.switchExistingTreeTab = switchExistingTreeTab;
 
 function syncExistingTreeScientific() {
-  const sel = document.getElementById('exSpeciesSelect');
-  if (!sel) return;
-  const opt = sel.options[sel.selectedIndex];
-  const sci = opt?.dataset?.sci || SAMAR_EXISTING_TREE_SPECIES_MAP[sel.value] || '';
+  const speciesInput = document.getElementById('exSpeciesSelect');
+  const sciInput = document.getElementById('exScientific');
+  if (!speciesInput) return;
+  const val = speciesInput.value.trim();
+  if (!val) return;
+
+  const matchKey = Object.keys(SAMAR_EXISTING_TREE_SPECIES_MAP).find(
+    k => k.toLowerCase() === val.toLowerCase()
+  );
+  if (matchKey && sciInput) {
+    sciInput.value = SAMAR_EXISTING_TREE_SPECIES_MAP[matchKey];
+  }
 }
 window.syncExistingTreeScientific = syncExistingTreeScientific;
 
@@ -2658,10 +2688,14 @@ window.filterExistingTreesFromModal = filterExistingTreesFromModal;
 
 async function saveExistingTreeRecord() {
   const treeId = document.getElementById('exTreeId')?.value?.trim() || getNextExistingTreeId();
-  const speciesSelect = document.getElementById('exSpeciesSelect');
-  const speciesCommon = speciesSelect?.value || 'Narra';
-  const opt = speciesSelect?.options[speciesSelect.selectedIndex];
-  const scientific = opt?.dataset?.sci || SAMAR_EXISTING_TREE_SPECIES_MAP[speciesCommon] || 'Pterocarpus indicus';
+  const speciesInput = document.getElementById('exSpeciesSelect');
+  const speciesCommon = speciesInput?.value?.trim() || 'Native Tree';
+  const sciInput = document.getElementById('exScientific');
+  const matchKey = Object.keys(SAMAR_EXISTING_TREE_SPECIES_MAP).find(
+    k => k.toLowerCase() === speciesCommon.toLowerCase()
+  );
+  const scientific = sciInput?.value?.trim() || (matchKey ? SAMAR_EXISTING_TREE_SPECIES_MAP[matchKey] : 'Indeterminate Botanical Species');
+  const treeType = document.getElementById('exTreeType')?.value || 'Native';
 
   const stageDesc = document.getElementById('exTreeStage')?.value || 'Existing Tree (Young Native - 2 yrs)';
   const treeAge = document.getElementById('exTreeAge')?.value?.trim() || '2 Years';
@@ -2695,14 +2729,13 @@ async function saveExistingTreeRecord() {
     treeClassification: 'Existing Tree',
     stage: 'Existing Tree',
     isExistingTree: true,
-    species: { common: speciesCommon, scientific: scientific, type: 'Native' },
+    species: { common: speciesCommon, scientific: scientific, type: treeType },
     speciesCommon: speciesCommon,
     commonName: speciesCommon,
     scientificName: scientific,
-    treeType: 'Native',
+    treeType: treeType,
     treeCount: 1,
     takenCount: adopterName ? 1 : 0,
-    stage: 'Existing Tree',
     stageDescription: stageDesc,
     age: treeAge,
     ageOfTree: treeAge,
@@ -2761,6 +2794,7 @@ async function saveExistingTreeRecord() {
   window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated', { detail: ALL_TREES }));
 
   // Re-render and update UI
+  populateDynamicFilters();
   applyFilters();
   updateStats();
   closeModal('modalExistingTreeInfo');

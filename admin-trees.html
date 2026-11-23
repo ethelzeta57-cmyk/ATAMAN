@@ -863,15 +863,61 @@
               </div>
             </div>
             <div class="modal-form-group">
-              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Native
-                Species *</label>
-              <select id="exSpeciesSelect" class="modal-input" onchange="syncExistingTreeScientific()" required>
-                <option value="Narra" data-sci="Pterocarpus indicus">Narra (Pterocarpus indicus)</option>
-                <option value="Molave" data-sci="Vitex parviflora">Molave (Vitex parviflora)</option>
-                <option value="Yakal" data-sci="Shorea astylosa">Yakal (Shorea astylosa)</option>
-                <option value="Tindalo" data-sci="Afzelia rhomboidea">Tindalo (Afzelia rhomboidea)</option>
-                <option value="Dao" data-sci="Dracontomelon dao">Dao (Dracontomelon dao)</option>
-                <option value="Banaba" data-sci="Lagerstroemia speciosa">Banaba (Lagerstroemia speciosa)</option>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <label style="font-size:12px; font-weight:700; color:#334155;">Native Species *</label>
+                <span style="font-size:10px; font-weight:700; color:#15803d; background:#ecfdf5; padding:1px 6px; border-radius:4px; border:1px solid #bbf7d0;">✏️ Typable &amp; Selectable</span>
+              </div>
+              <input type="text" id="exSpeciesSelect" list="existingNativeSpeciesList" class="modal-input"
+                placeholder="Type or pick tree (e.g. Narra, Kamagong, Acacia...)"
+                oninput="syncExistingTreeScientific()" autocomplete="off" required
+                style="background:#ffffff; font-weight:600; color:#0f172a;" value="Narra" />
+              <datalist id="existingNativeSpeciesList">
+                <option value="Narra">Pterocarpus indicus</option>
+                <option value="Molave">Vitex parviflora</option>
+                <option value="Yakal">Shorea astylosa</option>
+                <option value="Tindalo">Afzelia rhomboidea</option>
+                <option value="Dao">Dracontomelon dao</option>
+                <option value="Banaba">Lagerstroemia speciosa</option>
+                <option value="Kamagong">Diospyros blancoi</option>
+                <option value="Ipil">Intsia bijuga</option>
+                <option value="Toog">Petersianthus quadrialatus</option>
+                <option value="Balete">Ficus balete</option>
+                <option value="Talisay">Terminalia catappa</option>
+                <option value="Katmon">Dillenia philippinensis</option>
+                <option value="Almon">Shorea almon</option>
+                <option value="Bagtikan">Parashorea malaanonan</option>
+                <option value="White Lauan">Shorea contorta</option>
+                <option value="Red Lauan">Shorea negrosensis</option>
+                <option value="Mayapis">Shorea palosapis</option>
+                <option value="Guijo">Shorea guiso</option>
+                <option value="Apitong">Dipterocarpus grandiflorus</option>
+                <option value="Dalingdingan">Hopea acuminata</option>
+                <option value="Mahogany">Swietenia macrophylla</option>
+                <option value="Acacia">Samanea saman</option>
+              </datalist>
+              <div style="font-size:11px; color:#64748b; margin-top:3px;">
+                💡 Admin can freely type any custom tree species or pick from suggestions.
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div class="modal-form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <label style="font-size:12px; font-weight:700; color:#334155;">Scientific / Botanical Name</label>
+                <span style="font-size:10px; color:#64748b; font-style:italic;">Auto-syncs or Typable</span>
+              </div>
+              <input type="text" id="exScientific" class="modal-input" placeholder="e.g. Pterocarpus indicus" value="Pterocarpus indicus" style="font-style:italic;" />
+            </div>
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Tree Type / Classification</label>
+              <select id="exTreeType" class="modal-input">
+                <option value="Native" selected>Native</option>
+                <option value="Endemic">Endemic</option>
+                <option value="Centennial Heritage">Centennial Heritage</option>
+                <option value="Indigenous Hardwood">Indigenous Hardwood</option>
+                <option value="Fruit-bearing">Fruit-bearing</option>
+                <option value="Exotic">Exotic</option>
               </select>
             </div>
           </div>
