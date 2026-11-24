@@ -2795,3 +2795,898 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTable();
 
 });
+
+
+
+/* ==========================================================================
+   ATAMAN ADMIN: HELD PAYMENTS & CARETAKER QUEUE WORKFLOW CONTROLLER
+   Unified Adopter • Tree ID • Caretaker ID Protocol
+   ========================================================================== */
+
+const SEED_HELD_QUEUE_TREES = [
+  {
+    id: 'TR-10007',
+    species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
+    speciesCommon: 'Narra',
+    scientificName: 'Pterocarpus indicus',
+    treeType: 'Native',
+    treeCount: 1,
+    takenCount: 1,
+    status: 'healthy',
+    health: 'Healthy',
+    stage: 'Sapling',
+    stageDescription: '6-Month Nursery Sapling',
+    plantingZone: 'Zone 1 (Sector A • Canlapwas Watershed)',
+    zone: 'Zone 1',
+    plot: 'Plot A-14',
+    book: 'Book 1',
+    plotBook: 'Zone 1 • Plot A-14 (Book 1)',
+    barangay: 'Canlapwas',
+    municipality: 'Catbalogan City',
+    province: 'Samar',
+    lat: 11.7828,
+    lng: 124.8860,
+    sponsorName: 'Nikki Maga',
+    adopter: 'Nikki Maga',
+    adopterId: 'ADP-101',
+    adopterEmail: 'nikkimaga24@gmail.com',
+    adopterPhone: '+63 917 123 4567',
+    adopterType: 'Individual Community Sponsor',
+    dedication: 'For the future green youth of Catbalogan',
+    adoptionStatus: 'Adopted / Funded',
+    paymentMethod: 'GCash',
+    paymentStatus: 'Verified',
+    paymentRef: 'GCASH-982417283',
+    fundState: 'Held by Admin',
+    fundingAmount: 500,
+    fundedAt: '2026-11-22T08:00:00.000Z',
+    fundedDate: 'Nov 22, 2026',
+    caretaker: 'Awaiting Caretaker',
+    caretakerId: '',
+    caretakerEmail: '',
+    caretakerStatus: 'awaiting',
+    height: '1.8 meters',
+    trunkDiam: '2.8 cm',
+    datePlanted: '2026-05-21',
+    dateAdded: 'Nov 22, 2026',
+    photo: 'assets/tree.jpg',
+    history: [
+      { date: 'Nov 22, 2026', health: 'Healthy', class: 'healthy', notes: 'Adoption funded via GCash (₱500, Ref: GCASH-982417283). Fund held by Admin in escrow awaiting caretaker claim.' }
+    ]
+  },
+  {
+    id: 'TR-10008',
+    species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Native' },
+    speciesCommon: 'Molave',
+    scientificName: 'Vitex parviflora',
+    treeType: 'Native',
+    treeCount: 1,
+    takenCount: 1,
+    status: 'healthy',
+    health: 'Healthy',
+    stage: 'Sapling',
+    stageDescription: '8-Month Nursery Sapling',
+    plantingZone: 'Zone 2 (Sector B • Guinsorongan Coastal Buffer)',
+    zone: 'Zone 2',
+    plot: 'Plot B-08',
+    book: 'Book 2',
+    plotBook: 'Zone 2 • Plot B-08 (Book 2)',
+    barangay: 'Guinsorongan',
+    municipality: 'Catbalogan City',
+    province: 'Samar',
+    lat: 11.7612,
+    lng: 124.8870,
+    sponsorName: 'Elena Cruz',
+    adopter: 'Elena Cruz',
+    adopterId: 'ADP-102',
+    adopterEmail: 'elenacruz.samar@gmail.com',
+    adopterPhone: '+63 920 445 6789',
+    adopterType: 'Samar Heritage Foundation',
+    dedication: 'In memory of Samar natural coastal heritage',
+    adoptionStatus: 'Adopted / Funded',
+    paymentMethod: 'GCash',
+    paymentStatus: 'Verified',
+    paymentRef: 'GCASH-814917402',
+    fundState: 'Held by Admin',
+    fundingAmount: 500,
+    fundedAt: '2026-11-20T08:30:00.000Z',
+    fundedDate: 'Nov 20, 2026',
+    caretaker: 'Awaiting Caretaker',
+    caretakerId: '',
+    caretakerEmail: '',
+    caretakerStatus: 'awaiting',
+    height: '2.1 meters',
+    trunkDiam: '3.2 cm',
+    datePlanted: '2026-05-21',
+    dateAdded: 'Nov 20, 2026',
+    photo: 'assets/tree.jpg',
+    history: [
+      { date: 'Nov 20, 2026', health: 'Healthy', class: 'healthy', notes: 'Adoption funded via GCash (₱500, Ref: GCASH-814917402). Fund held by Admin in escrow awaiting caretaker claim.' }
+    ]
+  },
+  {
+    id: 'TR-10009',
+    species: { common: 'Yakal', scientific: 'Shorea astylosa', type: 'Native' },
+    speciesCommon: 'Yakal',
+    scientificName: 'Shorea astylosa',
+    treeType: 'Native',
+    treeCount: 1,
+    takenCount: 1,
+    status: 'healthy',
+    health: 'Healthy',
+    stage: 'Existing Tree',
+    stageDescription: 'Young Native Tree (1.5 Years Old)',
+    plantingZone: 'Zone 3 (Sector C • San Isidro Upland Slope)',
+    zone: 'Zone 3',
+    plot: 'Plot C-03',
+    book: 'Book 1',
+    plotBook: 'Zone 3 • Plot C-03 (Book 1)',
+    barangay: 'San Isidro',
+    municipality: 'Catbalogan City',
+    province: 'Samar',
+    lat: 11.7725,
+    lng: 124.8935,
+    sponsorName: 'Catbalogan Youth Eco-Alliance',
+    adopter: 'Catbalogan Youth Eco-Alliance',
+    adopterId: 'ADP-103',
+    adopterEmail: 'youth.eco@catbalogan.gov.ph',
+    adopterPhone: '+63 939 888 1234',
+    adopterType: 'Student Environmental Organization',
+    dedication: 'Preserving old-growth Samar rainforest canopy',
+    adoptionStatus: 'Adopted / Funded',
+    paymentMethod: 'GCash',
+    paymentStatus: 'Verified',
+    paymentRef: 'GCASH-710398214',
+    fundState: 'Held by Admin',
+    fundingAmount: 500,
+    fundedAt: '2026-11-18T09:00:00.000Z',
+    fundedDate: 'Nov 18, 2026',
+    caretaker: 'Awaiting Caretaker',
+    caretakerId: '',
+    caretakerEmail: '',
+    caretakerStatus: 'awaiting',
+    height: '3.4 meters',
+    trunkDiam: '5.6 cm',
+    datePlanted: '2025-05-20',
+    dateAdded: 'Nov 18, 2026',
+    photo: 'assets/tree.jpg',
+    history: [
+      { date: 'Nov 18, 2026', health: 'Healthy', class: 'healthy', notes: 'Existing standing tree adoption funded via GCash (₱500, Ref: GCASH-710398214). Fund held by Admin in escrow awaiting caretaker claim.' }
+    ]
+  },
+  {
+    id: 'TR-10010',
+    species: { common: 'Banaba', scientific: 'Lagerstroemia speciosa', type: 'Native' },
+    speciesCommon: 'Banaba',
+    scientificName: 'Lagerstroemia speciosa',
+    treeType: 'Native',
+    treeCount: 1,
+    takenCount: 1,
+    status: 'healthy',
+    health: 'Healthy',
+    stage: 'Sapling',
+    stageDescription: '5-Month Nursery Sapling',
+    plantingZone: 'Zone 6 (Darahuway Daco Island Sanctuary)',
+    zone: 'Zone 6',
+    plot: 'Plot DD-04',
+    book: 'Book 1',
+    plotBook: 'Zone 6 • Plot DD-04 (Book 1)',
+    barangay: 'Darahuway Daco',
+    municipality: 'Catbalogan City',
+    province: 'Samar',
+    lat: 11.7455,
+    lng: 124.8768,
+    sponsorName: 'Samar Island Heritage Council',
+    adopter: 'Samar Island Heritage Council',
+    adopterId: 'ADP-104',
+    adopterEmail: 'samar.heritage@island.ph',
+    adopterPhone: '+63 945 777 2345',
+    adopterType: 'Civic Cultural Foundation',
+    dedication: 'Island coastal buffer and watershed regeneration',
+    adoptionStatus: 'Adopted / Funded',
+    paymentMethod: 'GCash',
+    paymentStatus: 'Verified',
+    paymentRef: 'GCASH-620485918',
+    fundState: 'Held by Admin',
+    fundingAmount: 500,
+    fundedAt: '2026-11-23T11:00:00.000Z',
+    fundedDate: 'Nov 23, 2026',
+    caretaker: 'Awaiting Caretaker',
+    caretakerId: '',
+    caretakerEmail: '',
+    caretakerStatus: 'awaiting',
+    height: '1.6 meters',
+    trunkDiam: '2.5 cm',
+    datePlanted: '2026-05-21',
+    dateAdded: 'Nov 23, 2026',
+    photo: 'assets/tree.jpg',
+    history: [
+      { date: 'Nov 23, 2026', health: 'Healthy', class: 'healthy', notes: 'Island sapling adoption funded via GCash (₱500, Ref: GCASH-620485918). Fund held by Admin in escrow awaiting caretaker claim.' }
+    ]
+  }
+];
+
+let CURRENT_QUEUE_TAB = 'awaiting'; // 'awaiting' | 'verified' | 'all'
+let QUEUE_SEARCH_QUERY = '';
+
+function getQueueTreesFromStorage() {
+  let allTrees = [];
+  try {
+    const raw = localStorage.getItem('ATAMAN_trees_cache');
+    allTrees = raw ? JSON.parse(raw) : [];
+  } catch (_) { allTrees = []; }
+
+  if (!Array.isArray(allTrees) || allTrees.length === 0) {
+    allTrees = [...SEED_HELD_QUEUE_TREES];
+    try {
+      localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
+      localStorage.setItem('saplink_trees_cache', JSON.stringify(allTrees));
+    } catch (_) {}
+  } else {
+    // Ensure all 4 seed queue trees exist
+    SEED_HELD_QUEUE_TREES.forEach(seed => {
+      const idx = allTrees.findIndex(t => String(t.id) === String(seed.id));
+      if (idx === -1) {
+        allTrees.push({ ...seed });
+      } else {
+        // Enrich existing tree with held payment metadata if missing
+        const existing = allTrees[idx];
+        if (!existing.fundState) existing.fundState = seed.fundState;
+        if (!existing.paymentMethod) existing.paymentMethod = seed.paymentMethod;
+        if (!existing.paymentStatus) existing.paymentStatus = seed.paymentStatus;
+        if (!existing.paymentRef) existing.paymentRef = seed.paymentRef;
+        if (!existing.fundingAmount) existing.fundingAmount = seed.fundingAmount;
+        if (!existing.adopterId && seed.adopterId) existing.adopterId = seed.adopterId;
+        if (!existing.fundedAt && seed.fundedAt) existing.fundedAt = seed.fundedAt;
+      }
+    });
+  }
+
+  // Also make sure TR-10001 has care check-ins logged for payout release demonstration
+  const tr1 = allTrees.find(t => String(t.id) === 'TR-10001');
+  if (tr1) {
+    if (!tr1.adopter) { tr1.adopter = 'Nikki Maga'; tr1.adopterId = 'ADP-101'; tr1.sponsorName = 'Nikki Maga'; }
+    if (!tr1.caretaker || tr1.caretaker === 'Unassigned') { tr1.caretaker = 'Dodong Zeta'; tr1.caretakerId = 'CT-101'; }
+    if (!tr1.fundState) tr1.fundState = 'Held by Admin (Care Verified)';
+    if (!tr1.fundingAmount) tr1.fundingAmount = 500;
+    tr1.careVerified = true;
+    tr1.inspectionsCount = tr1.inspectionsCount || 3;
+    tr1.health = tr1.health || 'Healthy';
+  }
+
+  return allTrees;
+}
+
+function calculateDaysWaiting(dateStr) {
+  if (!dateStr) return 1;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return 1;
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  return Math.max(0, days);
+}
+
+function switchAdminCaretakersView(view) {
+  const tabDir = document.getElementById('tabViewCaretakers');
+  const tabQueue = document.getElementById('tabViewQueue');
+  const viewDir = document.getElementById('viewDirectorySection');
+  const viewQueue = document.getElementById('viewQueueSection');
+
+  if (view === 'queue') {
+    if (tabDir) tabDir.classList.remove('active');
+    if (tabQueue) tabQueue.classList.add('active');
+    if (viewDir) viewDir.style.display = 'none';
+    if (viewQueue) viewQueue.style.display = 'block';
+    initHeldPaymentsQueueWorkflow(false);
+
+    try {
+      const url = new URL(window.location);
+      url.searchParams.set('view', 'queue');
+      window.history.replaceState({}, '', url);
+    } catch (_) {}
+  } else {
+    if (tabDir) tabDir.classList.add('active');
+    if (tabQueue) tabQueue.classList.remove('active');
+    if (viewDir) viewDir.style.display = 'block';
+    if (viewQueue) viewQueue.style.display = 'none';
+
+    try {
+      const url = new URL(window.location);
+      url.searchParams.delete('view');
+      window.history.replaceState({}, '', url);
+    } catch (_) {}
+  }
+}
+window.switchAdminCaretakersView = switchAdminCaretakersView;
+
+function setQueueFilter(filter) {
+  CURRENT_QUEUE_TAB = filter;
+  const pills = document.querySelectorAll('#queueFilterPills .btn-queue-sub');
+  pills.forEach(p => {
+    if (p.getAttribute('data-queue-filter') === filter) p.classList.add('active');
+    else p.classList.remove('active');
+  });
+
+  const secAwaiting = document.getElementById('sectionAwaitingTable');
+  const secClaimed = document.getElementById('sectionClaimedTable');
+
+  if (filter === 'awaiting') {
+    if (secAwaiting) secAwaiting.style.display = 'block';
+    if (secClaimed) secClaimed.style.display = 'none';
+  } else if (filter === 'verified') {
+    if (secAwaiting) secAwaiting.style.display = 'none';
+    if (secClaimed) secClaimed.style.display = 'block';
+  } else {
+    if (secAwaiting) secAwaiting.style.display = 'block';
+    if (secClaimed) secClaimed.style.display = 'block';
+  }
+
+  initHeldPaymentsQueueWorkflow(false);
+}
+window.setQueueFilter = setQueueFilter;
+
+function handleQueueSearch() {
+  const inp = document.getElementById('queueSearchInput');
+  QUEUE_SEARCH_QUERY = (inp ? inp.value : '').toLowerCase().trim();
+  initHeldPaymentsQueueWorkflow(false);
+}
+window.handleQueueSearch = handleQueueSearch;
+
+function initHeldPaymentsQueueWorkflow(isRefresh = false) {
+  const allTrees = getQueueTreesFromStorage();
+
+  // 1. Separate into Queue Trees vs Claimed Trees
+  const awaitingQueue = [];
+  const claimedTrees = [];
+
+  allTrees.forEach(t => {
+    const isAwaiting = t.caretakerStatus === 'awaiting' || 
+                       String(t.caretaker || '').toLowerCase().includes('awaiting') || 
+                       !t.caretakerId;
+    const isFunded = t.fundState && (t.fundState.includes('Held') || t.fundState.includes('Released'));
+
+    if (isAwaiting && (isFunded || t.adopter || t.sponsorName)) {
+      awaitingQueue.push(t);
+    } else if (!isAwaiting && (t.careVerified || isFunded || t.adopter)) {
+      claimedTrees.push(t);
+    }
+  });
+
+  // 2. Compute KPIs
+  let totalHeldPhp = 0;
+  let totalReleasedPhp = 0;
+  let awaitingTreesCount = awaitingQueue.length;
+  let claimedTreesCount = claimedTrees.length;
+
+  allTrees.forEach(t => {
+    const amount = Number(t.fundingAmount || 500);
+    const fs = String(t.fundState || '');
+    if (fs.startsWith('Held by Admin') || fs.includes('Escrow')) {
+      totalHeldPhp += amount;
+    } else if (fs.includes('Released') || t.payoutStatus === 'Released') {
+      totalReleasedPhp += (Number(t.payoutAmount) || amount);
+    }
+  });
+
+  const kpiHeldEl = document.getElementById('kpiHeldTotalAmount');
+  const kpiHeldTreesEl = document.getElementById('kpiHeldTreesCount');
+  const kpiAwaitingEl = document.getElementById('kpiAwaitingCount');
+  const kpiClaimedEl = document.getElementById('kpiClaimedCount');
+  const kpiReleasedEl = document.getElementById('kpiReleasedAmount');
+  const kpiReleasedCountEl = document.getElementById('kpiReleasedCount');
+
+  if (kpiHeldEl) kpiHeldEl.textContent = '₱' + totalHeldPhp.toLocaleString();
+  if (kpiHeldTreesEl) kpiHeldTreesEl.textContent = `${awaitingTreesCount} Adopted trees in GCash escrow`;
+  if (kpiAwaitingEl) kpiAwaitingEl.textContent = `${awaitingTreesCount} Trees`;
+  if (kpiClaimedEl) kpiClaimedEl.textContent = `${claimedTreesCount} Tree${claimedTreesCount === 1 ? '' : 's'}`;
+  if (kpiReleasedEl) kpiReleasedEl.textContent = '₱' + totalReleasedPhp.toLocaleString();
+  if (kpiReleasedCountEl) kpiReleasedCountEl.textContent = `${totalReleasedPhp > 0 ? 'Care-verified disbursements' : 'No disbursements released yet'}`;
+
+  // Badges
+  const queueHeaderBadge = document.getElementById('queueHeaderBadge');
+  if (queueHeaderBadge) {
+    queueHeaderBadge.textContent = `${awaitingTreesCount} Awaiting • ₱${totalHeldPhp.toLocaleString()} Held`;
+  }
+  const pillAwaitingCount = document.getElementById('pillAwaitingCount');
+  if (pillAwaitingCount) pillAwaitingCount.textContent = awaitingTreesCount;
+  const pillVerifiedCount = document.getElementById('pillVerifiedCount');
+  if (pillVerifiedCount) pillVerifiedCount.textContent = claimedTrees.filter(t => t.careVerified || t.payoutStatus !== 'Released').length;
+
+  const awaitingTableBadge = document.getElementById('awaitingTableCountBadge');
+  if (awaitingTableBadge) awaitingTableBadge.textContent = `${awaitingTreesCount} Trees`;
+  const claimedTableBadge = document.getElementById('claimedTableCountBadge');
+  if (claimedTableBadge) claimedTableBadge.textContent = `${claimedTreesCount} Trees`;
+
+  // 3. Render Table 1: Awaiting Queue Table
+  renderAwaitingQueueTable(awaitingQueue);
+
+  // 4. Render Table 2: Claimed & Care Verified Table
+  renderClaimedPayoutsTable(claimedTrees);
+
+  if (isRefresh && typeof showAdminToast === 'function') {
+    showAdminToast('🔄 Held Payments & Caretaker Queue synchronized live.', 'info');
+  }
+}
+window.initHeldPaymentsQueueWorkflow = initHeldPaymentsQueueWorkflow;
+
+function renderAwaitingQueueTable(trees) {
+  const tbody = document.getElementById('awaitingQueueTbody');
+  if (!tbody) return;
+
+  let filtered = trees;
+  if (QUEUE_SEARCH_QUERY) {
+    filtered = trees.filter(t => {
+      const sp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || '';
+      const haystack = `${t.id} ${sp} ${t.barangay || ''} ${t.plotBook || ''} ${t.adopter || ''} ${t.sponsorName || ''} ${t.adopterId || ''}`.toLowerCase();
+      return haystack.includes(QUEUE_SEARCH_QUERY);
+    });
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:36px 16px; color:#64748b; font-size:13px;">
+      <div style="font-size:24px; margin-bottom:6px;">🌱</div>
+      No adopted trees are currently waiting in the queue.
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(t => {
+    const sp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Tree';
+    const sci = (typeof t.species === 'object' && t.species ? t.species.scientific : '') || t.scientificName || '';
+    const adopterName = t.adopter || t.sponsorName || 'Community Adopter';
+    const adopterId = t.adopterId || 'ADP-101';
+    const location = `${t.barangay || 'San Isidro'}, ${t.municipality || 'Catbalogan'}`;
+    const zonePlot = t.plotBook || t.plantingZone || 'Plot A-01';
+    const amount = Number(t.fundingAmount || 500);
+    const daysWaiting = calculateDaysWaiting(t.fundedAt || t.createdAt);
+    const isOverdue = daysWaiting >= 5;
+
+    const waitingBadge = isOverdue
+      ? `<span class="badge-waiting-age" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;">⚠️ ${daysWaiting} Days Waiting</span>`
+      : daysWaiting >= 3
+      ? `<span class="badge-waiting-age" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a;">⏳ ${daysWaiting} Days Waiting</span>`
+      : `<span class="badge-waiting-age" style="background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;">🌱 ${daysWaiting === 0 ? 'Today' : `${daysWaiting} Day${daysWaiting > 1 ? 's' : ''}`}</span>`;
+
+    const stageBadge = (t.stage || '').toLowerCase().includes('existing')
+      ? `<span style="background:#064e3b; color:#86efac; font-size:10px; font-weight:800; padding:1px 6px; border-radius:4px;">EXISTING</span>`
+      : `<span style="background:#166534; color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:4px;">SAPLING</span>`;
+
+    return `
+      <tr>
+        <td>
+          <div style="font-weight:800; color:#0f172a; font-size:13.5px; display:flex; align-items:center; gap:6px;">
+            <span>${t.id}</span>
+            ${stageBadge}
+          </div>
+          <div style="font-size:11px; color:#64748b;">${t.stageDescription || 'Reforestation Tree'}</div>
+        </td>
+        <td>
+          <strong style="color:#166534; font-size:13px;">${sp}</strong>
+          <div style="font-size:11.5px; font-style:italic; color:#64748b;">${sci}</div>
+        </td>
+        <td>
+          <div style="font-weight:600; color:#334155; font-size:12.5px;">${zonePlot}</div>
+          <div style="font-size:11px; color:#64748b;">📍 ${location}</div>
+        </td>
+        <td>
+          <div style="font-weight:700; color:#0f172a; font-size:12.5px;">${adopterName}</div>
+          <div style="font-size:11px; color:#1d4ed8; font-weight:600;">🆔 ${adopterId}</div>
+          ${t.dedication ? `<div style="font-size:11px; color:#64748b; font-style:italic; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">"${t.dedication}"</div>` : ''}
+        </td>
+        <td>
+          <span class="badge-held-admin">
+            <span>💰 ₱${amount.toLocaleString()}</span>
+            <span>• Held by Admin</span>
+          </span>
+          <div style="font-size:10.5px; color:#15803d; font-weight:600; margin-top:3px;">
+            ✓ GCash Verified (${t.paymentRef || 'Ref: GCASH-OK'})
+          </div>
+        </td>
+        <td>
+          ${waitingBadge}
+          ${isOverdue ? '<div style="font-size:10.5px; color:#dc2626; font-weight:700; margin-top:2px;">⚠️ Unclaimed too long</div>' : ''}
+        </td>
+        <td>
+          <span style="font-size:11.5px; font-weight:700; color:#d97706; background:#fffbeb; padding:2px 8px; border-radius:6px; border:1px solid #fde68a;">
+            ⏳ Open for Claim
+          </span>
+        </td>
+        <td class="text-center" style="white-space:nowrap;">
+          <div style="display:inline-flex; gap:6px;">
+            <button type="button" class="btn-assign-caretaker" onclick="openAssignCaretakerModal('${t.id}')" title="Assign Caretaker directly to this tree">
+              <span>👤 Assign Caretaker</span>
+            </button>
+            <button type="button" class="btn-queue-view" onclick="openQueueTreeDetailsModal('${t.id}')" title="Audit & Escrow Details">
+              <span>👁️ Details</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderClaimedPayoutsTable(trees) {
+  const tbody = document.getElementById('claimedPayoutTbody');
+  if (!tbody) return;
+
+  let filtered = trees;
+  if (QUEUE_SEARCH_QUERY) {
+    filtered = trees.filter(t => {
+      const sp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || '';
+      const ct = t.caretaker || '';
+      const haystack = `${t.id} ${sp} ${ct} ${t.caretakerId || ''} ${t.adopter || ''}`.toLowerCase();
+      return haystack.includes(QUEUE_SEARCH_QUERY);
+    });
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:36px 16px; color:#64748b; font-size:13px;">
+      <div style="font-size:24px; margin-bottom:6px;">🧑‍🌾</div>
+      No claimed trees with verified care records currently require payout authorization.
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(t => {
+    const sp = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Tree';
+    const ctName = t.caretaker || 'Dodong Zeta';
+    const ctId = t.caretakerId || 'CT-101';
+    const adopterName = t.adopter || t.sponsorName || 'Community Adopter';
+    const adopterId = t.adopterId || 'ADP-101';
+    const amount = Number(t.payoutAmount || t.fundingAmount || 500);
+    const isReleased = t.payoutStatus === 'Released' || String(t.fundState || '').includes('Released');
+
+    const healthStatus = t.health || t.status || 'Healthy';
+    const healthBadge = healthStatus.toLowerCase().includes('healthy')
+      ? `<span style="background:#dcfce7; color:#166534; font-weight:800; font-size:11px; padding:2px 7px; border-radius:6px;">🟢 Healthy • Verified</span>`
+      : healthStatus.toLowerCase().includes('grow')
+      ? `<span style="background:#ecfdf5; color:#047857; font-weight:800; font-size:11px; padding:2px 7px; border-radius:6px;">🌱 Growing</span>`
+      : `<span style="background:#fef3c7; color:#92400e; font-weight:800; font-size:11px; padding:2px 7px; border-radius:6px;">🟡 Needs Care</span>`;
+
+    const actionHtml = isReleased
+      ? `<span class="badge-payout-released">✓ Disbursed (Ref: ${t.payoutRef || 'GCASH-OUT'})</span>`
+      : `<button type="button" class="btn-release-payout" onclick="openReleasePayoutModal('${t.id}')">
+          <span>💸 Release GCash Payout</span>
+        </button>`;
+
+    return `
+      <tr>
+        <td>
+          <div style="font-weight:800; color:#0f172a; font-size:13.5px;">${t.id}</div>
+          <div style="font-size:12px; font-weight:600; color:#166534;">${sp}</div>
+          <div style="font-size:11px; color:#64748b;">${t.barangay || 'San Isidro'}</div>
+        </td>
+        <td>
+          <div style="font-weight:700; color:#0f172a; font-size:13px; display:flex; align-items:center; gap:6px;">
+            <span>🧑‍🌾 ${ctName}</span>
+          </div>
+          <span style="font-size:11px; font-weight:800; background:#f0fdf4; color:#166534; padding:1px 6px; border-radius:4px; border:1px solid #bbf7d0;">
+            Unified ID: ${ctId}
+          </span>
+        </td>
+        <td>
+          <div style="margin-bottom:4px;">${healthBadge}</div>
+          <div style="font-size:11.5px; color:#475569; font-weight:600;">
+            📷 ${t.inspectionsCount || 2} Care Check-in${(t.inspectionsCount || 2) > 1 ? 's' : ''} Logged
+          </div>
+          <div style="font-size:11px; color:#64748b;">Last check: ${t.lastCheck || 'Nov 23, 2026'}</div>
+        </td>
+        <td>
+          <div style="font-weight:700; color:#0f172a; font-size:12.5px;">${adopterName}</div>
+          <div style="font-size:11px; color:#1d4ed8; font-weight:600;">🆔 ${adopterId}</div>
+        </td>
+        <td>
+          <div style="font-size:15px; font-weight:800; color:#166534;">₱${amount.toLocaleString()}.00</div>
+          <div style="font-size:10.5px; color:#64748b;">GCash Escrow</div>
+        </td>
+        <td>
+          ${isReleased 
+            ? `<span style="font-size:11px; font-weight:800; color:#166534; background:#dcfce7; padding:3px 8px; border-radius:6px; border:1px solid #86efac;">✅ Released</span>
+               <div style="font-size:10px; color:#64748b; margin-top:2px;">${t.payoutReleasedAt ? new Date(t.payoutReleasedAt).toLocaleDateString() : 'Nov 23, 2026'}</div>`
+            : `<span style="font-size:11px; font-weight:800; color:#92400e; background:#fef3c7; padding:3px 8px; border-radius:6px; border:1px solid #fde68a;">⏳ Pending Release</span>`
+          }
+        </td>
+        <td class="text-center" style="white-space:nowrap;">
+          <div style="display:inline-flex; gap:6px;">
+            ${actionHtml}
+            <button type="button" class="btn-queue-view" onclick="openQueueTreeDetailsModal('${t.id}')" title="View Verification & Audit">
+              <span>👁️</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openAssignCaretakerModal(treeId) {
+  const allTrees = getQueueTreesFromStorage();
+  const tree = allTrees.find(t => String(t.id) === String(treeId));
+  if (!tree) return;
+
+  const sp = (typeof tree.species === 'object' && tree.species ? tree.species.common : tree.species) || tree.speciesCommon || 'Tree';
+  const adopterName = tree.adopter || tree.sponsorName || 'Community Adopter';
+  const adopterId = tree.adopterId || 'ADP-101';
+  const daysWaiting = calculateDaysWaiting(tree.fundedAt || tree.createdAt);
+
+  const titleEl = document.getElementById('assignTreeTitle');
+  const stageBadgeEl = document.getElementById('assignTreeStageBadge');
+  const adopterEl = document.getElementById('assignTreeAdopter');
+  const locEl = document.getElementById('assignTreeLocation');
+  const escrowEl = document.getElementById('assignTreeEscrow');
+  const waitingEl = document.getElementById('assignTreeWaiting');
+  const targetInp = document.getElementById('assignTargetTreeId');
+
+  if (titleEl) titleEl.textContent = `${tree.id} — ${sp}`;
+  if (stageBadgeEl) stageBadgeEl.textContent = tree.stage || 'Reforestation Tree';
+  if (adopterEl) adopterEl.textContent = `${adopterName} (${adopterId})`;
+  if (locEl) locEl.textContent = `${tree.barangay || 'San Isidro'} • ${tree.plotBook || 'Zone 1'}`;
+  if (escrowEl) escrowEl.textContent = `₱${Number(tree.fundingAmount || 500).toLocaleString()}.00 (GCash)`;
+  if (waitingEl) waitingEl.textContent = `${daysWaiting} Day${daysWaiting === 1 ? '' : 's'} in Queue`;
+  if (targetInp) targetInp.value = tree.id;
+
+  const modal = document.getElementById('modalAdminAssignCaretaker');
+  if (modal) modal.classList.remove('hidden');
+}
+window.openAssignCaretakerModal = openAssignCaretakerModal;
+
+function submitAdminAssignCaretaker() {
+  const treeId = document.getElementById('assignTargetTreeId')?.value;
+  const select = document.getElementById('assignCaretakerSelect');
+  if (!treeId || !select) return;
+
+  const chosenOpt = select.options[select.selectedIndex];
+  const ctId = select.value;
+  const ctName = chosenOpt.getAttribute('data-name') || 'Dodong Zeta';
+  const ctEmail = chosenOpt.getAttribute('data-email') || 'zetadodong@gmail.com';
+  const notes = document.getElementById('assignCaretakerNotes')?.value?.trim() || '';
+
+  const allTrees = getQueueTreesFromStorage();
+  const treeIdx = allTrees.findIndex(t => String(t.id) === String(treeId));
+  if (treeIdx === -1) return;
+
+  const tree = allTrees[treeIdx];
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+
+  tree.caretaker = ctName;
+  tree.caretakerId = ctId;
+  tree.caretakerEmail = ctEmail;
+  tree.caretakerStatus = 'assigned';
+  tree.fundState = 'Held by Admin (Escrowed for Caretaker)';
+  tree.assignedAt = now.toISOString();
+  tree.assignedBy = 'Ethel Zeta (Admin)';
+  tree.lastCheck = dateStr;
+  tree.careVerified = true;
+  tree.inspectionsCount = 1;
+
+  if (!Array.isArray(tree.history)) tree.history = [];
+  tree.history.unshift({
+    date: dateStr,
+    health: tree.health || 'Healthy',
+    class: 'healthy',
+    notes: `Tree directly assigned by Admin Ethel Zeta to Caretaker ${ctName} (Unified ID: ${ctId}) for Adopter ${tree.adopter || 'Community Sponsor'}. GCash fund (₱${tree.fundingAmount || 500}) held in escrow. ${notes}`
+  });
+
+  // Save to localStorage
+  try {
+    localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
+    localStorage.setItem('saplink_trees_cache', JSON.stringify(allTrees));
+  } catch (err) {
+    console.warn('Error saving trees cache:', err);
+  }
+
+  // Dispatch sync events
+  window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated', { detail: allTrees }));
+  window.dispatchEvent(new CustomEvent('ATAMAN:caretakers-updated', { detail: allTrees }));
+
+  closeAdminQueueModal('modalAdminAssignCaretaker');
+  initHeldPaymentsQueueWorkflow(false);
+
+  if (typeof showAdminToast === 'function') {
+    showAdminToast(`🤝 Tree ${treeId} successfully assigned to ${ctName} (${ctId})!`, 'success');
+  } else {
+    alert(`🤝 Tree ${treeId} successfully assigned to Caretaker ${ctName} (${ctId})!`);
+  }
+}
+window.submitAdminAssignCaretaker = submitAdminAssignCaretaker;
+
+function openReleasePayoutModal(treeId) {
+  const allTrees = getQueueTreesFromStorage();
+  const tree = allTrees.find(t => String(t.id) === String(treeId));
+  if (!tree) return;
+
+  const sp = (typeof tree.species === 'object' && tree.species ? tree.species.common : tree.species) || tree.speciesCommon || 'Tree';
+  const ctName = tree.caretaker || 'Dodong Zeta';
+  const ctId = tree.caretakerId || 'CT-101';
+  const adopterName = tree.adopter || tree.sponsorName || 'Community Adopter';
+  const adopterId = tree.adopterId || 'ADP-101';
+  const amount = Number(tree.fundingAmount || 500);
+
+  const displayEl = document.getElementById('payoutTreeDisplay');
+  const locEl = document.getElementById('payoutTreeLocation');
+  const amountEl = document.getElementById('payoutAmountDisplay');
+  const adopterEl = document.getElementById('payoutAdopterDisplay');
+  const ctEl = document.getElementById('payoutCaretakerDisplay');
+  const gcashEl = document.getElementById('payoutCaretakerGcash');
+  const healthEl = document.getElementById('payoutHealthDisplay');
+  const refInp = document.getElementById('payoutGcashRef');
+  const dateInp = document.getElementById('payoutDateDisplay');
+  const targetInp = document.getElementById('payoutTargetTreeId');
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+  const randomRef = 'GCASH-OUT-' + Math.floor(100000 + Math.random() * 900000);
+
+  if (displayEl) displayEl.textContent = `${tree.id} — ${sp}`;
+  if (locEl) locEl.textContent = `${tree.barangay || 'San Isidro'} • ${tree.plotBook || 'Zone 1'}`;
+  if (amountEl) amountEl.textContent = `₱${amount.toLocaleString()}.00`;
+  if (adopterEl) adopterEl.textContent = `${adopterName} (${adopterId})`;
+  if (ctEl) ctEl.textContent = `${ctName} (${ctId})`;
+  if (gcashEl) gcashEl.textContent = ctId === 'CT-102' ? '+63 920 888 9911' : '+63 918 333 4455';
+  if (healthEl) healthEl.textContent = `🟢 ${tree.health || 'Healthy'} • Care Verified`;
+  if (refInp) refInp.value = randomRef;
+  if (dateInp) dateInp.value = dateStr;
+  if (targetInp) targetInp.value = tree.id;
+
+  const modal = document.getElementById('modalAdminReleasePayout');
+  if (modal) modal.classList.remove('hidden');
+}
+window.openReleasePayoutModal = openReleasePayoutModal;
+
+function submitAdminReleasePayout() {
+  const treeId = document.getElementById('payoutTargetTreeId')?.value;
+  const gcashRef = document.getElementById('payoutGcashRef')?.value?.trim();
+  const notes = document.getElementById('payoutAdminNotes')?.value?.trim() || 'Caretaker care records verified and incentive released.';
+  if (!treeId || !gcashRef) return;
+
+  const allTrees = getQueueTreesFromStorage();
+  const treeIdx = allTrees.findIndex(t => String(t.id) === String(treeId));
+  if (treeIdx === -1) return;
+
+  const tree = allTrees[treeIdx];
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+  const amount = Number(tree.fundingAmount || 500);
+  const ctName = tree.caretaker || 'Dodong Zeta';
+  const ctId = tree.caretakerId || 'CT-101';
+
+  tree.fundState = 'Released to Caretaker';
+  tree.payoutStatus = 'Released';
+  tree.payoutRef = gcashRef;
+  tree.payoutAmount = amount;
+  tree.payoutReleasedAt = now.toISOString();
+  tree.payoutReleasedBy = 'Ethel Zeta (Admin)';
+
+  if (!Array.isArray(tree.history)) tree.history = [];
+  tree.history.unshift({
+    date: dateStr,
+    health: tree.health || 'Healthy',
+    class: 'healthy',
+    notes: `💸 GCash Payout of ₱${amount.toLocaleString()} released by Admin Ethel Zeta to Caretaker ${ctName} (${ctId}) under outbound reference ${gcashRef}. ${notes}`
+  });
+
+  // Save to localStorage
+  try {
+    localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
+    localStorage.setItem('saplink_trees_cache', JSON.stringify(allTrees));
+  } catch (err) {
+    console.warn('Error saving trees cache:', err);
+  }
+
+  // Dispatch sync events
+  window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated', { detail: allTrees }));
+  window.dispatchEvent(new CustomEvent('ATAMAN:caretakers-updated', { detail: allTrees }));
+
+  closeAdminQueueModal('modalAdminReleasePayout');
+  initHeldPaymentsQueueWorkflow(false);
+
+  if (typeof showAdminToast === 'function') {
+    showAdminToast(`💸 Payout of ₱${amount.toLocaleString()} successfully released to ${ctName} (${gcashRef})!`, 'success');
+  } else {
+    alert(`💸 Payout of ₱${amount.toLocaleString()} successfully released to Caretaker ${ctName} (${gcashRef})!`);
+  }
+}
+window.submitAdminReleasePayout = submitAdminReleasePayout;
+
+function openQueueTreeDetailsModal(treeId) {
+  const allTrees = getQueueTreesFromStorage();
+  const tree = allTrees.find(t => String(t.id) === String(treeId));
+  if (!tree) return;
+
+  const modal = document.getElementById('modalQueueTreeDetails');
+  const titleEl = document.getElementById('auditModalTitle');
+  const bodyEl = document.getElementById('auditModalBody');
+  if (!modal || !bodyEl) return;
+
+  const sp = (typeof tree.species === 'object' && tree.species ? tree.species.common : tree.species) || tree.speciesCommon || 'Tree';
+  const sci = (typeof tree.species === 'object' && tree.species ? tree.species.scientific : '') || tree.scientificName || '';
+  const amount = Number(tree.fundingAmount || 500);
+  const isReleased = tree.payoutStatus === 'Released' || String(tree.fundState || '').includes('Released');
+
+  if (titleEl) titleEl.textContent = `Tree ${tree.id} — Audit & Escrow Record`;
+
+  bodyEl.innerHTML = `
+    <div style="background:#fdfdf5; border:1.5px solid #dcfce7; border-radius:12px; padding:16px; margin-bottom:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div>
+          <h4 style="margin:0; font-size:16px; font-weight:800; color:#0f172a;">${tree.id} — ${sp}</h4>
+          <div style="font-size:12px; font-style:italic; color:#64748b;">${sci}</div>
+        </div>
+        <span style="background:#166534; color:#fff; font-size:11px; font-weight:800; padding:3px 9px; border-radius:999px;">
+          ${tree.stage || 'Reforestation Tree'}
+        </span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; font-size:12.5px; border-top:1px solid #e2e8f0; padding-top:10px;">
+        <div><strong>Planting Zone:</strong> <span style="color:#166534;">${tree.plantingZone || 'Zone 1'}</span></div>
+        <div><strong>Plot / Book:</strong> <span>${tree.plotBook || 'Plot A-01'}</span></div>
+        <div><strong>GPS Location:</strong> <span>${tree.lat ? `${Number(tree.lat).toFixed(4)}° N, ${Number(tree.lng).toFixed(4)}° E` : 'Catbalogan GPS'}</span></div>
+        <div><strong>Barangay:</strong> <span>${tree.barangay || 'San Isidro'}</span></div>
+      </div>
+    </div>
+
+    <!-- Adopter & Inbound GCash Payment -->
+    <div style="border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px;">
+      <h5 style="margin:0 0 10px 0; font-size:13px; font-weight:800; color:#1d4ed8; text-transform:uppercase;">🤝 Adopter Account &amp; GCash Inbound Payment</h5>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; font-size:12.5px;">
+        <div><strong>Adopter Name:</strong> <span>${tree.adopter || tree.sponsorName || 'Community Adopter'}</span></div>
+        <div><strong>Adopter ID:</strong> <span style="color:#1d4ed8; font-weight:700;">${tree.adopterId || 'ADP-101'}</span></div>
+        <div><strong>Payment Method:</strong> <span>GCash Mobile</span></div>
+        <div><strong>GCash Inbound Ref:</strong> <span style="font-family:monospace; font-weight:700; color:#166534;">${tree.paymentRef || 'GCASH-982417283'}</span></div>
+        <div><strong>Escrow Amount:</strong> <strong style="color:#166534;">₱${amount.toLocaleString()}.00</strong></div>
+        <div><strong>Fund State:</strong> <span style="background:#fef3c7; color:#92400e; font-weight:800; padding:2px 6px; border-radius:4px;">${tree.fundState || 'Held by Admin'}</span></div>
+      </div>
+      ${tree.dedication ? `<div style="margin-top:10px; padding:8px 12px; background:#f8fafc; border-radius:6px; font-size:12px; font-style:italic; color:#475569;">Dedication: "${tree.dedication}"</div>` : ''}
+    </div>
+
+    <!-- Caretaker & Outbound Disbursement -->
+    <div style="border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px;">
+      <h5 style="margin:0 0 10px 0; font-size:13px; font-weight:800; color:#166534; text-transform:uppercase;">🧑‍🌾 Caretaker Stewardship &amp; Outbound Payout</h5>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; font-size:12.5px;">
+        <div><strong>Assigned Caretaker:</strong> <span>${tree.caretaker && tree.caretaker !== 'Awaiting Caretaker' ? tree.caretaker : '⏳ Awaiting Caretaker Claim'}</span></div>
+        <div><strong>Caretaker ID:</strong> <span style="font-weight:700; color:#166534;">${tree.caretakerId || 'Pending'}</span></div>
+        <div><strong>Field Health Status:</strong> <span style="font-weight:700; color:#166534;">🟢 ${tree.health || 'Healthy'}</span></div>
+        <div><strong>Payout Status:</strong> <span style="font-weight:700; color:${isReleased ? '#166534' : '#92400e'};">${isReleased ? '✅ Disbursed' : '⏳ Pending Release'}</span></div>
+        ${isReleased ? `
+          <div><strong>GCash Outbound Ref:</strong> <span style="font-family:monospace; font-weight:700; color:#166534;">${tree.payoutRef || 'GCASH-OUT'}</span></div>
+          <div><strong>Release Date:</strong> <span>${tree.payoutReleasedAt ? new Date(tree.payoutReleasedAt).toLocaleString() : 'Nov 23, 2026'}</span></div>
+        ` : ''}
+      </div>
+    </div>
+
+    <!-- History Audit Logs -->
+    <div>
+      <h5 style="margin:0 0 8px 0; font-size:12px; font-weight:800; color:#475569; text-transform:uppercase;">📜 Stewardship Audit Trail</h5>
+      <div style="max-height:160px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:8px 12px; background:#f8fafc; font-size:11.5px;">
+        ${Array.isArray(tree.history) && tree.history.length > 0 ? tree.history.map(h => `
+          <div style="padding:4px 0; border-bottom:1px solid #edf2f7;">
+            <strong style="color:#0f172a;">${h.date}:</strong> <span style="color:#475569;">${h.notes}</span>
+          </div>
+        `).join('') : '<div style="color:#94a3b8;">No previous history records logged.</div>'}
+      </div>
+    </div>
+  `;
+
+  modal.classList.remove('hidden');
+}
+window.openQueueTreeDetailsModal = openQueueTreeDetailsModal;
+
+function closeAdminQueueModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) modal.classList.add('hidden');
+}
+window.closeAdminQueueModal = closeAdminQueueModal;
+
+// Auto-boot Held Payments & Caretaker Queue on DOM or if URL has ?view=queue
+document.addEventListener('DOMContentLoaded', () => {
+  const isQueueView = window.location.search.includes('view=queue') || window.location.hash === '#queue';
+  if (isQueueView) {
+    switchAdminCaretakersView('queue');
+  } else {
+    // Background init so badges and counts are immediately up to date
+    initHeldPaymentsQueueWorkflow(false);
+  }
+});

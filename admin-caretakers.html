@@ -255,6 +255,9 @@
         </div>
       </div>
       <div class="nav-actions-group">
+        <div id="adminLiveDatePill" class="admin-live-date-pill" title="Current Date" style="display:inline-flex; align-items:center; gap:6px; padding:0 11px; height:36px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; font-size:12px; font-weight:600; color:#334155; white-space:nowrap; flex-shrink:0;">
+          <span>📅</span><span id="adminLiveDateText">Nov 24, 2026</span>
+        </div>
         <button class="btn btn-outline" id="importCaretakersBtn" type="button">📥 Import</button>
         <button class="btn btn-outline" id="exportCaretakersBtn" type="button">📤 Export</button>
         <button class="btn btn-primary" id="openAddCaretakerModalBtn" type="button">+ Add Caretaker</button>
@@ -264,6 +267,28 @@
     </header>
 
     <main class="content-container">
+
+      <!-- 1. VIEW SWITCHER TABS -->
+      <div class="view-mode-tabs-bar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #e2e8f0; padding-bottom:12px; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="view-mode-tab active" id="tabViewCaretakers" onclick="switchAdminCaretakersView('directory')">
+            <span style="font-size:16px;">👥</span>
+            <span>Caretaker Directory</span>
+          </button>
+          <button type="button" class="view-mode-tab" id="tabViewQueue" onclick="switchAdminCaretakersView('queue')">
+            <span style="font-size:16px;">💰</span>
+            <span>Held Payments &amp; Caretaker Queue</span>
+            <span class="queue-pill-badge" id="queueHeaderBadge">4 Awaiting • ₱2,000 Held</span>
+          </button>
+        </div>
+        <div style="font-size:12px; color:#166534; font-weight:700; background:#f0fdf4; border:1px solid #bbf7d0; padding:5px 12px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;">
+          <span>🌱</span>
+          <span>Tanom. Ataman. Padayon. • Catbalogan City</span>
+        </div>
+      </div>
+
+      <!-- VIEW 1: CARETAKER DIRECTORY -->
+      <div id="viewDirectorySection">
 
       <!-- 2. OVERVIEW CARDS (6 Cards) -->
       <section class="summary-cards-grid">
@@ -436,7 +461,167 @@
             </tbody>
           </table>
         </div>
-      </section>
+            </section>
+      </div>
+      <!-- END VIEW 1: CARETAKER DIRECTORY -->
+
+      <!-- ════════════════════════ VIEW 2: HELD PAYMENTS & CARETAKER QUEUE ════════════════════════ -->
+      <div id="viewQueueSection" style="display:none;">
+        
+        <!-- Header Banner: Forest-Green & Warm-Cream Theme -->
+        <div style="background:linear-gradient(135deg, #fdfdf5 0%, #f0fdf4 100%); border:1.5px solid #dcfce7; border-radius:16px; padding:20px 24px; margin-bottom:22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; box-shadow:0 2px 8px rgba(22,101,52,0.06);">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+              <span style="background:#092e18; color:#86efac; font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px; letter-spacing:0.5px;">GCASH ESCROW &amp; STEWARDSHIP PROTOCOL</span>
+              <span style="background:#fef3c7; color:#92400e; font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px; border:1px solid #fde68a;">HELD BY ADMIN</span>
+            </div>
+            <h2 style="font-size:20px; font-weight:800; color:#0f172a; margin:0 0 4px 0;">Held Payments &amp; Caretaker Adoption Queue</h2>
+            <p style="font-size:13px; color:#475569; margin:0; max-width:850px; line-height:1.45;">
+              Adopter GCash payments are verified and held in escrow under unified Adopter and Tree IDs. Assign or release trees to field caretakers, review growth verification, and authorize caretaker incentive payouts.
+            </p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="btn btn-outline" onclick="initHeldPaymentsQueueWorkflow(true)" style="background:#ffffff; color:#166534; border:1.5px solid #86efac; font-weight:700;">
+              🔄 Refresh Queue
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Summary Cards -->
+        <section class="queue-kpi-grid">
+          <div class="queue-kpi-card held-card">
+            <div class="qk-header">
+              <span class="qk-icon">💰</span>
+              <span class="qk-label">Total Held by Admin</span>
+            </div>
+            <div class="qk-value" id="kpiHeldTotalAmount" style="color:#92400e;">₱2,000</div>
+            <div class="qk-subtext" id="kpiHeldTreesCount">4 Adopted trees in GCash escrow</div>
+          </div>
+
+          <div class="queue-kpi-card queue-card">
+            <div class="qk-header">
+              <span class="qk-icon">⏳</span>
+              <span class="qk-label">Awaiting Caretaker</span>
+            </div>
+            <div class="qk-value" id="kpiAwaitingCount" style="color:#166534;">4 Trees</div>
+            <div class="qk-subtext">Waiting for claim or Admin assignment</div>
+          </div>
+
+          <div class="queue-kpi-card">
+            <div class="qk-header">
+              <span class="qk-icon">🧑‍🌾</span>
+              <span class="qk-label">In Active Care</span>
+            </div>
+            <div class="qk-value" id="kpiClaimedCount" style="color:#0f172a;">0 Trees</div>
+            <div class="qk-subtext" id="kpiClaimedSub">Assigned to unified Caretaker IDs</div>
+          </div>
+
+          <div class="queue-kpi-card payout-card">
+            <div class="qk-header">
+              <span class="qk-icon">💸</span>
+              <span class="qk-label">Payouts Released</span>
+            </div>
+            <div class="qk-value" id="kpiReleasedAmount" style="color:#1d4ed8;">₱0</div>
+            <div class="qk-subtext" id="kpiReleasedCount">Care-verified caretaker disbursements</div>
+          </div>
+        </section>
+
+        <!-- Sub Tabs & Search Controls -->
+        <div class="queue-sub-nav">
+          <div class="queue-filter-pills" id="queueFilterPills">
+            <button type="button" class="btn-queue-sub active" data-queue-filter="awaiting" onclick="setQueueFilter('awaiting')">
+              <span>⏳ Adopted Trees Awaiting Caretaker</span>
+              <span class="badge" id="pillAwaitingCount" style="background:#fef3c7; color:#92400e; padding:1px 6px; border-radius:999px; font-size:10px;">4</span>
+            </button>
+            <button type="button" class="btn-queue-sub" data-queue-filter="verified" onclick="setQueueFilter('verified')">
+              <span>🌱 Claimed &amp; Care Verified (Ready for Payout)</span>
+              <span class="badge" id="pillVerifiedCount" style="background:#dcfce7; color:#166534; padding:1px 6px; border-radius:999px; font-size:10px;">0</span>
+            </button>
+            <button type="button" class="btn-queue-sub" data-queue-filter="all" onclick="setQueueFilter('all')">
+              <span>📋 All Queue Records</span>
+            </button>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center;">
+            <div class="search-input-wrapper" style="min-width:280px;">
+              <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:16px;height:16px;">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <input type="text" id="queueSearchInput" placeholder="Search Tree ID, Adopter, Barangay, Plot..." oninput="handleQueueSearch()" />
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 1: AWAITING CARETAKER TABLE -->
+        <section class="card table-card" id="sectionAwaitingTable" style="margin-bottom:28px;">
+          <div class="table-header-row" style="background:#fdfdf5; border-bottom:1.5px solid #dcfce7; padding:16px 20px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:18px;">⏳</span>
+                <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">Adopted Trees Awaiting Caretaker (Funds Held by Admin)</h3>
+                <span class="table-count-badge" id="awaitingTableCountBadge">4 Trees</span>
+              </div>
+              <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">Adopter GCash funds are held safely in escrow. If unclaimed too long, Admin can directly assign a field caretaker.</p>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="caretakers-table">
+              <thead>
+                <tr>
+                  <th>Tree ID &amp; Stage</th>
+                  <th>Native Species</th>
+                  <th>Planting Zone &amp; Plot</th>
+                  <th>Adopter Account</th>
+                  <th>Fund State (GCash)</th>
+                  <th>Queue Waiting</th>
+                  <th>Status</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="awaitingQueueTbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SECTION 2: CLAIMED & CARE VERIFIED TABLE (PAYOUT RELEASE) -->
+        <section class="card table-card" id="sectionClaimedTable">
+          <div class="table-header-row" style="background:#f0fdf4; border-bottom:1.5px solid #bbf7d0; padding:16px 20px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:18px;">💸</span>
+                <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">Caretaker Field Care &amp; GCash Payout Release</h3>
+                <span class="table-count-badge" id="claimedTableCountBadge">0 Trees</span>
+              </div>
+              <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">Review logged care check-ins, photo evidence, and health status (Healthy, Growing, Verified) to release GCash disbursements.</p>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="caretakers-table">
+              <thead>
+                <tr>
+                  <th>Tree ID &amp; Species</th>
+                  <th>Assigned Caretaker</th>
+                  <th>Care Performance &amp; Evidence</th>
+                  <th>Adopter Account</th>
+                  <th>Escrow Amount</th>
+                  <th>Payout Status</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="claimedPayoutTbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+      <!-- ════════════════════════ END VIEW 2 ════════════════════════ -->
     </main>
   </div>
 
@@ -1081,6 +1266,152 @@
       <div class="modal-footer" id="actionModalFooter">
         <button class="btn btn-outline" id="cancelActionBtn" type="button">Cancel</button>
         <button class="btn btn-primary" id="confirmActionBtn" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- ================= MODAL: ADMIN ASSIGN CARETAKER ================= -->
+  <div class="modal-overlay hidden" id="modalAdminAssignCaretaker">
+    <div class="modal-card" style="max-width: 580px; border-radius: 16px; overflow: hidden; padding: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
+      <div style="background: linear-gradient(135deg, #092e18 0%, #166534 100%); color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;">👤</span>
+          <div>
+            <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #ffffff;">Assign Caretaker to Adopted Tree</h3>
+            <div style="font-size: 11.5px; color: #bbf7d0;">Admin Direct Assignment • ATAMAN Stewardship Protocol</div>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeAdminQueueModal('modalAdminAssignCaretaker')" style="color: #ffffff; background: none; border: none; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="padding: 22px 24px; background: #ffffff;">
+        <div style="background: #fdfdf5; border: 1.5px solid #dcfce7; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <strong id="assignTreeTitle" style="font-size: 15px; color: #0f172a;">TR-10007 — Narra</strong>
+            <span id="assignTreeStageBadge" style="background: #dcfce7; color: #166534; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px;">Sapling</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; color: #475569;">
+            <div>Adopter: <strong id="assignTreeAdopter" style="color: #0f172a;">Nikki Maga (ADP-101)</strong></div>
+            <div>Location: <strong id="assignTreeLocation" style="color: #0f172a;">Canlapwas • Zone 1</strong></div>
+            <div>Held Escrow: <strong id="assignTreeEscrow" style="color: #166534;">₱500.00 (GCash)</strong></div>
+            <div>Waiting: <strong id="assignTreeWaiting" style="color: #b45309;">2 Days in Queue</strong></div>
+          </div>
+        </div>
+
+        <form id="formAdminAssignCaretaker" onsubmit="event.preventDefault(); submitAdminAssignCaretaker();">
+          <input type="hidden" id="assignTargetTreeId" />
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Select Field Caretaker *</label>
+            <select id="assignCaretakerSelect" class="form-control" style="width: 100%; height: 42px; border-radius: 8px; border: 1.5px solid #cbd5e1; padding: 0 12px; font-size: 13px; font-weight: 600;" required>
+              <option value="CT-101" data-name="Dodong Zeta" data-email="zetadodong@gmail.com" selected>🧑‍🌾 Dodong Zeta (CT-101 • Canlapwas / San Isidro)</option>
+              <option value="CT-102" data-name="June Luna" data-email="juneluna@gmail.com">🧑‍🌾 June Luna (CT-102 • Darahuway Daco Island)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Admin Assignment Note / Instructions</label>
+            <textarea id="assignCaretakerNotes" class="form-control" rows="2" style="width: 100%; border-radius: 8px; border: 1.5px solid #cbd5e1; padding: 8px 12px; font-size: 13px;" placeholder="e.g. Tree assigned due to queue age. Conduct initial inspection and upload growth photo."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="btn btn-outline" onclick="closeAdminQueueModal('modalAdminAssignCaretaker')">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="background: #166534; font-weight: 700;">🤝 Confirm &amp; Assign Caretaker</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ADMIN RELEASE GCASH PAYOUT ================= -->
+  <div class="modal-overlay hidden" id="modalAdminReleasePayout">
+    <div class="modal-card" style="max-width: 600px; border-radius: 16px; overflow: hidden; padding: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
+      <div style="background: linear-gradient(135deg, #064e3b 0%, #166534 100%); color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;">💸</span>
+          <div>
+            <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #ffffff;">Authorize &amp; Release GCash Caretaker Payout</h3>
+            <div style="font-size: 11.5px; color: #bbf7d0;">Performance Verified • Incentive Escrow Disbursement</div>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeAdminQueueModal('modalAdminReleasePayout')" style="color: #ffffff; background: none; border: none; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="padding: 22px 24px; background: #ffffff;">
+        <div style="background: #fdfdf5; border: 1.5px solid #dcfce7; border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+              <strong id="payoutTreeDisplay" style="font-size: 16px; color: #0f172a;">TR-10007 — Narra</strong>
+              <div id="payoutTreeLocation" style="font-size: 12px; color: #64748b;">Zone 1 • Plot A-14, Canlapwas</div>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Payout Amount</span>
+              <div id="payoutAmountDisplay" style="font-size: 22px; font-weight: 800; color: #166534;">₱500.00</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+            <div>Adopter: <strong id="payoutAdopterDisplay" style="color: #0f172a;">Nikki Maga (ADP-101)</strong></div>
+            <div>Caretaker: <strong id="payoutCaretakerDisplay" style="color: #0f172a;">Dodong Zeta (CT-101)</strong></div>
+            <div>GCash Mobile: <strong id="payoutCaretakerGcash" style="color: #1d4ed8;">+63 918 333 4455</strong></div>
+            <div>Status: <span id="payoutHealthDisplay" style="color: #166534; font-weight: 700;">🟢 Healthy • Verified</span></div>
+          </div>
+        </div>
+
+        <form id="formAdminReleasePayout" onsubmit="event.preventDefault(); submitAdminReleasePayout();">
+          <input type="hidden" id="payoutTargetTreeId" />
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+            <div class="form-group">
+              <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 4px;">Outbound GCash Reference No. *</label>
+              <input type="text" id="payoutGcashRef" class="form-control" style="width: 100%; height: 38px; border-radius: 8px; border: 1.5px solid #cbd5e1; padding: 0 10px; font-weight: 700; color: #0f172a;" required />
+            </div>
+            <div class="form-group">
+              <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 4px;">Disbursement Date</label>
+              <input type="text" id="payoutDateDisplay" class="form-control" style="width: 100%; height: 38px; border-radius: 8px; border: 1.5px solid #cbd5e1; padding: 0 10px; background: #f8fafc;" readonly />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 4px;">Admin Authorization Notes</label>
+            <textarea id="payoutAdminNotes" class="form-control" rows="2" style="width: 100%; border-radius: 8px; border: 1.5px solid #cbd5e1; padding: 8px 10px; font-size: 12.5px;" placeholder="Confirmed field check-in evidence verified. Caretaker incentive approved for disbursement."></textarea>
+          </div>
+
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="chkVerifyStandards" style="width: 16px; height: 16px; cursor: pointer;" required checked />
+            <label for="chkVerifyStandards" style="font-size: 12px; font-weight: 600; color: #166534; cursor: pointer;">
+              I certify that this tree has passed field monitoring inspection and survival standards.
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="btn btn-outline" onclick="closeAdminQueueModal('modalAdminReleasePayout')">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="background: #16a34a; font-weight: 700;">💸 Authorize &amp; Disburse GCash Payout</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: QUEUE AUDIT & DETAILS ================= -->
+  <div class="modal-overlay hidden" id="modalQueueTreeDetails">
+    <div class="modal-card modal-lg" style="border-radius: 16px; overflow: hidden; padding: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
+      <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;">🛡️</span>
+          <div>
+            <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #ffffff;" id="auditModalTitle">Tree TR-10007 — Audit &amp; Escrow Record</h3>
+            <div style="font-size: 11.5px; color: #94a3b8;">Unified Adopter • Tree ID • Caretaker ID Verification</div>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeAdminQueueModal('modalQueueTreeDetails')" style="color: #ffffff; background: none; border: none; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="padding: 22px 24px; background: #ffffff;" id="auditModalBody">
+        <!-- Dynamically injected -->
+      </div>
+      <div class="modal-footer" style="padding: 12px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+        <button type="button" class="btn btn-outline" onclick="closeAdminQueueModal('modalQueueTreeDetails')">Close</button>
       </div>
     </div>
   </div>
