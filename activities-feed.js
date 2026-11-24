@@ -14,7 +14,6 @@
       title: 'Catbalogan Watershed Aerial Canopy Inspection & Ridge Restoration',
       category: 'SHARED VIDEO',
       date: 'Nov 24, 2026',
-      zone: 'Zone 1 • Canlapwas',
       videoUrl: 'https://www.youtube.com/watch?v=O37yB6V7zFk',
       thumbnail: 'assets/tree1.jpg',
       excerpt: 'Watch drone footage tracking newly established Narra and Molave saplings across the Canlapwas watershed slopes.',
@@ -28,7 +27,6 @@
       title: 'Community 1,000 Native Hardwood Planting Drive at San Isidro',
       category: 'PLANTING DRIVE',
       date: 'Nov 20, 2026',
-      zone: 'Zone 3 • San Isidro',
       videoUrl: '',
       thumbnail: 'assets/tree2.jpg',
       excerpt: 'Join local student volunteers and barangay caretakers this Saturday as we plant 1,000 endemic Samar hardwoods.',
@@ -42,7 +40,6 @@
       title: 'Samar Green Ridge Corridor: 2026–2030 Forest Masterplan',
       category: 'PLAN',
       date: 'Nov 15, 2026',
-      zone: 'City-Wide • Samar Ridge',
       videoUrl: '',
       thumbnail: 'assets/tree.jpg',
       excerpt: 'The official strategic blueprint for connecting Catbalogan coastal mangrove sanctuaries to upland virgin forests.',
@@ -56,7 +53,6 @@
       title: 'Catbalogan City Recognizes 100 Pioneering Tree Adopters',
       category: 'NEWS',
       date: 'Nov 10, 2026',
-      zone: 'Catbalogan City Hall',
       videoUrl: '',
       thumbnail: 'assets/ATAMAN_bg.jpg',
       excerpt: 'Official certificates of environmental recognition conferred to diaspora sponsors, schools, and youth organizations.',
@@ -70,7 +66,6 @@
       title: 'Field Guide: How Caretakers Monitor Indigenous Samar Hardwoods',
       category: 'SHARED VIDEO',
       date: 'Nov 05, 2026',
-      zone: 'Zone 2 • Guinsorongan',
       videoUrl: 'https://www.youtube.com/watch?v=ScMzIvxBSi4',
       thumbnail: 'assets/tree1.jpg',
       excerpt: 'A short field documentary showing how our certified caretakers perform DBH measuring and growth photo check-ins.',
@@ -149,6 +144,7 @@
           // Normalize thumbnails (auto-heal bare names like '1.jpg')
           let modified = false;
           parsed.forEach(item => {
+            delete item.zone;
             if (item.thumbnail === '1.jpg' || !item.thumbnail) {
               item.thumbnail = resolveThumbnail(item);
               modified = true;
@@ -221,7 +217,6 @@
     grid.innerHTML = filtered.map(item => {
       const hasVideo = !!(item.videoUrl && isValidHttpUrl(item.videoUrl));
       const categoryBadge = getCategoryBadgeHtml(item.category);
-      const zoneBadge = item.zone ? `<span class="up-zone-pill">📍 ${escapeHtml(item.zone)}</span>` : '';
       const thumb = escapeHtml(resolveThumbnail(item));
       const title = escapeHtml(item.title);
       const excerpt = escapeHtml(item.excerpt || '');
@@ -237,7 +232,6 @@
               <div class="up-thumb-overlay"></div>
               <div class="up-badges-row">
                 ${categoryBadge}
-                ${zoneBadge}
               </div>
               <div class="up-play-indicator" aria-hidden="true">
                 <div class="up-play-circle">
@@ -271,7 +265,6 @@
               <div class="up-thumb-overlay"></div>
               <div class="up-badges-row">
                 ${categoryBadge}
-                ${zoneBadge}
               </div>
             </div>
             <div class="up-card-body">
@@ -305,7 +298,6 @@
     }
 
     document.getElementById('artModalCategory').innerHTML = getCategoryBadgeHtml(item.category);
-    document.getElementById('artModalZone').textContent = item.zone ? ` • 📍 ${item.zone}` : '';
     document.getElementById('artModalDate').textContent = `📅 ${item.date || 'Recent'}`;
     document.getElementById('artModalTitle').textContent = item.title;
     document.getElementById('artModalExcerpt').textContent = item.excerpt || '';
@@ -347,7 +339,6 @@
           <img id="artModalImage" src="assets/tree1.jpg" alt="Update Cover" onerror="this.src='assets/tree1.jpg'" />
           <div class="up-modal-media-overlay">
             <span id="artModalCategory"></span>
-            <span id="artModalZone" style="color:#dcfce7;font-size:0.85rem;font-weight:700;"></span>
           </div>
         </div>
         <div class="up-modal-content">

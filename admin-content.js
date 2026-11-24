@@ -77,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Editor Inputs
   const edId              = document.getElementById('edId');
   const edCategory        = document.getElementById('edCategory');
-  const edZoneTag         = document.getElementById('edZoneTag');
   const edTitle           = document.getElementById('edTitle');
   const edVideoUrl        = document.getElementById('edVideoUrl');
   const edThumbnail       = document.getElementById('edThumbnail');
@@ -340,7 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const tr = document.createElement('tr');
       const hasVideo = !!(item.videoUrl && String(item.videoUrl).trim().length > 0);
       const thumb = window.AtamanFeed && window.AtamanFeed.resolveThumbnail ? window.AtamanFeed.resolveThumbnail(item) : (item.thumbnail || 'assets/tree1.jpg');
-      const zone = item.zone || '—';
       const date = item.date || 'Recent';
       const author = item.author || 'ATAMAN Admin';
 
@@ -373,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </td>
         <td>${getCategoryBadge(item.category)}</td>
-        <td><span style="font-weight:600; color:#334155; font-size:.78rem;">${escapeHtml(zone)}</span></td>
         <td>${videoCellHtml}</td>
         <td><span style="color:#475569; font-size:.78rem;">${escapeHtml(author)}</span></td>
         <td><small style="color:#64748b; font-weight:600;">${escapeHtml(date)}</small></td>
@@ -410,9 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filtered = updatesList.filter(item => {
       const matchQuery = !query ||
         String(item.title || '').toLowerCase().includes(query) ||
-        String(item.excerpt || '').toLowerCase().includes(query) ||
-        String(item.zone || '').toLowerCase().includes(query) ||
-        String(item.description || item.body || '').toLowerCase().includes(query) ||
+        String(item.excerpt || '').toLowerCase().includes(query) ||        String(item.description || item.body || '').toLowerCase().includes(query) ||
         String(item.author || '').toLowerCase().includes(query);
 
       const itemCategory = String(item.category || '').toUpperCase().trim();
@@ -494,7 +489,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editorModalTitle) editorModalTitle.textContent = '✏️ Post News & Update (Admin)';
     if (edId) edId.value = '';
     if (edCategory) edCategory.value = 'NEWS';
-    if (edZoneTag) edZoneTag.value = '';
     if (edTitle) edTitle.value = '';
     if (edVideoUrl) edVideoUrl.value = '';
     if (edThumbnail) edThumbnail.value = 'assets/tree1.jpg';
@@ -525,7 +519,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editorModalTitle) editorModalTitle.textContent = `✏️ Edit Update: ${item.title}`;
     if (edId) edId.value = item.id;
     if (edCategory) edCategory.value = String(item.category || 'NEWS').toUpperCase().trim();
-    if (edZoneTag) edZoneTag.value = item.zone || '';
     if (edTitle) edTitle.value = item.title || '';
     if (edVideoUrl) edVideoUrl.value = item.videoUrl || '';
 
@@ -632,7 +625,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const category = (edCategory ? edCategory.value : 'NEWS').toUpperCase().trim();
-    const zone = (edZoneTag ? edZoneTag.value : '').trim();
     const body = (edBody ? edBody.value : '').trim() || excerpt;
     let thumb = (edThumbnail ? edThumbnail.value : '').trim();
     const author = (edAuthor ? edAuthor.value : '').trim() || 'ATAMAN Administrator';
@@ -664,7 +656,6 @@ document.addEventListener('DOMContentLoaded', () => {
           ...updatesList[idx],
           title,
           category,
-          zone,
           videoUrl,
           thumbnail: thumb,
           date: formattedDate,
@@ -680,7 +671,6 @@ document.addEventListener('DOMContentLoaded', () => {
         id: `UPD-2026-${String(updatesList.length + 1).padStart(3, '0')}`,
         title,
         category,
-        zone,
         videoUrl,
         thumbnail: thumb,
         date: formattedDate,

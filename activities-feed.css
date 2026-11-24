@@ -183,6 +183,7 @@
 }
 
 .up-zone-pill {
+  display: none !important;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 4px 9px;

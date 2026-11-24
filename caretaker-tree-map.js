@@ -42,8 +42,8 @@ function initFirebaseAuth() {
     const now = new Date();
     if (ctMapLiveDateText) {
       const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-      const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
-      ctMapLiveDateText.textContent = `${dateStr} • ${timeStr}`;
+
+      ctMapLiveDateText.textContent = dateStr;
     }
   }
   updateMapLiveClock();
