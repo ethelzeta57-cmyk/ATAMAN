@@ -642,14 +642,13 @@ function initFirebaseAuth() {
   // Sync immediately from localStorage so there is never a placeholder flash on refresh
   syncAllProfileDisplays(localStorage.getItem('ATAMAN_user_name'));
 
-  // Live Real-Time Date & Clock in Header + Date Inputs
+  // Live Real-Time Date in Header + Date Inputs
   const ctLiveDateText = document.getElementById('ctLiveDateText');
   function updateMyTreesLiveClock() {
     const now = new Date();
     if (ctLiveDateText) {
       const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-      const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
-      ctLiveDateText.textContent = `${dateStr} • ${timeStr}`;
+      ctLiveDateText.textContent = dateStr;
     }
   }
   updateMyTreesLiveClock();

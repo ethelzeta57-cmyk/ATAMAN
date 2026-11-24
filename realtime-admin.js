@@ -95,7 +95,7 @@
         const pill = document.createElement('div');
         pill.id = 'adminLiveDatePill';
         pill.style.cssText = 'display:inline-flex; align-items:center; gap:6px; padding:0 11px; height:36px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; font-size:12px; font-weight:600; color:#334155; white-space:nowrap; flex-shrink:0;';
-        pill.title = 'Live Real-Time Date & Clock';
+        pill.title = 'Current Date';
         pill.innerHTML = `<span>📅</span><span id="adminLiveDateText">${liveDates.today}</span>`;
         headerRight.insertBefore(pill, headerRight.firstChild);
       }
@@ -105,18 +105,16 @@
     
     function applyDateLabel(key) {
       currentRangeKey = key;
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
       const freshDates = getLiveDateLabels();
 
       const adminLiveText = document.getElementById('adminLiveDateText');
       if (adminLiveText) {
-        adminLiveText.textContent = `${freshDates.today} • ${timeStr}`;
+        adminLiveText.textContent = freshDates.today;
       }
 
       if (!dateBtn) return;
       const baseLabel = freshDates[key] || freshDates.today;
-      const label = key === 'today' ? `${freshDates.today} • ${timeStr}` : baseLabel;
+      const label = key === 'today' ? freshDates.today : baseLabel;
       const span = dateBtn.querySelector('span') || dateBtn;
       if (span && span.tagName === 'SPAN') {
         span.textContent = label;

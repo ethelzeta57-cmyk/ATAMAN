@@ -211,14 +211,13 @@ function initFirebaseAuth() {
   syncAllProfileDisplays(initialCtName, initialCtInitials);
   updateGreeting(initialCtName);
 
-  // Live Real-Time Date & Clock in Header + Date Inputs
+  // Live Real-Time Date in Header + Date Inputs
   const ctLiveDateText = document.getElementById('ctLiveDateText');
   function updateCaretakerLiveClock() {
     const now = new Date();
     if (ctLiveDateText) {
       const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-      const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
-      ctLiveDateText.textContent = `${dateStr} • ${timeStr}`;
+      ctLiveDateText.textContent = dateStr;
     }
   }
   updateCaretakerLiveClock();
