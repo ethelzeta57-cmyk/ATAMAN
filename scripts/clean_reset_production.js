@@ -5,13 +5,6 @@
  * Safety-First Protection:
  * Requires explicit confirmation argument:
  *   node scripts/clean_reset_production.js --confirm=CONFIRM_RESET_ATAMAN_PRODUCTION_2026
- *
- * Actions performed:
- * 1. Verifies explicit confirmation safeguard to prevent accidental production resets.
- * 2. Purges legacy mock/test collections in Cloud Firestore: trees, adopters, caretakers, monitoring_logs.
- * 3. Removes legacy user documents from Firestore users collection.
- * 4. Ensures the fresh Admin account (admin@ataman.catbalogan.gov.ph) is provisioned with role: "admin".
- * 5. Provides verification summary confirming pristine clean state ready for deployment.
  */
 
 const https = require('https');
@@ -116,6 +109,20 @@ function deleteHttp(url, token) {
   });
 }
 
+async function purgeCollectionViaRest(collectionName, token) {
+  try {
+    const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${collectionName}`;
+    const res = await getJson(url, token).catch(() => ({ documents: [] }));
+    const docs = res.documents || [];
+    for (const d of docs) {
+      await deleteHttp(`https://firestore.googleapis.com/v1/${d.name}`, token).catch(() => {});
+    }
+    console.log(`   ✓ Purged ${docs.length} documents from [${collectionName}] via REST`);
+  } catch (e) {
+    console.warn(`   ⚠ Notice purging ${collectionName}:`, e.message || e);
+  }
+}
+
 async function main() {
   console.log('================================================================');
   console.log('  ATAMAN — Production Clean Slate & Admin Provisioning Routine  ');
@@ -152,7 +159,7 @@ async function main() {
     idToken = authRes.idToken;
     console.log(`   Admin authenticated: ${FRESH_ADMIN.email} (UID: ${authRes.localId})`);
   } catch (err) {
-    console.log('   Admin user not found or needs creation. Creating user...');
+    console.log('   Admin user not found. Creating user in Firebase Auth...');
     try {
       const createRes = await postJson(
         `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`,
@@ -170,18 +177,16 @@ async function main() {
     }
   }
 
-  // 3. Delete collections via Firebase CLI
+  // 3. Delete collections via REST & CLI
   console.log('\n🧹 Purging Firestore collections: trees, adopters, caretakers, monitoring_logs...');
   const collections = ['trees', 'adopters', 'caretakers', 'monitoring_logs'];
   for (const col of collections) {
+    await purgeCollectionViaRest(col, idToken);
     try {
       execSync(`firebase firestore:delete ${col} -r -f --project ${FIREBASE_PROJECT_ID}`, {
         stdio: 'pipe'
       });
-      console.log(`   ✓ Collection [${col}] purged`);
-    } catch (e) {
-      console.warn(`   ⚠ Notice purging [${col}]:`, e.message ? e.message.split('\n')[0] : e);
-    }
+    } catch (_) {}
   }
 
   // 4. Ensure Fresh Admin document exists in Firestore users collection
@@ -202,7 +207,6 @@ async function main() {
 
   try {
     const fsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${FRESH_ADMIN.uid}`;
-    // Using PATCH via post with method override or PUT
     await new Promise((resolve, reject) => {
       const data = JSON.stringify(docPayload);
       const req = https.request(new URL(fsUrl), {

@@ -1043,15 +1043,8 @@ function getAdminAvailableTreesAndSpecies() {
     }
   }
 
-  // Fallback defaults reflecting Samar Admin Tree Catalogue
-  return [
-    { id: 'TR-10001', name: 'Narra', sc: 'Pterocarpus indicus', type: 'Native', icon: '🌳', desc: 'Philippine National Tree, strong watershed canopy', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10001' },
-    { id: 'TR-10002', name: 'Molave', sc: 'Vitex parviflora', type: 'Native', icon: '🌲', desc: 'Dense hardwood, exceptional carbon sequestration', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10002' },
-    { id: 'TR-10003', name: 'Yakal', sc: 'Shorea astylosa', type: 'Native', icon: '🪵', desc: 'High-grade Samar timber, high canopy & erosion control', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10003' },
-    { id: 'TR-10004', name: 'Tindalo', sc: 'Afzelia rhomboidea', type: 'Native', icon: '🌱', desc: 'Vulnerable Samar indigenous hardwood species', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10004' },
-    { id: 'TR-10005', name: 'Dao', sc: 'Dracontomelon dao', type: 'Native', icon: '🍃', desc: 'Massive Samar buttress-rooted canopy watershed tree', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10005' },
-    { id: 'TR-10006', name: 'Banaba', sc: 'Lagerstroemia speciosa', type: 'Native', icon: '🌸', desc: 'Vibrant flowering watershed canopy tree', availableCount: 100, totalTrees: 100, adminTreeId: 'TR-10006' }
-  ];
+  // In clean production state, only real registered trees appear in catalogue
+  return [];
 }
 
 function getAvailableCaretakersList() {

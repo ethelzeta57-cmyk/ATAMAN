@@ -41,7 +41,7 @@
   ];
   window.ATAMAN_DEFAULT_USERS = DEFAULT_USERS;
 
-  const INIT_VERSION = 'ATAMAN_production_clean_slate_reset_v20261124';
+  const INIT_VERSION = 'ATAMAN_production_clean_slate_v20261124_p2';
 
   // Seed / migrate registered data when upgrading or if caches are missing
   if (!localStorage.getItem(INIT_VERSION)) {
