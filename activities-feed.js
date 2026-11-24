@@ -94,6 +94,51 @@
     }
   }
 
+  // Extract YouTube ID from standard, short, embed, or Facebook-redirected URLs
+  function extractYouTubeId(url) {
+    if (!url || typeof url !== 'string') return null;
+    try {
+      const decoded = decodeURIComponent(url);
+      const m = decoded.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|(?:embed|v)\/))([a-zA-Z0-9_-]{11})/i);
+      return m ? m[1] : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Resolves thumbnail to valid Data URL, web URL, YouTube cover, or asset path
+  function resolveThumbnail(item) {
+    let thumb = String(item?.thumbnail || '').trim();
+    if (thumb.startsWith('data:image/') || thumb.startsWith('http://') || thumb.startsWith('https://') || thumb.startsWith('assets/')) {
+      return thumb;
+    }
+    // If a bare filename like "1.jpg" was saved, attempt YouTube video cover recovery
+    const ytId = extractYouTubeId(item?.videoUrl);
+    if (ytId) {
+      return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+    }
+    if (thumb && thumb !== '1.jpg') {
+      return 'assets/' + thumb;
+    }
+    return 'assets/tree1.jpg';
+  }
+
+  // Image load error fallback handler
+  function handleImgError(imgEl, videoUrl) {
+    if (!imgEl) return;
+    if (imgEl._hasRetried) {
+      imgEl.src = 'assets/tree1.jpg';
+      return;
+    }
+    imgEl._hasRetried = true;
+    const ytId = extractYouTubeId(videoUrl);
+    if (ytId && !imgEl.src.includes('img.youtube.com')) {
+      imgEl.src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+    } else {
+      imgEl.src = 'assets/tree1.jpg';
+    }
+  }
+
   // Retrieve news & updates from storage or default
   function getNewsUpdates() {
     try {
@@ -101,6 +146,17 @@
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          // Normalize thumbnails (auto-heal bare names like '1.jpg')
+          let modified = false;
+          parsed.forEach(item => {
+            if (item.thumbnail === '1.jpg' || !item.thumbnail) {
+              item.thumbnail = resolveThumbnail(item);
+              modified = true;
+            }
+          });
+          if (modified) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+          }
           return parsed;
         }
       }
@@ -166,7 +222,7 @@
       const hasVideo = !!(item.videoUrl && isValidHttpUrl(item.videoUrl));
       const categoryBadge = getCategoryBadgeHtml(item.category);
       const zoneBadge = item.zone ? `<span class="up-zone-pill">📍 ${escapeHtml(item.zone)}</span>` : '';
-      const thumb = escapeHtml(item.thumbnail || 'assets/tree1.jpg');
+      const thumb = escapeHtml(resolveThumbnail(item));
       const title = escapeHtml(item.title);
       const excerpt = escapeHtml(item.excerpt || '');
       const date = escapeHtml(item.date || 'Recent');
@@ -177,7 +233,7 @@
         return `
           <a href="${escapeHtml(item.videoUrl)}" target="_blank" rel="noopener noreferrer" class="up-card up-card-video" title="Click to watch: ${title}">
             <div class="up-thumb-wrap">
-              <img src="${thumb}" alt="${title}" class="up-thumb-img" onerror="this.src='assets/tree1.jpg'" />
+              <img src="${thumb}" alt="${title}" class="up-thumb-img" onerror="window.AtamanFeed.handleImgError(this, '${escapeHtml(item.videoUrl)}')" />
               <div class="up-thumb-overlay"></div>
               <div class="up-badges-row">
                 ${categoryBadge}
@@ -211,7 +267,7 @@
         return `
           <div class="up-card up-card-article" onclick="window.AtamanFeed.openArticleModal('${item.id}')" role="button" tabindex="0" title="Click to read update">
             <div class="up-thumb-wrap">
-              <img src="${thumb}" alt="${title}" class="up-thumb-img" onerror="this.src='assets/tree1.jpg'" />
+              <img src="${thumb}" alt="${title}" class="up-thumb-img" onerror="window.AtamanFeed.handleImgError(this, '')" />
               <div class="up-thumb-overlay"></div>
               <div class="up-badges-row">
                 ${categoryBadge}
@@ -369,6 +425,9 @@
     getNewsUpdates,
     saveNewsUpdates,
     isValidHttpUrl,
+    extractYouTubeId,
+    resolveThumbnail,
+    handleImgError,
     renderPublicFeed,
     openArticleModal,
     closeArticleModal,

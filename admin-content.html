@@ -651,24 +651,51 @@
           </small>
         </div>
 
-        <!-- Cover Photo & Date Row -->
+        <!-- Cover Photo & Date Row with Device Upload & Auto-Thumbnail -->
         <div class="form-row">
           <div class="form-group flex-1">
-            <label for="edThumbnail">Cover Photo / Thumbnail URL</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:6px;">
+              <label for="edThumbnail" style="margin-bottom:0; font-weight:700;">Cover Photo / Thumbnail *</label>
+              <div style="display:flex; gap:6px;">
+                <button type="button" id="btnChooseImageFile" class="btn-outline-sm" style="background:#f0fdf4; color:#166534; border:1.5px solid #86efac; font-weight:700; font-size:11.5px; padding:3px 10px; border-radius:6px; cursor:pointer;">
+                  📁 Upload Photo from Device
+                </button>
+                <button type="button" id="btnGrabVideoThumb" class="btn-outline-sm" style="background:#fee2e2; color:#b91c1c; border:1.5px solid #fca5a5; font-weight:700; font-size:11.5px; padding:3px 10px; border-radius:6px; cursor:pointer;" title="Auto-grab thumbnail from video URL">
+                  🎬 Grab Video Cover
+                </button>
+              </div>
+            </div>
+
+            <!-- Hidden File Input for Device Image Upload -->
+            <input type="file" id="edThumbFileInput" accept="image/*" style="display:none;" />
+
+            <!-- Text Input for Image URL or Data URL -->
             <input type="text" class="form-control" id="edThumbnail"
-              placeholder="assets/tree1.jpg or custom image URL" />
-            <div style="margin-top:4px;font-size:0.75rem;color:#64748b;">
+              placeholder="Click 'Upload Photo' above or paste image URL..." />
+
+            <!-- Live Image Preview Box -->
+            <div id="thumbPreviewBox" style="margin-top:8px; display:flex; align-items:center; gap:12px; background:#f8fafc; padding:8px 12px; border-radius:8px; border:1.5px solid #e2e8f0;">
+              <img id="edLiveThumbImg" src="assets/tree1.jpg" alt="Thumbnail Preview" style="width:72px; height:46px; border-radius:6px; object-fit:cover; border:1px solid #cbd5e1; background:#0f291e;" onerror="if(window.AtamanFeed) window.AtamanFeed.handleImgError(this, document.getElementById('edVideoUrl')?.value);" />
+              <div style="flex:1; min-width:0;">
+                <span id="edLiveThumbLabel" style="font-size:0.8rem; font-weight:700; color:#0f291e; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Selected Image Preview</span>
+                <span id="edLiveThumbSub" style="font-size:0.72rem; color:#166534; font-weight:600; display:block;">Active thumbnail for public card</span>
+              </div>
+              <button type="button" id="btnResetThumb" style="border:none; background:none; color:#dc2626; font-size:11.5px; cursor:pointer; font-weight:700; padding:4px 8px; border-radius:4px;">✕ Clear</button>
+            </div>
+
+            <div style="margin-top:6px; font-size:0.75rem; color:#64748b;">
               Presets:
-              <a href="javascript:void(0)" onclick="document.getElementById('edThumbnail').value='assets/tree1.jpg'" style="color:#166534;font-weight:600;">Tree 1</a> •
-              <a href="javascript:void(0)" onclick="document.getElementById('edThumbnail').value='assets/tree2.jpg'" style="color:#166534;font-weight:600;">Tree 2</a> •
-              <a href="javascript:void(0)" onclick="document.getElementById('edThumbnail').value='assets/tree.jpg'" style="color:#166534;font-weight:600;">Nursery</a> •
-              <a href="javascript:void(0)" onclick="document.getElementById('edThumbnail').value='assets/ATAMAN_bg.jpg'" style="color:#166534;font-weight:600;">Forest View</a>
+              <a href="javascript:void(0)" onclick="setThumbnailPreset('assets/tree1.jpg')" style="color:#166534; font-weight:600;">Tree 1</a> •
+              <a href="javascript:void(0)" onclick="setThumbnailPreset('assets/tree2.jpg')" style="color:#166534; font-weight:600;">Tree 2</a> •
+              <a href="javascript:void(0)" onclick="setThumbnailPreset('assets/tree.jpg')" style="color:#166534; font-weight:600;">Nursery</a> •
+              <a href="javascript:void(0)" onclick="setThumbnailPreset('assets/ATAMAN_bg.jpg')" style="color:#166534; font-weight:600;">Forest View</a>
             </div>
           </div>
 
           <div class="form-group flex-1">
             <label for="edDate">Publish Date *</label>
             <input type="date" class="form-control" id="edDate" required />
+            <small style="color:#64748b; font-size:0.75rem; margin-top:4px;">Date displayed on public feed and archives</small>
           </div>
         </div>
 

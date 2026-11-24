@@ -75,19 +75,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnPublishFromPreview= document.getElementById('btnPublishFromPreview');
 
   // Editor Inputs
-  const edId        = document.getElementById('edId');
-  const edCategory  = document.getElementById('edCategory');
-  const edZoneTag   = document.getElementById('edZoneTag');
-  const edTitle     = document.getElementById('edTitle');
-  const edVideoUrl  = document.getElementById('edVideoUrl');
-  const edThumbnail = document.getElementById('edThumbnail');
-  const edDate      = document.getElementById('edDate');
-  const edExcerpt   = document.getElementById('edExcerpt');
-  const edBody      = document.getElementById('edBody');
-  const edStatus    = document.getElementById('edStatus');
-  const edAuthor    = document.getElementById('edAuthor');
-  const videoUrlError = document.getElementById('videoUrlError');
-  const editorModalTitle = document.getElementById('editorModalTitle');
+  const edId              = document.getElementById('edId');
+  const edCategory        = document.getElementById('edCategory');
+  const edZoneTag         = document.getElementById('edZoneTag');
+  const edTitle           = document.getElementById('edTitle');
+  const edVideoUrl        = document.getElementById('edVideoUrl');
+  const edThumbnail       = document.getElementById('edThumbnail');
+  const edThumbFileInput  = document.getElementById('edThumbFileInput');
+  const btnChooseImageFile= document.getElementById('btnChooseImageFile');
+  const btnGrabVideoThumb = document.getElementById('btnGrabVideoThumb');
+  const btnResetThumb     = document.getElementById('btnResetThumb');
+  const edLiveThumbImg    = document.getElementById('edLiveThumbImg');
+  const edLiveThumbLabel  = document.getElementById('edLiveThumbLabel');
+  const edLiveThumbSub    = document.getElementById('edLiveThumbSub');
+  const edDate            = document.getElementById('edDate');
+  const edExcerpt         = document.getElementById('edExcerpt');
+  const edBody            = document.getElementById('edBody');
+  const edStatus          = document.getElementById('edStatus');
+  const edAuthor          = document.getElementById('edAuthor');
+  const videoUrlError     = document.getElementById('videoUrlError');
+  const editorModalTitle  = document.getElementById('editorModalTitle');
 
   // Preview elements
   const prevBadge   = document.getElementById('prevBadge');
@@ -107,7 +114,155 @@ document.addEventListener('DOMContentLoaded', () => {
     }, duration);
   }
 
-  /* ── 5. Category & Status Badges ── */
+  /* ── 5. Client-Side Image Compression for Local File Uploads ── */
+  function compressImage(file, maxDimension = 1280, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* ── 6. Image Upload & Thumbnail Handlers ── */
+  if (btnChooseImageFile && edThumbFileInput) {
+    btnChooseImageFile.addEventListener('click', () => {
+      edThumbFileInput.click();
+    });
+
+    edThumbFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast('⚠️ Please select a valid image file (JPG, PNG, WEBP).');
+        return;
+      }
+
+      try {
+        showToast('⏳ Compressing and loading image...');
+        const compressedDataUrl = await compressImage(file, 1280, 0.85);
+
+        if (edThumbnail) edThumbnail.value = compressedDataUrl;
+        if (edLiveThumbImg) edLiveThumbImg.src = compressedDataUrl;
+        if (edLiveThumbLabel) edLiveThumbLabel.textContent = `${file.name} (${Math.round(file.size / 1024)} KB)`;
+        if (edLiveThumbSub) edLiveThumbSub.textContent = 'Uploaded from device • Ready to publish';
+
+        showToast(`📷 Image "${file.name}" uploaded successfully!`);
+      } catch (err) {
+        console.error('Image compression error:', err);
+        showToast('⚠️ Could not process image. Please try another image file.');
+      }
+    });
+  }
+
+  // Grab Video Cover Button
+  if (btnGrabVideoThumb) {
+    btnGrabVideoThumb.addEventListener('click', () => {
+      const videoUrl = edVideoUrl ? edVideoUrl.value.trim() : '';
+      if (!videoUrl) {
+        showToast('⚠️ Please enter an Original Video URL first.');
+        if (edVideoUrl) edVideoUrl.focus();
+        return;
+      }
+
+      const ytId = window.AtamanFeed && window.AtamanFeed.extractYouTubeId ? window.AtamanFeed.extractYouTubeId(videoUrl) : null;
+      if (ytId) {
+        const ytThumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        if (edThumbnail) edThumbnail.value = ytThumb;
+        if (edLiveThumbImg) edLiveThumbImg.src = ytThumb;
+        if (edLiveThumbLabel) edLiveThumbLabel.textContent = `YouTube Video Cover (${ytId})`;
+        if (edLiveThumbSub) edLiveThumbSub.textContent = 'Auto-grabbed from video link';
+        showToast('🎬 Video cover thumbnail grabbed successfully!');
+      } else {
+        showToast('⚠️ No YouTube video ID found in URL. You can upload an image from your device instead.');
+      }
+    });
+  }
+
+  // Reset Thumbnail Button
+  if (btnResetThumb) {
+    btnResetThumb.addEventListener('click', () => {
+      if (edThumbnail) edThumbnail.value = '';
+      if (edLiveThumbImg) edLiveThumbImg.src = 'assets/tree1.jpg';
+      if (edLiveThumbLabel) edLiveThumbLabel.textContent = 'Default Placeholder';
+      if (edLiveThumbSub) edLiveThumbSub.textContent = 'Click Upload Photo or Grab Video Cover';
+      if (edThumbFileInput) edThumbFileInput.value = '';
+      showToast('🔄 Thumbnail reset to default.');
+    });
+  }
+
+  // Live input changes on edThumbnail
+  if (edThumbnail) {
+    edThumbnail.addEventListener('input', () => {
+      const val = edThumbnail.value.trim();
+      if (edLiveThumbImg) {
+        edLiveThumbImg.src = val || 'assets/tree1.jpg';
+      }
+      if (edLiveThumbLabel) {
+        if (val.startsWith('data:image/')) {
+          edLiveThumbLabel.textContent = 'Device Uploaded Image';
+        } else if (val.includes('img.youtube.com')) {
+          edLiveThumbLabel.textContent = 'YouTube Video Cover';
+        } else if (val) {
+          edLiveThumbLabel.textContent = val.split('/').pop() || 'Custom Image URL';
+        } else {
+          edLiveThumbLabel.textContent = 'Default Placeholder';
+        }
+      }
+    });
+  }
+
+  // Auto-grab video cover when user pastes a video URL and thumbnail is empty or default
+  if (edVideoUrl) {
+    edVideoUrl.addEventListener('change', () => {
+      const vUrl = edVideoUrl.value.trim();
+      const currentThumb = edThumbnail ? edThumbnail.value.trim() : '';
+      if (vUrl && (!currentThumb || currentThumb === 'assets/tree1.jpg' || currentThumb === '1.jpg')) {
+        const ytId = window.AtamanFeed && window.AtamanFeed.extractYouTubeId ? window.AtamanFeed.extractYouTubeId(vUrl) : null;
+        if (ytId) {
+          const ytThumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+          if (edThumbnail) edThumbnail.value = ytThumb;
+          if (edLiveThumbImg) edLiveThumbImg.src = ytThumb;
+          if (edLiveThumbLabel) edLiveThumbLabel.textContent = `YouTube Video Cover (${ytId})`;
+          if (edLiveThumbSub) edLiveThumbSub.textContent = 'Auto-grabbed from video link';
+        }
+      }
+    });
+  }
+
+  // Global Preset Click Handler
+  window.setThumbnailPreset = function(src) {
+    if (edThumbnail) edThumbnail.value = src;
+    if (edLiveThumbImg) edLiveThumbImg.src = src;
+    if (edLiveThumbLabel) edLiveThumbLabel.textContent = 'Preset: ' + src.split('/').pop();
+    if (edLiveThumbSub) edLiveThumbSub.textContent = 'Ready for display on public card';
+  };
+
+  /* ── 7. Category & Status Badges ── */
   function getCategoryBadge(cat) {
     const c = String(cat || 'NEWS').toUpperCase().trim();
     if (c === 'SHARED VIDEO') {
@@ -132,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /* ── 6. Update Summary & Tab Badges ── */
+  /* ── 8. Update Summary & Tab Badges ── */
   function updateCounters() {
     const total = updatesList.length;
     const pub = updatesList.filter(i => (i.status || 'Published').toLowerCase() === 'published').length;
@@ -157,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badgeAnnounceCount) badgeAnnounceCount.textContent = nws;
   }
 
-  /* ── 7. Render Table ── */
+  /* ── 9. Render Table ── */
   function renderContentTable(items = updatesList) {
     if (!contentTableBody) return;
     contentTableBody.innerHTML = '';
@@ -184,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
     items.forEach(item => {
       const tr = document.createElement('tr');
       const hasVideo = !!(item.videoUrl && String(item.videoUrl).trim().length > 0);
-      const thumb = item.thumbnail || 'assets/tree1.jpg';
+      const thumb = window.AtamanFeed && window.AtamanFeed.resolveThumbnail ? window.AtamanFeed.resolveThumbnail(item) : (item.thumbnail || 'assets/tree1.jpg');
       const zone = item.zone || '—';
       const date = item.date || 'Recent';
       const author = item.author || 'ATAMAN Admin';
@@ -204,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="position:relative;width:54px;height:38px;border-radius:6px;overflow:hidden;background:#0f291e;flex-shrink:0;">
-              <img src="${thumb}" alt="${escapeHtml(item.title)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='assets/tree1.jpg'" />
+              <img src="${escapeHtml(thumb)}" alt="${escapeHtml(item.title)}" style="width:100%;height:100%;object-fit:cover;" onerror="if(window.AtamanFeed) window.AtamanFeed.handleImgError(this, '${escapeHtml(item.videoUrl)}');" />
               ${hasVideo ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">▶</div>' : ''}
             </div>
             <div class="title-cell" style="min-width:0;">
@@ -245,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCounters();
   }
 
-  /* ── 8. Filters & Search ── */
+  /* ── 10. Filters & Search ── */
   function applyContentFilters() {
     const query  = (contentSearchInput ? contentSearchInput.value : '').toLowerCase().trim();
     const type   = contentTypeFilter ? contentTypeFilter.value.toUpperCase().trim() : '';
@@ -287,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ── 9. In-Page Tab Navigation ── */
+  /* ── 11. In-Page Tab Navigation ── */
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       tabButtons.forEach(b => b.classList.remove('active'));
@@ -296,7 +451,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetTab = btn.dataset.tab;
 
       if (targetTab === 'homepage') {
-        // Direct link or switch to public feed preview
         window.open('index.html#updates', '_blank', 'noopener,noreferrer');
       } else {
         if (contentTypeFilter) {
@@ -330,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ── 10. Editor Modal Controls ── */
+  /* ── 12. Editor Modal Controls ── */
   function openAddModal() {
     if (!isCurrentAdmin()) {
       showToast('⚠️ Admin Access Required: Please sign in with an Administrator account.');
@@ -344,13 +498,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (edTitle) edTitle.value = '';
     if (edVideoUrl) edVideoUrl.value = '';
     if (edThumbnail) edThumbnail.value = 'assets/tree1.jpg';
+    if (edLiveThumbImg) edLiveThumbImg.src = 'assets/tree1.jpg';
+    if (edLiveThumbLabel) edLiveThumbLabel.textContent = 'Default Placeholder';
+    if (edLiveThumbSub) edLiveThumbSub.textContent = 'Click Upload Photo or Grab Video Cover';
+    if (edThumbFileInput) edThumbFileInput.value = '';
     if (edExcerpt) edExcerpt.value = '';
     if (edBody) edBody.value = '';
     if (edStatus) edStatus.value = 'Published';
     if (edAuthor) edAuthor.value = 'ATAMAN Administrator';
     if (videoUrlError) videoUrlError.style.display = 'none';
 
-    // Set today's date formatted as YYYY-MM-DD
     if (edDate) {
       const now = new Date();
       edDate.value = now.toISOString().split('T')[0];
@@ -371,7 +528,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (edZoneTag) edZoneTag.value = item.zone || '';
     if (edTitle) edTitle.value = item.title || '';
     if (edVideoUrl) edVideoUrl.value = item.videoUrl || '';
-    if (edThumbnail) edThumbnail.value = item.thumbnail || 'assets/tree1.jpg';
+
+    // Resolve active cover photo thumbnail
+    const thumb = window.AtamanFeed && window.AtamanFeed.resolveThumbnail ? window.AtamanFeed.resolveThumbnail(item) : (item.thumbnail || 'assets/tree1.jpg');
+    if (edThumbnail) edThumbnail.value = thumb;
+    if (edLiveThumbImg) edLiveThumbImg.src = thumb;
+    if (edLiveThumbLabel) {
+      if (thumb.startsWith('data:image/')) {
+        edLiveThumbLabel.textContent = 'Device Uploaded Image';
+      } else if (thumb.includes('img.youtube.com')) {
+        edLiveThumbLabel.textContent = 'YouTube Video Cover';
+      } else {
+        edLiveThumbLabel.textContent = thumb.split('/').pop() || 'Current Active Cover';
+      }
+    }
+    if (edLiveThumbSub) edLiveThumbSub.textContent = 'Active thumbnail for public card';
+    if (edThumbFileInput) edThumbFileInput.value = '';
+
     if (edExcerpt) edExcerpt.value = item.excerpt || '';
     if (edBody) edBody.value = item.description || item.body || '';
     if (edStatus) edStatus.value = item.status || 'Published';
@@ -396,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (openAddContentModalBtn) openAddContentModalBtn.addEventListener('click', openAddModal);
   if (closeEditorModalBtn) closeEditorModalBtn.addEventListener('click', closeEditorModal);
 
-  /* ── 11. Delete Update (Admin Only) ── */
+  /* ── 13. Delete Update (Admin Only) ── */
   function deleteUpdate(id) {
     if (!isCurrentAdmin()) {
       showToast('⚠️ Admin Access Required: Only signed-in Admins can delete news & updates.');
@@ -421,7 +594,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast(`🗑️ Update "${item.title}" deleted successfully.`);
   }
 
-  /* ── 12. Save & Publish Actions (Admin Only) ── */
+  /* ── 14. Save & Publish Actions (Admin Only) ── */
   function saveContent(publishStatus) {
     // 1. Admin Verification
     if (!isCurrentAdmin()) {
@@ -464,16 +637,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let thumb = (edThumbnail ? edThumbnail.value : '').trim();
     const author = (edAuthor ? edAuthor.value : '').trim() || 'ATAMAN Administrator';
 
-    // Auto-detect YouTube thumbnail if not explicitly given
-    if (!thumb && videoUrl) {
-      const ytMatch = videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|(?:embed|v)\/))([a-zA-Z0-9_-]{11})/i);
-      if (ytMatch && ytMatch[1]) {
-        thumb = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
-      } else {
-        thumb = 'assets/tree1.jpg';
-      }
+    // Auto-resolve thumbnail if user entered bare filename or empty
+    if (window.AtamanFeed && window.AtamanFeed.resolveThumbnail) {
+      thumb = window.AtamanFeed.resolveThumbnail({ thumbnail: thumb, videoUrl: videoUrl });
+    } else if (!thumb) {
+      thumb = 'assets/tree1.jpg';
     }
-    if (!thumb) thumb = 'assets/tree1.jpg';
 
     // Format Date string: "Nov 24, 2026"
     let formattedDate = 'Recent';
@@ -546,7 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnPublishContent) btnPublishContent.addEventListener('click', () => saveContent('Published'));
   if (btnPublishFromPreview) btnPublishFromPreview.addEventListener('click', () => saveContent('Published'));
 
-  /* ── 13. Preview Modal Controls ── */
+  /* ── 15. Preview Modal Controls ── */
   function openPreviewModal(item) {
     if (!previewModal) return;
     if (prevBadge) prevBadge.textContent = item.category || 'NEWS';
@@ -558,9 +727,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const featImg = previewModal.querySelector('.prev-featured-img');
     if (featImg) {
       const hasVideo = !!(item.videoUrl && String(item.videoUrl).trim().length > 0);
+      const thumb = window.AtamanFeed && window.AtamanFeed.resolveThumbnail ? window.AtamanFeed.resolveThumbnail(item) : (item.thumbnail || 'assets/tree1.jpg');
       featImg.innerHTML = `
         <div style="position:relative;width:100%;height:220px;border-radius:10px;overflow:hidden;background:#0f291e;">
-          <img src="${item.thumbnail || 'assets/tree1.jpg'}" alt="Preview" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='assets/tree1.jpg'" />
+          <img src="${escapeHtml(thumb)}" alt="Preview" style="width:100%;height:100%;object-fit:cover;" onerror="if(window.AtamanFeed) window.AtamanFeed.handleImgError(this, '${escapeHtml(item.videoUrl)}');" />
           ${hasVideo ? `
             <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;">
               <div style="width:48px;height:48px;border-radius:50%;background:#166534;border:2px solid #fff;display:flex;align-items:center;justify-content:center;margin-bottom:6px;">▶</div>
@@ -586,13 +756,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnPreviewInModal) {
     btnPreviewInModal.addEventListener('click', () => {
+      const rawThumb = edThumbnail ? edThumbnail.value.trim() : '';
+      const vUrl = edVideoUrl ? edVideoUrl.value.trim() : '';
+      const thumb = window.AtamanFeed && window.AtamanFeed.resolveThumbnail ? window.AtamanFeed.resolveThumbnail({ thumbnail: rawThumb, videoUrl: vUrl }) : (rawThumb || 'assets/tree1.jpg');
+
       const item = {
         title: edTitle ? edTitle.value || 'Untitled Update' : 'Untitled Update',
         excerpt: edExcerpt ? edExcerpt.value || 'No summary provided.' : '',
         description: edBody ? edBody.value || '' : '',
         category: edCategory ? edCategory.value : 'NEWS',
-        videoUrl: edVideoUrl ? edVideoUrl.value : '',
-        thumbnail: edThumbnail ? edThumbnail.value || 'assets/tree1.jpg' : 'assets/tree1.jpg',
+        videoUrl: vUrl,
+        thumbnail: thumb,
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
       };
       closeEditorModal();
@@ -600,7 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ── 14. Quick Search & Mobile Navigation ── */
+  /* ── 16. Quick Search & Mobile Navigation ── */
   const quickSearch = document.getElementById('btnQuickSearchFocus');
   if (quickSearch && contentSearchInput) {
     quickSearch.addEventListener('click', () => {
@@ -631,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ── 15. Initial Table Render ── */
+  /* ── 17. Initial Table Render ── */
   renderContentTable();
 });
 
