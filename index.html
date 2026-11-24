@@ -43,6 +43,8 @@
   <!-- Leaflet CSS for Public Tree Map Showcase -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1787906634580"
     crossorigin="anonymous" />
+  <!-- ATAMAN Public Activities & Updates Feed CSS -->
+  <link rel="stylesheet" href="activities-feed.css?v=20261124_v1" />
 
   <style>
     /* ── Reset & Variables ── */
@@ -2068,6 +2070,7 @@
           <li><a href="#species" class="nav-link">Native Trees</a></li>
           <li><a href="#live-map" class="nav-link">Live Map</a></li>
           <li><a href="#sectors" class="nav-link">Sectors</a></li>
+          <li><a href="#updates" class="nav-link">Activities &amp; Updates</a></li>
           <li><a href="#roles" class="nav-link">Portals</a></li>
           <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
           <li><a href="login.html" class="nav-link nav-link-signin">Sign In</a></li>
@@ -2521,6 +2524,29 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- ================= ACTIVITIES & UPDATES SECTION ================= -->
+  <section class="section-wrap updates-section" id="updates">
+    <div class="section-header">
+      <span class="section-badge" style="background:#dcfce7; color:#166534; border:1px solid #bbf7d0;">🌱 Tanom • Ataman • Padayon</span>
+      <h2 class="section-title">Activities &amp; Updates</h2>
+      <p class="section-desc">
+        Real-time field dispatches, community planting drives, green corridor plans, and shared documentary videos from Catbalogan City and Samar.
+      </p>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div class="updates-filter-bar">
+      <button type="button" class="up-filter-btn active" data-filter="ALL">All Updates</button>
+      <button type="button" class="up-filter-btn" data-filter="NEWS">📰 News</button>
+      <button type="button" class="up-filter-btn" data-filter="PLAN">🗺️ Plans</button>
+      <button type="button" class="up-filter-btn" data-filter="PLANTING DRIVE">🌱 Planting Drives</button>
+      <button type="button" class="up-filter-btn" data-filter="SHARED VIDEO">▶️ Shared Videos</button>
+    </div>
+
+    <!-- Feed Cards Grid (Rendered via activities-feed.js) -->
+    <div class="updates-feed-grid" id="updatesFeedGrid"></div>
   </section>
 
   <!-- Stakeholder Portals (Roles) -->
@@ -3272,6 +3298,8 @@
     }
   </script>
 
+  <!-- ATAMAN Public Activities & Updates Feed Engine -->
+  <script src="activities-feed.js?v=20261124_v1"></script>
   <!-- ATAMAN Connectivity Guard -->
   <script src="ataman-connectivity.js"></script>
   <!-- Authentication Handler -->

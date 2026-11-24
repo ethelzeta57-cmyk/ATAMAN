@@ -256,20 +256,19 @@
         </svg>
       </button>
       <div class="topbar-title">
-        <h1>📝 Content Management</h1>
-        <span class="topbar-sub">Create and manage the information, announcements, educational materials, and media
-          displayed in ATAMAN.</span>
+        <h1>📰 Post / Manage News &amp; Updates</h1>
+        <span class="topbar-sub">Publish field updates, planting drives, forest plans, and shared videos to the public ATAMAN portal.</span>
       </div>
       <div class="topbar-actions">
-        <button class="btn-outline-sm" id="btnOpenMediaLibrary">
+        <a href="index.html#updates" target="_blank" rel="noopener noreferrer" class="btn-outline-sm" id="btnViewLiveFeed">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
-            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-            <circle cx="9" cy="9" r="2" />
-            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15 3 21 3 21 9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
           </svg>
-          📁 Media Library
-        </button>
+          👁️ View Public Feed
+        </a>
         <button class="btn-outline-sm" id="btnQuickSearchFocus">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -284,7 +283,7 @@
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          + Add Content
+          + Post News &amp; Update
         </button>
 
 
@@ -294,16 +293,13 @@
     <!-- IN-PAGE TABS BAR -->
     <div class="content-tabs-bar">
       <div class="tab-list">
-        <button class="tab-btn active" data-tab="all">All Content <span class="tab-badge"
-            id="badgeAllCount">0</span></button>
-        <button class="tab-btn" data-tab="announcements">📢 Announcements <span class="tab-badge">0</span></button>
-        <button class="tab-btn" data-tab="news">📰 News &amp; Updates <span class="tab-badge">0</span></button>
-        <button class="tab-btn" data-tab="education">🌱 Educational Guides <span class="tab-badge">0</span></button>
-        <button class="tab-btn" data-tab="faqs">❓ FAQs <span class="tab-badge">0</span></button>
-        <button class="tab-btn" data-tab="pages">📄 Static Pages <span class="tab-badge">0</span></button>
-        <button class="tab-btn" data-tab="banners">🖼️ Banners <span class="tab-badge">0</span></button>
-        <button class="tab-btn" data-tab="homepage">🏠 Homepage Layout</button>
-        <button class="tab-btn" data-tab="history">📝 Audit History</button>
+        <button class="tab-btn active" data-tab="all">All Updates <span class="tab-badge" id="badgeAllCount">0</span></button>
+        <button class="tab-btn" data-tab="news">📰 News <span class="tab-badge" id="badgeNewsCount">0</span></button>
+        <button class="tab-btn" data-tab="plans">🗺️ Plans <span class="tab-badge" id="badgePlansCount">0</span></button>
+        <button class="tab-btn" data-tab="planting-drives">🌱 Planting Drives <span class="tab-badge" id="badgeDrivesCount">0</span></button>
+        <button class="tab-btn" data-tab="videos">▶️ Shared Videos <span class="tab-badge" id="badgeVideosCount">0</span></button>
+        <button class="tab-btn" data-tab="announcements">📢 Announcements <span class="tab-badge" id="badgeAnnounceCount">0</span></button>
+        <button class="tab-btn" data-tab="homepage">🏠 Public Feed Preview</button>
       </div>
     </div>
 
@@ -315,49 +311,49 @@
       <section class="content-summary-grid">
         <div class="summary-card" data-filter="all">
           <div class="sc-body">
-            <span class="sc-lbl">📝Total Content</span>
+            <span class="sc-lbl">📝 Total Updates</span>
             <span class="sc-val" id="cntTotal">0</span>
-            <span class="sc-sub">Portal articles &amp; notices</span>
+            <span class="sc-sub">All active dispatches</span>
           </div>
         </div>
 
         <div class="summary-card card-green" data-filter="published">
           <div class="sc-body">
-            <span class="sc-lbl">🟢Published</span>
+            <span class="sc-lbl">🟢 Published Live</span>
             <span class="sc-val text-success" id="cntPublished">0</span>
-            <span class="sc-sub">Live &amp; visible to users</span>
+            <span class="sc-sub">Visible to adopters &amp; public</span>
           </div>
         </div>
 
         <div class="summary-card card-amber" data-filter="draft">
           <div class="sc-body">
-            <span class="sc-lbl">🟡Drafts</span>
+            <span class="sc-lbl">🟡 Drafts</span>
             <span class="sc-val text-warning" id="cntDrafts">0</span>
             <span class="sc-sub">Work in progress</span>
           </div>
         </div>
 
-        <div class="summary-card card-blue" data-filter="scheduled">
+        <div class="summary-card card-blue" data-filter="NEWS">
           <div class="sc-body">
-            <span class="sc-lbl">📅Scheduled</span>
-            <span class="sc-val" style="color:var(--blue);" id="cntScheduled">0</span>
-            <span class="sc-sub">Auto-publish upcoming</span>
+            <span class="sc-lbl">📰 News Posts</span>
+            <span class="sc-val" style="color:var(--blue);" id="cntNews">0</span>
+            <span class="sc-sub">Articles &amp; announcements</span>
           </div>
         </div>
 
-        <div class="summary-card card-violet" id="cardMediaFiles">
+        <div class="summary-card card-violet" data-filter="PLAN">
           <div class="sc-body">
-            <span class="sc-lbl">🖼️Media Files</span>
-            <span class="sc-val" style="color:var(--violet);">0</span>
-            <span class="sc-sub">Photos &amp; illustrations</span>
+            <span class="sc-lbl">🗺️ Reforestation Plans</span>
+            <span class="sc-val" style="color:var(--violet);" id="cntPlans">0</span>
+            <span class="sc-sub">Canopy &amp; watershed plans</span>
           </div>
         </div>
 
-        <div class="summary-card card-emerald" data-filter="announcement">
+        <div class="summary-card card-emerald" data-filter="SHARED VIDEO">
           <div class="sc-body">
-            <span class="sc-lbl">📢Announcements</span>
-            <span class="sc-val text-success">0</span>
-            <span class="sc-sub">Important field alerts</span>
+            <span class="sc-lbl">▶️ Shared Videos</span>
+            <span class="sc-val" style="color:#dc2626;" id="cntVideos">0</span>
+            <span class="sc-sub">Drone &amp; field videos</span>
           </div>
         </div>
       </section>
@@ -373,33 +369,30 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
           <input type="text" id="contentSearchInput" class="search-input"
-            placeholder="Search title, excerpt, keyword, or author..." />
+            placeholder="Search headline, excerpt, zone, keyword, or author..." />
         </div>
 
         <div class="filter-group">
           <select class="filter-select" id="contentTypeFilter">
-            <option value="">All Content Types</option>
+            <option value="">All Categories</option>
+            <option value="NEWS">📰 NEWS</option>
+            <option value="PLAN">🗺️ PLAN</option>
+            <option value="PLANTING DRIVE">🌱 PLANTING DRIVE</option>
+            <option value="SHARED VIDEO">▶️ SHARED VIDEO</option>
             <option value="Announcement">📢 Announcements</option>
-            <option value="News">📰 News &amp; Updates</option>
-            <option value="Education">🌱 Educational Guides</option>
-            <option value="FAQ">❓ FAQs</option>
-            <option value="Page">📄 Static Pages</option>
-            <option value="Banner">🖼️ Banners</option>
           </select>
 
           <select class="filter-select" id="contentStatusFilter">
             <option value="">All Statuses</option>
             <option value="Published">🟢 Published</option>
             <option value="Draft">🟡 Draft</option>
-            <option value="Scheduled">📅 Scheduled</option>
-            <option value="Archived">🔴 Archived</option>
           </select>
 
           <select class="filter-select" id="contentAuthorFilter">
             <option value="">All Authors</option>
-            <option value="Admin">Admin (Ethel Zeta)</option>
-            <option value="Editorial Team">Editorial Team</option>
-            <option value="Agronomy Lead">Agronomy Lead</option>
+            <option value="ATAMAN">ATAMAN Units</option>
+            <option value="City Environment">City Environment Office</option>
+            <option value="Forestry">Forestry Taskforce</option>
           </select>
 
           <button class="btn-outline-sm" id="resetContentFiltersBtn">Reset Filters</button>
@@ -416,11 +409,12 @@
               <thead>
                 <tr>
                   <th width="40"><input type="checkbox" id="selectAllContentCheckbox"></th>
-                  <th>Title &amp; Summary</th>
-                  <th>Type</th>
-                  <th>Category / Section</th>
+                  <th>Headline &amp; Excerpt</th>
+                  <th>Category Badge</th>
+                  <th>Zone / Barangay</th>
+                  <th>Original Video URL</th>
                   <th>Author</th>
-                  <th>Last Updated</th>
+                  <th>Date</th>
                   <th>Status</th>
                   <th width="120" style="text-align:right;">Actions</th>
                 </tr>
@@ -594,97 +588,124 @@
   </main>
 
   <!-- ════════════════════════════════════════
-       CONTENT EDITOR MODAL (Rich Editor)
+       CONTENT EDITOR MODAL (Admin News & Update Form)
   ════════════════════════════════════════ -->
   <div class="modal-overlay hidden" id="contentEditorModal">
     <div class="modal-card modal-xl">
       <div class="modal-hd">
-        <h3 id="editorModalTitle">✏️ Create New Content Item</h3>
+        <h3 id="editorModalTitle">✏️ Post / Manage News &amp; Updates</h3>
         <button class="modal-close-btn" id="closeEditorModalBtn">&times;</button>
       </div>
 
       <div class="modal-body editor-body">
+        <input type="hidden" id="edId" value="" />
+
+        <!-- Category & Zone Tag -->
         <div class="form-row">
           <div class="form-group flex-1">
-            <label>Content Type *</label>
-            <select class="form-control" id="edType">
-              <option value="Announcement">📢 Announcement</option>
-              <option value="News">📰 News / Update</option>
-              <option value="Education">🌱 Educational Article</option>
-              <option value="FAQ">❓ FAQ</option>
-              <option value="Page">📄 Static Page</option>
-              <option value="Banner">🖼️ Banner / Hero</option>
+            <label for="edCategory">Category Badge *</label>
+            <select class="form-control" id="edCategory" required>
+              <option value="NEWS">📰 NEWS</option>
+              <option value="PLAN">🗺️ PLAN</option>
+              <option value="PLANTING DRIVE">🌱 PLANTING DRIVE</option>
+              <option value="SHARED VIDEO">▶️ SHARED VIDEO</option>
             </select>
+            <small style="color:#64748b;font-size:0.75rem;">Determines badge styling &amp; icon on public feed cards</small>
           </div>
+
           <div class="form-group flex-1">
-            <label>Category / Topic</label>
-            <input type="text" class="form-control" id="edCategory"
-              placeholder="e.g. Field Operations, Tree Planting, FAQs" />
+            <label for="edZoneTag">Barangay / Planting Zone Tag (Optional)</label>
+            <input type="text" class="form-control" id="edZoneTag" list="zoneListOptions"
+              placeholder="e.g. Zone 1 • Canlapwas, Zone 3 • San Isidro, or City-Wide" />
+            <datalist id="zoneListOptions">
+              <option value="Zone 1 • Canlapwas"></option>
+              <option value="Zone 2 • Guinsorongan"></option>
+              <option value="Zone 3 • San Isidro"></option>
+              <option value="Zone 4 • Ibol Watershed"></option>
+              <option value="Zone 5 • Cabugawan"></option>
+              <option value="Zone 6 • Darahuway Daco"></option>
+              <option value="City-Wide • Samar Ridge"></option>
+              <option value="Catbalogan City Hall"></option>
+            </datalist>
+            <small style="color:#64748b;font-size:0.75rem;">Optional geographic tag for reforestation monitoring</small>
           </div>
         </div>
 
+        <!-- Headline / Title -->
         <div class="form-group">
-          <label>Title *</label>
+          <label for="edTitle">Headline / Title *</label>
           <input type="text" class="form-control" id="edTitle"
-            placeholder="e.g. Tree Monitoring Activities — September 2026" required />
+            placeholder="e.g. Catbalogan Watershed Drone Inspection & Native Canopy Growth" required />
         </div>
 
+        <!-- Original Video URL -->
         <div class="form-group">
-          <label>Short Description / Excerpt</label>
-          <input type="text" class="form-control" id="edExcerpt"
-            placeholder="Brief summary displayed on cards and search results..." />
-        </div>
-
-        <!-- Rich Text Editor Simulation -->
-        <div class="form-group">
-          <label>Article Body &amp; Content</label>
-          <div class="rich-toolbar">
-            <button type="button" class="rt-btn" title="Bold"><strong>B</strong></button>
-            <button type="button" class="rt-btn" title="Italic"><em>I</em></button>
-            <button type="button" class="rt-btn" title="Underline"><u>U</u></button>
-            <span class="rt-sep"></span>
-            <button type="button" class="rt-btn" title="Heading 2">H2</button>
-            <button type="button" class="rt-btn" title="Heading 3">H3</button>
-            <span class="rt-sep"></span>
-            <button type="button" class="rt-btn" title="Bullet List">• List</button>
-            <button type="button" class="rt-btn" title="Numbered List">1. List</button>
-            <span class="rt-sep"></span>
-            <button type="button" class="rt-btn" title="Insert Link">🔗 Link</button>
-            <button type="button" class="rt-btn" title="Insert Media Image">🖼️ Image</button>
+          <label for="edVideoUrl">Original Video URL (YouTube, Facebook, or external video link)</label>
+          <input type="url" class="form-control" id="edVideoUrl"
+            placeholder="https://www.youtube.com/watch?v=... or https://fb.watch/..." />
+          <div id="videoUrlError" style="display:none;color:#dc2626;font-size:0.8rem;margin-top:4px;font-weight:700;">
+            ⚠️ Video URL must be a valid link starting with http:// or https://
           </div>
-          <textarea class="form-control rich-textarea" id="edBody" rows="8"
-            placeholder="Type or paste formatted article content here..."></textarea>
+          <small style="color:#64748b;font-size:0.78rem;display:block;margin-top:4px;">
+            When users click this card on the public "Activities &amp; Updates" feed, it opens directly in a new browser tab.
+          </small>
         </div>
 
+        <!-- Cover Photo & Date Row -->
         <div class="form-row">
           <div class="form-group flex-1">
-            <label>Featured Image</label>
-            <div class="upload-dropzone">
-              <span class="dz-ico">📷</span>
-              <span>Click to upload or drag image here</span>
-              <small>Supported: JPG, PNG, WEBP (Max 5MB)</small>
+            <label for="edThumbnail">Cover Photo / Thumbnail URL</label>
+            <input type="text" class="form-control" id="edThumbnail"
+              placeholder="assets/tree1.jpg or custom image URL" />
+            <div style="margin-top:4px;font-size:0.75rem;color:#64748b;">
+              Presets:
+              <a href="javascript:void(0)" onclick="document.getElementById('edThumbnail').value='assets/tree1.jpg'" style="color:#166534;font-weight:600;">Tree 1</a> •
+              <a href="javascript:void(0)" onclick="document.getElementById('edThumbnail').value='assets/tree2.jpg'" style="color:#166534;font-weight:600;">Tree 2</a> •
+              <a href="javascript:void(0)" onclick="document.getElementById('edThumbnail').value='assets/tree.jpg'" style="color:#166534;font-weight:600;">Nursery</a> •
+              <a href="javascript:void(0)" onclick="document.getElementById('edThumbnail').value='assets/ATAMAN_bg.jpg'" style="color:#166534;font-weight:600;">Forest View</a>
             </div>
           </div>
-          <div class="form-group flex-1">
-            <label>Publishing Status *</label>
-            <select class="form-control" id="edStatus">
-              <option value="Published">🟢 Published (Live Immediately)</option>
-              <option value="Draft" selected>🟡 Draft (Work in progress)</option>
-              <option value="Scheduled">📅 Scheduled (Auto-publish)</option>
-              <option value="Archived">🔴 Archived</option>
-            </select>
 
-            <label style="margin-top:10px;">Publish Date</label>
-            <input type="date" class="form-control" id="edDate" value="2026-08-29" />
+          <div class="form-group flex-1">
+            <label for="edDate">Publish Date *</label>
+            <input type="date" class="form-control" id="edDate" required />
+          </div>
+        </div>
+
+        <!-- Short Description / Excerpt -->
+        <div class="form-group">
+          <label for="edExcerpt">Short Description / Excerpt *</label>
+          <textarea class="form-control" id="edExcerpt" rows="2"
+            placeholder="Brief 1-2 sentence preview displayed on public feed cards..." required></textarea>
+        </div>
+
+        <!-- Full Description / Body -->
+        <div class="form-group">
+          <label for="edBody">Full Description / Content *</label>
+          <textarea class="form-control rich-textarea" id="edBody" rows="6"
+            placeholder="Provide complete story details, field notes, schedules, or background..." required></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="edStatus">Publishing Status *</label>
+            <select class="form-control" id="edStatus">
+              <option value="Published" selected>🟢 Published (Live in Public Feed)</option>
+              <option value="Draft">🟡 Draft (Hidden from Public Feed)</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="edAuthor">Author / Entity</label>
+            <input type="text" class="form-control" id="edAuthor" value="ATAMAN Administrator" />
           </div>
         </div>
       </div>
 
       <div class="modal-ft">
-        <button class="btn btn-secondary" id="btnPreviewInModal">👁️ Live Preview</button>
+        <button type="button" class="btn btn-secondary" id="btnPreviewInModal">👁️ Live Preview</button>
         <div style="display:flex; gap:8px;">
-          <button class="btn btn-outline-sm" id="btnSaveDraft">💾 Save Draft</button>
-          <button class="btn btn-primary" id="btnPublishContent">⚡ Publish Content</button>
+          <button type="button" class="btn btn-outline-sm" id="btnSaveDraft">💾 Save as Draft</button>
+          <button type="button" class="btn btn-primary" id="btnPublishContent">⚡ Publish Update</button>
         </div>
       </div>
     </div>
@@ -726,7 +747,8 @@
   <div class="toast hidden" id="toastMsg"></div>
 
   <script src="ATAMAN-init.js?v=20261120_v7"></script>
-  <script src="admin-content.js"></script>
+  <script src="activities-feed.js?v=20261124_v1"></script>
+  <script src="admin-content.js?v=20261124_v1"></script>
   <!-- Real-Time Sync Engine -->
   <script src="realtime-admin.js?v=20261110_v14"></script>
   <!-- Mobile Bottom Navigation Bar -->

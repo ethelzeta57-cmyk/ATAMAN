@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.55-clean-caretakers';
+const CACHE_NAME = 'ataman-pwa-v2.2.60-activities-updates-feed';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
@@ -19,6 +19,11 @@ const PRECACHE_ASSETS = [
   './my-trees.html',
   './admin-tree-map.html',
   './admin-trees.html',
+  './admin-content.html',
+  './activities-feed.css',
+  './activities-feed.js',
+  './admin-content.css',
+  './admin-content.js',
   './offline.html',
   './manifest.json',
   './dashboard.css',
