@@ -909,6 +909,15 @@
       let ctsModified = false;
       let treesModified = false;
 
+      // Filter out mock/test caretakers
+      const beforeCtCount = caretakers.length;
+      caretakers = caretakers.filter(c => {
+        const em = String(c?.email || '').toLowerCase().trim();
+        const nm = String(c?.name || '').toLowerCase().trim();
+        return !em.includes('zetadodong') && !em.includes('juneluna') && !em.includes('caretaker@') && nm !== 'dodong zeta' && nm !== 'june luna';
+      });
+      if (caretakers.length !== beforeCtCount) ctsModified = true;
+
       // A. Deduplicate Adopters & Preserve Custom Funding
       adopters.forEach(a => {
         if (!a) return;
@@ -948,14 +957,15 @@
         }
       }
 
-      // B. Sync Registered Caretakers into ATAMAN_caretakers_cache
+      // B. Sync Registered Caretakers into ATAMAN_caretakers_cache (real registered caretakers only)
       if (Array.isArray(regUsers)) {
         regUsers.forEach((u, idx) => {
           const role = String(u?.role || '').toLowerCase();
           if (!role.includes('caretaker')) return;
           const name = (u.displayName || u.name || '').trim();
-          const email = (u.email || '').trim();
+          const email = (u.email || '').trim().toLowerCase();
           if (!name) return;
+          if (email.includes('zetadodong') || email.includes('juneluna') || email.includes('caretaker@') || name.toLowerCase() === 'dodong zeta' || name.toLowerCase() === 'june luna') return;
           const exists = caretakers.some(c =>
             (email && c.email && c.email.toLowerCase().trim() === email.toLowerCase()) ||
             (c.name && c.name.toLowerCase().trim() === name.toLowerCase())

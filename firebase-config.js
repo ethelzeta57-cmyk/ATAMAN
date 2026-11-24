@@ -14,7 +14,7 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   'use strict';
 
   // Ensure one-time cache reset runs on every dashboard (even pages that don't load ATAMAN-init.js)
-  const INIT_VERSION = 'ATAMAN_production_clean_slate_v20261124_p2';
+  const INIT_VERSION = 'ATAMAN_production_clean_slate_v20261124_p5';
   if (!localStorage.getItem(INIT_VERSION)) {
     // 1. Reset all tree, transaction, and operational records to zero
     const purgeKeys = [

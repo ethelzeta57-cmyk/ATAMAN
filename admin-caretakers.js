@@ -3199,8 +3199,8 @@ function submitAdminAssignCaretaker() {
 
   const chosenOpt = select.options[select.selectedIndex];
   const ctId = select.value;
-  const ctName = chosenOpt.getAttribute('data-name') || 'Dodong Zeta';
-  const ctEmail = chosenOpt.getAttribute('data-email') || 'zetadodong@gmail.com';
+  const ctName = chosenOpt ? (chosenOpt.getAttribute('data-name') || '') : '';
+  const ctEmail = chosenOpt ? (chosenOpt.getAttribute('data-email') || '') : '';
   const notes = document.getElementById('assignCaretakerNotes')?.value?.trim() || '';
 
   const allTrees = getQueueTreesFromStorage();

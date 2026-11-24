@@ -41,7 +41,7 @@
   ];
   window.ATAMAN_DEFAULT_USERS = DEFAULT_USERS;
 
-  const INIT_VERSION = 'ATAMAN_production_clean_slate_v20261124_p2';
+  const INIT_VERSION = 'ATAMAN_production_clean_slate_v20261124_p5';
 
   // Seed / migrate registered data when upgrading or if caches are missing
   if (!localStorage.getItem(INIT_VERSION)) {
@@ -96,46 +96,11 @@
       localStorage.setItem('ATAMAN_adopters_cache', '[]');
     }
 
-    // 3. Caretakers: Reset metrics to 0 while preserving user accounts
-    try {
-      let existingCaretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-      if (Array.isArray(existingCaretakers) && existingCaretakers.length > 0) {
-        existingCaretakers = existingCaretakers.map(c => ({
-          ...c,
-          treesAssigned: 0,
-          assignedTreeCount: 0,
-          inspectionsLogged: 0,
-          pendingMonitoring: 0,
-          completedMonitoring: 0,
-          assignedTrees: [],
-          treesList: [],
-          assignedTreeIds: [],
-          assignedTreesList: [],
-          areaBreakdown: [],
-          assignedProjects: [],
-          criticalTrees: [],
-          recentActivity: [],
-          photos: [],
-          photosUploaded: 0,
-          maintenanceRecords: 0,
-          monitoredThisMonth: 0,
-          overdueMonitoring: 0,
-          assignedAdopter: '',
-          assignedAdopterName: '',
-          assignedTreeType: '',
-          treesCondition: { healthy: 0, care: 0, critical: 0, dead: 0 }
-        }));
-        localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(existingCaretakers));
-        localStorage.setItem('saplink_caretakers_cache', JSON.stringify(existingCaretakers));
-      } else {
-        localStorage.setItem('ATAMAN_caretakers_cache', '[]');
-        localStorage.setItem('saplink_caretakers_cache', '[]');
-      }
-    } catch (_) {
-      localStorage.setItem('ATAMAN_caretakers_cache', '[]');
-    }
+    // 3. Caretakers: Clear caretaker user accounts to clean slate
+    localStorage.setItem('ATAMAN_caretakers_cache', '[]');
+    localStorage.setItem('saplink_caretakers_cache', '[]');
 
-    // 4. Users: Preserve all accounts (Admin, Adopter, Caretaker)
+    // 4. Users: Preserve Admin, clear caretaker user accounts
     let existingUsers = (() => {
       try {
         const raw = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
@@ -147,7 +112,10 @@
     if (existingUsers) {
       existingUsers.forEach(u => {
         const email = (u.email || '').toLowerCase().trim();
-        if (email && email !== 'pedro.reyes@ataman.org' && email !== 'john.sho@gmail.com' && email !== 'contact@centurycatbalogan.com' && !cleanedUsers.some(cu => cu.email.toLowerCase() === email)) {
+        const name = (u.name || u.displayName || '').toLowerCase().trim();
+        const role = (u.role || '').toLowerCase().trim();
+        const isCaretaker = role.includes('caretaker') || email.includes('zetadodong') || email.includes('juneluna') || email.includes('caretaker@') || name === 'dodong zeta' || name === 'june luna';
+        if (email && !isCaretaker && email !== 'pedro.reyes@ataman.org' && email !== 'john.sho@gmail.com' && email !== 'contact@centurycatbalogan.com' && !cleanedUsers.some(cu => cu.email.toLowerCase() === email)) {
           cleanedUsers.push(u);
         }
       });
@@ -195,8 +163,16 @@
 
   try {
     let caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-    if (!Array.isArray(caretakers) || caretakers.length === 0 || caretakers.some(c => c.name === 'Pedro Reyes' || c.email === 'pedro.reyes@ataman.org')) {
-      localStorage.setItem('ATAMAN_caretakers_cache', '[]');
+    if (Array.isArray(caretakers) && caretakers.length > 0) {
+      const filtered = caretakers.filter(c => {
+        const em = String(c?.email || '').toLowerCase().trim();
+        const nm = String(c?.name || '').toLowerCase().trim();
+        return !em.includes('zetadodong') && !em.includes('juneluna') && !em.includes('caretaker@') && nm !== 'dodong zeta' && nm !== 'june luna' && nm !== 'pedro reyes';
+      });
+      if (filtered.length !== caretakers.length) {
+        localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(filtered));
+        localStorage.setItem('saplink_caretakers_cache', JSON.stringify(filtered));
+      }
     }
   } catch (_) {
     try { localStorage.setItem('ATAMAN_caretakers_cache', '[]'); } catch (_) {}
@@ -204,10 +180,13 @@
 
   try {
     let users = JSON.parse(localStorage.getItem('ATAMAN_registered_users') || localStorage.getItem('ATAMAN_users_cache') || '[]');
-    if (!Array.isArray(users) || users.length <= 1 || users.some(u => u.email === 'pedro.reyes@ataman.org' || u.email === 'john.sho@gmail.com')) {
-      let filtered = (Array.isArray(users) ? users : []).filter(u => {
+    if (Array.isArray(users) && users.length > 0) {
+      let filtered = users.filter(u => {
         const em = (u.email || '').toLowerCase().trim();
-        return em !== 'pedro.reyes@ataman.org' && em !== 'john.sho@gmail.com' && em !== 'contact@centurycatbalogan.com';
+        const nm = (u.name || u.displayName || '').toLowerCase().trim();
+        const role = (u.role || '').toLowerCase().trim();
+        const isLegacyCt = role.includes('caretaker') || em.includes('zetadodong') || em.includes('juneluna') || em.includes('caretaker@') || nm === 'dodong zeta' || nm === 'june luna';
+        return !isLegacyCt && em !== 'pedro.reyes@ataman.org' && em !== 'john.sho@gmail.com' && em !== 'contact@centurycatbalogan.com';
       });
       DEFAULT_USERS.forEach(defU => {
         if (!filtered.some(u => (u.email || '').toLowerCase() === defU.email.toLowerCase())) {

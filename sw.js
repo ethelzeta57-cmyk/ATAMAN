@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.49-clean-queue-dashboard';
+const CACHE_NAME = 'ataman-pwa-v2.2.55-clean-caretakers';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
