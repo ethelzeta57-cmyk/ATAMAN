@@ -18,33 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return `data:image/svg+xml;utf8,${encoded}`;
   };
 
-  const DEFAULT_CARETAKERS = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS) && window.ATAMAN_DEFAULT_CARETAKERS.length > 0)
-    ? window.ATAMAN_DEFAULT_CARETAKERS
-    : [
-      {
-        id: 'CT-101',
-        empId: 'EMP-002',
-        name: 'Dodong Zeta',
-        fullName: 'Dodong Zeta',
-        email: 'zetadodong@gmail.com',
-        phone: '+63 918 333 4455',
-        address: 'Brgy. Canlapwas, Catbalogan City, Samar',
-        role: 'Field Caretaker',
-        status: 'Active',
-        treesAssigned: 0,
-        assignedTreeCount: 0,
-        location: 'Catbalogan City & Jiabong, Samar',
-        municipality: 'Catbalogan City',
-        barangay: 'Canlapwas',
-        assignedTrees: [],
-        assignedAdopterName: 'Nikki Maga',
-        joinedDate: '2026-08-01',
-        createdAt: '2026-08-01T08:00:00.000Z',
-        performanceRating: '98%',
-        inspectionsLogged: 0,
-        survivalRate: '96.8%'
-      }
-    ];
+  const DEFAULT_CARETAKERS = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_CARETAKERS)) ? window.ATAMAN_DEFAULT_CARETAKERS : [];
   window.ATAMAN_DEFAULT_CARETAKERS = DEFAULT_CARETAKERS;
 
   // Caretakers Database (loads live user-created caretakers)
@@ -3426,6 +3400,22 @@ function openAssignCaretakerModal(treeId) {
   if (escrowEl) escrowEl.textContent = `₱${Number(tree.fundingAmount || 500).toLocaleString()}.00 (GCash)`;
   if (waitingEl) waitingEl.textContent = `${daysWaiting} Day${daysWaiting === 1 ? '' : 's'} in Queue`;
   if (targetInp) targetInp.value = tree.id;
+
+  // Dynamically populate available registered caretakers
+  const assignSelect = document.getElementById('assignCaretakerSelect');
+  if (assignSelect) {
+    let availableCts = [];
+    try { availableCts = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]'); } catch (_) {}
+    if (Array.isArray(availableCts) && availableCts.length > 0) {
+      assignSelect.innerHTML = availableCts.map(c => `
+        <option value="${c.id}" data-name="${c.name || c.fullName}" data-email="${c.email || ''}">
+          🧑‍🌾 ${c.name || c.fullName} (${c.id} • ${c.barangay || c.primaryArea || 'Catbalogan'})
+        </option>
+      `).join('');
+    } else {
+      assignSelect.innerHTML = '<option value="" disabled selected>No field caretakers registered yet (Add in Caretaker Directory)</option>';
+    }
+  }
 
   const modal = document.getElementById('modalAdminAssignCaretaker');
   if (modal) modal.classList.remove('hidden');

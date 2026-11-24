@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function cleanEmail(em) {
     if (!em) return '';
     const cleaned = em.toLowerCase().trim().replace(/@saplink\.org$/i, '@ataman.org');
-    if (cleaned === 'admin@ataman.org') return 'ethelzeta57@gmail.com';
+    if (cleaned === 'admin@ataman.org' || cleaned === 'ethelzeta57@gmail.com' || cleaned === 'ataman_admin') return 'admin@ataman.catbalogan.gov.ph';
     return cleaned;
   }
 
@@ -62,9 +62,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Default system registered accounts
     const defaultSeeds = [
-      { uid: '152HcDnFRaTZtHcTN5uxUMfBY7R2', id: '152HcDnFRaTZtHcTN5uxUMfBY7R2', email: 'ethelzeta57@gmail.com', displayName: 'Ethel Zeta (Admin)', role: 'Administrator', empId: 'EMP-001', location: 'Catbalogan City, Samar', status: 'Active' },
-      { uid: 'USR-CT-001', id: 'CT-101', email: 'zetadodong@gmail.com', displayName: 'Dodong Zeta', role: 'Caretaker', empId: 'EMP-002', location: 'Brgy. Canlapwas, Catbalogan City', status: 'Active', phone: '+63 918 333 4455' },
-      { uid: 'USR-ADP-001', id: 'ADP-101', email: 'nikkimaga24@gmail.com', displayName: 'Nikki Maga', role: 'Adopter', empId: 'ADP-101', location: 'Brgy. Guinsorongan, Catbalogan City', status: 'Active', phone: '+63 917 123 4567' }
+      {
+        uid: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+        id: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+        email: 'admin@ataman.catbalogan.gov.ph',
+        displayName: 'ATAMAN Administrator',
+        name: 'ATAMAN Administrator',
+        username: 'ataman_admin',
+        role: 'Administrator',
+        empId: 'EMP-001',
+        location: 'Catbalogan City, Samar',
+        status: 'Active'
+      }
     ];
 
     defaultSeeds.forEach(seed => {
@@ -1150,3 +1159,67 @@ document.addEventListener('DOMContentLoaded', () => {
   updateSummaryCards();
   syncFromFirestore();
 });
+
+
+// ── Clean Slate System Reset Handlers ──
+window.openCleanResetModal = function() {
+  const m = document.getElementById('modalCleanResetConfirm');
+  if (m) {
+    m.style.display = 'flex';
+    m.classList.remove('hidden');
+    const inp = document.getElementById('inputResetConfirmation');
+    if (inp) { inp.value = ''; inp.focus(); }
+    const btn = document.getElementById('btnExecuteCleanReset');
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; }
+  }
+};
+
+window.closeCleanResetModal = function() {
+  const m = document.getElementById('modalCleanResetConfirm');
+  if (m) {
+    m.style.display = 'none';
+    m.classList.add('hidden');
+  }
+};
+
+window.handleResetConfirmationInput = function(val) {
+  const btn = document.getElementById('btnExecuteCleanReset');
+  const msg = document.getElementById('resetStatusMsg');
+  const isMatch = val.trim() === 'CONFIRM RESET';
+  if (btn) {
+    btn.disabled = !isMatch;
+    btn.style.opacity = isMatch ? '1' : '0.5';
+    btn.style.cursor = isMatch ? 'pointer' : 'not-allowed';
+  }
+  if (msg) {
+    if (isMatch) {
+      msg.textContent = '✅ Confirmation matched. Ready to execute clean slate reset.';
+      msg.style.color = '#15803d';
+    } else {
+      msg.textContent = 'Explicit confirmation safeguard active. Type CONFIRM RESET.';
+      msg.style.color = '#64748b';
+    }
+  }
+};
+
+window.executeSystemCleanReset = function() {
+  const inp = document.getElementById('inputResetConfirmation');
+  if (!inp || inp.value.trim() !== 'CONFIRM RESET') {
+    alert('Safety Check: You must type the exact phrase "CONFIRM RESET" to proceed.');
+    return;
+  }
+  const btn = document.getElementById('btnExecuteCleanReset');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = 'Resetting system...';
+  }
+  try {
+    if (typeof window.ATAMAN_RESET_SYSTEM === 'function') {
+      window.ATAMAN_RESET_SYSTEM({ confirmationCode: 'CONFIRM RESET' });
+    } else {
+      alert('Reset system function ready.');
+    }
+  } catch (err) {
+    alert('Error during reset: ' + err.message);
+  }
+};

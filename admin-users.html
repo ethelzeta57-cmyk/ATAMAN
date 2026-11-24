@@ -278,6 +278,12 @@
           </svg>
           Export
         </button>
+        <button class="btn-danger-outline" id="btnOpenCleanResetModal" type="button" onclick="openCleanResetModal()"
+          title="Clean Slate System Reset"
+          style="background:#fef2f2; color:#b91c1c; border:1.5px solid #fca5a5; font-weight:700; display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:13px; margin-right:8px;">
+          <span>🛡️</span>
+          <span>System Reset</span>
+        </button>
         <button class="btn-primary" id="openAddUserModalBtn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">
@@ -933,6 +939,51 @@
   <script src="admin-users.js?v=20261110_v14"></script>
   <!-- Mobile Bottom Navigation Bar -->
   <script src="ataman-bottom-nav.js?v=20261113_v1"></script>
+
+  <!-- Clean Slate System Reset Confirmation Safeguard Modal -->
+  <div class="modal hidden" id="modalCleanResetConfirm" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:#ffffff; border-radius:16px; max-width:520px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,0.3); border:2px solid #ef4444; overflow:hidden;">
+      <div style="background:#7f1d1d; color:#ffffff; padding:18px 24px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:22px;">⚠️</span>
+          <h3 style="margin:0; font-size:18px; font-weight:800;">Production Clean Slate Reset</h3>
+        </div>
+        <button type="button" onclick="closeCleanResetModal()" style="background:none; border:none; color:#ffffff; font-size:24px; cursor:pointer;">&times;</button>
+      </div>
+      <div style="padding:22px 24px; color:#1e293b; font-size:13.5px; line-height:1.6;">
+        <p style="margin-top:0; font-weight:600; color:#991b1b;">
+          This administrative action purges all dashboard activity, mock trees, community adopters, and caretaker assignments, returning the system to a clean production state.
+        </p>
+        <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:14px; margin-bottom:16px; font-size:12.5px;">
+          <ul style="margin:0; padding-left:18px; color:#7f1d1d;">
+            <li>All registered trees, GPS coordinates, and plot bookings will be cleared.</li>
+            <li>All community adopter registrations and caretaker links will be cleared.</li>
+            <li>Your fresh Admin account (<code>admin@ataman.catbalogan.gov.ph</code>) is preserved with full administrative control.</li>
+            <li>System role structures and unified ID linking protocols remain intact.</li>
+          </ul>
+        </div>
+        <p style="margin-bottom:8px; font-weight:700; color:#0f172a;">
+          To confirm, please type <span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-family:monospace; font-weight:800;">CONFIRM RESET</span> below:
+        </p>
+        <input type="text" id="inputResetConfirmation" placeholder="Type CONFIRM RESET here"
+          style="width:100%; padding:10px 14px; border:2px solid #cbd5e1; border-radius:8px; font-size:14px; box-sizing:border-box; font-family:monospace;"
+          oninput="handleResetConfirmationInput(this.value)" />
+        <div id="resetStatusMsg" style="font-size:12px; margin-top:8px; color:#64748b;">Explicit confirmation safeguard active.</div>
+      </div>
+      <div style="background:#f8fafc; padding:16px 24px; display:flex; justify-content:flex-end; gap:12px; border-top:1px solid #e2e8f0;">
+        <button type="button" onclick="closeCleanResetModal()"
+          style="background:#f1f5f9; border:1px solid #cbd5e1; padding:9px 18px; border-radius:8px; font-weight:600; cursor:pointer; color:#475569;">
+          Cancel
+        </button>
+        <button type="button" id="btnExecuteCleanReset" disabled onclick="executeSystemCleanReset()"
+          style="background:#dc2626; opacity:0.5; border:none; color:#ffffff; padding:9px 20px; border-radius:8px; font-weight:700; cursor:not-allowed; display:inline-flex; align-items:center; gap:8px;">
+          <span>🗑️</span>
+          <span>Execute Clean Reset</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>

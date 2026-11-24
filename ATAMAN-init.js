@@ -15,459 +15,33 @@
     }
   } catch (_) {}
 
-  const DEFAULT_TREES = [
-    {
-      id: 'TR-10001',
-      species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
-      speciesCommon: 'Narra',
-      commonName: 'Narra',
-      scientificName: 'Pterocarpus indicus',
-      treeType: 'Native',
-      treeCount: 100,
-      takenCount: 0,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Canlapwas',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7820,
-      lng: 124.8875,
-      sponsorName: '',
-      adopter: '',
-      fundingAmount: 50,
-      dateAdded: 'Nov 21, 2026',
-      datePlanted: '2026-05-21',
-      createdAt: '2026-11-21T06:00:00.000Z',
-      age: '6 Months',
-      ageOfTree: '6 Months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.5 meters',
-      trunkDiam: '4.0 cm'
-    },
-    {
-      id: 'TR-10002',
-      species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Native' },
-      speciesCommon: 'Molave',
-      commonName: 'Molave',
-      scientificName: 'Vitex parviflora',
-      treeType: 'Native',
-      treeCount: 100,
-      takenCount: 0,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Guinsorongan',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7598,
-      lng: 124.8861,
-      sponsorName: '',
-      adopter: '',
-      fundingAmount: 50,
-      dateAdded: 'Nov 21, 2026',
-      datePlanted: '2026-05-21',
-      createdAt: '2026-11-21T06:05:00.000Z',
-      age: '6 Months',
-      ageOfTree: '6 Months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.4 meters',
-      trunkDiam: '3.8 cm'
-    },
-    {
-      id: 'TR-10003',
-      species: { common: 'Yakal', scientific: 'Shorea astylosa', type: 'Native' },
-      speciesCommon: 'Yakal',
-      commonName: 'Yakal',
-      scientificName: 'Shorea astylosa',
-      treeType: 'Native',
-      treeCount: 100,
-      takenCount: 0,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'San Isidro',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7710,
-      lng: 124.8910,
-      sponsorName: '',
-      adopter: '',
-      fundingAmount: 50,
-      dateAdded: 'Nov 21, 2026',
-      datePlanted: '2026-05-21',
-      createdAt: '2026-11-21T06:10:00.000Z',
-      age: '6 Months',
-      ageOfTree: '6 Months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.8 meters',
-      trunkDiam: '4.5 cm'
-    },
-    {
-      id: 'TR-10004',
-      species: { common: 'Tindalo', scientific: 'Afzelia rhomboidea', type: 'Native' },
-      speciesCommon: 'Tindalo',
-      commonName: 'Tindalo',
-      scientificName: 'Afzelia rhomboidea',
-      treeType: 'Native',
-      treeCount: 100,
-      takenCount: 0,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Bunuanan',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7885,
-      lng: 124.8890,
-      sponsorName: '',
-      adopter: '',
-      fundingAmount: 50,
-      dateAdded: 'Nov 21, 2026',
-      datePlanted: '2026-05-21',
-      createdAt: '2026-11-21T06:15:00.000Z',
-      age: '6 Months',
-      ageOfTree: '6 Months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.1 meters',
-      trunkDiam: '3.5 cm'
-    },
-    {
-      id: 'TR-10005',
-      species: { common: 'Dao', scientific: 'Dracontomelon dao', type: 'Native' },
-      speciesCommon: 'Dao',
-      commonName: 'Dao',
-      scientificName: 'Dracontomelon dao',
-      treeType: 'Native',
-      treeCount: 100,
-      takenCount: 0,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Mabini',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7740,
-      lng: 124.9030,
-      sponsorName: '',
-      adopter: '',
-      fundingAmount: 50,
-      dateAdded: 'Nov 21, 2026',
-      datePlanted: '2026-05-21',
-      createdAt: '2026-11-21T06:20:00.000Z',
-      age: '6 Months',
-      ageOfTree: '6 Months',
-      caretaker: 'Dodong Zeta',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '3.0 meters',
-      trunkDiam: '5.2 cm'
-    },
-    {
-      id: 'TR-10006',
-      species: { common: 'Banaba', scientific: 'Lagerstroemia speciosa', type: 'Native' },
-      speciesCommon: 'Banaba',
-      commonName: 'Banaba',
-      scientificName: 'Lagerstroemia speciosa',
-      treeType: 'Native',
-      treeCount: 100,
-      takenCount: 0,
-      status: 'healthy',
-      health: 'Healthy',
-      barangay: 'Darahuway Daco',
-      lat: 11.7450,
-      lng: 124.8761,
-      sponsorName: '',
-      adopter: '',
-      fundingAmount: 50,
-      dateAdded: 'Nov 21, 2026',
-      datePlanted: '2026-05-21',
-      createdAt: '2026-11-21T06:25:00.000Z',
-      age: '6 Months',
-      ageOfTree: '6 Months',
-      caretaker: 'June Luna',
-      customCaretaker: true,
-      customGps: true,
-      customLocation: true,
-      height: '2.6 meters',
-      trunkDiam: '4.2 cm'
-    },
-    {
-      id: 'TR-10007',
-      species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
-      speciesCommon: 'Narra',
-      commonName: 'Narra',
-      scientificName: 'Pterocarpus indicus',
-      treeType: 'Native',
-      treeCount: 1,
-      takenCount: 1,
-      status: 'healthy',
-      health: 'Healthy',
-      stage: 'Sapling',
-      stageDescription: '6-Month Nursery Sapling',
-      plantingZone: 'Zone 1 (Sector A • Canlapwas Watershed)',
-      zone: 'Zone 1',
-      plot: 'Plot A-14',
-      book: 'Book 1',
-      plotBook: 'Zone 1 • Plot A-14 (Book 1)',
-      barangay: 'Canlapwas',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7828,
-      lng: 124.8860,
-      sponsorName: 'Nikki Maga',
-      adopter: 'Nikki Maga',
-      adopterId: 'ADP-101',
-      adopterEmail: 'nikkimaga24@gmail.com',
-      adopterPhone: '+63 917 123 4567',
-      adopterType: 'Individual Community Sponsor',
-      dedication: 'For the future green youth of Catbalogan',
-      caretaker: 'Awaiting Caretaker',
-      caretakerId: '',
-      caretakerEmail: '',
-      caretakerStatus: 'awaiting',
-      height: '1.8 meters',
-      trunkDiam: '2.8 cm',
-      fundingAmount: 50,
-      dateAdded: 'Nov 22, 2026',
-      datePlanted: '2026-05-21',
-      createdAt: '2026-11-22T08:00:00.000Z',
-      photo: 'assets/tree.jpg'
-    },
-    {
-      id: 'TR-10008',
-      species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Native' },
-      speciesCommon: 'Molave',
-      commonName: 'Molave',
-      scientificName: 'Vitex parviflora',
-      treeType: 'Native',
-      treeCount: 1,
-      takenCount: 1,
-      status: 'healthy',
-      health: 'Healthy',
-      stage: 'Sapling',
-      stageDescription: '8-Month Nursery Sapling',
-      plantingZone: 'Zone 2 (Sector B • Guinsorongan Coastal Buffer)',
-      zone: 'Zone 2',
-      plot: 'Plot B-08',
-      book: 'Book 2',
-      plotBook: 'Zone 2 • Plot B-08 (Book 2)',
-      barangay: 'Guinsorongan',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7612,
-      lng: 124.8870,
-      sponsorName: 'Elena Cruz',
-      adopter: 'Elena Cruz',
-      adopterId: 'ADP-102',
-      adopterEmail: 'elenacruz.samar@gmail.com',
-      adopterPhone: '+63 920 445 6789',
-      adopterType: 'Samar Heritage Foundation',
-      dedication: 'In memory of Samar natural coastal heritage',
-      caretaker: 'Awaiting Caretaker',
-      caretakerId: '',
-      caretakerEmail: '',
-      caretakerStatus: 'awaiting',
-      height: '2.1 meters',
-      trunkDiam: '3.2 cm',
-      fundingAmount: 50,
-      dateAdded: 'Nov 22, 2026',
-      datePlanted: '2026-05-21',
-      createdAt: '2026-11-22T08:30:00.000Z',
-      photo: 'assets/tree.jpg'
-    },
-    {
-      id: 'TR-10009',
-      species: { common: 'Yakal', scientific: 'Shorea astylosa', type: 'Native' },
-      speciesCommon: 'Yakal',
-      commonName: 'Yakal',
-      scientificName: 'Shorea astylosa',
-      treeType: 'Native',
-      treeCount: 1,
-      takenCount: 1,
-      status: 'healthy',
-      health: 'Healthy',
-      stage: 'Existing Tree',
-      stageDescription: 'Young Native Tree (1.5 Years Old)',
-      plantingZone: 'Zone 3 (Sector C • San Isidro Upland Slope)',
-      zone: 'Zone 3',
-      plot: 'Plot C-03',
-      book: 'Book 1',
-      plotBook: 'Zone 3 • Plot C-03 (Book 1)',
-      barangay: 'San Isidro',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7725,
-      lng: 124.8935,
-      sponsorName: 'Catbalogan Youth Eco-Alliance',
-      adopter: 'Catbalogan Youth Eco-Alliance',
-      adopterId: 'ADP-103',
-      adopterEmail: 'youth.eco@catbalogan.gov.ph',
-      adopterPhone: '+63 939 888 1234',
-      adopterType: 'Student Environmental Organization',
-      dedication: 'Preserving old-growth Samar rainforest canopy',
-      caretaker: 'Awaiting Caretaker',
-      caretakerId: '',
-      caretakerEmail: '',
-      caretakerStatus: 'awaiting',
-      height: '3.4 meters',
-      trunkDiam: '5.6 cm',
-      fundingAmount: 50,
-      dateAdded: 'Nov 22, 2026',
-      datePlanted: '2025-05-20',
-      createdAt: '2026-11-22T09:00:00.000Z',
-      photo: 'assets/tree.jpg'
-    },
-    {
-      id: 'TR-10010',
-      species: { common: 'Banaba', scientific: 'Lagerstroemia speciosa', type: 'Native' },
-      speciesCommon: 'Banaba',
-      commonName: 'Banaba',
-      scientificName: 'Lagerstroemia speciosa',
-      treeType: 'Native',
-      treeCount: 1,
-      takenCount: 1,
-      status: 'healthy',
-      health: 'Healthy',
-      stage: 'Sapling',
-      stageDescription: '5-Month Nursery Sapling',
-      plantingZone: 'Zone 6 (Darahuway Daco Island Sanctuary)',
-      zone: 'Zone 6',
-      plot: 'Plot DD-04',
-      book: 'Book 1',
-      plotBook: 'Zone 6 • Plot DD-04 (Book 1)',
-      barangay: 'Darahuway Daco',
-      municipality: 'Catbalogan City',
-      province: 'Samar',
-      lat: 11.7455,
-      lng: 124.8765,
-      sponsorName: 'Governor & Samar Eco-Patrons',
-      adopter: 'Governor & Samar Eco-Patrons',
-      adopterId: 'ADP-104',
-      adopterEmail: 'ecopatrons.samar@gov.ph',
-      adopterPhone: '+63 917 555 9876',
-      adopterType: 'Civic Patron Group',
-      dedication: 'Coastal green barrier & island biodiversity protection',
-      caretaker: 'Awaiting Caretaker',
-      caretakerId: '',
-      caretakerEmail: '',
-      caretakerStatus: 'awaiting',
-      height: '1.6 meters',
-      trunkDiam: '2.4 cm',
-      fundingAmount: 50,
-      dateAdded: 'Nov 22, 2026',
-      datePlanted: '2026-06-15',
-      createdAt: '2026-11-22T09:30:00.000Z',
-      photo: 'assets/tree.jpg'
-    }
-  ];
+  const DEFAULT_TREES = [];
   window.ATAMAN_DEFAULT_TREES = DEFAULT_TREES;
 
-  const DEFAULT_ADOPTERS = [
-    {
-      id: 'ADP-101',
-      name: 'Nikki Maga',
-      fullName: 'Nikki Maga',
-      contactPerson: 'Nikki Maga',
-      type: 'Individual',
-      email: 'nikkimaga24@gmail.com',
-      phone: '+63 917 123 4567',
-      address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
-      status: 'Active',
-      treesCount: 0,
-      treesAdopted: 0,
-      funding: 0,
-      fundingPaid: 0,
-      customFunding: false,
-      treesList: [],
-      joinedDate: '2026-08-28',
-      startDate: '2026-08-28',
-      expDate: 'Ongoing'
-    }
-  ];
+  const DEFAULT_ADOPTERS = [];
   window.ATAMAN_DEFAULT_ADOPTERS = DEFAULT_ADOPTERS;
 
-  const DEFAULT_CARETAKERS = [
-    {
-      id: 'CT-101',
-      empId: 'EMP-002',
-      name: 'Dodong Zeta',
-      fullName: 'Dodong Zeta',
-      email: 'zetadodong@gmail.com',
-      phone: '+63 918 333 4455',
-      address: 'Brgy. Canlapwas, Catbalogan City, Samar',
-      role: 'Field Caretaker',
-      status: 'Active',
-      treesAssigned: 0,
-      assignedTreeCount: 0,
-      inspectionsLogged: 0,
-      assignedTrees: [],
-      treesList: [],
-      assignedAdopterName: '',
-      joinedDate: '2026-08-01',
-      createdAt: '2026-08-01T08:00:00.000Z',
-      performanceRating: '100%',
-      survivalRate: '100%'
-    }
-  ];
+  const DEFAULT_CARETAKERS = [];
   window.ATAMAN_DEFAULT_CARETAKERS = DEFAULT_CARETAKERS;
 
   const DEFAULT_USERS = [
     {
-      uid: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
-      id: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
-      email: 'ethelzeta57@gmail.com',
-      displayName: 'Ethel Zeta (Admin)',
-      name: 'Ethel Zeta (Admin)',
-      username: 'ethelzeta57',
+      uid: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+      id: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+      email: 'admin@ataman.catbalogan.gov.ph',
+      displayName: 'ATAMAN Administrator',
+      name: 'ATAMAN Administrator',
+      username: 'ataman_admin',
       empId: 'EMP-001',
       role: 'admin',
       status: 'Active',
-      password: 'Password123!',
-      createdAt: '2026-08-26T00:00:00.000Z'
-    },
-    {
-      uid: 'USR-CT-001',
-      id: 'CT-101',
-      email: 'zetadodong@gmail.com',
-      displayName: 'Dodong Zeta',
-      name: 'Dodong Zeta',
-      username: 'zetadodong',
-      empId: 'EMP-002',
-      role: 'caretaker',
-      status: 'Active',
-      phone: '+63 918 333 4455',
-      address: 'Brgy. Canlapwas, Catbalogan City, Samar',
-      password: 'Password123!',
-      createdAt: '2026-08-01T08:00:00.000Z'
-    },
-    {
-      uid: 'USR-ADP-001',
-      id: 'ADP-101',
-      email: 'nikkimaga24@gmail.com',
-      displayName: 'Nikki Maga',
-      name: 'Nikki Maga',
-      username: 'nikkimaga24',
-      empId: 'ADP-101',
-      role: 'adopter',
-      status: 'Active',
-      phone: '+63 917 123 4567',
-      address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
-      password: 'Password123!',
-      createdAt: '2026-08-28T08:00:00.000Z'
+      password: 'Ataman#2026!Padayon',
+      createdAt: '2026-11-24T08:00:00.000Z'
     }
   ];
   window.ATAMAN_DEFAULT_USERS = DEFAULT_USERS;
 
-  const INIT_VERSION = 'ATAMAN_clean_reset_v13_clear_all_transactions_20261120';
+  const INIT_VERSION = 'ATAMAN_production_clean_slate_reset_v20261124';
 
   // Seed / migrate registered data when upgrading or if caches are missing
   if (!localStorage.getItem(INIT_VERSION)) {
@@ -515,11 +89,11 @@
         localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(existingAdopters));
         localStorage.setItem('saplink_adopters_cache', JSON.stringify(existingAdopters));
       } else {
-        localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
-        localStorage.setItem('saplink_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
+        localStorage.setItem('ATAMAN_adopters_cache', '[]');
+        localStorage.setItem('saplink_adopters_cache', '[]');
       }
     } catch (_) {
-      localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
+      localStorage.setItem('ATAMAN_adopters_cache', '[]');
     }
 
     // 3. Caretakers: Reset metrics to 0 while preserving user accounts
@@ -554,11 +128,11 @@
         localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(existingCaretakers));
         localStorage.setItem('saplink_caretakers_cache', JSON.stringify(existingCaretakers));
       } else {
-        localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
-        localStorage.setItem('saplink_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
+        localStorage.setItem('ATAMAN_caretakers_cache', '[]');
+        localStorage.setItem('saplink_caretakers_cache', '[]');
       }
     } catch (_) {
-      localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
+      localStorage.setItem('ATAMAN_caretakers_cache', '[]');
     }
 
     // 4. Users: Preserve all accounts (Admin, Adopter, Caretaker)
@@ -613,19 +187,19 @@
   try {
     let adopters = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
     if (!Array.isArray(adopters) || adopters.length === 0 || adopters.some(a => a.name === 'John Sho' || a.name === 'Century Catbalogan')) {
-      localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS));
+      localStorage.setItem('ATAMAN_adopters_cache', '[]');
     }
   } catch (_) {
-    try { localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(DEFAULT_ADOPTERS)); } catch (_) {}
+    try { localStorage.setItem('ATAMAN_adopters_cache', '[]'); } catch (_) {}
   }
 
   try {
     let caretakers = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
     if (!Array.isArray(caretakers) || caretakers.length === 0 || caretakers.some(c => c.name === 'Pedro Reyes' || c.email === 'pedro.reyes@ataman.org')) {
-      localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS));
+      localStorage.setItem('ATAMAN_caretakers_cache', '[]');
     }
   } catch (_) {
-    try { localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(DEFAULT_CARETAKERS)); } catch (_) {}
+    try { localStorage.setItem('ATAMAN_caretakers_cache', '[]'); } catch (_) {}
   }
 
   try {

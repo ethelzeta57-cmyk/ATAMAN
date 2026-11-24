@@ -4,7 +4,8 @@
   "private": true,
   "description": "ATAMAN Tree Management and Monitoring System",
   "scripts": {
-    "build": "echo 'ATAMAN static site ready'"
+    "build": "echo 'ATAMAN static site ready'",
+    "reset:prod": "node scripts/clean_reset_production.js --confirm=CONFIRM_RESET_ATAMAN_PRODUCTION_2026"
   }
 }
 

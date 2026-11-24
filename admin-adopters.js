@@ -4,29 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  const DEFAULT_ADOPTERS = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS) && window.ATAMAN_DEFAULT_ADOPTERS.length > 0)
-    ? window.ATAMAN_DEFAULT_ADOPTERS
-    : [
-      {
-        id: 'ADP-101',
-        name: 'Nikki Maga',
-        fullName: 'Nikki Maga',
-        contactPerson: 'Nikki Maga',
-        type: 'Individual',
-        email: 'nikkimaga24@gmail.com',
-        phone: '+63 917 123 4567',
-        address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
-        status: 'Active',
-        treesCount: 0,
-        funding: 0,
-        fundingPaid: 0,
-        customFunding: false,
-        joinedDate: '2026-08-28',
-        startDate: '2026-08-28',
-        expDate: 'Ongoing',
-        treesList: []
-      }
-    ];
+  const DEFAULT_ADOPTERS = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_ADOPTERS)) ? window.ATAMAN_DEFAULT_ADOPTERS : [];
   window.ATAMAN_DEFAULT_ADOPTERS = DEFAULT_ADOPTERS;
 
   // Load persisted adopters cache
@@ -41,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     adoptersList = [];
   }
   if (!adoptersList || adoptersList.length === 0) {
-    adoptersList = [...DEFAULT_ADOPTERS];
+    adoptersList = Array.isArray(DEFAULT_ADOPTERS) ? [...DEFAULT_ADOPTERS] : [];
     try { localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(adoptersList)); } catch (_) {}
   }
 

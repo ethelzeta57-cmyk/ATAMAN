@@ -14,51 +14,59 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   'use strict';
 
   // Ensure one-time cache reset runs on every dashboard (even pages that don't load ATAMAN-init.js)
-  const INIT_VERSION = 'ATAMAN_clean_reset_v10_zero_ghost_trees';
+  const INIT_VERSION = 'ATAMAN_production_clean_slate_reset_v20261124';
   if (!localStorage.getItem(INIT_VERSION)) {
-    localStorage.setItem('ATAMAN_trees_cache', '[]');
-    localStorage.setItem('saplink_trees_cache', '[]');
-    localStorage.setItem('ATAMAN_tree_logs_cache', '[]');
-    localStorage.setItem('ATAMAN_monitoring_logs', '[]');
-    localStorage.setItem('ATAMAN_tree_transactions', '[]');
-    localStorage.setItem('ATAMAN_tree_activities', '[]');
+    // 1. Reset all tree, transaction, and operational records to zero
+    const purgeKeys = [
+      'ATAMAN_trees_cache', 'saplink_trees_cache', 'admin_trees_data',
+      'ATAMAN_adopters_cache', 'saplink_adopters_cache',
+      'ATAMAN_caretakers_cache', 'saplink_caretakers_cache',
+      'ATAMAN_tree_logs_cache', 'ATAMAN_monitoring_logs', 'ATAMAN_tree_transactions', 'ATAMAN_tree_activities',
+      'ATAMAN_system_logs', 'ATAMAN_reports_archive', 'ATAMAN_notifications', 'ATAMAN_notifications_cache',
+      'ATAMAN_caretaker_notifications', 'ATAMAN_monthly_logs_cache'
+    ];
+    purgeKeys.forEach(function (k) {
+      try { localStorage.setItem(k, '[]'); } catch (_) {}
+    });
 
     try {
-      let ads = JSON.parse(localStorage.getItem('ATAMAN_adopters_cache') || '[]');
-      if (Array.isArray(ads)) {
-        ads = ads.map(a => ({
-          ...a,
-          treesCount: 0,
-          treesAdopted: 0,
-          funding: 0,
-          fundingPaid: 0,
-          customFunding: false,
-          treesList: [],
-          transactions: [],
-          donations: []
-        }));
-        localStorage.setItem('ATAMAN_adopters_cache', JSON.stringify(ads));
-        localStorage.setItem('saplink_adopters_cache', JSON.stringify(ads));
-      }
+      Object.keys(localStorage).forEach(function (k) {
+        if (k.indexOf('ATAMAN_monthly_logs_seeded_') === 0) localStorage.removeItem(k);
+      });
     } catch (_) {}
 
-    try {
-      let cts = JSON.parse(localStorage.getItem('ATAMAN_caretakers_cache') || '[]');
-      if (Array.isArray(cts)) {
-        cts = cts.map(c => ({
-          ...c,
-          treesAssigned: 0,
-          assignedTreeCount: 0,
-          inspectionsLogged: 0,
-          pendingMonitoring: 0,
-          completedMonitoring: 0,
-          assignedTrees: [],
-          treesList: []
-        }));
-        localStorage.setItem('ATAMAN_caretakers_cache', JSON.stringify(cts));
-        localStorage.setItem('saplink_caretakers_cache', JSON.stringify(cts));
-      }
-    } catch (_) {}
+    // 2. Set fresh provisioned Admin account in registered users cache
+    const FRESH_ADMIN_RECORD = {
+      uid: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+      id: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+      email: 'admin@ataman.catbalogan.gov.ph',
+      username: 'ataman_admin',
+      displayName: 'ATAMAN Administrator',
+      name: 'ATAMAN Administrator',
+      role: 'admin',
+      empId: 'EMP-001',
+      status: 'Active',
+      password: 'Ataman#2026!Padayon',
+      createdAt: '2026-11-24T08:00:00.000Z'
+    };
+    const freshAdminJson = JSON.stringify([FRESH_ADMIN_RECORD]);
+    localStorage.setItem('ATAMAN_registered_users', freshAdminJson);
+    localStorage.setItem('saplink_registered_users', freshAdminJson);
+    localStorage.setItem('ATAMAN_users_cache', freshAdminJson);
+    localStorage.setItem('saplink_users_cache', freshAdminJson);
+
+    // 3. Clear obsolete sessions (log out legacy admin/test accounts)
+    const currentEmail = (localStorage.getItem('ATAMAN_user_email') || '').toLowerCase().trim();
+    if (currentEmail && currentEmail !== 'admin@ataman.catbalogan.gov.ph') {
+      localStorage.removeItem('ATAMAN_logged_in');
+      localStorage.removeItem('ATAMAN_current_user');
+      localStorage.removeItem('ATAMAN_user_email');
+      localStorage.removeItem('ATAMAN_user_role');
+      localStorage.removeItem('ATAMAN_user_id');
+      localStorage.removeItem('ATAMAN_user_name');
+      localStorage.removeItem('ATAMANUser');
+      localStorage.removeItem('saplink_user');
+    }
 
     localStorage.setItem(INIT_VERSION, 'done');
   }
@@ -261,62 +269,25 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   // Pre-configured role demo users for quick testing
   const DEMO_USERS = {
     admin: {
-      email: 'ethelzeta57@gmail.com',
-      displayName: 'Ethel Zeta (Admin)',
+      email: 'admin@ataman.catbalogan.gov.ph',
+      displayName: 'ATAMAN Administrator',
       role: 'admin'
-    },
-    caretaker: {
-      email: 'zetadodong@gmail.com',
-      displayName: 'Dodong Zeta',
-      role: 'caretaker'
-    },
-    adopter: {
-      email: 'nikkimaga24@gmail.com',
-      displayName: 'Nikki Maga',
-      role: 'adopter'
     }
   };
 
   // Default registered system accounts
   const DEFAULT_ACCOUNTS = [
     {
-      uid: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
-      id: '152HcDnFRaTZtHcTN5uxUMfBY7R2',
-      email: 'ethelzeta57@gmail.com',
-      displayName: 'Ethel Zeta (Admin)',
-      name: 'Ethel Zeta (Admin)',
+      uid: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+      id: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+      email: 'admin@ataman.catbalogan.gov.ph',
+      displayName: 'ATAMAN Administrator',
+      name: 'ATAMAN Administrator',
+      username: 'ataman_admin',
       role: 'admin',
       empId: 'EMP-001',
-      password: 'Password123!',
-      createdAt: '2026-08-26T00:00:00.000Z'
-    },
-    {
-      uid: 'USR-CT-001',
-      id: 'CT-101',
-      email: 'zetadodong@gmail.com',
-      displayName: 'Dodong Zeta',
-      name: 'Dodong Zeta',
-      empId: 'EMP-002',
-      role: 'caretaker',
-      status: 'Active',
-      phone: '+63 918 333 4455',
-      address: 'Brgy. Canlapwas, Catbalogan City, Samar',
-      password: 'Password123!',
-      createdAt: '2026-08-01T08:00:00.000Z'
-    },
-    {
-      uid: 'USR-ADP-001',
-      id: 'ADP-101',
-      email: 'nikkimaga24@gmail.com',
-      displayName: 'Nikki Maga',
-      name: 'Nikki Maga',
-      empId: 'ADP-101',
-      role: 'adopter',
-      status: 'Active',
-      phone: '+63 917 123 4567',
-      address: 'Brgy. Guinsorongan, Catbalogan City, Samar',
-      password: 'Password123!',
-      createdAt: '2026-08-28T08:00:00.000Z'
+      password: 'Ataman#2026!Padayon',
+      createdAt: '2026-11-24T08:00:00.000Z'
     }
   ];
 
@@ -2217,6 +2188,60 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
   };
 
   // Expose services globally to window
+
+  // Global administrative reset function with confirmation safeguard
+  window.ATAMAN_RESET_SYSTEM = function(options) {
+    if (!options || options.confirmationCode !== 'CONFIRM RESET') {
+      throw new Error('Explicit confirmation safeguard failed. You must provide confirmationCode: "CONFIRM RESET".');
+    }
+    const purgeKeys = [
+      'ATAMAN_trees_cache', 'saplink_trees_cache', 'admin_trees_data',
+      'ATAMAN_adopters_cache', 'saplink_adopters_cache',
+      'ATAMAN_caretakers_cache', 'saplink_caretakers_cache',
+      'ATAMAN_tree_logs_cache', 'ATAMAN_monitoring_logs', 'ATAMAN_tree_transactions', 'ATAMAN_tree_activities',
+      'ATAMAN_system_logs', 'ATAMAN_reports_archive', 'ATAMAN_notifications', 'ATAMAN_notifications_cache',
+      'ATAMAN_caretaker_notifications', 'ATAMAN_monthly_logs_cache'
+    ];
+    purgeKeys.forEach(function (k) {
+      try { localStorage.setItem(k, '[]'); } catch (_) {}
+    });
+
+    const FRESH_ADMIN_RECORD = {
+      uid: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+      id: 'qrrT7OfTAsYKfhSEc0HcrbD9rJg2',
+      email: 'admin@ataman.catbalogan.gov.ph',
+      username: 'ataman_admin',
+      displayName: 'ATAMAN Administrator',
+      name: 'ATAMAN Administrator',
+      role: 'admin',
+      empId: 'EMP-001',
+      status: 'Active',
+      password: 'Ataman#2026!Padayon',
+      createdAt: '2026-11-24T08:00:00.000Z'
+    };
+    const adminJson = JSON.stringify([FRESH_ADMIN_RECORD]);
+    localStorage.setItem('ATAMAN_registered_users', adminJson);
+    localStorage.setItem('saplink_registered_users', adminJson);
+    localStorage.setItem('ATAMAN_users_cache', adminJson);
+    localStorage.setItem('saplink_users_cache', adminJson);
+
+    // Keep active admin session authenticated
+    localStorage.setItem('ATAMAN_logged_in', 'true');
+    localStorage.setItem('ATAMAN_current_user', JSON.stringify(FRESH_ADMIN_RECORD));
+    localStorage.setItem('ATAMAN_user_email', FRESH_ADMIN_RECORD.email);
+    localStorage.setItem('ATAMAN_user_role', 'admin');
+    localStorage.setItem('ATAMAN_user_id', FRESH_ADMIN_RECORD.id);
+    localStorage.setItem('ATAMAN_user_name', FRESH_ADMIN_RECORD.displayName);
+
+    window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated', { detail: [] }));
+    window.dispatchEvent(new CustomEvent('ATAMAN:caretakers-updated', { detail: [] }));
+    window.dispatchEvent(new CustomEvent('ATAMAN:adopters-updated', { detail: [] }));
+    window.dispatchEvent(new CustomEvent('ATAMAN:users-updated', { detail: [FRESH_ADMIN_RECORD] }));
+
+    alert('✅ System Clean Slate Reset executed successfully. All dashboard records cleared.');
+    window.location.reload();
+  };
+
   window.ATAMAN_AUTH = ATAMAN_AUTH;
   window.ATAMAN_DB = ATAMAN_DB;
   window.ATAMAN_FIRESTORE = firestoreDb;

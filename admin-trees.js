@@ -304,22 +304,25 @@ const DEFAULT_SAMAR_TREES = [
   }
 ];
 
-const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES) && window.ATAMAN_DEFAULT_TREES.length > 0)
+const DEFAULT_TREES = (typeof window !== 'undefined' && Array.isArray(window.ATAMAN_DEFAULT_TREES))
   ? window.ATAMAN_DEFAULT_TREES
-  : DEFAULT_SAMAR_TREES;
+  : [];
 window.ATAMAN_DEFAULT_TREES = DEFAULT_TREES;
 
 // Load persisted data from localStorage (fallback when Firestore is not available)
 const _cachedTrees = (() => {
   try {
-    const raw = JSON.parse(localStorage.getItem('ATAMAN_trees_cache') || '[]');
-    if (Array.isArray(raw) && raw.length > 0) return raw;
+    const stored = localStorage.getItem('ATAMAN_trees_cache') || localStorage.getItem('saplink_trees_cache');
+    if (stored !== null) {
+      const raw = JSON.parse(stored);
+      if (Array.isArray(raw)) return raw;
+    }
     localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(DEFAULT_TREES));
     localStorage.setItem('saplink_trees_cache', JSON.stringify(DEFAULT_TREES));
     return [...DEFAULT_TREES];
   } catch (_) { return [...DEFAULT_TREES]; }
 })();
-let ALL_TREES = _cachedTrees && _cachedTrees.length > 0 ? _cachedTrees : [...DEFAULT_TREES];
+let ALL_TREES = Array.isArray(_cachedTrees) ? _cachedTrees : [];
 
 let filteredTrees = [...ALL_TREES];
 
@@ -662,17 +665,17 @@ function initAuth() {
     if (window.ATAMAN_AUTH) {
       window.ATAMAN_AUTH.onAuthStateChanged(user => {
         if (!user) { window.location.href = 'index.html'; return; }
-        const name = user.displayName || localStorage.getItem('ATAMAN_user_name') || 'Ethel Zeta (Admin)';
+        const name = user.displayName || localStorage.getItem('ATAMAN_user_name') || 'ATAMAN Administrator';
         setUserMeta(name, 'Super Administrator');
       });
     } else {
       const stored = JSON.parse(localStorage.getItem('ATAMANUser') || 'null');
-      const name = stored?.name || localStorage.getItem('ATAMAN_user_name') || 'Ethel Zeta (Admin)';
+      const name = stored?.name || localStorage.getItem('ATAMAN_user_name') || 'ATAMAN Administrator';
       const role = stored?.role || 'Super Administrator';
       setUserMeta(name, role);
     }
   } catch (e) {
-    setUserMeta('Ethel Zeta (Admin)', 'Super Administrator');
+    setUserMeta('ATAMAN Administrator', 'Super Administrator');
   }
 
   document.getElementById('logoutBtn')?.addEventListener('click', () => {
