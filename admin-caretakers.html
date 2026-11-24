@@ -278,7 +278,7 @@
           <button type="button" class="view-mode-tab" id="tabViewQueue" onclick="switchAdminCaretakersView('queue')">
             <span style="font-size:16px;">💰</span>
             <span>Held Payments &amp; Caretaker Queue</span>
-            <span class="queue-pill-badge" id="queueHeaderBadge">4 Awaiting • ₱2,000 Held</span>
+            <span class="queue-pill-badge" id="queueHeaderBadge">0 Awaiting • ₱0 Held</span>
           </button>
         </div>
         <div style="font-size:12px; color:#166534; font-weight:700; background:#f0fdf4; border:1px solid #bbf7d0; padding:5px 12px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;">
@@ -494,8 +494,8 @@
               <span class="qk-icon">💰</span>
               <span class="qk-label">Total Held by Admin</span>
             </div>
-            <div class="qk-value" id="kpiHeldTotalAmount" style="color:#92400e;">₱2,000</div>
-            <div class="qk-subtext" id="kpiHeldTreesCount">4 Adopted trees in GCash escrow</div>
+            <div class="qk-value" id="kpiHeldTotalAmount" style="color:#92400e;">₱0</div>
+            <div class="qk-subtext" id="kpiHeldTreesCount">0 Adopted trees in GCash escrow</div>
           </div>
 
           <div class="queue-kpi-card queue-card">
@@ -503,7 +503,7 @@
               <span class="qk-icon">⏳</span>
               <span class="qk-label">Awaiting Caretaker</span>
             </div>
-            <div class="qk-value" id="kpiAwaitingCount" style="color:#166534;">4 Trees</div>
+            <div class="qk-value" id="kpiAwaitingCount" style="color:#166534;">0 Trees</div>
             <div class="qk-subtext">Waiting for claim or Admin assignment</div>
           </div>
 
@@ -531,7 +531,7 @@
           <div class="queue-filter-pills" id="queueFilterPills">
             <button type="button" class="btn-queue-sub active" data-queue-filter="awaiting" onclick="setQueueFilter('awaiting')">
               <span>⏳ Adopted Trees Awaiting Caretaker</span>
-              <span class="badge" id="pillAwaitingCount" style="background:#fef3c7; color:#92400e; padding:1px 6px; border-radius:999px; font-size:10px;">4</span>
+              <span class="badge" id="pillAwaitingCount" style="background:#fef3c7; color:#92400e; padding:1px 6px; border-radius:999px; font-size:10px;">0</span>
             </button>
             <button type="button" class="btn-queue-sub" data-queue-filter="verified" onclick="setQueueFilter('verified')">
               <span>🌱 Claimed &amp; Care Verified (Ready for Payout)</span>
@@ -560,7 +560,7 @@
               <div style="display:flex; align-items:center; gap:8px;">
                 <span style="font-size:18px;">⏳</span>
                 <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">Adopted Trees Awaiting Caretaker (Funds Held by Admin)</h3>
-                <span class="table-count-badge" id="awaitingTableCountBadge">4 Trees</span>
+                <span class="table-count-badge" id="awaitingTableCountBadge">0 Trees</span>
               </div>
               <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">Adopter GCash funds are held safely in escrow. If unclaimed too long, Admin can directly assign a field caretaker.</p>
             </div>

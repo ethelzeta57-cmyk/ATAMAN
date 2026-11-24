@@ -2777,208 +2777,16 @@ document.addEventListener('DOMContentLoaded', () => {
    Unified Adopter • Tree ID • Caretaker ID Protocol
    ========================================================================== */
 
-const SEED_HELD_QUEUE_TREES = [
-  {
-    id: 'TR-10007',
-    species: { common: 'Narra', scientific: 'Pterocarpus indicus', type: 'Native' },
-    speciesCommon: 'Narra',
-    scientificName: 'Pterocarpus indicus',
-    treeType: 'Native',
-    treeCount: 1,
-    takenCount: 1,
-    status: 'healthy',
-    health: 'Healthy',
-    stage: 'Sapling',
-    stageDescription: '6-Month Nursery Sapling',
-    plantingZone: 'Zone 1 (Sector A • Canlapwas Watershed)',
-    zone: 'Zone 1',
-    plot: 'Plot A-14',
-    book: 'Book 1',
-    plotBook: 'Zone 1 • Plot A-14 (Book 1)',
-    barangay: 'Canlapwas',
-    municipality: 'Catbalogan City',
-    province: 'Samar',
-    lat: 11.7828,
-    lng: 124.8860,
-    sponsorName: 'Nikki Maga',
-    adopter: 'Nikki Maga',
-    adopterId: 'ADP-101',
-    adopterEmail: 'nikkimaga24@gmail.com',
-    adopterPhone: '+63 917 123 4567',
-    adopterType: 'Individual Community Sponsor',
-    dedication: 'For the future green youth of Catbalogan',
-    adoptionStatus: 'Adopted / Funded',
-    paymentMethod: 'GCash',
-    paymentStatus: 'Verified',
-    paymentRef: 'GCASH-982417283',
-    fundState: 'Held by Admin',
-    fundingAmount: 500,
-    fundedAt: '2026-11-22T08:00:00.000Z',
-    fundedDate: 'Nov 22, 2026',
-    caretaker: 'Awaiting Caretaker',
-    caretakerId: '',
-    caretakerEmail: '',
-    caretakerStatus: 'awaiting',
-    height: '1.8 meters',
-    trunkDiam: '2.8 cm',
-    datePlanted: '2026-05-21',
-    dateAdded: 'Nov 22, 2026',
-    photo: 'assets/tree.jpg',
-    history: [
-      { date: 'Nov 22, 2026', health: 'Healthy', class: 'healthy', notes: 'Adoption funded via GCash (₱500, Ref: GCASH-982417283). Fund held by Admin in escrow awaiting caretaker claim.' }
-    ]
-  },
-  {
-    id: 'TR-10008',
-    species: { common: 'Molave', scientific: 'Vitex parviflora', type: 'Native' },
-    speciesCommon: 'Molave',
-    scientificName: 'Vitex parviflora',
-    treeType: 'Native',
-    treeCount: 1,
-    takenCount: 1,
-    status: 'healthy',
-    health: 'Healthy',
-    stage: 'Sapling',
-    stageDescription: '8-Month Nursery Sapling',
-    plantingZone: 'Zone 2 (Sector B • Guinsorongan Coastal Buffer)',
-    zone: 'Zone 2',
-    plot: 'Plot B-08',
-    book: 'Book 2',
-    plotBook: 'Zone 2 • Plot B-08 (Book 2)',
-    barangay: 'Guinsorongan',
-    municipality: 'Catbalogan City',
-    province: 'Samar',
-    lat: 11.7612,
-    lng: 124.8870,
-    sponsorName: 'Elena Cruz',
-    adopter: 'Elena Cruz',
-    adopterId: 'ADP-102',
-    adopterEmail: 'elenacruz.samar@gmail.com',
-    adopterPhone: '+63 920 445 6789',
-    adopterType: 'Samar Heritage Foundation',
-    dedication: 'In memory of Samar natural coastal heritage',
-    adoptionStatus: 'Adopted / Funded',
-    paymentMethod: 'GCash',
-    paymentStatus: 'Verified',
-    paymentRef: 'GCASH-814917402',
-    fundState: 'Held by Admin',
-    fundingAmount: 500,
-    fundedAt: '2026-11-20T08:30:00.000Z',
-    fundedDate: 'Nov 20, 2026',
-    caretaker: 'Awaiting Caretaker',
-    caretakerId: '',
-    caretakerEmail: '',
-    caretakerStatus: 'awaiting',
-    height: '2.1 meters',
-    trunkDiam: '3.2 cm',
-    datePlanted: '2026-05-21',
-    dateAdded: 'Nov 20, 2026',
-    photo: 'assets/tree.jpg',
-    history: [
-      { date: 'Nov 20, 2026', health: 'Healthy', class: 'healthy', notes: 'Adoption funded via GCash (₱500, Ref: GCASH-814917402). Fund held by Admin in escrow awaiting caretaker claim.' }
-    ]
-  },
-  {
-    id: 'TR-10009',
-    species: { common: 'Yakal', scientific: 'Shorea astylosa', type: 'Native' },
-    speciesCommon: 'Yakal',
-    scientificName: 'Shorea astylosa',
-    treeType: 'Native',
-    treeCount: 1,
-    takenCount: 1,
-    status: 'healthy',
-    health: 'Healthy',
-    stage: 'Existing Tree',
-    stageDescription: 'Young Native Tree (1.5 Years Old)',
-    plantingZone: 'Zone 3 (Sector C • San Isidro Upland Slope)',
-    zone: 'Zone 3',
-    plot: 'Plot C-03',
-    book: 'Book 1',
-    plotBook: 'Zone 3 • Plot C-03 (Book 1)',
-    barangay: 'San Isidro',
-    municipality: 'Catbalogan City',
-    province: 'Samar',
-    lat: 11.7725,
-    lng: 124.8935,
-    sponsorName: 'Catbalogan Youth Eco-Alliance',
-    adopter: 'Catbalogan Youth Eco-Alliance',
-    adopterId: 'ADP-103',
-    adopterEmail: 'youth.eco@catbalogan.gov.ph',
-    adopterPhone: '+63 939 888 1234',
-    adopterType: 'Student Environmental Organization',
-    dedication: 'Preserving old-growth Samar rainforest canopy',
-    adoptionStatus: 'Adopted / Funded',
-    paymentMethod: 'GCash',
-    paymentStatus: 'Verified',
-    paymentRef: 'GCASH-710398214',
-    fundState: 'Held by Admin',
-    fundingAmount: 500,
-    fundedAt: '2026-11-18T09:00:00.000Z',
-    fundedDate: 'Nov 18, 2026',
-    caretaker: 'Awaiting Caretaker',
-    caretakerId: '',
-    caretakerEmail: '',
-    caretakerStatus: 'awaiting',
-    height: '3.4 meters',
-    trunkDiam: '5.6 cm',
-    datePlanted: '2025-05-20',
-    dateAdded: 'Nov 18, 2026',
-    photo: 'assets/tree.jpg',
-    history: [
-      { date: 'Nov 18, 2026', health: 'Healthy', class: 'healthy', notes: 'Existing standing tree adoption funded via GCash (₱500, Ref: GCASH-710398214). Fund held by Admin in escrow awaiting caretaker claim.' }
-    ]
-  },
-  {
-    id: 'TR-10010',
-    species: { common: 'Banaba', scientific: 'Lagerstroemia speciosa', type: 'Native' },
-    speciesCommon: 'Banaba',
-    scientificName: 'Lagerstroemia speciosa',
-    treeType: 'Native',
-    treeCount: 1,
-    takenCount: 1,
-    status: 'healthy',
-    health: 'Healthy',
-    stage: 'Sapling',
-    stageDescription: '5-Month Nursery Sapling',
-    plantingZone: 'Zone 6 (Darahuway Daco Island Sanctuary)',
-    zone: 'Zone 6',
-    plot: 'Plot DD-04',
-    book: 'Book 1',
-    plotBook: 'Zone 6 • Plot DD-04 (Book 1)',
-    barangay: 'Darahuway Daco',
-    municipality: 'Catbalogan City',
-    province: 'Samar',
-    lat: 11.7455,
-    lng: 124.8768,
-    sponsorName: 'Samar Island Heritage Council',
-    adopter: 'Samar Island Heritage Council',
-    adopterId: 'ADP-104',
-    adopterEmail: 'samar.heritage@island.ph',
-    adopterPhone: '+63 945 777 2345',
-    adopterType: 'Civic Cultural Foundation',
-    dedication: 'Island coastal buffer and watershed regeneration',
-    adoptionStatus: 'Adopted / Funded',
-    paymentMethod: 'GCash',
-    paymentStatus: 'Verified',
-    paymentRef: 'GCASH-620485918',
-    fundState: 'Held by Admin',
-    fundingAmount: 500,
-    fundedAt: '2026-11-23T11:00:00.000Z',
-    fundedDate: 'Nov 23, 2026',
-    caretaker: 'Awaiting Caretaker',
-    caretakerId: '',
-    caretakerEmail: '',
-    caretakerStatus: 'awaiting',
-    height: '1.6 meters',
-    trunkDiam: '2.5 cm',
-    datePlanted: '2026-05-21',
-    dateAdded: 'Nov 23, 2026',
-    photo: 'assets/tree.jpg',
-    history: [
-      { date: 'Nov 23, 2026', health: 'Healthy', class: 'healthy', notes: 'Island sapling adoption funded via GCash (₱500, Ref: GCASH-620485918). Fund held by Admin in escrow awaiting caretaker claim.' }
-    ]
+// Clean queue legacy caches if any legacy seed trees exist
+try {
+  const rawTrees = localStorage.getItem('ATAMAN_trees_cache');
+  if (rawTrees && (rawTrees.includes('TR-10007') || rawTrees.includes('GCASH-982417283'))) {
+    localStorage.setItem('ATAMAN_trees_cache', '[]');
+    localStorage.setItem('saplink_trees_cache', '[]');
   }
-];
+} catch (_) {}
+
+const SEED_HELD_QUEUE_TREES = [];
 
 let CURRENT_QUEUE_TAB = 'awaiting'; // 'awaiting' | 'verified' | 'all'
 let QUEUE_SEARCH_QUERY = '';
@@ -2986,49 +2794,11 @@ let QUEUE_SEARCH_QUERY = '';
 function getQueueTreesFromStorage() {
   let allTrees = [];
   try {
-    const raw = localStorage.getItem('ATAMAN_trees_cache');
+    const raw = localStorage.getItem('ATAMAN_trees_cache') || localStorage.getItem('saplink_trees_cache');
     allTrees = raw ? JSON.parse(raw) : [];
   } catch (_) { allTrees = []; }
 
-  if (!Array.isArray(allTrees) || allTrees.length === 0) {
-    allTrees = [...SEED_HELD_QUEUE_TREES];
-    try {
-      localStorage.setItem('ATAMAN_trees_cache', JSON.stringify(allTrees));
-      localStorage.setItem('saplink_trees_cache', JSON.stringify(allTrees));
-    } catch (_) {}
-  } else {
-    // Ensure all 4 seed queue trees exist
-    SEED_HELD_QUEUE_TREES.forEach(seed => {
-      const idx = allTrees.findIndex(t => String(t.id) === String(seed.id));
-      if (idx === -1) {
-        allTrees.push({ ...seed });
-      } else {
-        // Enrich existing tree with held payment metadata if missing
-        const existing = allTrees[idx];
-        if (!existing.fundState) existing.fundState = seed.fundState;
-        if (!existing.paymentMethod) existing.paymentMethod = seed.paymentMethod;
-        if (!existing.paymentStatus) existing.paymentStatus = seed.paymentStatus;
-        if (!existing.paymentRef) existing.paymentRef = seed.paymentRef;
-        if (!existing.fundingAmount) existing.fundingAmount = seed.fundingAmount;
-        if (!existing.adopterId && seed.adopterId) existing.adopterId = seed.adopterId;
-        if (!existing.fundedAt && seed.fundedAt) existing.fundedAt = seed.fundedAt;
-      }
-    });
-  }
-
-  // Also make sure TR-10001 has care check-ins logged for payout release demonstration
-  const tr1 = allTrees.find(t => String(t.id) === 'TR-10001');
-  if (tr1) {
-    if (!tr1.adopter) { tr1.adopter = 'Nikki Maga'; tr1.adopterId = 'ADP-101'; tr1.sponsorName = 'Nikki Maga'; }
-    if (!tr1.caretaker || tr1.caretaker === 'Unassigned') { tr1.caretaker = 'Dodong Zeta'; tr1.caretakerId = 'CT-101'; }
-    if (!tr1.fundState) tr1.fundState = 'Held by Admin (Care Verified)';
-    if (!tr1.fundingAmount) tr1.fundingAmount = 500;
-    tr1.careVerified = true;
-    tr1.inspectionsCount = tr1.inspectionsCount || 3;
-    tr1.health = tr1.health || 'Healthy';
-  }
-
-  return allTrees;
+  return Array.isArray(allTrees) ? allTrees : [];
 }
 
 function calculateDaysWaiting(dateStr) {
