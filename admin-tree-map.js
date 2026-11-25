@@ -20,22 +20,22 @@ function initFirebaseAuth() {
   if (authAPI) {
     authAPI.onAuthStateChanged((user) => {
       if (user) {
-        const displayName = user.displayName || localStorage.getItem('ATAMAN_user_name') || 'Ethel Zeta (Admin)';
+        const displayName = user.displayName || localStorage.getItem('ATAMAN_user_name') || 'ATAMAN Administrator';
         const initials = displayName
           .split(' ')
           .map(n => n[0])
           .join('')
           .toUpperCase()
-          .slice(0, 2) || 'EZ';
+          .slice(0, 2) || 'AA';
 
         if (sbUserName) sbUserName.textContent = displayName;
         if (sbUserAvatar) sbUserAvatar.textContent = initials;
       }
     });
   } else {
-    const displayName = localStorage.getItem('ATAMAN_user_name') || 'Ethel Zeta (Admin)';
+    const displayName = localStorage.getItem('ATAMAN_user_name') || 'ATAMAN Administrator';
     if (sbUserName) sbUserName.textContent = displayName;
-    if (sbUserAvatar) sbUserAvatar.textContent = 'EZ';
+    if (sbUserAvatar) sbUserAvatar.textContent = 'AA';
   }
 
   if (logoutBtn) {

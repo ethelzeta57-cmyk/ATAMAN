@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.75-clean-species-catalog';
+const CACHE_NAME = 'ataman-pwa-v2.2.76-strict-auth-admin';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [

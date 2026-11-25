@@ -41,6 +41,20 @@
   ];
   window.ATAMAN_DEFAULT_USERS = DEFAULT_USERS;
 
+  // Enforce strict manual authentication: clear any legacy automatic session
+  const STRICT_AUTH_KEY = 'ATAMAN_strict_auth_v20261125_r1';
+  if (!localStorage.getItem(STRICT_AUTH_KEY)) {
+    localStorage.removeItem('ATAMAN_logged_in');
+    localStorage.removeItem('ATAMAN_current_user');
+    localStorage.removeItem('ATAMAN_user_email');
+    localStorage.removeItem('ATAMAN_user_role');
+    localStorage.removeItem('ATAMAN_user_id');
+    localStorage.removeItem('ATAMAN_user_name');
+    localStorage.removeItem('ATAMANUser');
+    localStorage.removeItem('saplink_user');
+    localStorage.setItem(STRICT_AUTH_KEY, 'true');
+  }
+
   const INIT_VERSION = 'ATAMAN_production_clean_slate_v20261124_p5';
 
   // Seed / migrate registered data when upgrading or if caches are missing
@@ -217,14 +231,12 @@
     if (isAdminPage) {
       const rawRole = (localStorage.getItem('ATAMAN_user_role') || '').toLowerCase();
       const isAdmin = rawRole === 'admin' || rawRole === 'administrator' || rawRole.includes('admin');
+      const isLoggedIn = localStorage.getItem('ATAMAN_logged_in') === 'true';
 
-      localStorage.setItem('ATAMAN_logged_in', 'true');
-      if (!isAdmin) {
-        localStorage.setItem('ATAMAN_user_role', 'admin');
-        if (!localStorage.getItem('ATAMAN_user_name') || localStorage.getItem('ATAMAN_user_name').toLowerCase().includes('adopter') || localStorage.getItem('ATAMAN_user_name').toLowerCase().includes('john sho')) {
-          localStorage.setItem('ATAMAN_user_name', 'Ethel Zeta (Admin)');
-        }
-        console.log(`[ATAMAN RBAC] Switched to admin role for "${filename}".`);
+      if (!isLoggedIn || !isAdmin) {
+        console.warn(`[ATAMAN RBAC] Unauthorized admin access to "${filename}". Redirecting to login.html`);
+        window.location.replace('login.html?redirect=' + encodeURIComponent(filename));
+        return;
       }
     }
   } catch (guardErr) {

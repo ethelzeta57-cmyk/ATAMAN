@@ -197,13 +197,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = emailInput ? emailInput.value.trim() : '';
       const password = passwordInput ? passwordInput.value : '';
 
-      // Check if user clicked sign in with empty fields -> Offer quick login
-      if (!email && !password && currentMode === 'signin') {
-        setButtonLoading(true, `Signing in as ${roleData[currentRole].name}...`);
-        const user = authAPI ? authAPI.loginAsRole(currentRole) : null;
-        setTimeout(() => {
-          window.location.href = getDashboardUrl(currentRole);
-        }, 500);
+      // Strict Sign In: Both username/email and password are strictly required
+      if (!email) {
+        if (emailInput) emailInput.focus();
+        showToast('Please enter your username or email', '⚠️');
+        return;
+      }
+
+      if (!password) {
+        if (passwordInput) passwordInput.focus();
+        showToast('Please enter your password', '⚠️');
         return;
       }
 

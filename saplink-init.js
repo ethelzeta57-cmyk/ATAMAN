@@ -217,14 +217,12 @@
     if (isAdminPage) {
       const rawRole = (localStorage.getItem('ATAMAN_user_role') || '').toLowerCase();
       const isAdmin = rawRole === 'admin' || rawRole === 'administrator' || rawRole.includes('admin');
+      const isLoggedIn = localStorage.getItem('ATAMAN_logged_in') === 'true';
 
-      localStorage.setItem('ATAMAN_logged_in', 'true');
-      if (!isAdmin) {
-        localStorage.setItem('ATAMAN_user_role', 'admin');
-        if (!localStorage.getItem('ATAMAN_user_name') || localStorage.getItem('ATAMAN_user_name').toLowerCase().includes('adopter') || localStorage.getItem('ATAMAN_user_name').toLowerCase().includes('john sho')) {
-          localStorage.setItem('ATAMAN_user_name', 'Ethel Zeta (Admin)');
-        }
-        console.log(`[ATAMAN RBAC] Switched to admin role for "${filename}".`);
+      if (!isLoggedIn || !isAdmin) {
+        console.warn(`[ATAMAN RBAC] Unauthorized admin access to "${filename}". Redirecting to login.html`);
+        window.location.replace('login.html?redirect=' + encodeURIComponent(filename));
+        return;
       }
     }
   } catch (guardErr) {

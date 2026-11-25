@@ -1107,13 +1107,14 @@ if (typeof self !== 'undefined') self.solveSimpleChallenge = solveSimpleChalleng
         ];
 
         if (adminPages.includes(filename) || adminPages.includes(rawFilename)) {
-          localStorage.setItem('ATAMAN_logged_in', 'true');
           const rawRole = (localStorage.getItem('ATAMAN_user_role') || '').toLowerCase();
-          if (rawRole !== 'admin' && rawRole !== 'administrator' && !rawRole.includes('admin')) {
-            localStorage.setItem('ATAMAN_user_role', 'admin');
-            if (!localStorage.getItem('ATAMAN_user_name') || localStorage.getItem('ATAMAN_user_name').toLowerCase().includes('adopter') || localStorage.getItem('ATAMAN_user_name').toLowerCase().includes('john sho')) {
-              localStorage.setItem('ATAMAN_user_name', 'Ethel Zeta (Admin)');
-            }
+          const isLoggedIn = localStorage.getItem('ATAMAN_logged_in') === 'true';
+          const isAdmin = rawRole === 'admin' || rawRole === 'administrator' || rawRole.includes('admin');
+
+          if (!isLoggedIn || !isAdmin) {
+            console.warn(`[ATAMAN RBAC] Unauthorized admin access to "${rawFilename}". Redirecting to login.html`);
+            window.location.replace('login.html?redirect=' + encodeURIComponent(filename));
+            return;
           }
           return;
         }

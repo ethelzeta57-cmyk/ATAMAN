@@ -3217,7 +3217,7 @@ function submitAdminAssignCaretaker() {
   tree.caretakerStatus = 'assigned';
   tree.fundState = 'Held by Admin (Escrowed for Caretaker)';
   tree.assignedAt = now.toISOString();
-  tree.assignedBy = 'Ethel Zeta (Admin)';
+  tree.assignedBy = 'ATAMAN Administrator';
   tree.lastCheck = dateStr;
   tree.careVerified = true;
   tree.inspectionsCount = 1;
@@ -3318,7 +3318,7 @@ function submitAdminReleasePayout() {
   tree.payoutRef = gcashRef;
   tree.payoutAmount = amount;
   tree.payoutReleasedAt = now.toISOString();
-  tree.payoutReleasedBy = 'Ethel Zeta (Admin)';
+  tree.payoutReleasedBy = 'ATAMAN Administrator';
 
   if (!Array.isArray(tree.history)) tree.history = [];
   tree.history.unshift({
