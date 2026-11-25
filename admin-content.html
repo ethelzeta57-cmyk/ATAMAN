@@ -599,35 +599,16 @@
       <div class="modal-body editor-body">
         <input type="hidden" id="edId" value="" />
 
-        <!-- Category & Zone Tag -->
-        <div class="form-row">
-          <div class="form-group flex-1">
-            <label for="edCategory">Category Badge *</label>
-            <select class="form-control" id="edCategory" required>
-              <option value="NEWS">📰 NEWS</option>
-              <option value="PLAN">🗺️ PLAN</option>
-              <option value="PLANTING DRIVE">🌱 PLANTING DRIVE</option>
-              <option value="SHARED VIDEO">▶️ SHARED VIDEO</option>
-            </select>
-            <small style="color:#64748b;font-size:0.75rem;">Determines badge styling &amp; icon on public feed cards</small>
-          </div>
-
-          <div class="form-group flex-1">
-            <label for="edZoneTag">Barangay / Planting Zone Tag (Optional)</label>
-            <input type="text" class="form-control" id="edZoneTag" list="zoneListOptions"
-              placeholder="e.g. Zone 1 • Canlapwas, Zone 3 • San Isidro, or City-Wide" />
-            <datalist id="zoneListOptions">
-              <option value="Zone 1 • Canlapwas"></option>
-              <option value="Zone 2 • Guinsorongan"></option>
-              <option value="Zone 3 • San Isidro"></option>
-              <option value="Zone 4 • Ibol Watershed"></option>
-              <option value="Zone 5 • Cabugawan"></option>
-              <option value="Zone 6 • Darahuway Daco"></option>
-              <option value="City-Wide • Samar Ridge"></option>
-              <option value="Catbalogan City Hall"></option>
-            </datalist>
-            <small style="color:#64748b;font-size:0.75rem;">Optional geographic tag for reforestation monitoring</small>
-          </div>
+        <!-- Category Badge -->
+        <div class="form-group">
+          <label for="edCategory">Category Badge *</label>
+          <select class="form-control" id="edCategory" required>
+            <option value="NEWS">📰 NEWS</option>
+            <option value="PLAN">🗺️ PLAN</option>
+            <option value="PLANTING DRIVE">🌱 PLANTING DRIVE</option>
+            <option value="SHARED VIDEO">▶️ SHARED VIDEO</option>
+          </select>
+          <small style="color:#64748b;font-size:0.75rem;">Determines badge styling &amp; icon on public feed cards</small>
         </div>
 
         <!-- Headline / Title -->
