@@ -2960,8 +2960,8 @@ async function saveExistingTreeRecord() {
   const health = document.getElementById('exTreeHealth')?.value || 'healthy';
   const treeCount = Math.max(1, parseInt(document.getElementById('exTreeCount')?.value, 10) || 1);
 
-  const barangay = document.getElementById('exTreeBarangay')?.value || 'San Isidro';
-  const plot = document.getElementById('exTreePlot')?.value?.trim() || 'Plot C-04 (Book 1)';
+  const barangay = document.getElementById('exTreeBarangay')?.value || '';
+  const plot = document.getElementById('exTreePlot')?.value?.trim() || '';
   const lat = parseFloat(document.getElementById('exTreeLat')?.value) || 11.7710;
   const lng = parseFloat(document.getElementById('exTreeLng')?.value) || 124.8910;
 
@@ -3010,7 +3010,7 @@ async function saveExistingTreeRecord() {
     barangay: barangay,
     municipality: 'Catbalogan City',
     province: 'Samar',
-    plantingZone: `Zone ${treeId.slice(-1) || '1'} (${barangay} Sector)`,
+    plantingZone: barangay ? `Zone ${treeId.slice(-1) || '1'} (${barangay} Sector)` : 'Catbalogan Forest Sector',
     plot: plot,
     plotBook: plot,
     lat: lat,
