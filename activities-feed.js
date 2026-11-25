@@ -283,6 +283,8 @@
         `;
       }
     }).join('');
+
+    initCarouselScroll();
   }
 
   // Open Article Detail Modal for items without video
@@ -409,6 +411,128 @@
     });
   }
 
+  // Initialize Horizontal Carousel Scroll Controls & Auto-Scroll
+  let autoScrollTimer = null;
+  let isCarouselInitialized = false;
+  let isHovered = false;
+
+  function initCarouselScroll() {
+    const grid = document.getElementById('updatesFeedGrid');
+    const prevBtn = document.getElementById('upNavPrev');
+    const nextBtn = document.getElementById('upNavNext');
+    if (!grid) return;
+
+    function getScrollStep() {
+      const firstCard = grid.querySelector('.up-card');
+      return firstCard ? (firstCard.offsetWidth + 26) : 376;
+    }
+
+    if (!isCarouselInitialized) {
+      if (prevBtn) {
+        prevBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const step = getScrollStep();
+          if (grid.scrollLeft <= 15) {
+            grid.scrollTo({ left: grid.scrollWidth, behavior: 'smooth' });
+          } else {
+            grid.scrollBy({ left: -step, behavior: 'smooth' });
+          }
+          resetAutoScroll();
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const step = getScrollStep();
+          if (grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 30) {
+            grid.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+            grid.scrollBy({ left: step, behavior: 'smooth' });
+          }
+          resetAutoScroll();
+        });
+      }
+
+      // Mouse drag-to-scroll support
+      let isDown = false;
+      let startX = 0;
+      let scrollLeftPos = 0;
+      let hasDragged = false;
+
+      grid.addEventListener('mousedown', (e) => {
+        if (e.target.closest('button')) return;
+        isDown = true;
+        hasDragged = false;
+        grid.classList.add('is-dragging');
+        startX = e.pageX - grid.offsetLeft;
+        scrollLeftPos = grid.scrollLeft;
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!isDown) return;
+        isDown = false;
+        grid.classList.remove('is-dragging');
+      });
+
+      grid.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        hasDragged = true;
+        const x = e.pageX - grid.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        grid.scrollLeft = scrollLeftPos - walk;
+        resetAutoScroll();
+      });
+
+      grid.addEventListener('click', (e) => {
+        if (hasDragged) {
+          e.preventDefault();
+          e.stopPropagation();
+          hasDragged = false;
+        }
+      }, true);
+
+      // Horizontal Mouse Wheel Scroll
+      grid.addEventListener('wheel', (e) => {
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          grid.scrollBy({ left: e.deltaY * 1.5, behavior: 'auto' });
+          resetAutoScroll();
+        }
+      }, { passive: false });
+
+      grid.addEventListener('mouseenter', () => { isHovered = true; });
+      grid.addEventListener('mouseleave', () => { isHovered = false; });
+      grid.addEventListener('touchstart', () => { isHovered = true; }, { passive: true });
+      grid.addEventListener('touchend', () => { isHovered = false; resetAutoScroll(); }, { passive: true });
+
+      isCarouselInitialized = true;
+    }
+
+    function startAutoScroll() {
+      if (autoScrollTimer) clearInterval(autoScrollTimer);
+      autoScrollTimer = setInterval(() => {
+        if (isHovered || !grid) return;
+        if (grid.scrollWidth <= grid.clientWidth) return;
+
+        const step = getScrollStep();
+        if (grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 30) {
+          grid.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          grid.scrollBy({ left: step, behavior: 'smooth' });
+        }
+      }, 4200);
+    }
+
+    function resetAutoScroll() {
+      startAutoScroll();
+    }
+
+    startAutoScroll();
+  }
+
   // Export Global API
   window.AtamanFeed = {
     STORAGE_KEY,
@@ -422,10 +546,12 @@
     renderPublicFeed,
     openArticleModal,
     closeArticleModal,
+    initCarouselScroll,
     init: function () {
       initFeedFilters();
       renderPublicFeed('ALL');
       initSyncListener();
+      initCarouselScroll();
     }
   };
 

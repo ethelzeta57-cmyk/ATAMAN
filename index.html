@@ -2536,8 +2536,26 @@
       </p>
     </div>
 
-    <!-- Feed Cards Grid (Rendered via activities-feed.js) -->
-    <div class="updates-feed-grid" id="updatesFeedGrid"></div>
+    <!-- Carousel / Horizontal Scroll Container with Left/Right Controls -->
+    <div class="updates-carousel-wrap">
+      <button type="button" class="up-nav-btn up-nav-prev" id="upNavPrev" aria-label="Scroll left" title="Scroll left">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+
+      <!-- Feed Cards Horizontal Scroll Track (Rendered via activities-feed.js) -->
+      <div class="updates-feed-grid updates-scroll-track" id="updatesFeedGrid"></div>
+
+      <button type="button" class="up-nav-btn up-nav-next" id="upNavNext" aria-label="Scroll right" title="Scroll right">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+
+    <!-- Scroll & Navigation Hint -->
+    <div class="updates-scroll-hint">
+      <span class="hint-arrow">⟵</span>
+      <span>Scroll left &amp; right to explore all updates</span>
+      <span class="hint-arrow">⟶</span>
+    </div>
   </section>
 
   <!-- Stakeholder Portals (Roles) -->

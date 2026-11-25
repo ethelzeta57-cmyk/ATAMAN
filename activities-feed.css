@@ -51,24 +51,131 @@
   box-shadow: 0 4px 12px rgba(22, 101, 52, 0.25);
 }
 
-/* Grid Layout */
-.updates-feed-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 28px;
-  max-width: 1200px;
+/* Carousel / Horizontal Track Container */
+.updates-carousel-wrap {
+  position: relative;
+  max-width: 1260px;
   margin: 0 auto;
+  padding: 0 14px;
+}
+
+.updates-feed-grid {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 26px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 6px 24px 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #166534 #f1f5f9;
+  cursor: grab;
+}
+
+.updates-feed-grid.is-dragging {
+  scroll-behavior: auto;
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+  scroll-snap-type: none;
+}
+
+.updates-feed-grid::-webkit-scrollbar {
+  height: 8px;
+}
+.updates-feed-grid::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 9999px;
+}
+.updates-feed-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+.updates-feed-grid::-webkit-scrollbar-thumb:hover {
+  background: #166534;
+}
+
+/* Carousel Navigation Arrows */
+.up-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #166534;
+  border: 1.5px solid #dcfce7;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.up-nav-btn:hover {
+  background: #166534;
+  color: #ffffff;
+  border-color: #166534;
+  box-shadow: 0 8px 24px rgba(22, 101, 52, 0.32);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.up-nav-btn:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+.up-nav-prev {
+  left: -12px;
+}
+
+.up-nav-next {
+  right: -12px;
+}
+
+/* Scroll Hint Bar */
+.updates-scroll-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 600;
+  user-select: none;
+}
+
+.updates-scroll-hint .hint-arrow {
+  color: #166534;
+  font-weight: 800;
+  font-size: 0.95rem;
+  animation: pulseArrow 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseArrow {
+  0%, 100% { transform: scale(1); opacity: 0.65; }
+  50% { transform: scale(1.25); opacity: 1; }
 }
 
 @media (max-width: 768px) {
-  .updates-feed-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
+  .up-nav-prev { left: 4px; }
+  .up-nav-next { right: 4px; }
+  .up-nav-btn { width: 38px; height: 38px; }
 }
 
 /* Base Card */
 .up-card {
+  flex: 0 0 350px;
+  width: 350px;
+  min-width: 320px;
+  max-width: 360px;
+  scroll-snap-align: start;
   background: #ffffff;
   border: 1.5px solid #e7dfd5;
   border-radius: 18px;
@@ -80,6 +187,14 @@
   text-decoration: none;
   color: inherit;
   position: relative;
+}
+
+@media (max-width: 640px) {
+  .up-card {
+    flex: 0 0 86vw;
+    width: 86vw;
+    min-width: 280px;
+  }
 }
 
 .up-card:hover {
