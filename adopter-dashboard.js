@@ -1489,14 +1489,23 @@ function openAdoptTreeModal() {
             targetAdminTree.takenCount = (parseInt(targetAdminTree.takenCount, 10) || 0) + selectedQty;
             targetAdminTree.sponsorName = userName;
             targetAdminTree.adopter = userName;
-            targetAdminTree.caretaker = chosenCaretakerName;
-            targetAdminTree.caretakerId = chosenCaretakerId;
-            targetAdminTree.caretakerEmail = chosenCaretakerEmail;
-            targetAdminTree.barangay = chosenLocName;
-            targetAdminTree.location = `${chosenLocName}, Catbalogan City, Samar`;
-            targetAdminTree.lat = resolvedLat;
-            targetAdminTree.lng = resolvedLng;
+            targetAdminTree.adopterId = userUid;
+            targetAdminTree.adopterEmail = userEmail;
+            // Sapling adopted: remains UNASSIGNED location until claimed by Caretaker
+            targetAdminTree.status = 'adopted-floating';
+            targetAdminTree.state = 'awaiting-claim';
+            targetAdminTree.fundState = 'Funded (Awaiting Caretaker Claim)';
+            targetAdminTree.caretaker = 'Awaiting Caretaker Claim';
+            targetAdminTree.caretakerId = '';
+            targetAdminTree.caretakerStatus = 'awaiting_claim';
+            targetAdminTree.barangay = '';
+            targetAdminTree.municipality = '';
+            targetAdminTree.province = '';
+            targetAdminTree.location = 'Unassigned (Awaiting Caretaker Claim)';
+            targetAdminTree.lat = null;
+            targetAdminTree.lng = null;
             targetAdminTree.updatedAt = now.toISOString();
+            targetAdminTree.dedication = dedication;
           } else {
             // Generate sequential TR ID
             const existingNums = allTrees.map(t => {
@@ -1517,22 +1526,25 @@ function openAdoptTreeModal() {
               commonName: chosenSpeciesObj.name,
               scientificName: chosenSpeciesObj.sc,
               treeType: chosenSpeciesObj.type,
+              stage: 'Sapling',
               treeCount: selectedQty,
               takenCount: selectedQty,
               sponsorName: userName,
               adopter: userName,
               adopterId: userUid,
               adopterEmail: userEmail,
-              caretaker: chosenCaretakerName,
-              caretakerId: chosenCaretakerId,
-              caretakerEmail: chosenCaretakerEmail,
-              municipality: 'Catbalogan City',
-              barangay: chosenLocName,
-              location: `${chosenLocName}, Catbalogan City, Samar`,
-              province: 'Samar',
-              status: 'healthy',
-              lat: resolvedLat,
-              lng: resolvedLng,
+              status: 'adopted-floating',
+              state: 'awaiting-claim',
+              fundState: 'Funded (Awaiting Caretaker Claim)',
+              caretaker: 'Awaiting Caretaker Claim',
+              caretakerId: '',
+              caretakerStatus: 'awaiting_claim',
+              municipality: '',
+              barangay: '',
+              location: 'Unassigned (Awaiting Caretaker Claim)',
+              province: '',
+              lat: null,
+              lng: null,
               plantingDate: now.toISOString().slice(0, 10),
               dateAdded: autoDateDisplay,
               savedAt: autoDateTimeDisplay,

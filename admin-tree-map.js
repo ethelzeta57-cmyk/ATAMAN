@@ -285,9 +285,14 @@ let RELOCATING_TREE_ID = null;
 /* ─── 4. Render Markers on Leaflet ─── */
 function isTreeAssignedOrMapped(tree) {
   if (!tree) return false;
+  // Exclude floating / unassigned trees until claimed by a caretaker
+  if (tree.status === 'floating' || tree.state === 'floating' || tree.status === 'adopted-floating') return false;
+  if (!tree.barangay || tree.barangay === 'Unassigned' || tree.lat == null || tree.lng == null || isNaN(Number(tree.lat)) || isNaN(Number(tree.lng))) return false;
+  if (tree.location && tree.location.toLowerCase().includes('unassigned')) return false;
+
   const hasAdopter = Boolean((tree.adopter && tree.adopter !== 'None' && tree.adopter !== 'Not yet adopted' && tree.adopter !== 'Available for Adoption') || (tree.sponsorName && tree.sponsorName !== 'None' && tree.sponsorName !== 'Available for Adoption') || (parseInt(tree.takenCount) || 0) > 0);
-  const hasCaretaker = Boolean(tree.caretaker && tree.caretaker !== 'Unassigned' && tree.caretaker !== 'None');
-  const hasExplicitLocation = Boolean(tree.barangay || (tree.customGps && tree.lat != null && tree.lng != null));
+  const hasCaretaker = Boolean(tree.caretaker && tree.caretaker !== 'Unassigned' && tree.caretaker !== 'None' && !tree.caretaker.includes('Awaiting'));
+  const hasExplicitLocation = Boolean(tree.barangay && tree.lat != null && tree.lng != null);
   return hasAdopter || hasCaretaker || hasExplicitLocation;
 }
 

@@ -1,3 +1,31 @@
+
+const CLAIM_BARANGAY_COORDS = {
+  'Darahuway Daco': { lat: 11.7450, lng: 124.8761 },
+  'Guinsorongan': { lat: 11.7598, lng: 124.8861 },
+  'San Isidro': { lat: 11.7710, lng: 124.8910 },
+  'Canlapwas': { lat: 11.7820, lng: 124.8870 },
+  'Bunuanan': { lat: 11.7885, lng: 124.8790 },
+  'Mercedes': { lat: 11.7680, lng: 124.8810 },
+  'Iguid': { lat: 11.8020, lng: 124.8690 },
+  'Maulong': { lat: 11.7915, lng: 124.8720 },
+  'Silanga': { lat: 11.8210, lng: 124.8510 },
+  'Pangdan': { lat: 11.7580, lng: 124.8850 },
+  'Santiago': { lat: 11.7820, lng: 124.8820 },
+  'Payao': { lat: 11.7620, lng: 124.8730 },
+  'Mabini': { lat: 11.7910, lng: 124.8750 },
+  'Bagongon': { lat: 11.7510, lng: 124.9540 },
+  'Central Hub': { lat: 11.7753, lng: 124.8860 }
+};
+
+function onClaimBarangayChange(val) {
+  const c = CLAIM_BARANGAY_COORDS[val] || CLAIM_BARANGAY_COORDS['San Isidro'];
+  const display = document.getElementById('claimCoordsDisplay');
+  if (display && c) {
+    display.textContent = `${c.lat.toFixed(6)}° N, ${c.lng.toFixed(6)}° E`;
+  }
+}
+window.onClaimBarangayChange = onClaimBarangayChange;
+
 /**
  * ATAMAN Caretaker Dashboard Logic with Universal Authentication
  */

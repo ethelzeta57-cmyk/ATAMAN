@@ -1315,6 +1315,48 @@
           </div>
         </div>
 
+        
+        <!-- Field Planting Location Assignment (Attached Only Upon Caretaker Claim) -->
+        <div style="background:#fefce8; border:1.5px solid #fde047; border-radius:14px; padding:16px; margin-bottom:18px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+            <span style="font-size:18px;">📍</span>
+            <div>
+              <strong style="font-size:0.88rem; color:#854d0e; display:block;">Field Planting Location Assignment</strong>
+              <span style="font-size:0.75rem; color:#a16207;">Saplings register and adopt in a floating state. Attach verified planting zone and coordinates now.</span>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div>
+              <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:4px;">Barangay / Sector *</label>
+              <select id="claimBarangaySelect" class="ct-filter-select" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; font-weight:600; background:#fff;" onchange="if(window.onClaimBarangayChange) window.onClaimBarangayChange(this.value);">
+                <option value="San Isidro" selected>San Isidro</option>
+                <option value="Canlapwas">Canlapwas</option>
+                <option value="Guinsorongan">Guinsorongan</option>
+                <option value="Darahuway Daco">Darahuway Daco</option>
+                <option value="Bunuanan">Bunuanan</option>
+                <option value="Mercedes">Mercedes</option>
+                <option value="Iguid">Iguid</option>
+                <option value="Maulong">Maulong</option>
+                <option value="Silanga">Silanga</option>
+                <option value="Pangdan">Pangdan</option>
+                <option value="Santiago">Santiago</option>
+                <option value="Payao">Payao</option>
+                <option value="Mabini">Mabini</option>
+                <option value="Bagongon">Bagongon</option>
+                <option value="Central Hub">Central Hub</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:4px;">Planting Zone &amp; Plot Reference</label>
+              <input type="text" id="claimPlotInput" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; font-weight:600; box-sizing:border-box;" value="Zone 1 • Plot A-14 (Book 1)" placeholder="e.g. Zone 1 • Plot A-14" />
+            </div>
+            <div style="grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; background:#ffffff; border:1px solid #fde68a; border-radius:8px; padding:8px 12px; font-size:12px;">
+              <span style="color:#78350f; font-weight:600;">📡 Verified Field GPS Coordinates:</span>
+              <strong id="claimCoordsDisplay" style="color:#15803d; font-family:monospace; font-size:12.5px;">11.771000° N, 124.891000° E</strong>
+            </div>
+          </div>
+        </div>
+
         <!-- Caretaker Unified ID Assurance Card -->
         <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:12px; padding:14px; margin-bottom:14px;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">

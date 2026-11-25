@@ -258,14 +258,14 @@
         <div id="adminLiveDatePill" class="admin-live-date-pill" title="Current Date">
           <span>📅</span><span id="adminLiveDateText">Nov 13, 2026</span>
         </div>
-        <button class="btn-nav-action primary" id="btnAddTree" type="button" title="Register a Saplink"
+        <button class="btn-nav-action primary" id="btnAddTree" type="button" title="Register a Sapling"
           onclick="openEditTree()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          <span>Register a Saplink</span>
+          <span>Register a Sapling</span>
         </button>
         <button class="btn-nav-action" id="btnExistingTree" type="button"
           title="Existing Trees Information & Registration" onclick="openExistingTreeInfoModal()"
@@ -576,8 +576,8 @@
             <div class="avail-filter-pills" id="availFilterPills">
               <button class="btn-avail-pill active" data-filter="all" onclick="setAvailabilityFilter('all')">All
                 Trees</button>
-              <button class="btn-avail-pill" data-filter="available" onclick="setAvailabilityFilter('available')">🟢
-                Available Only</button>
+              <button class="btn-avail-pill" data-filter="available" onclick="setAvailabilityFilter('available')">🟢 Available Only</button>
+              <button class="btn-avail-pill" data-filter="floating" onclick="setAvailabilityFilter('floating')">☁️ Floating Saplings</button>
               <button class="btn-avail-pill" data-filter="taken" onclick="setAvailabilityFilter('taken')">🤝 Taken /
                 Adopted</button>
               <button class="btn-avail-pill" data-filter="existing" onclick="setAvailabilityFilter('existing')">🌳
@@ -661,6 +661,16 @@
       </div>
       <div class="modal-body">
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <!-- Floating State Notice Banner -->
+          <div class="modal-form-group"
+            style="grid-column: 1 / -1; background:#fefce8; border:1.5px solid #fde047; border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:12px;">
+            <span style="font-size:24px;">☁️</span>
+            <div style="font-size:12px; color:#854d0e; line-height:1.45;">
+              <strong style="font-size:12.5px; color:#713f12; display:block; margin-bottom:2px;">Floating State Upon Registration:</strong>
+              Saplings are registered in a <em>Floating</em> state without an assigned location. Planting zone, sector, and GPS coordinates remain unassigned until claimed by an assigned Field Caretaker.
+            </div>
+          </div>
+
           <div class="modal-form-group">
             <label>Tree ID (auto-generated)</label>
             <input type="text" id="editTreeId" placeholder="TR-XXXXX" readonly
@@ -717,7 +727,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn-nav-action" onclick="closeModal('modalAddTree')">Cancel</button>
-        <button class="btn-nav-action primary" id="btnSaveTree" onclick="saveTree()">💾 Save Tree</button>
+        <button class="btn-nav-action primary" id="btnSaveTree" onclick="saveTree()">💾 Register Saplink</button>
       </div>
     </div>
   </div>

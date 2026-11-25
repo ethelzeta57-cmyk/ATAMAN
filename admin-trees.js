@@ -568,11 +568,30 @@ function renderTable() {
           <div class="tree-species-cell">
             <span class="species-common">${(typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Tree'}</span>
             <span class="species-scientific" style="font-style:italic; color:#64748b; font-size:12px;">${(typeof t.species === 'object' && t.species ? t.species.scientific : '') || t.scientificName || ''}</span>
-            ${t.caretaker && t.caretaker !== 'Unassigned' ? `
+            ${(t.status === 'floating' || t.state === 'floating' || !t.barangay) ? `
+              <div style="margin-top:3px; display:flex; flex-direction:column; gap:2px;">
+                <span style="display:inline-flex; align-items:center; gap:3px; padding:1px 7px; font-size:11px; font-weight:700; border-radius:4px; background:#fefce8; color:#854d0e; border:1px solid #fde047;">
+                  ☁️ Floating (Awaiting Adoption)
+                </span>
+                <span style="display:inline-flex; align-items:center; gap:3px; padding:1px 7px; font-size:10.5px; font-weight:600; border-radius:4px; background:#f8fafc; color:#64748b; border:1px solid #e2e8f0;">
+                  📍 Location: Unassigned
+                </span>
+              </div>
+            ` : (t.status === 'adopted-floating' || (t.adopter && (!t.caretaker || t.caretaker === 'Unassigned' || t.caretaker.includes('Awaiting')))) ? `
+              <div style="margin-top:3px; display:flex; flex-direction:column; gap:2px;">
+                <span style="display:inline-flex; align-items:center; gap:3px; padding:1px 7px; font-size:11px; font-weight:700; border-radius:4px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">
+                  🤝 Adopted • Awaiting Caretaker Take
+                </span>
+                <span style="display:inline-flex; align-items:center; gap:3px; padding:1px 7px; font-size:10.5px; font-weight:600; border-radius:4px; background:#f8fafc; color:#64748b; border:1px solid #e2e8f0;">
+                  📍 Location: Unassigned (Awaiting Caretaker Claim)
+                </span>
+              </div>
+            ` : (t.caretaker && t.caretaker !== 'Unassigned') ? `
               <div style="margin-top:2px;">
                 <span style="display:inline-flex; align-items:center; gap:3px; padding:1px 7px; font-size:11px; font-weight:600; border-radius:4px; background:#f0fdf4; color:#166534; border:1px solid #bbf7d0;">
                   🧑‍🌾 Caretaker: ${t.caretaker}
                 </span>
+                ${t.barangay ? `<span style="margin-left:4px; display:inline-flex; align-items:center; gap:3px; padding:1px 7px; font-size:10.5px; font-weight:600; border-radius:4px; background:#f1f5f9; color:#475569;">📍 ${t.barangay}</span>` : ''}
               </div>
             ` : ''}
             ${displayAdopter ? `
@@ -799,6 +818,10 @@ function applyFilters() {
     // Quick Pill / Metric Card Availability Filter
     if (currentAvailabilityFilter === 'available' && remaining <= 0) return false;
     if (currentAvailabilityFilter === 'taken' && taken <= 0) return false;
+    if (currentAvailabilityFilter === 'floating') {
+      const isFloating = t.status === 'floating' || t.state === 'floating' || t.status === 'adopted-floating' || !t.barangay || (t.location && t.location.toLowerCase().includes('unassigned'));
+      if (!isFloating) return false;
+    }
     if (currentAvailabilityFilter === 'existing') {
       const isExisting = String(t.id || '').toUpperCase().startsWith('EXT-') ||
                          String(t.id || '').toUpperCase().startsWith('EX-') ||
@@ -1608,10 +1631,10 @@ function openEditTree(treeId) {
     if (document.getElementById('editTakenCount')) document.getElementById('editTakenCount').value = '0';
     if (document.getElementById('editAdopterName')) document.getElementById('editAdopterName').value = '';
     if (document.getElementById('editTreeAge')) document.getElementById('editTreeAge').value = '';
-    if (document.getElementById('editBarangay')) document.getElementById('editBarangay').value = 'San Isidro';
-    if (document.getElementById('editMunicipality')) document.getElementById('editMunicipality').value = 'Catbalogan City';
-    if (document.getElementById('editLat')) document.getElementById('editLat').value = '11.771000';
-    if (document.getElementById('editLng')) document.getElementById('editLng').value = '124.891000';
+    if (document.getElementById('editBarangay')) document.getElementById('editBarangay').value = '';
+    if (document.getElementById('editMunicipality')) document.getElementById('editMunicipality').value = '';
+    if (document.getElementById('editLat')) document.getElementById('editLat').value = '';
+    if (document.getElementById('editLng')) document.getElementById('editLng').value = '';
     document.getElementById('modalAddTreeTitle').textContent = '✏️ Register a Saplink';
     updateModalRemainingPreview();
     openModal('modalAddTree'); 
@@ -1773,6 +1796,7 @@ async function saveTree() {
   const editLat = !isNaN(parsedLat) ? parsedLat : (existingTree?.lat != null ? Number(existingTree.lat) : null);
   const editLng = !isNaN(parsedLng) ? parsedLng : (existingTree?.lng != null ? Number(existingTree.lng) : null);
 
+  const isNewSapling = !existingTree;
   const treeData = {
     ...(existingTree || {}),
     id: treeId,
@@ -1784,17 +1808,23 @@ async function saveTree() {
     adopter: adopterName || (takenCount > 0 ? (existingTree?.adopter || existingTree?.sponsorName || '') : ''),
     age: treeAge,
     height: existingTree?.height || treeAge,
+    stage: existingTree?.stage || 'Sapling',
     plantingDate: existingTree?.plantingDate || autoDateFormatted,
     dateAdded: existingTree?.dateAdded || autoDateDisplay,
     savedAt: autoDateTimeDisplay,
     savedTimestamp: now.getTime(),
-    status: existingTree?.status || 'healthy',
-    caretaker: existingTree?.caretaker || 'Unassigned',
-    municipality: editMunicipality,
-    barangay: editBarangay,
-    province: (editBarangay || editMunicipality) ? (existingTree?.province || 'Samar') : '',
-    lat: editLat,
-    lng: editLng
+    status: isNewSapling ? 'floating' : (existingTree?.status || 'healthy'),
+    state: isNewSapling ? 'floating' : (existingTree?.state || 'active'),
+    fundState: isNewSapling ? 'Unfunded (Awaiting Adoption)' : (existingTree?.fundState || 'Funded'),
+    caretaker: isNewSapling ? 'Unassigned' : (existingTree?.caretaker || 'Unassigned'),
+    caretakerId: isNewSapling ? '' : (existingTree?.caretakerId || ''),
+    caretakerStatus: isNewSapling ? 'unassigned' : (existingTree?.caretakerStatus || 'unassigned'),
+    municipality: isNewSapling ? '' : editMunicipality,
+    barangay: isNewSapling ? '' : editBarangay,
+    province: isNewSapling ? '' : ((editBarangay || editMunicipality) ? (existingTree?.province || 'Samar') : ''),
+    location: isNewSapling ? 'Unassigned (Floating)' : (existingTree?.location || (editBarangay ? `${editBarangay}, Catbalogan City, Samar` : 'Unassigned (Floating)')),
+    lat: isNewSapling ? null : editLat,
+    lng: isNewSapling ? null : editLng
   };
 
   // Update in-memory array first

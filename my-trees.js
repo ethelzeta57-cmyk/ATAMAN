@@ -12,7 +12,8 @@ const getMyTreesRealtimeDate = (daysAgo = 0) => {
 // Dynamic tree dataset and state
 function mapRawTreeToMyTree(t) {
   const species = (typeof t.species === 'object' && t.species ? t.species.common : t.species) || 'Tree';
-  const location = t.barangay ? `Brgy. ${t.barangay}` : (t.location || 'Not Set');
+  const isFloating = t.status === 'floating' || t.status === 'adopted-floating' || (!t.barangay && (!t.lat || !t.lng));
+  const location = isFloating ? '☁️ Unassigned (Awaiting Caretaker Claim)' : (t.barangay ? `Brgy. ${t.barangay}` : (t.location || 'Not Set'));
   const health = t.status === 'needs-care' ? 'needs' : (t.status || 'healthy');
   const healthLabel = health === 'healthy' ? 'Healthy' : (health === 'critical' ? 'Critical' : (health === 'dead' ? 'Dead' : 'Needs Care'));
   const count = Math.max(1, parseInt(t.treeCount || t.count) || 1);
