@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.91-remove-existing-tree-location-fields';
+const CACHE_NAME = 'ataman-pwa-v2.2.92-caretaker-mobile-real-gps-claim-flow';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [

@@ -17,14 +17,240 @@ const CLAIM_BARANGAY_COORDS = {
   'Central Hub': { lat: 11.7753, lng: 124.8860 }
 };
 
+let currentClaimLocation = {
+  lat: 11.771000,
+  lng: 124.891000,
+  accuracy: null,
+  isRealGps: false,
+  source: 'Sector Center Baseline'
+};
+
+function isMobileDevice() {
+  const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+  const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i;
+  const hasTouch = (navigator.maxTouchPoints > 1) || ('ontouchstart' in window);
+  const isSmallScreen = window.innerWidth <= 768;
+  return mobileRegex.test(ua) || (hasTouch && isSmallScreen);
+}
+window.isMobileDevice = isMobileDevice;
+
+function findNearestBarangay(lat, lng) {
+  let closest = 'San Isidro';
+  let minDistance = Infinity;
+  for (const [brgy, coords] of Object.entries(CLAIM_BARANGAY_COORDS)) {
+    const dLat = lat - coords.lat;
+    const dLng = lng - coords.lng;
+    const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+    if (dist < minDistance) {
+      minDistance = dist;
+      closest = brgy;
+    }
+  }
+  return closest;
+}
+window.findNearestBarangay = findNearestBarangay;
+
+function updateGpsStatus(state, msg, accuracy = null) {
+  const box = document.getElementById('claimGpsStatusBox');
+  const icon = document.getElementById('claimGpsIcon');
+  const text = document.getElementById('claimGpsStatusText');
+  const actionWrap = document.getElementById('claimGpsActionWrap');
+  const accuracyBadge = document.getElementById('claimGpsAccuracyBadge');
+  const sourceBadge = document.getElementById('claimLocationSourceBadge');
+
+  if (!box || !icon || !text) return;
+
+  if (state === 'acquiring') {
+    box.style.background = '#fefce8';
+    box.style.borderColor = '#fde047';
+    box.style.color = '#854d0e';
+    icon.textContent = '⏳';
+    text.innerHTML = '<strong>Acquiring Live GPS:</strong> Contacting satellite positioning network...';
+    if (actionWrap) actionWrap.innerHTML = '';
+    if (sourceBadge) {
+      sourceBadge.textContent = 'ACQUIRING GPS';
+      sourceBadge.style.background = '#fef9c3';
+      sourceBadge.style.color = '#854d0e';
+    }
+  } else if (state === 'success') {
+    box.style.background = '#f0fdf4';
+    box.style.borderColor = '#86efac';
+    box.style.color = '#14532d';
+    icon.textContent = '🟢';
+    text.innerHTML = `<strong>Live Device GPS Verified!</strong> ${accuracy ? `(Accurate within ±${accuracy}m)` : ''} Real on-ground coordinates captured.`;
+    if (actionWrap) {
+      actionWrap.innerHTML = `<button type="button" onclick="captureLiveFieldLocation()" style="background:#ffffff; border:1px solid #86efac; color:#15803d; border-radius:6px; font-size:11px; font-weight:700; padding:3px 8px; cursor:pointer;">🔄 Refresh GPS</button>`;
+    }
+    if (accuracyBadge) {
+      accuracyBadge.textContent = accuracy ? `Live GPS (±${accuracy}m)` : 'Verified Live GPS';
+      accuracyBadge.style.background = '#dcfce7';
+      accuracyBadge.style.color = '#15803d';
+    }
+    if (sourceBadge) {
+      sourceBadge.textContent = isMobileDevice() ? '📱 REAL MOBILE GPS' : '💻 LIVE GEOLOCATION';
+      sourceBadge.style.background = '#dcfce7';
+      sourceBadge.style.color = '#15803d';
+    }
+  } else if (state === 'error' || state === 'denied') {
+    box.style.background = '#fef2f2';
+    box.style.borderColor = '#fca5a5';
+    box.style.color = '#991b1b';
+    icon.textContent = '🔴';
+    text.innerHTML = `<strong>Location Services Off or Denied:</strong> ${msg}`;
+    if (actionWrap) {
+      actionWrap.innerHTML = `<button type="button" onclick="captureLiveFieldLocation()" style="background:#ffffff; border:1.5px solid #f87171; color:#991b1b; border-radius:6px; font-size:11px; font-weight:800; padding:4px 10px; cursor:pointer;">🔄 Retry GPS</button>`;
+    }
+    if (accuracyBadge) {
+      accuracyBadge.textContent = 'Sector Fallback';
+      accuracyBadge.style.background = '#fee2e2';
+      accuracyBadge.style.color = '#991b1b';
+    }
+    if (sourceBadge) {
+      sourceBadge.textContent = 'GPS OFF (MANUAL)';
+      sourceBadge.style.background = '#fee2e2';
+      sourceBadge.style.color = '#991b1b';
+    }
+  } else {
+    // Idle state
+    box.style.background = '#fffbeb';
+    box.style.borderColor = '#fde68a';
+    box.style.color = '#92400e';
+    icon.textContent = '📡';
+    text.textContent = msg || 'Location Status: Awaiting GPS capture or sector confirmation.';
+    if (actionWrap) actionWrap.innerHTML = '';
+    if (accuracyBadge) {
+      accuracyBadge.textContent = 'Sector Baseline';
+      accuracyBadge.style.background = '#fef3c7';
+      accuracyBadge.style.color = '#92400e';
+    }
+    if (sourceBadge) {
+      sourceBadge.textContent = 'AWAITING CLAIM';
+      sourceBadge.style.background = '#fef3c7';
+      sourceBadge.style.color = '#92400e';
+    }
+  }
+}
+window.updateGpsStatus = updateGpsStatus;
+
+function captureLiveFieldLocation() {
+  if (!navigator.geolocation) {
+    updateGpsStatus('error', 'Geolocation API is not supported on this browser or platform.');
+    showCtToast('⚠️ Geolocation not supported by this browser.', 'warning');
+    return;
+  }
+
+  updateGpsStatus('acquiring');
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      const accuracy = position.coords.accuracy ? Math.round(position.coords.accuracy) : null;
+      const isMob = isMobileDevice();
+
+      currentClaimLocation = {
+        lat: parseFloat(lat.toFixed(6)),
+        lng: parseFloat(lng.toFixed(6)),
+        accuracy: accuracy,
+        isRealGps: true,
+        source: isMob ? `Real Mobile Phone GPS (±${accuracy || 5}m)` : `Browser Live Geolocation (±${accuracy || 10}m)`,
+        timestamp: new Date().toISOString()
+      };
+
+      const latInput = document.getElementById('claimLatInput');
+      const lngInput = document.getElementById('claimLngInput');
+      const display = document.getElementById('claimCoordsDisplay');
+
+      if (latInput) latInput.value = currentClaimLocation.lat.toFixed(6);
+      if (lngInput) lngInput.value = currentClaimLocation.lng.toFixed(6);
+      if (display) display.textContent = `${currentClaimLocation.lat.toFixed(6)}° N, ${currentClaimLocation.lng.toFixed(6)}° E`;
+
+      // Match closest Samar barangay
+      const nearestBrgy = findNearestBarangay(lat, lng);
+      const brgySelect = document.getElementById('claimBarangaySelect');
+      if (brgySelect && nearestBrgy) {
+        brgySelect.value = nearestBrgy;
+      }
+
+      updateGpsStatus('success', '', accuracy);
+      showCtToast(`📍 Live GPS Captured: ${currentClaimLocation.lat.toFixed(5)}° N, ${currentClaimLocation.lng.toFixed(5)}° E`);
+    },
+    (error) => {
+      console.warn('Geolocation capture error:', error);
+      const isMob = isMobileDevice();
+      let errorDesc = 'Position could not be acquired.';
+      if (error.code === 1) { // PERMISSION_DENIED
+        errorDesc = isMob
+          ? 'Phone Location / GPS permission denied or turned off. Please turn on Location in phone settings and tap Retry.'
+          : 'Location permission was denied in your browser settings. You can enter coordinates manually or allow location.';
+      } else if (error.code === 2) { // POSITION_UNAVAILABLE
+        errorDesc = 'Position unavailable. Satellite/network positioning could not determine your current fix.';
+      } else if (error.code === 3) { // TIMEOUT
+        errorDesc = 'GPS acquisition request timed out. Please ensure you have GPS signal reception.';
+      }
+      updateGpsStatus('denied', errorDesc);
+      showCtToast('⚠️ Unable to capture live GPS. Sector baseline coordinates remain available.', 'warning');
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 12000,
+      maximumAge: 0
+    }
+  );
+}
+window.captureLiveFieldLocation = captureLiveFieldLocation;
+
 function onClaimBarangayChange(val) {
   const c = CLAIM_BARANGAY_COORDS[val] || CLAIM_BARANGAY_COORDS['San Isidro'];
+  const latInput = document.getElementById('claimLatInput');
+  const lngInput = document.getElementById('claimLngInput');
   const display = document.getElementById('claimCoordsDisplay');
-  if (display && c) {
-    display.textContent = `${c.lat.toFixed(6)}° N, ${c.lng.toFixed(6)}° E`;
+
+  // If not locked by real GPS, update inputs to sector baseline
+  if (!currentClaimLocation.isRealGps) {
+    if (latInput) latInput.value = c.lat.toFixed(6);
+    if (lngInput) lngInput.value = c.lng.toFixed(6);
+    if (display) display.textContent = `${c.lat.toFixed(6)}° N, ${c.lng.toFixed(6)}° E`;
+    currentClaimLocation.lat = c.lat;
+    currentClaimLocation.lng = c.lng;
+    currentClaimLocation.source = `Sector Baseline (${val})`;
+  } else {
+    // If real GPS is already active, notify user that real GPS is preserved
+    showCtToast(`📍 Barangay set to ${val}. Your verified device GPS coordinates remain active.`);
   }
 }
 window.onClaimBarangayChange = onClaimBarangayChange;
+
+function onManualCoordsChange() {
+  const latInput = document.getElementById('claimLatInput');
+  const lngInput = document.getElementById('claimLngInput');
+  const display = document.getElementById('claimCoordsDisplay');
+  const accuracyBadge = document.getElementById('claimGpsAccuracyBadge');
+  const sourceBadge = document.getElementById('claimLocationSourceBadge');
+
+  const lat = parseFloat(latInput?.value);
+  const lng = parseFloat(lngInput?.value);
+
+  if (!isNaN(lat) && !isNaN(lng)) {
+    if (display) display.textContent = `${lat.toFixed(6)}° N, ${lng.toFixed(6)}° E`;
+    currentClaimLocation.lat = lat;
+    currentClaimLocation.lng = lng;
+    currentClaimLocation.source = 'Manual Coordinate Entry';
+    currentClaimLocation.isRealGps = false;
+
+    if (accuracyBadge) {
+      accuracyBadge.textContent = 'Custom Pin';
+      accuracyBadge.style.background = '#e0f2fe';
+      accuracyBadge.style.color = '#0369a1';
+    }
+    if (sourceBadge) {
+      sourceBadge.textContent = 'MANUAL COORDS';
+      sourceBadge.style.background = '#e0f2fe';
+      sourceBadge.style.color = '#0369a1';
+    }
+  }
+}
+window.onManualCoordsChange = onManualCoordsChange;
 
 /**
  * ATAMAN Caretaker Dashboard Logic with Universal Authentication
@@ -1993,6 +2219,47 @@ function openClaimConfirmModal(treeId) {
   setEl('modalCtId', `${ct.id} (${ct.empId})`);
   setEl('modalCtEmail', ct.email);
 
+  // Mobile detection & prompt visibility
+  const isMob = isMobileDevice();
+  const mobPrompt = document.getElementById('claimMobileGpsPrompt');
+  const dskBar = document.getElementById('claimDesktopGpsBar');
+  if (mobPrompt) mobPrompt.style.display = isMob ? 'block' : 'none';
+  if (dskBar) dskBar.style.display = isMob ? 'none' : 'flex';
+
+  // Check if tree has existing coordinates
+  const hasTreeCoords = tree.lat != null && tree.lng != null && !isNaN(Number(tree.lat));
+  const initLat = hasTreeCoords ? Number(tree.lat) : 11.771000;
+  const initLng = hasTreeCoords ? Number(tree.lng) : 124.891000;
+
+  currentClaimLocation = {
+    lat: initLat,
+    lng: initLng,
+    accuracy: null,
+    isRealGps: false,
+    source: hasTreeCoords ? (tree.locationSource || 'Existing Coordinates') : 'Sector Baseline'
+  };
+
+  const latInput = document.getElementById('claimLatInput');
+  const lngInput = document.getElementById('claimLngInput');
+  const display = document.getElementById('claimCoordsDisplay');
+  const brgySelect = document.getElementById('claimBarangaySelect');
+  const plotInput = document.getElementById('claimPlotInput');
+
+  if (latInput) latInput.value = initLat.toFixed(6);
+  if (lngInput) lngInput.value = initLng.toFixed(6);
+  if (display) display.textContent = `${initLat.toFixed(6)}° N, ${initLng.toFixed(6)}° E`;
+  if (brgySelect && tree.barangay) {
+    const cleanBrgy = tree.barangay.replace(/^Brgy.s*/i, '');
+    brgySelect.value = cleanBrgy;
+  }
+  if (plotInput && (tree.plot || tree.plotBook || tree.plantingZone)) {
+    plotInput.value = tree.plot || tree.plotBook || `${tree.plantingZone || 'Zone 1'} • Plot A-01`;
+  }
+
+  updateGpsStatus('idle', isMob
+    ? '📱 Mobile Device Ready: Turn on your phone Location/GPS and tap "Capture My Live Phone GPS" above.'
+    : '💻 Desktop/Tablet Ready: Click "Detect Live Geolocation" or adjust coordinates manually.');
+
   modal.classList.remove('hide');
 }
 
@@ -2023,17 +2290,41 @@ async function executeClaimTree(treeId) {
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
 
-  // 1. Attach tree directly to the logged-in Caretaker's single unified Caretaker ID
+  // Capture confirmed field location values
+  const latInput = document.getElementById('claimLatInput');
+  const lngInput = document.getElementById('claimLngInput');
+  const finalLat = latInput && !isNaN(parseFloat(latInput.value)) ? parseFloat(latInput.value) : currentClaimLocation.lat;
+  const finalLng = lngInput && !isNaN(parseFloat(lngInput.value)) ? parseFloat(lngInput.value) : currentClaimLocation.lng;
+  const finalBarangay = document.getElementById('claimBarangaySelect')?.value || tree.barangay || 'San Isidro';
+  const finalPlot = document.getElementById('claimPlotInput')?.value?.trim() || tree.plot || 'Zone 1 • Plot A-01';
+  const finalSource = currentClaimLocation.isRealGps ? (isMobileDevice() ? `Real Mobile GPS (±${currentClaimLocation.accuracy || 5}m)` : 'Browser Geolocation') : (currentClaimLocation.source || 'Sector Reference');
+
+  // 1. Attach tree directly to the logged-in Caretaker's single unified Caretaker ID and lock in real location
   tree.caretaker = ct.name;
   tree.caretakerId = ct.id; // Single unified ID: 'CT-101'
   tree.caretakerEmail = ct.email;
   tree.caretakerStatus = 'assigned';
   tree.claimedAt = now.toISOString();
+  tree.claimedTimestamp = now.getTime();
   tree.lastCheck = dateStr;
   tree.nextMonitoring = 'Due Today';
   tree.dueCategory = 'Due Today';
-  tree.status = tree.status || 'healthy';
-  tree.health = tree.health || 'Healthy';
+  tree.status = 'healthy';
+  tree.health = 'Healthy';
+  tree.state = 'active'; // Transition from floating to active
+  tree.fundState = tree.fundState || 'Funded';
+
+  // Lock in verified field location
+  tree.lat = finalLat;
+  tree.lng = finalLng;
+  tree.barangay = finalBarangay;
+  tree.municipality = 'Catbalogan City';
+  tree.province = 'Samar';
+  tree.plot = finalPlot;
+  tree.plotBook = finalPlot;
+  tree.plantingZone = `${finalBarangay} Sector`;
+  tree.location = `${finalBarangay}, Catbalogan City, Samar`;
+  tree.locationSource = finalSource;
 
   // Add onboarding log in history
   if (!Array.isArray(tree.history)) tree.history = [];
@@ -2041,7 +2332,7 @@ async function executeClaimTree(treeId) {
     date: dateStr,
     health: 'Healthy',
     class: 'healthy',
-    notes: `Tree claimed and onboarded into field care by Caretaker ${ct.name} (Unified ID: ${ct.id}) for Adopter ${tree.adopter || tree.sponsorName || 'Community Adopter'}.`
+    notes: `Tree claimed & verified by Caretaker ${ct.name} (Unified ID: ${ct.id}). Field GPS Coordinates pinned: ${finalLat.toFixed(6)}° N, ${finalLng.toFixed(6)}° E (${finalSource}) in ${finalBarangay} (${finalPlot}). Linked with Adopter ${tree.adopter || tree.sponsorName || 'Community Adopter'}.`
   });
 
   // Save updated trees array
@@ -2095,6 +2386,14 @@ async function executeClaimTree(treeId) {
             matchTree.caretakerId = ct.id;
             matchTree.caretakerEmail = ct.email;
             matchTree.caretakerStatus = 'assigned';
+            matchTree.lat = finalLat;
+            matchTree.lng = finalLng;
+            matchTree.barangay = finalBarangay;
+            matchTree.location = `${finalBarangay}, Catbalogan City, Samar`;
+            matchTree.plantingZone = `${finalBarangay} Sector`;
+            matchTree.plot = finalPlot;
+            matchTree.state = 'active';
+            matchTree.locationSource = finalSource;
             adChanged = true;
           }
         }
@@ -2114,6 +2413,16 @@ async function executeClaimTree(treeId) {
       caretakerId: ct.id,
       caretakerEmail: ct.email,
       caretakerStatus: 'assigned',
+      lat: tree.lat,
+      lng: tree.lng,
+      barangay: tree.barangay,
+      municipality: tree.municipality,
+      province: tree.province,
+      plot: tree.plot,
+      plantingZone: tree.plantingZone,
+      location: tree.location,
+      locationSource: tree.locationSource,
+      state: tree.state,
       claimedAt: tree.claimedAt,
       lastCheck: tree.lastCheck,
       nextMonitoring: tree.nextMonitoring,
