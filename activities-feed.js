@@ -207,8 +207,8 @@
       grid.innerHTML = `
         <div class="up-empty-state">
           <div style="font-size: 2.4rem; margin-bottom: 8px;">🌱</div>
-          <h4 style="font-size: 1.1rem; color: #1e3a29; margin-bottom: 4px; font-weight: 700;">No updates found in this category</h4>
-          <p style="color: #64748b; font-size: 0.88rem;">Check back soon or select "All Updates" to view the latest dispatches from Catbalogan City.</p>
+          <h4 style="font-size: 1.1rem; color: #1e3a29; margin-bottom: 4px; font-weight: 700;">No updates available</h4>
+          <p style="color: #64748b; font-size: 0.88rem;">Check back soon to view the latest dispatches from Catbalogan City.</p>
         </div>
       `;
       return;
