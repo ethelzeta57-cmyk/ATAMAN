@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.89-add-register-photo-document';
+const CACHE_NAME = 'ataman-pwa-v2.2.90-clean-switcher-remove-redundant-register-btn';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
