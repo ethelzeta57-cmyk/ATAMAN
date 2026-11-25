@@ -50,6 +50,7 @@
     localStorage.removeItem('ATAMAN_user_role');
     localStorage.removeItem('ATAMAN_user_id');
     localStorage.removeItem('ATAMAN_user_name');
+    localStorage.removeItem('ATAMAN_admin_profile');
     localStorage.removeItem('ATAMANUser');
     localStorage.removeItem('saplink_user');
     localStorage.setItem(STRICT_AUTH_KEY, 'true');

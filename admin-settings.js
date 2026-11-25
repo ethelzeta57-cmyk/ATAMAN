@@ -75,21 +75,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.phone && profPhone) profPhone.value = data.phone;
       if (data.roleTitle && profRoleTitle) profRoleTitle.value = data.roleTitle;
 
-      const fullName = `${data.firstName || 'Ethel'} ${data.lastName || 'Zeta'}`;
+      const fullName = `${data.firstName || 'ATAMAN'} ${data.lastName || 'Administrator'}`;
       if (heroAdminName) heroAdminName.textContent = fullName;
-      if (heroAdminEmail) heroAdminEmail.textContent = data.email || 'ethel.zeta@ATAMAN.org';
+      if (heroAdminEmail) heroAdminEmail.textContent = data.email || 'admin@ataman.catbalogan.gov.ph';
       
-      const initials = `${(data.firstName||'E')[0]}${(data.lastName||'Z')[0]}`.toUpperCase();
+      const initials = `${(data.firstName||'A')[0]}${(data.lastName||'A')[0]}`.toUpperCase();
       if (avatarDisplay) avatarDisplay.textContent = initials;
     }
   } catch (e) {}
 
   // 5. Save Profile Form
   function saveProfile() {
-    const firstName = profFirstName ? profFirstName.value.trim() : 'Ethel';
-    const lastName = profLastName ? profLastName.value.trim() : 'Zeta';
-    const email = profEmail ? profEmail.value.trim() : 'ethel.zeta@ATAMAN.org';
-    const phone = profPhone ? profPhone.value.trim() : '+63 917 555 0192';
+    const firstName = profFirstName ? profFirstName.value.trim() : 'ATAMAN';
+    const lastName = profLastName ? profLastName.value.trim() : 'Administrator';
+    const email = profEmail ? profEmail.value.trim() : 'admin@ataman.catbalogan.gov.ph';
+    const phone = profPhone ? profPhone.value.trim() : '+63 917 888 2026';
     const roleTitle = profRoleTitle ? profRoleTitle.value.trim() : 'Super Administrator';
 
     const profileData = { firstName, lastName, email, phone, roleTitle };
@@ -99,12 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (heroAdminName) heroAdminName.textContent = fullName;
     if (heroAdminEmail) heroAdminEmail.textContent = email;
     
-    const initials = `${firstName[0] || 'E'}${lastName[0] || 'Z'}`.toUpperCase();
+    const initials = `${firstName[0] || 'A'}${lastName[0] || 'A'}`.toUpperCase();
     if (avatarDisplay) avatarDisplay.textContent = initials;
 
     // Update sidebar user name
     const sbUserName = document.querySelector('.sb-user-name');
-    if (sbUserName) sbUserName.textContent = `${fullName} (Admin)`;
+    if (sbUserName) sbUserName.textContent = `${fullName}`;
 
     showToast('Admin profile information updated successfully.');
   }
