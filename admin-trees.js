@@ -539,7 +539,7 @@ function renderTable() {
     tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:56px 20px; color:#64748b; font-weight:600; font-size:14px;">
       <div style="font-size:28px; margin-bottom:8px;">🌱</div>
       No trees match your filter.<br>
-      <span style="font-size:12px; color:#94a3b8; font-weight:500;">Try resetting your filters or click <strong>+ Register a Splink</strong> above to enter your own tree data.</span>
+      <span style="font-size:12px; color:#94a3b8; font-weight:500;">Try resetting your filters or click <strong>+ Register a Saplink</strong> above to enter your own tree data.</span>
     </td></tr>`;
     renderPagination();
     return;
@@ -1612,7 +1612,7 @@ function openEditTree(treeId) {
     if (document.getElementById('editMunicipality')) document.getElementById('editMunicipality').value = 'Catbalogan City';
     if (document.getElementById('editLat')) document.getElementById('editLat').value = '11.771000';
     if (document.getElementById('editLng')) document.getElementById('editLng').value = '124.891000';
-    document.getElementById('modalAddTreeTitle').textContent = '✏️ Register a Splink';
+    document.getElementById('modalAddTreeTitle').textContent = '✏️ Register a Saplink';
     updateModalRemainingPreview();
     openModal('modalAddTree'); 
     return; 
