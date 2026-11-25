@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.68-horizontal-carousel';
+const CACHE_NAME = 'ataman-pwa-v2.2.69-clear-hero';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
