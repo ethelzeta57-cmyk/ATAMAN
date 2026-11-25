@@ -45,14 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebarToggle        = document.getElementById('sidebarToggle');
   const sidebar              = document.getElementById('sidebar');
 
-  // Summary Counters
-  const cntTotal             = document.getElementById('cntTotal');
-  const cntPublished         = document.getElementById('cntPublished');
-  const cntDrafts            = document.getElementById('cntDrafts');
-  const cntNews              = document.getElementById('cntNews');
-  const cntPlans             = document.getElementById('cntPlans');
-  const cntVideos            = document.getElementById('cntVideos');
-
   // Tab Badge Counters
   const badgeAllCount        = document.getElementById('badgeAllCount');
   const badgeNewsCount       = document.getElementById('badgeNewsCount');
@@ -295,13 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const pln = updatesList.filter(i => String(i.category || '').toUpperCase().trim() === 'PLAN').length;
     const drv = updatesList.filter(i => String(i.category || '').toUpperCase().trim() === 'PLANTING DRIVE').length;
     const vid = updatesList.filter(i => String(i.category || '').toUpperCase().trim() === 'SHARED VIDEO').length;
-
-    if (cntTotal) cntTotal.textContent = total;
-    if (cntPublished) cntPublished.textContent = pub;
-    if (cntDrafts) cntDrafts.textContent = dft;
-    if (cntNews) cntNews.textContent = nws;
-    if (cntPlans) cntPlans.textContent = pln;
-    if (cntVideos) cntVideos.textContent = vid;
 
     if (badgeAllCount) badgeAllCount.textContent = total;
     if (badgeNewsCount) badgeNewsCount.textContent = nws;

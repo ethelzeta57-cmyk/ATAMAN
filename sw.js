@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.72-remove-zone-tag';
+const CACHE_NAME = 'ataman-pwa-v2.2.73-remove-summary-cards';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
