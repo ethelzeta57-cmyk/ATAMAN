@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.84-sapling-labels';
+const CACHE_NAME = 'ataman-pwa-v2.2.86-separate-saplings-existing-trees';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [

@@ -1,4 +1,114 @@
 
+function isExistingTreeRecord(t) {
+  if (!t) return false;
+  return Boolean(
+    String(t.id || '').toUpperCase().startsWith('EXT-') ||
+    String(t.id || '').toUpperCase().startsWith('EX-') ||
+    t.isExistingTree === true ||
+    t.treeClassification === 'Existing Tree' ||
+    (t.stage || '').toLowerCase().includes('existing') ||
+    (t.stageDescription || '').toLowerCase().includes('existing')
+  );
+}
+window.isExistingTreeRecord = isExistingTreeRecord;
+
+let currentRegistryMode = 'saplings'; // 'saplings' | 'existing' | 'all'
+
+function setRegistryMode(mode) {
+  currentRegistryMode = mode;
+  currentPage = 1;
+  currentAvailabilityFilter = 'all';
+
+  const btnSap = document.getElementById('modeBtnSaplings');
+  const btnEx = document.getElementById('modeBtnExisting');
+  const btnAll = document.getElementById('modeBtnAll');
+  const actionBtn = document.getElementById('modeActionRegisterBtn');
+  const searchInp = document.getElementById('tableSearchInput');
+
+  [btnSap, btnEx, btnAll].forEach(b => {
+    if (b) {
+      b.style.background = 'transparent';
+      b.style.color = '#64748b';
+      b.style.boxShadow = 'none';
+      b.classList.remove('active');
+    }
+  });
+
+  const activeBtn = mode === 'existing' ? btnEx : (mode === 'all' ? btnAll : btnSap);
+  if (activeBtn) {
+    activeBtn.style.background = '#ffffff';
+    activeBtn.style.color = '#166534';
+    activeBtn.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)';
+    activeBtn.classList.add('active');
+  }
+
+  if (actionBtn) {
+    if (mode === 'existing') {
+      actionBtn.innerHTML = '<span>🌳 Register Existing Tree</span>';
+      actionBtn.style.background = '#064e3b';
+      actionBtn.style.borderColor = '#047857';
+    } else {
+      actionBtn.innerHTML = '<span>+ Register a Sapling</span>';
+      actionBtn.style.background = '#166534';
+      actionBtn.style.borderColor = '#166534';
+    }
+  }
+
+  if (searchInp) {
+    if (mode === 'existing') {
+      searchInp.placeholder = '🔍  Search Existing Tree ID (EXT-...), Species, Sector, Plot...';
+    } else if (mode === 'all') {
+      searchInp.placeholder = '🔍  Search Sapling or Tree ID, Species, Caretaker, Location...';
+    } else {
+      searchInp.placeholder = '🔍  Search Sapling ID, Species, Adopter, Caretaker...';
+    }
+  }
+
+  updatePillFiltersForMode();
+  applyFilters();
+}
+window.setRegistryMode = setRegistryMode;
+
+function onModeRegisterClick() {
+  if (currentRegistryMode === 'existing') {
+    openExistingTreeInfoModal('form');
+  } else {
+    openEditTree();
+  }
+}
+window.onModeRegisterClick = onModeRegisterClick;
+
+function updatePillFiltersForMode() {
+  const pillsWrap = document.getElementById('availFilterPills');
+  if (!pillsWrap) return;
+
+  if (currentRegistryMode === 'existing') {
+    pillsWrap.innerHTML = `
+      <button class="btn-avail-pill active" data-filter="all" onclick="setAvailabilityFilter('all')">All Existing Trees</button>
+      <button class="btn-avail-pill" data-filter="healthy" onclick="setAvailabilityFilter('healthy')">🟢 Healthy</button>
+      <button class="btn-avail-pill" data-filter="needs-care" onclick="setAvailabilityFilter('needs-care')">🟡 Needs Care</button>
+      <button class="btn-avail-pill" data-filter="critical" onclick="setAvailabilityFilter('critical')">🔴 Critical</button>
+    `;
+  } else if (currentRegistryMode === 'all') {
+    pillsWrap.innerHTML = `
+      <button class="btn-avail-pill active" data-filter="all" onclick="setAvailabilityFilter('all')">All Records</button>
+      <button class="btn-avail-pill" data-filter="saplings-only" onclick="setAvailabilityFilter('saplings-only')">🌱 Saplings</button>
+      <button class="btn-avail-pill" data-filter="existing-only" onclick="setAvailabilityFilter('existing-only')">🌳 Existing Trees</button>
+      <button class="btn-avail-pill" data-filter="available" onclick="setAvailabilityFilter('available')">🟢 Available</button>
+      <button class="btn-avail-pill" data-filter="floating" onclick="setAvailabilityFilter('floating')">☁️ Floating</button>
+    `;
+  } else {
+    pillsWrap.innerHTML = `
+      <button class="btn-avail-pill active" data-filter="all" onclick="setAvailabilityFilter('all')">All Saplings</button>
+      <button class="btn-avail-pill" data-filter="available" onclick="setAvailabilityFilter('available')">🟢 Available Only</button>
+      <button class="btn-avail-pill" data-filter="floating" onclick="setAvailabilityFilter('floating')">☁️ Floating Saplings</button>
+      <button class="btn-avail-pill" data-filter="taken" onclick="setAvailabilityFilter('taken')">🤝 Taken / Adopted</button>
+    `;
+  }
+}
+window.updatePillFiltersForMode = updatePillFiltersForMode;
+
+
 function syncLinkedAdopterAndCaretaker(allTrees) {
   try {
     const list = Array.isArray(allTrees) ? allTrees : [];
@@ -274,8 +384,34 @@ function updateStats() {
   }
 
   const tableBadge = document.getElementById('tableBadgeCount');
+  const mainTitle = document.getElementById('mainTableTitle');
+  const saplingCount = ALL_TREES.filter(t => !isExistingTreeRecord(t)).length;
+  const existingCount = ALL_TREES.filter(t => isExistingTreeRecord(t)).length;
+
+  const badgeSap = document.getElementById('badgeModeSaplings');
+  const badgeEx = document.getElementById('badgeModeExisting');
+  const badgeAll = document.getElementById('badgeModeAll');
+  if (badgeSap) badgeSap.textContent = saplingCount.toLocaleString();
+  if (badgeEx) badgeEx.textContent = existingCount.toLocaleString();
+  if (badgeAll) badgeAll.textContent = ALL_TREES.length.toLocaleString();
+
+  if (mainTitle) {
+    if (currentRegistryMode === 'existing') {
+      mainTitle.textContent = '🌳 Existing Native Trees Registry';
+    } else if (currentRegistryMode === 'all') {
+      mainTitle.textContent = '📋 Combined Trees & Saplings Inventory';
+    } else {
+      mainTitle.textContent = '🌱 Registered Saplings';
+    }
+  }
+
   if (tableBadge) {
-    tableBadge.textContent = `${filteredTrees.length} batch${filteredTrees.length === 1 ? '' : 'es'} · ${totalTrees.toLocaleString()} total trees (${availableTrees.toLocaleString()} available)`;
+    if (currentRegistryMode === 'existing') {
+      const totalExistTrees = filteredTrees.reduce((sum, t) => sum + (Math.max(1, parseInt(t.treeCount || t.count) || 1)), 0);
+      tableBadge.textContent = `${filteredTrees.length} stand${filteredTrees.length === 1 ? '' : 's'} · ${totalExistTrees.toLocaleString()} trees existing`;
+    } else {
+      tableBadge.textContent = `${filteredTrees.length} batch${filteredTrees.length === 1 ? '' : 'es'} · ${totalTrees.toLocaleString()} total saplings (${availableTrees.toLocaleString()} available)`;
+    }
   }
 }
 
@@ -382,6 +518,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlFilter = urlParams.get('filter');
   if (urlFilter) {
     setTimeout(() => filterByStatus(urlFilter), 50);
+  }
+  const urlMode = urlParams.get('mode') || (window.location.hash.includes('existing') ? 'existing' : null);
+  if (urlMode) {
+    setTimeout(() => setRegistryMode(urlMode), 60);
+  } else {
+    updatePillFiltersForMode();
   }
   // Support #add anchor from dashboard
   if (window.location.hash === '#add') {
@@ -527,6 +669,71 @@ function initSidebarToggles() {
 /* ── 4. RENDER TABLE ── */
 function renderTable() {
   const tbody = document.getElementById('treesTableBody');
+  if (!tbody) return;
+
+  const table = document.getElementById('mainTreesTable') || document.querySelector('.trees-table');
+  const thead = table ? table.querySelector('thead') : null;
+
+  if (thead) {
+    if (currentRegistryMode === 'existing') {
+      thead.innerHTML = `
+        <tr>
+          <th style="width:36px;"><input type="checkbox" id="checkAll" style="width:16px; height:16px; cursor:pointer;" /></th>
+          <th style="min-width:110px;">Existing Tree ID ↑</th>
+          <th style="min-width:180px;">Native Species &amp; Botanical</th>
+          <th style="min-width:120px;">Classification</th>
+          <th style="min-width:140px;">Number of Trees Exist</th>
+          <th style="min-width:130px;">Estimated Age &amp; Stage</th>
+          <th style="min-width:130px;">Trunk DBH &amp; Height</th>
+          <th style="min-width:150px;">Watershed Sector &amp; Plot</th>
+          <th style="min-width:100px;">Health</th>
+          <th style="min-width:80px; text-align:right;">Actions</th>
+        </tr>
+      `;
+    } else if (currentRegistryMode === 'all') {
+      thead.innerHTML = `
+        <tr>
+          <th style="width:36px;"><input type="checkbox" id="checkAll" style="width:16px; height:16px; cursor:pointer;" /></th>
+          <th style="min-width:110px;">ID &amp; Registry ↑</th>
+          <th style="min-width:180px;">Species / Name</th>
+          <th style="min-width:120px;">Category</th>
+          <th style="min-width:160px;">Quantity &amp; Availability</th>
+          <th style="min-width:120px;">Stage &amp; Age</th>
+          <th style="min-width:140px;">Location / Sector</th>
+          <th style="min-width:100px;">Status</th>
+          <th style="min-width:80px; text-align:right;">Actions</th>
+        </tr>
+      `;
+    } else {
+      thead.innerHTML = `
+        <tr>
+          <th style="width:36px;"><input type="checkbox" id="checkAll" style="width:16px; height:16px; cursor:pointer;" /></th>
+          <th style="min-width:110px;">Sapling ID ↑</th>
+          <th style="min-width:180px;">Name of Sapling</th>
+          <th style="min-width:120px;">Sapling Type</th>
+          <th style="min-width:190px;">Number of Saplings &amp; Availability</th>
+          <th style="min-width:120px;">Age of Sapling</th>
+          <th style="min-width:110px;">Date Added</th>
+          <th style="min-width:80px; text-align:right;">Actions</th>
+        </tr>
+      `;
+    }
+
+    const ca = document.getElementById('checkAll');
+    if (ca) {
+      ca.addEventListener('change', function () {
+        const start = (currentPage - 1) * pageSize;
+        const slice = filteredTrees.slice(start, start + pageSize);
+        slice.forEach(t => {
+          if (this.checked) selectedIds.add(t.id);
+          else selectedIds.delete(t.id);
+        });
+        updateBulkBar();
+        renderTable();
+      });
+    }
+  }
+
   const start = (currentPage - 1) * pageSize;
   const end = Math.min(start + pageSize, filteredTrees.length);
   const slice = filteredTrees.slice(start, end);
@@ -536,10 +743,15 @@ function renderTable() {
   document.getElementById('tablePageInfo').textContent = `Showing ${filteredTrees.length === 0 ? 0 : start + 1}–${end} of ${filteredTrees.length.toLocaleString()}`;
 
   if (slice.length === 0) {
+    const isExMode = currentRegistryMode === 'existing';
+    const icon = isExMode ? '🌳' : '🌱';
+    const msg = isExMode
+      ? 'No existing trees match your filter.<br><span style="font-size:12px; color:#94a3b8; font-weight:500;">Click <strong>🌳 Existing Trees Information &amp; Registration</strong> above to record standing trees.</span>'
+      : 'No saplings match your filter.<br><span style="font-size:12px; color:#94a3b8; font-weight:500;">Try resetting your filters or click <strong>+ Register a Sapling</strong> above to enter your own tree data.</span>';
+
     tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:56px 20px; color:#64748b; font-weight:600; font-size:14px;">
-      <div style="font-size:28px; margin-bottom:8px;">🌱</div>
-      No trees match your filter.<br>
-      <span style="font-size:12px; color:#94a3b8; font-weight:500;">Try resetting your filters or click <strong>+ Register a Sapling</strong> above to enter your own tree data.</span>
+      <div style="font-size:32px; margin-bottom:8px;">${icon}</div>
+      ${msg}
     </td></tr>`;
     renderPagination();
     return;
@@ -548,6 +760,67 @@ function renderTable() {
   tbody.innerHTML = slice.map(t => {
     const { total, taken, remaining, adopterNames } = getTreeCounts(t);
     const checked = selectedIds.has(t.id) ? 'checked' : '';
+    const isEx = isExistingTreeRecord(t);
+
+    if (currentRegistryMode === 'existing') {
+      return `
+        <tr class="${selectedIds.has(t.id) ? 'selected' : ''}" id="row-${t.id}">
+          <td><input type="checkbox" class="row-check" data-id="${t.id}" ${checked} onchange="handleRowCheck(this)" style="width:16px;height:16px;cursor:pointer;" /></td>
+          <td>
+            <div class="tree-id-cell" onclick="openTreeProfile('${t.id}')">
+              <span style="font-weight:800; color:#15803d; font-size:13.5px;">${t.id}</span>
+              <span style="font-size:9.5px; font-weight:800; padding:1px 5px; border-radius:4px; background:#064e3b; color:#86efac; border:1px solid #059669; letter-spacing:0.3px; margin-left:4px;" title="Unique Existing Tree ID">EXT</span>
+            </div>
+          </td>
+          <td>
+            <div class="tree-species-cell">
+              <span class="species-common" style="font-weight:800; color:#0f172a;">${(typeof t.species === 'object' && t.species ? t.species.common : t.species) || t.speciesCommon || 'Native Tree'}</span>
+              <span class="species-scientific" style="font-style:italic; color:#64748b; font-size:12px;">${(typeof t.species === 'object' && t.species ? t.species.scientific : '') || t.scientificName || 'Indeterminate Botanical Species'}</span>
+            </div>
+          </td>
+          <td>
+            <span style="display:inline-block; padding:3px 9px; font-size:12px; font-weight:700; border-radius:6px; background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">
+              ${t.treeType || t.species?.type || 'Native'}
+            </span>
+          </td>
+          <td>
+            <span style="display:inline-flex; align-items:center; gap:4px; padding:3px 10px; font-size:13px; font-weight:800; border-radius:6px; background:#f0fdf4; color:#166534; border:1.5px solid #86efac;">
+              🌳 ${total.toLocaleString()} ${total === 1 ? 'tree exist' : 'trees exist'}
+            </span>
+          </td>
+          <td>
+            <span style="font-weight:700; font-size:13px; color:#0f172a;">${t.ageOfTree || t.age || '—'}</span>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">${t.stageDescription || t.stage || 'Standing Tree'}</div>
+          </td>
+          <td style="font-size:12px; color:#334155; line-height:1.4;">
+            <div>DBH: <strong style="color:#0f172a;">${t.trunkDiam || '—'}</strong></div>
+            <div style="color:#64748b;">Height: <strong>${t.height || '—'}</strong></div>
+          </td>
+          <td>
+            <span style="font-weight:700; font-size:12.5px; color:#166534;">📍 ${t.barangay || 'San Isidro'}</span>
+            <div style="font-size:11px; color:#64748b;">${t.plot || t.plotBook || 'Plot C-04'}</div>
+          </td>
+          <td>
+            ${statusBadgeHTML(t.status || 'healthy')}
+          </td>
+          <td style="text-align:right;">
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
+              <button onclick="openTreeProfile('${t.id}')" title="View details"
+                style="background:none; border:none; cursor:pointer; padding:3px 5px; border-radius:6px; color:#16a34a; transition:background 0.15s;"
+                onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='none'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <button onclick="confirmDeleteTree('${t.id}')" title="Delete record"
+                style="background:none; border:none; cursor:pointer; padding:3px 5px; border-radius:6px; color:#dc2626; transition:background 0.15s;"
+                onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
     const isFullyTaken = remaining === 0;
     const isPartiallyTaken = taken > 0 && remaining > 0;
     const displayAdopter = adopterNames || t.sponsorName || t.adopter || '';
@@ -813,6 +1086,17 @@ function applyFilters() {
   let statusFilter = health !== 'all' ? health : currentActiveFilter;
 
   filteredTrees = ALL_TREES.filter(t => {
+    const isEx = isExistingTreeRecord(t);
+
+    if (currentRegistryMode === 'saplings' && isEx) return false;
+    if (currentRegistryMode === 'existing' && !isEx) return false;
+
+    if (currentAvailabilityFilter === 'saplings-only' && isEx) return false;
+    if (currentAvailabilityFilter === 'existing-only' && !isEx) return false;
+    if (currentAvailabilityFilter === 'healthy' && (t.status || 'healthy') !== 'healthy') return false;
+    if (currentAvailabilityFilter === 'needs-care' && t.status !== 'needs-care') return false;
+    if (currentAvailabilityFilter === 'critical' && t.status !== 'critical') return false;
+
     const { total, taken, remaining } = getTreeCounts(t);
 
     // Quick Pill / Metric Card Availability Filter
@@ -2528,7 +2812,7 @@ window.syncExistingTreeCoords = syncExistingTreeCoords;
 
 function filterExistingTreesFromModal() {
   closeModal('modalExistingTreeInfo');
-  setAvailabilityFilter('existing');
+  setRegistryMode('existing');
   showAdminToast('🌳 Filtered table to show all registered Existing Trees.', 'success');
   const tableCard = document.querySelector('.table-card');
   if (tableCard) tableCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2643,10 +2927,9 @@ async function saveExistingTreeRecord() {
   // Dispatch sync event
   window.dispatchEvent(new CustomEvent('ATAMAN:trees-updated', { detail: ALL_TREES }));
 
-  // Re-render and update UI
+  // Re-render and update UI to Existing Trees view
   populateDynamicFilters();
-  applyFilters();
-  updateStats();
+  setRegistryMode('existing');
   closeModal('modalExistingTreeInfo');
 
   showAdminToast(`🌳 Successfully registered Existing Tree ${treeId} (${speciesCommon})!`, 'success');
