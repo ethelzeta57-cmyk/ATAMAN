@@ -1903,12 +1903,108 @@ function getNextTreeId() {
   return `TR-${maxNum + 1}`;
 }
 
+/* ── 9B. SAPLING & EXISTING TREE REGISTRATION PHOTO HANDLERS ── */
+async function handleSaplingPhotoSelected(input) {
+  const file = input?.files?.[0];
+  if (!file) return;
+  try {
+    showAdminToast('⏳ Compressing registration photo...', 'info');
+    const base64Url = await compressImageForStorage(file, 1280, 0.85);
+    const dataInput = document.getElementById('editTreePhotoData');
+    if (dataInput) dataInput.value = base64Url;
+
+    const img = document.getElementById('saplingPhotoPreviewImg');
+    if (img) img.src = base64Url;
+
+    const nameEl = document.getElementById('saplingPhotoFileName');
+    if (nameEl) nameEl.textContent = file.name || 'Registration Photo Attached';
+
+    const dropzone = document.getElementById('saplingPhotoDropzone');
+    if (dropzone) dropzone.style.display = 'none';
+
+    const card = document.getElementById('saplingPhotoPreviewCard');
+    if (card) card.style.display = 'flex';
+
+    showAdminToast('📷 Registration photo attached successfully!', 'success');
+  } catch (err) {
+    console.error('Sapling photo compression error:', err);
+    showAdminToast('❌ Failed to process photo. Please try a different image.', 'error');
+  }
+}
+window.handleSaplingPhotoSelected = handleSaplingPhotoSelected;
+
+function removeSaplingPhoto() {
+  const dataInput = document.getElementById('editTreePhotoData');
+  if (dataInput) dataInput.value = '';
+
+  const fileInput = document.getElementById('editTreePhotoInput');
+  if (fileInput) fileInput.value = '';
+
+  const img = document.getElementById('saplingPhotoPreviewImg');
+  if (img) img.src = '';
+
+  const dropzone = document.getElementById('saplingPhotoDropzone');
+  if (dropzone) dropzone.style.display = 'flex';
+
+  const card = document.getElementById('saplingPhotoPreviewCard');
+  if (card) card.style.display = 'none';
+}
+window.removeSaplingPhoto = removeSaplingPhoto;
+
+async function handleExistingTreePhotoSelected(input) {
+  const file = input?.files?.[0];
+  if (!file) return;
+  try {
+    showAdminToast('⏳ Compressing tree documentation photo...', 'info');
+    const base64Url = await compressImageForStorage(file, 1280, 0.85);
+    const dataInput = document.getElementById('exTreePhotoData');
+    if (dataInput) dataInput.value = base64Url;
+
+    const img = document.getElementById('exTreePhotoPreviewImg');
+    if (img) img.src = base64Url;
+
+    const nameEl = document.getElementById('exTreePhotoFileName');
+    if (nameEl) nameEl.textContent = file.name || 'Tree Photo Attached';
+
+    const dropzone = document.getElementById('exTreePhotoDropzone');
+    if (dropzone) dropzone.style.display = 'none';
+
+    const card = document.getElementById('exTreePhotoPreviewCard');
+    if (card) card.style.display = 'flex';
+
+    showAdminToast('📷 Tree documentation photo attached!', 'success');
+  } catch (err) {
+    console.error('Existing tree photo compression error:', err);
+    showAdminToast('❌ Failed to process photo. Please try a different image.', 'error');
+  }
+}
+window.handleExistingTreePhotoSelected = handleExistingTreePhotoSelected;
+
+function removeExistingTreePhoto() {
+  const dataInput = document.getElementById('exTreePhotoData');
+  if (dataInput) dataInput.value = '';
+
+  const fileInput = document.getElementById('exTreePhotoInput');
+  if (fileInput) fileInput.value = '';
+
+  const img = document.getElementById('exTreePhotoPreviewImg');
+  if (img) img.src = '';
+
+  const dropzone = document.getElementById('exTreePhotoDropzone');
+  if (dropzone) dropzone.style.display = 'flex';
+
+  const card = document.getElementById('exTreePhotoPreviewCard');
+  if (card) card.style.display = 'none';
+}
+window.removeExistingTreePhoto = removeExistingTreePhoto;
+
 /* ── 10. EDIT / ADD TREE ── */
 function openEditTree(treeId) {
   const t = treeId ? ALL_TREES.find(x => x.id === treeId) : null;
   if (!t) { 
     document.getElementById('editTreeId').value = getNextTreeId();
     document.getElementById('editSpecies').value = '';
+    removeSaplingPhoto();
     document.getElementById('editScientific').value = '';
     if (document.getElementById('editTreeType')) document.getElementById('editTreeType').value = 'Native';
     document.getElementById('editTreeCount').value = '1';
@@ -1955,6 +2051,22 @@ function openEditTree(treeId) {
     const lngNum = t.lng != null ? Number(t.lng) : 124.8910;
     document.getElementById('editLng').value = isNaN(lngNum) ? '124.891000' : lngNum.toFixed(6);
   }
+  const currentSaplingPhoto = (t.photos && t.photos.treePhoto) ? t.photos.treePhoto : (t.image || t.imageUrl || '');
+  if (currentSaplingPhoto && !currentSaplingPhoto.startsWith('data:image/svg')) {
+    const dataInput = document.getElementById('editTreePhotoData');
+    if (dataInput) dataInput.value = currentSaplingPhoto;
+    const img = document.getElementById('saplingPhotoPreviewImg');
+    if (img) img.src = currentSaplingPhoto;
+    const nameEl = document.getElementById('saplingPhotoFileName');
+    if (nameEl) nameEl.textContent = 'Documented Sapling Photo';
+    const dropzone = document.getElementById('saplingPhotoDropzone');
+    if (dropzone) dropzone.style.display = 'none';
+    const card = document.getElementById('saplingPhotoPreviewCard');
+    if (card) card.style.display = 'flex';
+  } else {
+    removeSaplingPhoto();
+  }
+
   document.getElementById('modalAddTreeTitle').textContent = `✏️ Edit Tree — ${t.id}`;
   updateModalRemainingPreview();
   openModal('modalAddTree');
@@ -2081,10 +2193,20 @@ async function saveTree() {
   const editLng = !isNaN(parsedLng) ? parsedLng : (existingTree?.lng != null ? Number(existingTree.lng) : null);
 
   const isNewSapling = !existingTree;
+  const saplingPhotoData = document.getElementById('editTreePhotoData')?.value || '';
+  const updatedSaplingPhotos = {
+    ...(existingTree?.photos || {}),
+    ...(saplingPhotoData ? { treePhoto: saplingPhotoData } : {})
+  };
+
   const treeData = {
     ...(existingTree || {}),
     id: treeId,
     species: matchedSpecies,
+    image: saplingPhotoData || existingTree?.image || existingTree?.imageUrl || '',
+    imageUrl: saplingPhotoData || existingTree?.imageUrl || existingTree?.image || '',
+    photos: updatedSaplingPhotos,
+    registrationPhoto: saplingPhotoData || existingTree?.registrationPhoto || '',
     treeType: treeType,
     treeCount: treeCount,
     takenCount: takenCount,
@@ -2711,6 +2833,7 @@ function getNextExistingTreeId() {
 window.getNextExistingTreeId = getNextExistingTreeId;
 
 function openExistingTreeInfoModal(defaultTab = 'info') {
+  if (typeof removeExistingTreePhoto === 'function') removeExistingTreePhoto();
   const nextId = getNextExistingTreeId();
   const idInput = document.getElementById('exTreeId');
   if (idInput) idInput.value = nextId;
@@ -2851,6 +2974,13 @@ async function saveExistingTreeRecord() {
 
   const adopterName = document.getElementById('exTreeAdopter')?.value?.trim() || '';
   const notes = document.getElementById('exTreeNotes')?.value?.trim() || 'Existing standing native tree documented and registered in ATAMAN.';
+  const exPhotoData = document.getElementById('exTreePhotoData')?.value || '';
+  const exPhotosObj = {
+    treePhoto: exPhotoData || 'assets/tree.jpg',
+    leaves: '',
+    trunk: '',
+    soil: ''
+  };
 
   const now = new Date();
   const autoDateDisplay = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -2898,7 +3028,11 @@ async function saveExistingTreeRecord() {
     savedAt: autoDateTimeDisplay,
     savedTimestamp: now.getTime(),
     createdAt: now.toISOString(),
-    photo: 'assets/tree.jpg',
+    photo: exPhotoData || 'assets/tree.jpg',
+    image: exPhotoData || 'assets/tree.jpg',
+    imageUrl: exPhotoData || 'assets/tree.jpg',
+    photos: exPhotosObj,
+    registrationPhoto: exPhotoData || '',
     history: [
       {
         date: autoDateDisplay,
