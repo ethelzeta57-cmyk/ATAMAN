@@ -968,8 +968,37 @@
             </div>
           </div>
 
+          <!-- Tree Quantity & Health Row -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div class="modal-form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <label style="font-size:12px; font-weight:700; color:#334155;">Number of Trees Exist *</label>
+                <span
+                  style="font-size:10px; font-weight:700; color:#15803d; background:#ecfdf5; padding:1px 6px; border-radius:4px; border:1px solid #bbf7d0;">🌳
+                  Living Count</span>
+              </div>
+              <input type="number" id="exTreeCount" min="1" class="modal-input" placeholder="e.g. 1" value="1" required
+                style="background:#ffffff; font-weight:700; color:#0f172a;" />
+              <div style="font-size:11px; color:#64748b; margin-top:3px;">
+                Total quantity of living existing trees recorded in this stand/plot.
+              </div>
+            </div>
+            <div class="modal-form-group">
+              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Health
+                Status</label>
+              <select id="exTreeHealth" class="modal-input">
+                <option value="healthy" selected>🟢 Healthy</option>
+                <option value="needs-care">🟡 Needs Care</option>
+                <option value="critical">🔴 Critical</option>
+              </select>
+              <div style="font-size:11px; color:#64748b; margin-top:3px;">
+                Overall vitality and canopy foliage condition.
+              </div>
+            </div>
+          </div>
+
           <!-- Biometrics Row -->
-          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:14px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
             <div class="modal-form-group">
               <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Height
                 (meters)</label>
@@ -980,15 +1009,6 @@
               <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Trunk DBH
                 (cm)</label>
               <input type="text" id="exTreeTrunk" class="modal-input" placeholder="e.g. 5.4 cm" value="5.4 cm" />
-            </div>
-            <div class="modal-form-group">
-              <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Health
-                Status</label>
-              <select id="exTreeHealth" class="modal-input">
-                <option value="healthy" selected>🟢 Healthy</option>
-                <option value="needs-care">🟡 Needs Care</option>
-                <option value="critical">🔴 Critical</option>
-              </select>
             </div>
           </div>
 

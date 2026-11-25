@@ -2437,6 +2437,9 @@ function openExistingTreeInfoModal(defaultTab = 'info') {
   const sciInput = document.getElementById('exScientific');
   if (sciInput && !sciInput.value) sciInput.value = 'Pterocarpus indicus';
 
+  const countInput = document.getElementById('exTreeCount');
+  if (countInput) countInput.value = '1';
+
   syncExistingTreeCoords();
   switchExistingTreeTab(defaultTab);
   openModal('modalExistingTreeInfo');
@@ -2548,6 +2551,7 @@ async function saveExistingTreeRecord() {
   const height = document.getElementById('exTreeHeight')?.value?.trim() || '3.2 meters';
   const trunkDiam = document.getElementById('exTreeTrunk')?.value?.trim() || '5.4 cm';
   const health = document.getElementById('exTreeHealth')?.value || 'healthy';
+  const treeCount = Math.max(1, parseInt(document.getElementById('exTreeCount')?.value, 10) || 1);
 
   const barangay = document.getElementById('exTreeBarangay')?.value || 'San Isidro';
   const plot = document.getElementById('exTreePlot')?.value?.trim() || 'Plot C-04 (Book 1)';
@@ -2580,8 +2584,8 @@ async function saveExistingTreeRecord() {
     commonName: speciesCommon,
     scientificName: scientific,
     treeType: treeType,
-    treeCount: 1,
-    takenCount: adopterName ? 1 : 0,
+    treeCount: treeCount,
+    takenCount: adopterName ? treeCount : 0,
     stageDescription: stageDesc,
     age: treeAge,
     ageOfTree: treeAge,
