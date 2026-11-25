@@ -5,6 +5,22 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Production Clean Slate: Purge old prototype accounts from browser storage
+  const USERS_CLEAN_SLATE_KEY = 'ATAMAN_users_clean_slate_v2026_11_25';
+  if (localStorage.getItem(USERS_CLEAN_SLATE_KEY) !== 'true') {
+    localStorage.removeItem('ATAMAN_registered_users');
+    localStorage.removeItem('saplink_registered_users');
+    localStorage.removeItem('ATAMAN_users_cache');
+    localStorage.removeItem('saplink_users_cache');
+    localStorage.removeItem('ATAMAN_adopters_cache');
+    localStorage.removeItem('saplink_adopters_cache');
+    localStorage.removeItem('ATAMAN_caretakers_cache');
+    localStorage.removeItem('saplink_caretakers_cache');
+    localStorage.setItem('ATAMAN_user_name', 'ATAMAN Administrator');
+    localStorage.setItem('ATAMAN_user_email', 'admin@ataman.catbalogan.gov.ph');
+    localStorage.setItem('ATAMAN_user_role', 'admin');
+    localStorage.setItem(USERS_CLEAN_SLATE_KEY, 'true');
+  }
 
   /* ── 1. Load & Normalise Registered Users from Auth Registry ── */
 
@@ -12,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function cleanEmail(em) {
     if (!em) return '';
     const cleaned = em.toLowerCase().trim().replace(/@saplink\.org$/i, '@ataman.org');
-    if (cleaned === 'admin@ataman.org' || cleaned === 'ethelzeta57@gmail.com' || cleaned === 'ataman_admin') return 'admin@ataman.catbalogan.gov.ph';
+    if (cleaned === 'admin@ataman.org' || cleaned === 'admin@ataman.catbalogan.gov.ph' || cleaned === 'admin' || cleaned === 'ataman_admin') return 'admin@ataman.catbalogan.gov.ph';
     return cleaned;
   }
 
@@ -68,10 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
         email: 'admin@ataman.catbalogan.gov.ph',
         displayName: 'ATAMAN Administrator',
         name: 'ATAMAN Administrator',
-        username: 'ataman_admin',
+        username: 'admin',
         role: 'Administrator',
-        empId: 'EMP-001',
-        location: 'Catbalogan City, Samar',
+        empId: 'ADM-001',
+        location: 'Catbalogan City Hall',
         status: 'Active'
       }
     ];
@@ -1214,11 +1230,22 @@ window.executeSystemCleanReset = function() {
     btn.innerHTML = 'Resetting system...';
   }
   try {
-    if (typeof window.ATAMAN_RESET_SYSTEM === 'function') {
-      window.ATAMAN_RESET_SYSTEM({ confirmationCode: 'CONFIRM RESET' });
-    } else {
-      alert('Reset system function ready.');
-    }
+    localStorage.removeItem('ATAMAN_registered_users');
+    localStorage.removeItem('saplink_registered_users');
+    localStorage.removeItem('ATAMAN_users_cache');
+    localStorage.removeItem('saplink_users_cache');
+    localStorage.removeItem('ATAMAN_adopters_cache');
+    localStorage.removeItem('saplink_adopters_cache');
+    localStorage.removeItem('ATAMAN_caretakers_cache');
+    localStorage.removeItem('saplink_caretakers_cache');
+    localStorage.removeItem('ATAMAN_trees_cache');
+    localStorage.removeItem('admin_trees_data');
+    localStorage.removeItem('ATAMAN_news_updates');
+    localStorage.setItem('ATAMAN_user_name', 'ATAMAN Administrator');
+    localStorage.setItem('ATAMAN_user_email', 'admin@ataman.catbalogan.gov.ph');
+    localStorage.setItem('ATAMAN_user_role', 'admin');
+    alert('✅ System accounts and records successfully reset to fresh Admin state.');
+    location.reload();
   } catch (err) {
     alert('Error during reset: ' + err.message);
   }

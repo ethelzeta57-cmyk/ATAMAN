@@ -779,9 +779,9 @@
     const adopterMap = new Map();
 
     // Always include the Super Admin account
-    userMap.set('ethelzeta57@gmail.com', {
-      name: 'Ethel Zeta (Admin)',
-      roleLabel: 'Super Admin',
+    userMap.set('admin@ataman.catbalogan.gov.ph', {
+      name: 'ATAMAN Administrator',
+      roleLabel: 'Administrator',
       role: 'admin'
     });
 
