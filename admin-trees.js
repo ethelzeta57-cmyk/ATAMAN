@@ -1077,7 +1077,7 @@ function openTreeProfile(treeId) {
     <div class="profile-section-card">
       <div class="profile-section-hdr">📋 Basic Information &amp; Availability</div>
       <div class="profile-data-row"><span class="profile-data-label">Tree ID</span><span class="profile-data-val">${t.id}</span></div>
-      <div class="profile-data-row"><span class="profile-data-label">Name of Tree</span><span class="profile-data-val">${spCommon}</span></div>
+      <div class="profile-data-row"><span class="profile-data-label">Name of Sapling</span><span class="profile-data-val">${spCommon}</span></div>
       <div class="profile-data-row"><span class="profile-data-label">Scientific Name</span><span class="profile-data-val" style="font-style:italic;">${spScientific || '—'}</span></div>
       <div class="profile-data-row"><span class="profile-data-label">Tree Type</span><span class="profile-data-val">${spType}</span></div>
       <div class="profile-data-row"><span class="profile-data-label">Total Trees Registered</span><span class="profile-data-val" style="font-weight:800; color:#0f172a;">🌳 ${total.toLocaleString()}</span></div>
@@ -1725,7 +1725,7 @@ function updateModalRemainingPreview() {
   const remaining = Math.max(0, total - taken);
   const percentAvail = Math.round((remaining / total) * 100);
 
-  prevEl.textContent = `${remaining.toLocaleString()} tree${remaining === 1 ? '' : 's'} available (${taken.toLocaleString()} taken via adoptions)`;
+  prevEl.textContent = `${remaining.toLocaleString()} sapling${remaining === 1 ? '' : 's'} available (${taken.toLocaleString()} taken via adoptions)`;
 
   if (remaining === 0) {
     badgeEl.textContent = '🔴 0% Available (Fully Taken)';
@@ -1750,7 +1750,7 @@ async function saveTree() {
   const id = document.getElementById('editTreeId')?.value?.trim();
   const speciesCommon = document.getElementById('editSpecies')?.value?.trim();
   if (!speciesCommon) {
-    showAdminToast('⚠️ Please enter the Name of the Tree.', 'warning');
+    showAdminToast('⚠️ Please enter the Name of the Sapling.', 'warning');
     document.getElementById('editSpecies')?.focus();
     return;
   }
