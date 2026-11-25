@@ -2110,19 +2110,19 @@
       <!-- Real-Time Metrics Bar -->
       <div class="hero-stats-bar">
         <div class="stat-box">
-          <span class="stat-number green">600+</span>
+          <span class="stat-number green" id="heroStatPlanted">0</span>
           <span class="stat-label">Planted Native Trees</span>
         </div>
         <div class="stat-box">
-          <span class="stat-number gold">6</span>
+          <span class="stat-number gold" id="heroStatSpecies">0</span>
           <span class="stat-label">Indigenous Species</span>
         </div>
         <div class="stat-box">
-          <span class="stat-number green">100%</span>
+          <span class="stat-number green" id="heroStatGeotagged">0%</span>
           <span class="stat-label">Land GPS Geotagged</span>
         </div>
         <div class="stat-box">
-          <span class="stat-number">₱50</span>
+          <span class="stat-number" id="heroStatRate">₱50</span>
           <span class="stat-label">Sponsorship Per Tree</span>
         </div>
       </div>
@@ -2188,7 +2188,7 @@
         <div>
           <div class="species-header">
             <div class="species-icon-box">🌳</div>
-            <span class="species-batch-pill">Batch TR-10001 • 100 Trees</span>
+            <span class="species-batch-pill">Indigenous Samar Hardwood</span>
           </div>
           <h3 class="species-name">Narra</h3>
           <p class="species-scientific">Pterocarpus indicus</p>
@@ -2210,7 +2210,7 @@
         <div>
           <div class="species-header">
             <div class="species-icon-box">🌲</div>
-            <span class="species-batch-pill">Batch TR-10002 • 100 Trees</span>
+            <span class="species-batch-pill">Indigenous Samar Hardwood</span>
           </div>
           <h3 class="species-name">Molave</h3>
           <p class="species-scientific">Vitex parviflora</p>
@@ -2232,7 +2232,7 @@
         <div>
           <div class="species-header">
             <div class="species-icon-box">🪵</div>
-            <span class="species-batch-pill">Batch TR-10003 • 100 Trees</span>
+            <span class="species-batch-pill">Indigenous Samar Hardwood</span>
           </div>
           <h3 class="species-name">Yakal</h3>
           <p class="species-scientific">Shorea astylosa</p>
@@ -2254,7 +2254,7 @@
         <div>
           <div class="species-header">
             <div class="species-icon-box">🌱</div>
-            <span class="species-batch-pill">Batch TR-10004 • 100 Trees</span>
+            <span class="species-batch-pill">Indigenous Samar Hardwood</span>
           </div>
           <h3 class="species-name">Tindalo</h3>
           <p class="species-scientific">Afzelia rhomboidea</p>
@@ -2276,7 +2276,7 @@
         <div>
           <div class="species-header">
             <div class="species-icon-box">🍃</div>
-            <span class="species-batch-pill">Batch TR-10005 • 100 Trees</span>
+            <span class="species-batch-pill">Indigenous Samar Hardwood</span>
           </div>
           <h3 class="species-name">Dao</h3>
           <p class="species-scientific">Dracontomelon dao</p>
@@ -2298,7 +2298,7 @@
         <div>
           <div class="species-header">
             <div class="species-icon-box">🌸</div>
-            <span class="species-batch-pill">Batch TR-10006 • 100 Trees</span>
+            <span class="species-batch-pill">Indigenous Samar Hardwood</span>
           </div>
           <h3 class="species-name">Banaba</h3>
           <p class="species-scientific">Lagerstroemia speciosa</p>
@@ -2342,25 +2342,25 @@
       <div class="map-stat-card">
         <div class="map-stat-ico" style="background:#ecfdf5;color:#059669;">🌲</div>
         <div class="map-stat-info">
-          <span class="map-stat-val" id="statTotalMonitored">600</span>
+          <span class="map-stat-val" id="statTotalMonitored">0</span>
           <span class="map-stat-lbl">Total Monitored Trees</span>
-          <span class="map-stat-sub" id="statBatchesCount">6 Samar Batches</span>
+          <span class="map-stat-sub" id="statBatchesCount">0 Samar Batches</span>
         </div>
       </div>
 
       <div class="map-stat-card" style="border-left:4px solid #3b82f6;">
         <div class="map-stat-ico" style="background:#eff6ff;color:#2563eb;">🛡️</div>
         <div class="map-stat-info">
-          <span class="map-stat-val" style="color:#1d4ed8;" id="statWithCaretaker">600</span>
+          <span class="map-stat-val" style="color:#1d4ed8;" id="statWithCaretaker">0</span>
           <span class="map-stat-lbl">Trees with Caretaker</span>
-          <span class="map-stat-sub" id="statCaretakerNames">Dodong Zeta &amp; June Luna</span>
+          <span class="map-stat-sub" id="statCaretakerNames">Awaiting Assignment</span>
         </div>
       </div>
 
       <div class="map-stat-card" style="border-left:4px solid #10b981;">
         <div class="map-stat-ico" style="background:#ecfdf5;color:#10b981;">🌱</div>
         <div class="map-stat-info">
-          <span class="map-stat-val" style="color:#047857;" id="statAvailableAdoption">600</span>
+          <span class="map-stat-val" style="color:#047857;" id="statAvailableAdoption">0</span>
           <span class="map-stat-lbl">Available for Adoption</span>
           <span class="map-stat-sub">Rate: ₱50.00 / tree</span>
         </div>
@@ -2369,9 +2369,9 @@
       <div class="map-stat-card" style="border-left:4px solid #f59e0b;">
         <div class="map-stat-ico" style="background:#fffbeb;color:#d97706;">📍</div>
         <div class="map-stat-info">
-          <span class="map-stat-val" style="color:#b45309;" id="statSectorsCount">6</span>
+          <span class="map-stat-val" style="color:#b45309;" id="statSectorsCount">0</span>
           <span class="map-stat-lbl">Protected Samar Sectors</span>
-          <span class="map-stat-sub">100% Geotagged on Land</span>
+          <span class="map-stat-sub">Awaiting Land GPS Records</span>
         </div>
       </div>
     </div>
@@ -2381,13 +2381,13 @@
       <div class="map-filter-group">
         <span class="filter-lbl">Quick Filter:</span>
         <button type="button" class="map-filter-btn active" data-filter="all" id="btnFilterAll">
-          🌐 All Trees (<span id="countAllFilter">600</span>)
+          🌐 All Trees (<span id="countAllFilter">0</span>)
         </button>
         <button type="button" class="map-filter-btn" data-filter="caretaker" id="btnFilterCaretaker">
-          🛡️ With Caretaker (<span id="countCaretakerFilter">600</span>)
+          🛡️ With Caretaker (<span id="countCaretakerFilter">0</span>)
         </button>
         <button type="button" class="map-filter-btn" data-filter="available" id="btnFilterAvailable">
-          🌱 Available for Adoption (<span id="countAvailableFilter">600</span>)
+          🌱 Available for Adoption (<span id="countAvailableFilter">0</span>)
         </button>
       </div>
 
@@ -2457,7 +2457,7 @@
           <span class="sector-badge-code">Sector A</span>
           <div class="sector-item-content">
             <h4>Brgy. Canlapwas — Central Watershed Reserve</h4>
-            <p>Critical freshwater catchment zone managed by Caretaker Dodong Zeta. Anchored by Narra batches.</p>
+            <p>Critical freshwater catchment zone anchored by native Narra and watershed saplings.</p>
           </div>
         </div>
 
@@ -2497,7 +2497,7 @@
           <span class="sector-badge-code">Island Sanctuary</span>
           <div class="sector-item-content">
             <h4>Darahuway Daco — Marine &amp; Mangrove Sanctuary</h4>
-            <p>Island reserve station maintained by Caretaker June Luna, featuring flowering Banaba trees.</p>
+            <p>Island reserve station featuring coastal buffer trees and flowering Banaba saplings.</p>
           </div>
         </div>
       </div>
@@ -2873,93 +2873,7 @@
   <script>
     (function initPublicLandingMap() {
       // Default Samar Reforestation Trees fallback
-      const DEFAULT_PORTAL_TREES = [
-        {
-          id: 'TR-10001',
-          commonName: 'Narra',
-          scientificName: 'Pterocarpus indicus',
-          treeType: 'Native',
-          treeCount: 100,
-          takenCount: 0,
-          barangay: 'Canlapwas (Sector A)',
-          municipality: 'Catbalogan City',
-          province: 'Samar',
-          lat: 11.7820,
-          lng: 124.8875,
-          caretaker: 'Dodong Zeta'
-        },
-        {
-          id: 'TR-10002',
-          commonName: 'Molave',
-          scientificName: 'Vitex parviflora',
-          treeType: 'Native',
-          treeCount: 100,
-          takenCount: 0,
-          barangay: 'Guinsorongan (Sector B)',
-          municipality: 'Catbalogan City',
-          province: 'Samar',
-          lat: 11.7598,
-          lng: 124.8861,
-          caretaker: 'Dodong Zeta'
-        },
-        {
-          id: 'TR-10003',
-          commonName: 'Yakal',
-          scientificName: 'Shorea astylosa',
-          treeType: 'Native',
-          treeCount: 100,
-          takenCount: 0,
-          barangay: 'San Isidro (Sector C)',
-          municipality: 'Catbalogan City',
-          province: 'Samar',
-          lat: 11.7710,
-          lng: 124.8910,
-          caretaker: 'Dodong Zeta'
-        },
-        {
-          id: 'TR-10004',
-          commonName: 'Tindalo',
-          scientificName: 'Afzelia rhomboidea',
-          treeType: 'Native',
-          treeCount: 100,
-          takenCount: 0,
-          barangay: 'Bunuanan (Sector D)',
-          municipality: 'Catbalogan City',
-          province: 'Samar',
-          lat: 11.7885,
-          lng: 124.8890,
-          caretaker: 'Dodong Zeta'
-        },
-        {
-          id: 'TR-10005',
-          commonName: 'Dao',
-          scientificName: 'Dracontomelon dao',
-          treeType: 'Native',
-          treeCount: 100,
-          takenCount: 0,
-          barangay: 'Mabini (Sector E)',
-          municipality: 'Catbalogan City',
-          province: 'Samar',
-          lat: 11.7740,
-          lng: 124.9030,
-          caretaker: 'Dodong Zeta'
-        },
-        {
-          id: 'TR-10006',
-          commonName: 'Banaba',
-          scientificName: 'Lagerstroemia speciosa',
-          treeType: 'Native',
-          treeCount: 100,
-          takenCount: 0,
-          barangay: 'Darahuway Daco (Island Sanctuary)',
-          municipality: 'Catbalogan City',
-          province: 'Samar',
-          lat: 11.7450,
-          lng: 124.8761,
-          caretaker: 'June Luna'
-        }
-      ];
-
+      const DEFAULT_PORTAL_TREES = [];
       function getTreeData() {
         try {
           if (window.ATAMAN_DB && typeof window.ATAMAN_DB.getLocalTrees === 'function') {
@@ -3021,14 +2935,23 @@
         if (statTotal) statTotal.textContent = totalCount.toLocaleString();
         if (statCaretaker) statCaretaker.textContent = withCaretakerCount.toLocaleString();
         if (statAvail) statAvail.textContent = availableCount.toLocaleString();
-        if (statSectors) statSectors.textContent = Math.max(6, locationsSet.size);
+        if (statSectors) statSectors.textContent = locationsSet.size.toString();
         if (statBatches) statBatches.textContent = `${trees.length} Samar Batches`;
-        if (statCaretakerNames && caretakersSet.size > 0) {
-          statCaretakerNames.textContent = Array.from(caretakersSet).join(' & ');
+        if (statCaretakerNames) {
+          statCaretakerNames.textContent = caretakersSet.size > 0 ? Array.from(caretakersSet).join(' & ') : 'Awaiting Assignment';
         }
         if (countAll) countAll.textContent = totalCount;
         if (countCaretaker) countCaretaker.textContent = withCaretakerCount;
         if (countAvail) countAvail.textContent = availableCount;
+        const heroPlanted = document.getElementById('heroStatPlanted');
+        const heroSpecies = document.getElementById('heroStatSpecies');
+        const heroGeotagged = document.getElementById('heroStatGeotagged');
+        if (heroPlanted) heroPlanted.textContent = totalCount > 0 ? totalCount.toLocaleString() : '0';
+        if (heroSpecies) {
+          const spSet = new Set(trees.map(t => t.commonName || t.speciesCommon || (t.species && t.species.common)).filter(Boolean));
+          heroSpecies.textContent = spSet.size > 0 ? spSet.size.toString() : '0';
+        }
+        if (heroGeotagged) heroGeotagged.textContent = totalCount > 0 ? '100%' : '0%';
 
         // 2. Setup Leaflet Map centered on Catbalogan City / Samar
         const defaultCenter = [11.7753, 124.8850];
@@ -3310,6 +3233,19 @@
   <!-- ATAMAN Public Activities & Updates Feed Engine -->
   <script src="activities-feed.js?v=20261124_v1"></script>
   <!-- ATAMAN Connectivity Guard -->
+  <script>
+    // Production Clean Slate: Wipe legacy mock items from browser storage once
+    (function () {
+      if (localStorage.getItem('ATAMAN_clean_slate_2026') !== 'true') {
+        localStorage.removeItem('ATAMAN_trees_cache');
+        localStorage.removeItem('admin_trees_data');
+        localStorage.removeItem('ATAMAN_news_updates');
+        localStorage.removeItem('ATAMAN_caretakers');
+        localStorage.removeItem('ATAMAN_adopters');
+        localStorage.setItem('ATAMAN_clean_slate_2026', 'true');
+      }
+    })();
+  </script>
   <script src="ataman-connectivity.js"></script>
   <!-- Authentication Handler -->
   <script src="app.js?v=20261113_v1"></script>

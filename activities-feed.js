@@ -7,74 +7,8 @@
 (function (window) {
   'use strict';
 
-  // Seed / Curated News & Updates for Catbalogan City Reforestation
-  const DEFAULT_NEWS_UPDATES = [
-    {
-      id: 'UPD-2026-001',
-      title: 'Catbalogan Watershed Aerial Canopy Inspection & Ridge Restoration',
-      category: 'SHARED VIDEO',
-      date: 'Nov 24, 2026',
-      videoUrl: 'https://www.youtube.com/watch?v=O37yB6V7zFk',
-      thumbnail: 'assets/tree1.jpg',
-      excerpt: 'Watch drone footage tracking newly established Narra and Molave saplings across the Canlapwas watershed slopes.',
-      description: 'Our field drone team conducted an aerial canopy survey across Zone 1 (Canlapwas Watershed Sector). Over 350 adopted native saplings have reached healthy establishment with a 98% survival rate thanks to community field stewards. Watch the full aerial footage on YouTube to see the canopy transformation and erosion-control stabilization on Samar slopes.',
-      author: 'ATAMAN Forestry Unit',
-      status: 'Published',
-      createdAt: '2026-11-24T08:00:00.000Z'
-    },
-    {
-      id: 'UPD-2026-002',
-      title: 'Community 1,000 Native Hardwood Planting Drive at San Isidro',
-      category: 'PLANTING DRIVE',
-      date: 'Nov 20, 2026',
-      videoUrl: '',
-      thumbnail: 'assets/tree2.jpg',
-      excerpt: 'Join local student volunteers and barangay caretakers this Saturday as we plant 1,000 endemic Samar hardwoods.',
-      description: 'ATAMAN announces the upcoming community planting drive at Zone 3 (San Isidro Watershed Buffer). Adopters, youth leaders, and volunteers are invited to participate in planting certified Narra, Yakal, and Molave saplings. Free seedlings, planting tools, orientation briefings, and light refreshments will be provided by the City Environment & Natural Resources Office.',
-      author: 'City Environment Office',
-      status: 'Published',
-      createdAt: '2026-11-20T08:00:00.000Z'
-    },
-    {
-      id: 'UPD-2026-003',
-      title: 'Samar Green Ridge Corridor: 2026–2030 Forest Masterplan',
-      category: 'PLAN',
-      date: 'Nov 15, 2026',
-      videoUrl: '',
-      thumbnail: 'assets/tree.jpg',
-      excerpt: 'The official strategic blueprint for connecting Catbalogan coastal mangrove sanctuaries to upland virgin forests.',
-      description: 'The Catbalogan CICTO and Forestry Taskforce have finalized the 5-Year Green Ridge Corridor Masterplan. The plan designates 6 protected ecological zones, establishes real-time GIS plot monitoring, and pairs 5,000 native tree sponsorships with livelihood incentives for registered community caretakers.',
-      author: 'Catbalogan CICTO & Forestry Taskforce',
-      status: 'Published',
-      createdAt: '2026-11-15T08:00:00.000Z'
-    },
-    {
-      id: 'UPD-2026-004',
-      title: 'Catbalogan City Recognizes 100 Pioneering Tree Adopters',
-      category: 'NEWS',
-      date: 'Nov 10, 2026',
-      videoUrl: '',
-      thumbnail: 'assets/ATAMAN_bg.jpg',
-      excerpt: 'Official certificates of environmental recognition conferred to diaspora sponsors, schools, and youth organizations.',
-      description: 'In a special ceremony at Catbalogan City Hall, the City Mayor and City Environment Office awarded official Certificates of Reforestation Recognition to our first cohort of 100 tree adopters. Each adopter contribution is permanently recorded on the ATAMAN digital ledger with verified GPS plot boundaries and photo-documented care milestones.',
-      author: 'Public Information Office',
-      status: 'Published',
-      createdAt: '2026-11-10T08:00:00.000Z'
-    },
-    {
-      id: 'UPD-2026-005',
-      title: 'Field Guide: How Caretakers Monitor Indigenous Samar Hardwoods',
-      category: 'SHARED VIDEO',
-      date: 'Nov 05, 2026',
-      videoUrl: 'https://www.youtube.com/watch?v=ScMzIvxBSi4',
-      thumbnail: 'assets/tree1.jpg',
-      excerpt: 'A short field documentary showing how our certified caretakers perform DBH measuring and growth photo check-ins.',
-      description: 'Step into the field with our dedicated community stewards in Guinsorongan. Learn how tree trunk DBH (Diameter at Breast Height), canopy health, and photo geotagging are logged straight into the ATAMAN platform to ensure transparency for global and local adopters.',
-      author: 'Field Stewardship Team',
-      status: 'Published',
-      createdAt: '2026-11-05T08:00:00.000Z'
-    }
-  ];
+  // Seed / Curated News & Updates for Catbalogan City Reforestation (Empty - waiting for live admin posts)
+  const DEFAULT_NEWS_UPDATES = [];
 
   const STORAGE_KEY = 'ATAMAN_news_updates';
 
@@ -141,29 +75,20 @@
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Normalize thumbnails (auto-heal bare names like '1.jpg')
-          let modified = false;
-          parsed.forEach(item => {
-            delete item.zone;
-            if (item.thumbnail === '1.jpg' || !item.thumbnail) {
-              item.thumbnail = resolveThumbnail(item);
-              modified = true;
-            }
-          });
-          if (modified) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+          // If contains legacy mock update from prototype, auto-clear
+          const isLegacyMock = parsed.some(i => i.id === 'UPD-2026-001' && (i.title || '').includes('Catbalogan Watershed Aerial'));
+          if (isLegacyMock) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+            return [];
           }
+          parsed.forEach(item => { delete item.zone; });
           return parsed;
         }
       }
     } catch (e) {
       console.warn('Error reading ATAMAN_news_updates:', e);
     }
-    // Seed default if empty
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_NEWS_UPDATES));
-    } catch (_) {}
-    return DEFAULT_NEWS_UPDATES.slice();
+    return [];
   }
 
   // Save updates to storage
@@ -205,13 +130,26 @@
 
     if (filtered.length === 0) {
       grid.innerHTML = `
-        <div class="up-empty-state">
-          <div style="font-size: 2.4rem; margin-bottom: 8px;">🌱</div>
-          <h4 style="font-size: 1.1rem; color: #1e3a29; margin-bottom: 4px; font-weight: 700;">No updates available</h4>
-          <p style="color: #64748b; font-size: 0.88rem;">Check back soon to view the latest dispatches from Catbalogan City.</p>
+        <div class="up-empty-state" style="text-align: center; padding: 48px 24px; background: #ffffff; border-radius: 18px; border: 1.5px dashed #cbd5e1; width: 100%; max-width: 720px; margin: 0 auto; box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
+          <div style="font-size: 2.8rem; margin-bottom: 12px;">🌱</div>
+          <h4 style="font-size: 1.25rem; color: #1e3a29; margin-bottom: 8px; font-weight: 700;">No Activities or Updates Yet</h4>
+          <p style="color: #64748b; font-size: 0.94rem; line-height: 1.6; max-width: 540px; margin: 0 auto;">The feed is clean and waiting for new field updates, planting drives, or video dispatches to be posted.</p>
         </div>
       `;
+      const prevBtn = document.getElementById('upNavPrev');
+      const nextBtn = document.getElementById('upNavNext');
+      const hint = document.querySelector('.updates-scroll-hint');
+      if (prevBtn) prevBtn.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'none';
+      if (hint) hint.style.display = 'none';
       return;
+    } else {
+      const prevBtn = document.getElementById('upNavPrev');
+      const nextBtn = document.getElementById('upNavNext');
+      const hint = document.querySelector('.updates-scroll-hint');
+      if (prevBtn) prevBtn.style.display = 'flex';
+      if (nextBtn) nextBtn.style.display = 'flex';
+      if (hint) hint.style.display = 'flex';
     }
 
     grid.innerHTML = filtered.map(item => {
