@@ -3,7 +3,7 @@
  * Provides offline caching, network-resilient fallbacks, and PWA installation support.
  */
 
-const CACHE_NAME = 'ataman-pwa-v2.2.78-logo-update';
+const CACHE_NAME = 'ataman-pwa-v2.2.79-register-splink';
 
 // Core Application Shell Assets to Pre-cache
 const PRECACHE_ASSETS = [
